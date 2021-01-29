@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="TNLWorlds">
+    <output-path>$USER_HOME$/Desktop/Coding/PluginProjects/Plugins</output-path>
+    <root id="archive" name="TNLWorlds.jar">
+      <element id="module-output" name="TNLWorlds" />
+      <element id="file-copy" path="$PROJECT_DIR$/plugin.yml" />
+    </root>
+  </artifact>
+</component>
