@@ -1,6 +1,7 @@
 package net.nonswag.tnl.world;
 
 import net.nonswag.tnl.listener.NMSMain;
+import net.nonswag.tnl.listener.api.command.CommandManager;
 import net.nonswag.tnl.listener.utils.GlobalConfigUtil;
 import net.nonswag.tnl.listener.utils.PluginUpdate;
 import net.nonswag.tnl.world.api.enerators.VoidGenerator;
@@ -38,15 +39,8 @@ public class Worlds extends JavaPlugin {
         setConfigUtil(new GlobalConfigUtil(getPlugin()));
         getConfigUtil().initConfig();
         Bukkit.getPluginManager().registerEvents(new WorldListener(), getPlugin());
-        try {
-            PluginCommand command = this.getCommand("world");
-            command.setExecutor(new WorldCommand());
-            command.setTabCompleter(new WorldCommandTabCompleter());
-            command.setPermission("tnl.world");
-            command.setPermissionMessage(NMSMain.getPrefix() + " §cYou have no Rights §8(§4tnl.world§8)");
-        } catch (Throwable t) {
-            NMSMain.stacktrace(t);
-        }
+        CommandManager commandManager = new CommandManager(this);
+        commandManager.registerCommand("world", "tnl.world", new WorldCommand(), new WorldCommandTabCompleter());
         loadWorlds();
         new PluginUpdate(getPlugin()).downloadUpdate();
     }
