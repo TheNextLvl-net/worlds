@@ -16,7 +16,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Spigot 1.15.2" level="project" />
     <orderEntry type="library" name="TNLListener" level="project" />
+    <orderEntry type="library" name="Tuinity 1.15.2" level="project" />
   </component>
 </module>

@@ -23,6 +23,7 @@ public class WorldListener implements Listener {
                     Worlds.getConfigUtil().set("worlds", worlds);
                     Worlds.getConfigUtil().set(event.getWorld().getName() + ".type", event.getWorld().getWorldType().name());
                     Worlds.getConfigUtil().set(event.getWorld().getName() + ".environment", event.getWorld().getEnvironment().name());
+                    // generator name/plugin
                 } catch (Throwable t) {
                     NMSMain.stacktrace(t);
                 }
