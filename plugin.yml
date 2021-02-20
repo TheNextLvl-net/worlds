@@ -2,7 +2,7 @@ name: TNLWorlds
 version: "2.0"
 api-version: "1.15"
 main: net.nonswag.tnl.world.Worlds
-load: STARTUP
+load: POSTWORLD
 author: NonSwag
 website: https://www.thenextlvl.net/
 depend:

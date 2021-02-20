@@ -8,6 +8,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,12 +59,19 @@ public class WorldCommandTabCompleter implements TabCompleter {
                     for (WorldType worldType : WorldType.values()) {
                         suggestions.add(worldType.name());
                     }
-                    suggestions.add("VOID");
                 }
             } else if (args.length == 4) {
                 if (args[0].equalsIgnoreCase("create")) {
                     for (World.Environment environment : World.Environment.values()) {
                         suggestions.add(environment.name());
+                    }
+                }
+            } else if (args.length == 5) {
+                if (args[0].equalsIgnoreCase("create")) {
+                    for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+                        if (plugin.getDefaultWorldGenerator("test", null) != null) {
+                            suggestions.add(plugin.getName());
+                        }
                     }
                 }
             }

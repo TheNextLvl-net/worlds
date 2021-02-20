@@ -4,6 +4,7 @@ import net.nonswag.tnl.listener.api.command.CommandManager;
 import net.nonswag.tnl.listener.utils.GlobalConfigUtil;
 import net.nonswag.tnl.listener.utils.PluginUpdate;
 import net.nonswag.tnl.world.api.Environment;
+import net.nonswag.tnl.world.api.generator.BuildWorldGenerator;
 import net.nonswag.tnl.world.commands.WorldCommand;
 import net.nonswag.tnl.world.listeners.WorldListener;
 import net.nonswag.tnl.world.tabcompleter.WorldCommandTabCompleter;
@@ -56,15 +57,29 @@ public class Worlds extends JavaPlugin {
 
     public static void loadWorld(String name) {
         if (Bukkit.getWorld(name) == null) {
-            if (new File(getPlugin().getDataFolder().getAbsoluteFile().getParentFile().getParent() + "/" + name).exists()) {
-                Plugin plugin = Bukkit.getPluginManager().getPlugin(Worlds.getConfigUtil().getConfig().getString(name + ".generator"));
-                WorldType type = WorldType.getByName(Worlds.getConfigUtil().getConfig().getString(name + ".type"));
-                Environment environment = Environment.getByName(Worlds.getConfigUtil().getConfig().getString(name + ".environment"));
-                ChunkGenerator generator = plugin.getDefaultWorldGenerator(name, null);
-                WorldCreator worldCreator = new WorldCreator(name);
-                worldCreator.createWorld();
+            if (new File(name).exists()) {
+                try {
+                    String string = Worlds.getConfigUtil().getConfig().getString(name + ".generator");
+                    WorldType type = WorldType.getByName(Worlds.getConfigUtil().getConfig().getString(name + ".type"));
+                    Environment environment = Environment.getByName(Worlds.getConfigUtil().getConfig().getString(name + ".environment"));
+                    WorldCreator worldCreator = new WorldCreator(name);
+                    if (string != null) {
+                        Plugin plugin = Bukkit.getPluginManager().getPlugin(string);
+                        if (plugin != null && plugin.isEnabled()) {
+                            worldCreator.generator(plugin.getDefaultWorldGenerator(name, null));
+                        }
+                    }
+                    worldCreator.createWorld();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
+    }
+
+    @Override
+    public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+        return new BuildWorldGenerator();
     }
 
     public static List<String> getWorlds() {
