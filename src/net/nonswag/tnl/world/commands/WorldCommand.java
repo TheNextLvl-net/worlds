@@ -1,6 +1,6 @@
 package net.nonswag.tnl.world.commands;
 
-import net.nonswag.tnl.listener.NMSMain;
+import net.nonswag.tnl.listener.TNLListener;
 import net.nonswag.tnl.world.Worlds;
 import net.nonswag.tnl.world.api.Environment;
 import org.bukkit.*;
@@ -59,33 +59,33 @@ public class WorldCommand implements CommandExecutor {
                                                 if (generator != null) {
                                                     new WorldCreator(args[1]).generator(generator).createWorld();
                                                 } else {
-                                                    sender.sendMessage(NMSMain.getPrefix() + "§4" + plugin.getName() + "§c has no default generator");
+                                                    sender.sendMessage(TNLListener.getInstance().getPrefix() + "§4" + plugin.getName() + "§c has no default generator");
                                                 }
                                             } else {
-                                                sender.sendMessage(NMSMain.getPrefix() + " §c/world create " + args[1] + " " + args[2] + " " + environment.name() + " §8(§6Plugin§8)");
+                                                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world create " + args[1] + " " + args[2] + " " + environment.name() + " §8(§6Plugin§8)");
                                             }
                                         } else {
-                                            sender.sendMessage(NMSMain.getPrefix() + " §aStarting generation of new world §6" + args[1]);
+                                            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §aStarting generation of new world §6" + args[1]);
                                             new WorldCreator(args[1]).type(type).environment(environment.getEnvironment()).createWorld();
-                                            sender.sendMessage(NMSMain.getPrefix() + " §aSuccessfully created world §6" + args[1]);
+                                            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §aSuccessfully created world §6" + args[1]);
                                         }
                                     } else {
-                                        sender.sendMessage(NMSMain.getPrefix() + " §c/world create " + args[1] + " " + args[2] + " §8[§6Environment§8] §8(§6Plugin§8)");
+                                        sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world create " + args[1] + " " + args[2] + " §8[§6Environment§8] §8(§6Plugin§8)");
                                     }
                                 } else {
-                                    sender.sendMessage(NMSMain.getPrefix() + " §c/world create " + args[1] + " " + args[2] + " §8[§6Environment§8] §8(§6Plugin§8)");
+                                    sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world create " + args[1] + " " + args[2] + " §8[§6Environment§8] §8(§6Plugin§8)");
                                 }
                             } else {
-                                sender.sendMessage(NMSMain.getPrefix() + " §c/world create " + args[1] + " §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
+                                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world create " + args[1] + " §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
                             }
                         } else {
-                            sender.sendMessage(NMSMain.getPrefix() + " §c/world create " + args[1] + " §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
+                            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world create " + args[1] + " §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
                         }
                     } else {
-                        sender.sendMessage(NMSMain.getPrefix() + " §cA world named §4" + args[1] + " §calready exist");
+                        sender.sendMessage(TNLListener.getInstance().getPrefix() + " §cA world named §4" + args[1] + " §calready exist");
                     }
                 } else {
-                    sender.sendMessage(NMSMain.getPrefix() + " §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
+                    sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
                 }
             } else if (args[0].equalsIgnoreCase("tp")) {
                 if (args.length == 2) {
@@ -94,12 +94,12 @@ public class WorldCommand implements CommandExecutor {
                         World world = Bukkit.getWorld(args[1]);
                         if (world != null) {
                             player.teleport(world.getSpawnLocation());
-                            sender.sendMessage(NMSMain.getPrefix() + " §aTeleported you to the world spawn of world §6" + world.getName());
+                            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §aTeleported you to the world spawn of world §6" + world.getName());
                         } else {
-                            sender.sendMessage(NMSMain.getPrefix() + " §c/world tp §8[§6World§8]");
+                            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world tp §8[§6World§8]");
                         }
                     } else {
-                        sender.sendMessage(NMSMain.getPrefix() + " §c/world tp §8[§6Player§8] §8[§6World§8]");
+                        sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world tp §8[§6Player§8] §8[§6World§8]");
                     }
                 } else if (args.length >= 3) {
                     Player player = Bukkit.getPlayer(args[1]);
@@ -108,41 +108,41 @@ public class WorldCommand implements CommandExecutor {
                         if (world != null) {
                             player.teleport(world.getSpawnLocation());
                             if (sender.equals(player)) {
-                                sender.sendMessage(NMSMain.getPrefix() + " §aTeleported you to the world spawn of world §6" + world.getName());
+                                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §aTeleported you to the world spawn of world §6" + world.getName());
                             } else {
-                                player.sendMessage(NMSMain.getPrefix() + " §6" + sender.getName() + " §ateleported you to the world spawn of world §6" + world.getName());
-                                sender.sendMessage(NMSMain.getPrefix() + " §aTeleported §6" + player.getName() + "§a to the world spawn of world §6" + world.getName());
+                                player.sendMessage(TNLListener.getInstance().getPrefix() + " §6" + sender.getName() + " §ateleported you to the world spawn of world §6" + world.getName());
+                                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §aTeleported §6" + player.getName() + "§a to the world spawn of world §6" + world.getName());
                             }
                         } else {
-                            sender.sendMessage(NMSMain.getPrefix() + " §c/world tp " + player.getName() + " §8[§6World§8]");
+                            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world tp " + player.getName() + " §8[§6World§8]");
                         }
                     } else {
-                        sender.sendMessage(NMSMain.getPrefix() + " §c/world tp §8[§6Player§8] §8[§6World§8]");
+                        sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world tp §8[§6Player§8] §8[§6World§8]");
                     }
                 } else {
-                    sender.sendMessage(NMSMain.getPrefix() + " §c/world tp §8[§6Player§8] §8[§6World§8]");
-                    sender.sendMessage(NMSMain.getPrefix() + " §c/world tp §8[§6World§8]");
+                    sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world tp §8[§6Player§8] §8[§6World§8]");
+                    sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world tp §8[§6World§8]");
                 }
             } else if (args[0].equalsIgnoreCase("delete")) {
                 if (args.length >= 2) {
                     World world = Bukkit.getWorld(args[1]);
                     if (world != null) {
                         String name = world.getName();
-                        sender.sendMessage(NMSMain.getPrefix() + " §aTry to unload world §6" + name);
+                        sender.sendMessage(TNLListener.getInstance().getPrefix() + " §aTry to unload world §6" + name);
                         Bukkit.unloadWorld(world, true);
-                        sender.sendMessage(NMSMain.getPrefix() + " §aSuccessfully unloaded world §6" + name);
+                        sender.sendMessage(TNLListener.getInstance().getPrefix() + " §aSuccessfully unloaded world §6" + name);
                         File file = new File(Worlds.getPlugin().getDataFolder().getAbsoluteFile().getParentFile().getParent() + "/" + name);
                         if (file.exists() && file.isDirectory()) {
-                            NMSMain.runShellCommand("rm -r " + file.getAbsolutePath());
-                            sender.sendMessage(NMSMain.getPrefix() + " §aSuccessfully deleted world folder §6" + name);
+                            TNLListener.getInstance().runShellCommand("rm -r " + file.getAbsolutePath());
+                            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §aSuccessfully deleted world folder §6" + name);
                         } else {
-                            sender.sendMessage(NMSMain.getPrefix() + " §cStrange things happens while deleting world folder §4" + name);
+                            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §cStrange things happens while deleting world folder §4" + name);
                         }
                     } else {
-                        sender.sendMessage(NMSMain.getPrefix() + " §c/world delete §8[§6World§8]");
+                        sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world delete §8[§6World§8]");
                     }
                 } else {
-                    sender.sendMessage(NMSMain.getPrefix() + " §c/world delete §8[§6World§8]");
+                    sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world delete §8[§6World§8]");
                 }
             } else if (args[0].equalsIgnoreCase("import")) {
                 if (args.length >= 2) {
@@ -150,85 +150,85 @@ public class WorldCommand implements CommandExecutor {
                     if (world == null) {
                     } else {
                     }
-                    sender.sendMessage(NMSMain.getPrefix() + " §cSoon");
+                    sender.sendMessage(TNLListener.getInstance().getPrefix() + " §cSoon");
                 } else {
-                    sender.sendMessage(NMSMain.getPrefix() + " §c/world import §8[§6World§8]");
+                    sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world import §8[§6World§8]");
                 }
             } else if (args[0].equalsIgnoreCase("unload")) {
                 if (args.length >= 2) {
                     World world = Bukkit.getWorld(args[1]);
                     if (world != null) {
                         String name = world.getName();
-                        sender.sendMessage(NMSMain.getPrefix() + " §aTry to unload world §6" + name);
+                        sender.sendMessage(TNLListener.getInstance().getPrefix() + " §aTry to unload world §6" + name);
                         Bukkit.unloadWorld(world, true);
-                        sender.sendMessage(NMSMain.getPrefix() + " §aSuccessfully unloaded world §6" + name);
+                        sender.sendMessage(TNLListener.getInstance().getPrefix() + " §aSuccessfully unloaded world §6" + name);
                     } else {
-                        sender.sendMessage(NMSMain.getPrefix() + " §c/world unload §8[§6World§8]");
+                        sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world unload §8[§6World§8]");
                     }
                 } else {
-                    sender.sendMessage(NMSMain.getPrefix() + " §c/world unload §8[§6World§8]");
+                    sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world unload §8[§6World§8]");
                 }
             } else if (args[0].equalsIgnoreCase("save")) {
                 if (args.length >= 2) {
                     World world = Bukkit.getWorld(args[1]);
                     if (world != null) {
-                        sender.sendMessage(NMSMain.getPrefix() + " §aTry to save world §6" + world.getName());
+                        sender.sendMessage(TNLListener.getInstance().getPrefix() + " §aTry to save world §6" + world.getName());
                         world.save();
-                        sender.sendMessage(NMSMain.getPrefix() + " §aSuccessfully saved world §6" + world.getName());
+                        sender.sendMessage(TNLListener.getInstance().getPrefix() + " §aSuccessfully saved world §6" + world.getName());
                     } else {
-                        sender.sendMessage(NMSMain.getPrefix() + " §c/world save §8[§6World§8]");
+                        sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world save §8[§6World§8]");
                     }
                 } else {
-                    sender.sendMessage(NMSMain.getPrefix() + " §c/world save §8[§6World§8]");
+                    sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world save §8[§6World§8]");
                 }
             } else if (args[0].equalsIgnoreCase("load")) {
-                sender.sendMessage(NMSMain.getPrefix() + " §cSoon");
+                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §cSoon");
             } else if (args[0].equalsIgnoreCase("setspawn")) {
                 if (sender instanceof Player) {
                     Player player = ((Player) sender);
                     player.getWorld().setSpawnLocation(player.getLocation());
                     Location l = player.getWorld().getSpawnLocation();
-                    sender.sendMessage(NMSMain.getPrefix() + " §aSuccessfully set the spawn location to §6" + l.getX() + "§8, §6" + l.getY() + "§8, §6" + l.getZ());
+                    sender.sendMessage(TNLListener.getInstance().getPrefix() + " §aSuccessfully set the spawn location to §6" + l.getX() + "§8, §6" + l.getY() + "§8, §6" + l.getZ());
                 } else {
-                    sender.sendMessage(NMSMain.getPrefix() + " §cThis is a player command");
+                    sender.sendMessage(TNLListener.getInstance().getPrefix() + " §cThis is a player command");
                 }
             } else if (args[0].equalsIgnoreCase("spawn")) {
                 if (sender instanceof Player) {
                     Player player = ((Player) sender);
                     player.teleport(player.getWorld().getSpawnLocation());
-                    sender.sendMessage(NMSMain.getPrefix() + " §aTeleported you to the world spawn of world §6" + player.getWorld().getName());
+                    sender.sendMessage(TNLListener.getInstance().getPrefix() + " §aTeleported you to the world spawn of world §6" + player.getWorld().getName());
                 } else {
-                    sender.sendMessage(NMSMain.getPrefix() + " §cThis is a player command");
+                    sender.sendMessage(TNLListener.getInstance().getPrefix() + " §cThis is a player command");
                 }
             } else if (args[0].equalsIgnoreCase("list")) {
                 List<String> worlds = new ArrayList<>();
                 Bukkit.getWorlds().forEach(world -> worlds.add(world.getName()));
-                sender.sendMessage(NMSMain.getPrefix() + " §7Loaded Worlds §8(§6" + worlds.size() + "§8): §a" + String.join("§8, §a", worlds));
+                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §7Loaded Worlds §8(§6" + worlds.size() + "§8): §a" + String.join("§8, §a", worlds));
             } else {
-                sender.sendMessage(NMSMain.getPrefix() + " §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
-                sender.sendMessage(NMSMain.getPrefix() + " §c/world tp §8[§6Player§8] §8[§6World§8]");
-                sender.sendMessage(NMSMain.getPrefix() + " §c/world delete §8[§6World§8]");
-                sender.sendMessage(NMSMain.getPrefix() + " §c/world import §8[§6Name§8]");
-                sender.sendMessage(NMSMain.getPrefix() + " §c/world unload §8[§6World§8]");
-                sender.sendMessage(NMSMain.getPrefix() + " §c/world save §8[§6World§8]");
-                sender.sendMessage(NMSMain.getPrefix() + " §c/world load §8[§6Name§8]");
-                sender.sendMessage(NMSMain.getPrefix() + " §c/world tp §8[§6World§8]");
-                sender.sendMessage(NMSMain.getPrefix() + " §c/world setspawn");
-                sender.sendMessage(NMSMain.getPrefix() + " §c/world spawn");
-                sender.sendMessage(NMSMain.getPrefix() + " §c/world list");
+                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
+                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world tp §8[§6Player§8] §8[§6World§8]");
+                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world delete §8[§6World§8]");
+                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world import §8[§6Name§8]");
+                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world unload §8[§6World§8]");
+                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world save §8[§6World§8]");
+                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world load §8[§6Name§8]");
+                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world tp §8[§6World§8]");
+                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world setspawn");
+                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world spawn");
+                sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world list");
             }
         } else {
-            sender.sendMessage(NMSMain.getPrefix() + " §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
-            sender.sendMessage(NMSMain.getPrefix() + " §c/world tp §8[§6Player§8] §8[§6World§8]");
-            sender.sendMessage(NMSMain.getPrefix() + " §c/world delete §8[§6World§8]");
-            sender.sendMessage(NMSMain.getPrefix() + " §c/world import §8[§6Name§8]");
-            sender.sendMessage(NMSMain.getPrefix() + " §c/world unload §8[§6World§8]");
-            sender.sendMessage(NMSMain.getPrefix() + " §c/world save §8[§6World§8]");
-            sender.sendMessage(NMSMain.getPrefix() + " §c/world load §8[§6Name§8]");
-            sender.sendMessage(NMSMain.getPrefix() + " §c/world tp §8[§6World§8]");
-            sender.sendMessage(NMSMain.getPrefix() + " §c/world setspawn");
-            sender.sendMessage(NMSMain.getPrefix() + " §c/world spawn");
-            sender.sendMessage(NMSMain.getPrefix() + " §c/world list");
+            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
+            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world tp §8[§6Player§8] §8[§6World§8]");
+            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world delete §8[§6World§8]");
+            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world import §8[§6Name§8]");
+            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world unload §8[§6World§8]");
+            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world save §8[§6World§8]");
+            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world load §8[§6Name§8]");
+            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world tp §8[§6World§8]");
+            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world setspawn");
+            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world spawn");
+            sender.sendMessage(TNLListener.getInstance().getPrefix() + " §c/world list");
         }
         return false;
     }

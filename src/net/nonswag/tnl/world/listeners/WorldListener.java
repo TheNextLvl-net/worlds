@@ -1,6 +1,6 @@
 package net.nonswag.tnl.world.listeners;
 
-import net.nonswag.tnl.listener.NMSMain;
+import net.nonswag.tnl.listener.api.logger.Logger;
 import net.nonswag.tnl.world.Worlds;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,8 +24,8 @@ public class WorldListener implements Listener {
                     Worlds.getConfigUtil().set(event.getWorld().getName() + ".type", event.getWorld().getWorldType().name());
                     Worlds.getConfigUtil().set(event.getWorld().getName() + ".environment", event.getWorld().getEnvironment().name());
                     // generator name/plugin
-                } catch (Throwable t) {
-                    NMSMain.stacktrace(t);
+                } catch (Exception e) {
+                    Logger.error.println(e);
                 }
             }
         }
@@ -56,8 +56,8 @@ public class WorldListener implements Listener {
                     Worlds.getConfigUtil().set("worlds", worlds);
                     Worlds.getConfigUtil().set(event.getWorld().getName() + ".type", event.getWorld().getWorldType().name());
                     Worlds.getConfigUtil().set(event.getWorld().getName() + ".environment", event.getWorld().getEnvironment().name());
-                } catch (Throwable t) {
-                    NMSMain.stacktrace(t);
+                } catch (Exception e) {
+                    Logger.error.println(e);
                 }
             }
         }
