@@ -1,7 +1,9 @@
 package net.nonswag.tnl.world;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import net.nonswag.tnl.listener.api.command.CommandManager;
-import net.nonswag.tnl.listener.utils.GlobalConfigUtil;
+import net.nonswag.tnl.listener.api.file.JsonConfig;
 import net.nonswag.tnl.listener.utils.PluginUpdate;
 import net.nonswag.tnl.world.api.Environment;
 import net.nonswag.tnl.world.api.generator.BuildWorldGenerator;
@@ -13,30 +15,36 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.annotation.Nonnull;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Worlds extends JavaPlugin {
 
-    private static Plugin plugin;
-    private static JavaPlugin javaPlugin;
-    private static GlobalConfigUtil configUtil;
+    private static Worlds instance;
+    @Nonnull
+    private final JsonConfig configuration = new JsonConfig("plugins/TNLWorlds/", "saves.json");
+
+    public static Worlds getInstance() {
+        return instance;
+    }
+
+    public static void setInstance(Worlds instance) {
+        Worlds.instance = instance;
+    }
 
     @Override
     public void onEnable() {
-        super.onEnable();
-        setPlugin(this);
-        setJavaPlugin(this);
-        setConfigUtil(new GlobalConfigUtil(getPlugin()));
-        getConfigUtil().initConfig();
-        Bukkit.getPluginManager().registerEvents(new WorldListener(), getPlugin());
+        setInstance(this);
+        Bukkit.getPluginManager().registerEvents(new WorldListener(), getInstance());
         CommandManager commandManager = new CommandManager(this);
         commandManager.registerCommand("world", "tnl.world", new WorldCommand(), new WorldCommandTabCompleter());
         loadWorlds();
-        new PluginUpdate(getPlugin()).downloadUpdate();
+        new PluginUpdate(getInstance()).downloadUpdate();
     }
 
-    public static String getWorld(String name) {
+    public String getWorld(String name) {
         for(String s : getWorlds()) {
             String[] split = s.split("/");
             if (s.equalsIgnoreCase(name)) {
@@ -46,7 +54,7 @@ public class Worlds extends JavaPlugin {
         return null;
     }
 
-    public static void loadWorlds() {
+    public void loadWorlds() {
         for(String s : getWorlds()) {
             String[] split = s.split("/");
             if (Bukkit.getWorld(split[split.length - 1]) == null) {
@@ -55,13 +63,16 @@ public class Worlds extends JavaPlugin {
         }
     }
 
-    public static void loadWorld(String name) {
+    public void loadWorld(String name) {
         if (Bukkit.getWorld(name) == null) {
             if (new File(name).exists()) {
                 try {
-                    String string = Worlds.getConfigUtil().getConfig().getString(name + ".generator");
-                    WorldType type = WorldType.getByName(Worlds.getConfigUtil().getConfig().getString(name + ".type"));
-                    Environment environment = Environment.getByName(Worlds.getConfigUtil().getConfig().getString(name + ".environment"));
+                    String string = null;
+                    if (getConfiguration().getJsonElement().getAsJsonObject().has(name + ".generator")) {
+                        string = getConfiguration().getJsonElement().getAsJsonObject().get(name + ".generator").getAsString();
+                    }
+                    WorldType type = WorldType.getByName(getConfiguration().getJsonElement().getAsJsonObject().get(name + ".type").getAsString());
+                    Environment environment = Environment.getByName(getConfiguration().getJsonElement().getAsJsonObject().get(name + ".environment").getAsString());
                     WorldCreator worldCreator = new WorldCreator(name);
                     if (string != null) {
                         Plugin plugin = Bukkit.getPluginManager().getPlugin(string);
@@ -82,31 +93,28 @@ public class Worlds extends JavaPlugin {
         return new BuildWorldGenerator();
     }
 
-    public static List<String> getWorlds() {
-        return Worlds.getConfigUtil().getConfig().getStringList("worlds");
+    @Nonnull
+    public List<String> getWorlds() {
+        JsonArray worlds = getWorldArray();
+        List<String> strings = new ArrayList<>();
+        for (JsonElement world : worlds) {
+            strings.add(world.getAsString());
+        }
+        return strings;
     }
 
-    public static GlobalConfigUtil getConfigUtil() {
-        return configUtil;
+    @Nonnull
+    public JsonArray getWorldArray() {
+        JsonElement jsonElement = getConfiguration().getJsonElement().getAsJsonObject().get("worlds");
+        if (jsonElement != null && jsonElement.isJsonArray()) {
+            return jsonElement.getAsJsonArray();
+        } else {
+            return new JsonArray();
+        }
     }
 
-    public static void setConfigUtil(GlobalConfigUtil configUtil) {
-        Worlds.configUtil = configUtil;
-    }
-
-    public static void setPlugin(Plugin plugin) {
-        Worlds.plugin = plugin;
-    }
-
-    public static void setJavaPlugin(JavaPlugin javaPlugin) {
-        Worlds.javaPlugin = javaPlugin;
-    }
-
-    public static Plugin getPlugin() {
-        return plugin;
-    }
-
-    public static JavaPlugin getJavaPlugin() {
-        return javaPlugin;
+    @Nonnull
+    public JsonConfig getConfiguration() {
+        return configuration;
     }
 }

@@ -46,7 +46,7 @@ public class WorldCommandTabCompleter implements TabCompleter {
                         suggestions.add(all.getName());
                     }
                 } else if (args[0].equalsIgnoreCase("load")) {
-                    suggestions.addAll(Worlds.getWorlds());
+                    suggestions.addAll(Worlds.getInstance().getWorlds());
                 }
             } else if (args.length == 3) {
                 if (args[0].equalsIgnoreCase("tp")) {
