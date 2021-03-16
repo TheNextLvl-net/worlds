@@ -4,7 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import net.nonswag.tnl.listener.api.command.CommandManager;
 import net.nonswag.tnl.listener.api.file.JsonConfig;
-import net.nonswag.tnl.listener.utils.PluginUpdate;
+import net.nonswag.tnl.listener.api.plugin.PluginUpdate;
+import net.nonswag.tnl.listener.api.settings.Settings;
 import net.nonswag.tnl.world.api.Environment;
 import net.nonswag.tnl.world.api.generator.BuildWorldGenerator;
 import net.nonswag.tnl.world.commands.WorldCommand;
@@ -41,7 +42,9 @@ public class Worlds extends JavaPlugin {
         CommandManager commandManager = new CommandManager(this);
         commandManager.registerCommand("world", "tnl.world", new WorldCommand(), new WorldCommandTabCompleter());
         loadWorlds();
-        new PluginUpdate(getInstance()).downloadUpdate();
+        if (Settings.AUTO_UPDATER.getValue()) {
+            new PluginUpdate(getInstance()).downloadUpdate();
+        }
     }
 
     public String getWorld(String name) {

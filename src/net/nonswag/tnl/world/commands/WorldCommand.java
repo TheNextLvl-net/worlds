@@ -153,9 +153,10 @@ public class WorldCommand implements CommandExecutor {
                 if (args.length >= 2) {
                     World world = Bukkit.getWorld(args[1]);
                     if (world == null) {
+                        sender.sendMessage("%prefix% §cSoon");
                     } else {
+                        sender.sendMessage("%prefix% §cA world with this name already exist");
                     }
-                    sender.sendMessage("%prefix% §cSoon");
                 } else {
                     sender.sendMessage("%prefix% §c/world import §8[§6World§8]");
                 }
