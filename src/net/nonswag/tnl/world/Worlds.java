@@ -10,7 +10,7 @@ import net.nonswag.tnl.world.api.Environment;
 import net.nonswag.tnl.world.api.generator.BuildWorldGenerator;
 import net.nonswag.tnl.world.commands.WorldCommand;
 import net.nonswag.tnl.world.listeners.WorldListener;
-import net.nonswag.tnl.world.tabcompleter.WorldCommandTabCompleter;
+import net.nonswag.tnl.world.completer.WorldCommandTabCompleter;
 import org.bukkit.*;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;

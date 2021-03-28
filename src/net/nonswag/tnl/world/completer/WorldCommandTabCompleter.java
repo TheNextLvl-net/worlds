@@ -1,4 +1,4 @@
-package net.nonswag.tnl.world.tabcompleter;
+package net.nonswag.tnl.world.completer;
 
 import net.nonswag.tnl.world.Worlds;
 import org.bukkit.Bukkit;
