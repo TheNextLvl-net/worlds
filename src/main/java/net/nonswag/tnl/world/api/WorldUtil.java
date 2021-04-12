@@ -51,6 +51,9 @@ public class WorldUtil {
         if (!jsonWorld.has("environment")) {
             jsonWorld.addProperty("environment", world.getEnvironment().name());
         }
+        if (!jsonWorld.has("seed")) {
+            jsonWorld.addProperty("seed", world.getSeed());
+        }
         if (!jsonWorld.has("generator")) {
             for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
                 if (plugin != null) {
@@ -113,6 +116,9 @@ public class WorldUtil {
                             worldCreator.environment(Environment.getByName(world.get("environment").getAsString()).getEnvironment());
                         } else {
                             worldCreator.environment(World.Environment.NORMAL);
+                        }
+                        if (world.has("seed")) {
+                            worldCreator.seed(world.get("environment").getAsLong());
                         }
                         Logger.debug.println("§7Loaded world§8: §6" + worldCreator.createWorld().getName());
                     }
