@@ -1,14 +1,11 @@
-name: TNLWorlds
+name: "TNLWorlds"
 version: "2.0"
-api-version: "1.15"
+api-version: "1.13"
+author: "NonSwag"
 main: net.nonswag.tnl.world.Worlds
-load: POSTWORLD
-author: NonSwag
 website: https://www.thenextlvl.net/
 depend:
   - TNLListener
-softdepend:
-  - TNLListener
-prefix: World
+load: POSTWORLD
 commands:
   world:

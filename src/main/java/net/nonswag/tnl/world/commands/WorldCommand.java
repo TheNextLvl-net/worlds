@@ -1,6 +1,7 @@
 package net.nonswag.tnl.world.commands;
 
 import net.nonswag.tnl.listener.api.message.ChatComponent;
+import net.nonswag.tnl.listener.api.message.Message;
 import net.nonswag.tnl.listener.utils.LinuxUtil;
 import net.nonswag.tnl.world.Worlds;
 import net.nonswag.tnl.world.api.Environment;
@@ -62,12 +63,12 @@ public class WorldCommand implements CommandExecutor {
                                             if (plugin != null && plugin.isEnabled()) {
                                                 ChunkGenerator generator = plugin.getDefaultWorldGenerator(args[1], null);
                                                 if (generator != null) {
-                                                    new WorldCreator(args[1]).generator(generator).createWorld();
+                                                    new WorldCreator(args[1]).generator(generator).environment(environment.getEnvironment()).type(type.getWorldType()).createWorld();
                                                 } else {
-                                                    sender.sendMessage("%prefix%§4" + plugin.getName() + "§c has no default generator");
+                                                    sender.sendMessage(Message.PREFIX.getText() + "§4" + plugin.getName() + "§c has no default generator");
                                                 }
                                             } else {
-                                                sender.sendMessage("%prefix% §c/world create " + args[1] + " " + args[2] + " " + environment.name() + " §8(§6Plugin§8)");
+                                                sender.sendMessage(Message.PREFIX.getText() + " §c/world create " + args[1] + " " + args[2] + " " + environment.name() + " §8(§6Plugin§8)");
                                             }
                                         } else {
                                             sender.sendMessage(ChatComponent.getText("%prefix% §aStarting generation of new world §6" + args[1]));
@@ -99,12 +100,12 @@ public class WorldCommand implements CommandExecutor {
                         World world = Bukkit.getWorld(args[1]);
                         if (world != null) {
                             player.teleport(world.getSpawnLocation());
-                            sender.sendMessage("%prefix% §aTeleported you to the world spawn of world §6" + world.getName());
+                            sender.sendMessage(Message.PREFIX.getText() + " §aTeleported you to the world spawn of world §6" + world.getName());
                         } else {
-                            sender.sendMessage("%prefix% §c/world tp §8[§6World§8]");
+                            sender.sendMessage(Message.PREFIX.getText() + " §c/world tp §8[§6World§8]");
                         }
                     } else {
-                        sender.sendMessage("%prefix% §c/world tp §8[§6Player§8] §8[§6World§8]");
+                        sender.sendMessage(Message.PREFIX.getText() + " §c/world tp §8[§6Player§8] §8[§6World§8]");
                     }
                 } else if (args.length >= 3) {
                     Player player = Bukkit.getPlayer(args[1]);
@@ -113,128 +114,128 @@ public class WorldCommand implements CommandExecutor {
                         if (world != null) {
                             player.teleport(world.getSpawnLocation());
                             if (sender.equals(player)) {
-                                sender.sendMessage("%prefix% §aTeleported you to the world spawn of world §6" + world.getName());
+                                sender.sendMessage(Message.PREFIX.getText() + " §aTeleported you to the world spawn of world §6" + world.getName());
                             } else {
                                 player.sendMessage("%prefix% §6" + sender.getName() + " §ateleported you to the world spawn of world §6" + world.getName());
-                                sender.sendMessage("%prefix% §aTeleported §6" + player.getName() + "§a to the world spawn of world §6" + world.getName());
+                                sender.sendMessage(Message.PREFIX.getText() + " §aTeleported §6" + player.getName() + "§a to the world spawn of world §6" + world.getName());
                             }
                         } else {
-                            sender.sendMessage("%prefix% §c/world tp " + player.getName() + " §8[§6World§8]");
+                            sender.sendMessage(Message.PREFIX.getText() + " §c/world tp " + player.getName() + " §8[§6World§8]");
                         }
                     } else {
-                        sender.sendMessage("%prefix% §c/world tp §8[§6Player§8] §8[§6World§8]");
+                        sender.sendMessage(Message.PREFIX.getText() + " §c/world tp §8[§6Player§8] §8[§6World§8]");
                     }
                 } else {
-                    sender.sendMessage("%prefix% §c/world tp §8[§6Player§8] §8[§6World§8]");
-                    sender.sendMessage("%prefix% §c/world tp §8[§6World§8]");
+                    sender.sendMessage(Message.PREFIX.getText() + " §c/world tp §8[§6Player§8] §8[§6World§8]");
+                    sender.sendMessage(Message.PREFIX.getText() + " §c/world tp §8[§6World§8]");
                 }
             } else if (args[0].equalsIgnoreCase("delete")) {
                 if (args.length >= 2) {
                     World world = Bukkit.getWorld(args[1]);
                     if (world != null) {
                         String name = world.getName();
-                        sender.sendMessage("%prefix% §aTry to unload world §6" + name);
+                        sender.sendMessage(Message.PREFIX.getText() + " §aTry to unload world §6" + name);
                         Bukkit.unloadWorld(world, true);
-                        sender.sendMessage("%prefix% §aSuccessfully unloaded world §6" + name);
+                        sender.sendMessage(Message.PREFIX.getText() + " §aSuccessfully unloaded world §6" + name);
                         File file = new File(Worlds.getInstance().getDataFolder().getAbsoluteFile().getParentFile().getParent() + "/" + name);
                         if (file.exists() && file.isDirectory()) {
                             LinuxUtil.runSafeShellCommand("rm -r " + file.getAbsolutePath(), file);
-                            sender.sendMessage("%prefix% §aSuccessfully deleted world folder §6" + name);
+                            sender.sendMessage(Message.PREFIX.getText() + " §aSuccessfully deleted world folder §6" + name);
                         } else {
-                            sender.sendMessage("%prefix% §cStrange things happens while deleting world folder §4" + name);
+                            sender.sendMessage(Message.PREFIX.getText() + " §cStrange things happens while deleting world folder §4" + name);
                         }
                     } else {
-                        sender.sendMessage("%prefix% §c/world delete §8[§6World§8]");
+                        sender.sendMessage(Message.PREFIX.getText() + " §c/world delete §8[§6World§8]");
                     }
                 } else {
-                    sender.sendMessage("%prefix% §c/world delete §8[§6World§8]");
+                    sender.sendMessage(Message.PREFIX.getText() + " §c/world delete §8[§6World§8]");
                 }
             } else if (args[0].equalsIgnoreCase("import")) {
                 if (args.length >= 2) {
                     World world = Bukkit.getWorld(args[1]);
                     if (world == null) {
-                        sender.sendMessage("%prefix% §cSoon");
+                        sender.sendMessage(Message.PREFIX.getText() + " §cSoon");
                     } else {
-                        sender.sendMessage("%prefix% §cA world with this name already exist");
+                        sender.sendMessage(Message.PREFIX.getText() + " §cA world with this name already exist");
                     }
                 } else {
-                    sender.sendMessage("%prefix% §c/world import §8[§6World§8]");
+                    sender.sendMessage(Message.PREFIX.getText() + " §c/world import §8[§6World§8]");
                 }
             } else if (args[0].equalsIgnoreCase("unload")) {
                 if (args.length >= 2) {
                     World world = Bukkit.getWorld(args[1]);
                     if (world != null) {
                         String name = world.getName();
-                        sender.sendMessage("%prefix% §aTry to unload world §6" + name);
+                        sender.sendMessage(Message.PREFIX.getText() + " §aTry to unload world §6" + name);
                         Bukkit.unloadWorld(world, true);
-                        sender.sendMessage("%prefix% §aSuccessfully unloaded world §6" + name);
+                        sender.sendMessage(Message.PREFIX.getText() + " §aSuccessfully unloaded world §6" + name);
                     } else {
-                        sender.sendMessage("%prefix% §c/world unload §8[§6World§8]");
+                        sender.sendMessage(Message.PREFIX.getText() + " §c/world unload §8[§6World§8]");
                     }
                 } else {
-                    sender.sendMessage("%prefix% §c/world unload §8[§6World§8]");
+                    sender.sendMessage(Message.PREFIX.getText() + " §c/world unload §8[§6World§8]");
                 }
             } else if (args[0].equalsIgnoreCase("save")) {
                 if (args.length >= 2) {
                     World world = Bukkit.getWorld(args[1]);
                     if (world != null) {
-                        sender.sendMessage("%prefix% §aTry to save world §6" + world.getName());
+                        sender.sendMessage(Message.PREFIX.getText() + " §aTry to save world §6" + world.getName());
                         world.save();
-                        sender.sendMessage("%prefix% §aSuccessfully saved world §6" + world.getName());
+                        sender.sendMessage(Message.PREFIX.getText() + " §aSuccessfully saved world §6" + world.getName());
                     } else {
-                        sender.sendMessage("%prefix% §c/world save §8[§6World§8]");
+                        sender.sendMessage(Message.PREFIX.getText() + " §c/world save §8[§6World§8]");
                     }
                 } else {
-                    sender.sendMessage("%prefix% §c/world save §8[§6World§8]");
+                    sender.sendMessage(Message.PREFIX.getText() + " §c/world save §8[§6World§8]");
                 }
             } else if (args[0].equalsIgnoreCase("load")) {
-                sender.sendMessage("%prefix% §cSoon");
+                sender.sendMessage(Message.PREFIX.getText() + " §cSoon");
             } else if (args[0].equalsIgnoreCase("setspawn")) {
                 if (sender instanceof Player) {
                     Player player = ((Player) sender);
                     player.getWorld().setSpawnLocation(player.getLocation());
                     Location l = player.getWorld().getSpawnLocation();
-                    sender.sendMessage("%prefix% §aSuccessfully set the spawn location to §6" + l.getX() + "§8, §6" + l.getY() + "§8, §6" + l.getZ());
+                    sender.sendMessage(Message.PREFIX.getText() + " §aSuccessfully set the spawn location to §6" + l.getX() + "§8, §6" + l.getY() + "§8, §6" + l.getZ());
                 } else {
-                    sender.sendMessage("%prefix% §cThis is a player command");
+                    sender.sendMessage(Message.PREFIX.getText() + " §cThis is a player command");
                 }
             } else if (args[0].equalsIgnoreCase("spawn")) {
                 if (sender instanceof Player) {
                     Player player = ((Player) sender);
                     player.teleport(player.getWorld().getSpawnLocation());
-                    sender.sendMessage("%prefix% §aTeleported you to the world spawn of world §6" + player.getWorld().getName());
+                    sender.sendMessage(Message.PREFIX.getText() + " §aTeleported you to the world spawn of world §6" + player.getWorld().getName());
                 } else {
-                    sender.sendMessage("%prefix% §cThis is a player command");
+                    sender.sendMessage(Message.PREFIX.getText() + " §cThis is a player command");
                 }
             } else if (args[0].equalsIgnoreCase("list")) {
                 List<String> worlds = new ArrayList<>();
                 Bukkit.getWorlds().forEach(world -> worlds.add(world.getName()));
-                sender.sendMessage("%prefix% §7Loaded Worlds §8(§6" + worlds.size() + "§8): §a" + String.join("§8, §a", worlds));
+                sender.sendMessage(Message.PREFIX.getText() + " §7Loaded Worlds §8(§6" + worlds.size() + "§8): §a" + String.join("§8, §a", worlds));
             } else {
-                sender.sendMessage("%prefix% §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
-                sender.sendMessage("%prefix% §c/world tp §8[§6Player§8] §8[§6World§8]");
-                sender.sendMessage("%prefix% §c/world delete §8[§6World§8]");
-                sender.sendMessage("%prefix% §c/world import §8[§6Name§8]");
-                sender.sendMessage("%prefix% §c/world unload §8[§6World§8]");
-                sender.sendMessage("%prefix% §c/world save §8[§6World§8]");
-                sender.sendMessage("%prefix% §c/world load §8[§6Name§8]");
-                sender.sendMessage("%prefix% §c/world tp §8[§6World§8]");
-                sender.sendMessage("%prefix% §c/world setspawn");
-                sender.sendMessage("%prefix% §c/world spawn");
-                sender.sendMessage("%prefix% §c/world list");
+                sender.sendMessage(Message.PREFIX.getText() + " §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
+                sender.sendMessage(Message.PREFIX.getText() + " §c/world tp §8[§6Player§8] §8[§6World§8]");
+                sender.sendMessage(Message.PREFIX.getText() + " §c/world delete §8[§6World§8]");
+                sender.sendMessage(Message.PREFIX.getText() + " §c/world import §8[§6Name§8]");
+                sender.sendMessage(Message.PREFIX.getText() + " §c/world unload §8[§6World§8]");
+                sender.sendMessage(Message.PREFIX.getText() + " §c/world save §8[§6World§8]");
+                sender.sendMessage(Message.PREFIX.getText() + " §c/world load §8[§6Name§8]");
+                sender.sendMessage(Message.PREFIX.getText() + " §c/world tp §8[§6World§8]");
+                sender.sendMessage(Message.PREFIX.getText() + " §c/world setspawn");
+                sender.sendMessage(Message.PREFIX.getText() + " §c/world spawn");
+                sender.sendMessage(Message.PREFIX.getText() + " §c/world list");
             }
         } else {
-            sender.sendMessage("%prefix% §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
-            sender.sendMessage("%prefix% §c/world tp §8[§6Player§8] §8[§6World§8]");
-            sender.sendMessage("%prefix% §c/world delete §8[§6World§8]");
-            sender.sendMessage("%prefix% §c/world import §8[§6Name§8]");
-            sender.sendMessage("%prefix% §c/world unload §8[§6World§8]");
-            sender.sendMessage("%prefix% §c/world save §8[§6World§8]");
-            sender.sendMessage("%prefix% §c/world load §8[§6Name§8]");
-            sender.sendMessage("%prefix% §c/world tp §8[§6World§8]");
-            sender.sendMessage("%prefix% §c/world setspawn");
-            sender.sendMessage("%prefix% §c/world spawn");
-            sender.sendMessage("%prefix% §c/world list");
+            sender.sendMessage(Message.PREFIX.getText() + " §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
+            sender.sendMessage(Message.PREFIX.getText() + " §c/world tp §8[§6Player§8] §8[§6World§8]");
+            sender.sendMessage(Message.PREFIX.getText() + " §c/world delete §8[§6World§8]");
+            sender.sendMessage(Message.PREFIX.getText() + " §c/world import §8[§6Name§8]");
+            sender.sendMessage(Message.PREFIX.getText() + " §c/world unload §8[§6World§8]");
+            sender.sendMessage(Message.PREFIX.getText() + " §c/world save §8[§6World§8]");
+            sender.sendMessage(Message.PREFIX.getText() + " §c/world load §8[§6Name§8]");
+            sender.sendMessage(Message.PREFIX.getText() + " §c/world tp §8[§6World§8]");
+            sender.sendMessage(Message.PREFIX.getText() + " §c/world setspawn");
+            sender.sendMessage(Message.PREFIX.getText() + " §c/world spawn");
+            sender.sendMessage(Message.PREFIX.getText() + " §c/world list");
         }
         return false;
     }

@@ -1,6 +1,6 @@
 package net.nonswag.tnl.world.completer;
 
-import net.nonswag.tnl.world.Worlds;
+import net.nonswag.tnl.world.api.WorldUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldType;
@@ -46,7 +46,7 @@ public class WorldCommandTabCompleter implements TabCompleter {
                         suggestions.add(all.getName());
                     }
                 } else if (args[0].equalsIgnoreCase("load")) {
-                    suggestions.addAll(Worlds.getInstance().getWorlds());
+                    suggestions.addAll(WorldUtil.getInstance().getWorlds());
                 }
             } else if (args.length == 3) {
                 if (args[0].equalsIgnoreCase("tp")) {

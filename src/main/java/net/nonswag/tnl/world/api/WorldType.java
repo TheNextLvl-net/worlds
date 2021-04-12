@@ -5,11 +5,8 @@ import javax.annotation.Nonnull;
 public enum WorldType {
     NORMAL(org.bukkit.WorldType.NORMAL),
     FLAT(org.bukkit.WorldType.FLAT),
-    VERSION_1_1(org.bukkit.WorldType.VERSION_1_1),
     LARGE_BIOMES(org.bukkit.WorldType.LARGE_BIOMES),
-    AMPLIFIED(org.bukkit.WorldType.AMPLIFIED),
-    CUSTOMIZED(org.bukkit.WorldType.CUSTOMIZED),
-    BUFFET(org.bukkit.WorldType.BUFFET);
+    AMPLIFIED(org.bukkit.WorldType.AMPLIFIED);
 
     @Nonnull
     private final org.bukkit.WorldType worldType;
