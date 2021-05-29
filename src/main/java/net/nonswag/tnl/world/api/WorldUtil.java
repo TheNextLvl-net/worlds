@@ -118,12 +118,12 @@ public class WorldUtil {
                             worldCreator.environment(World.Environment.NORMAL);
                         }
                         if (world.has("seed")) {
-                            worldCreator.seed(world.get("environment").getAsLong());
+                            worldCreator.seed(world.get("seed").getAsLong());
                         }
                         Logger.debug.println("§7Loaded world§8: §6" + worldCreator.createWorld().getName());
                     }
                 } catch (Exception e) {
-                    Logger.error.println("Failed to create world §8'§4" + name + "§8'", e);
+                    Logger.error.println("Failed to load world §8'§4" + name + "§8'", e);
                 }
             }
         }
