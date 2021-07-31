@@ -41,29 +41,18 @@ public class WorldUtil {
 
     public void save(@Nonnull World world) {
         JsonObject jsonObject = getSaves().getJsonElement().getAsJsonObject();
-        if (!jsonObject.has(world.getName())) {
-            jsonObject.add(world.getName(), new JsonObject());
-        }
+        if (!jsonObject.has(world.getName())) jsonObject.add(world.getName(), new JsonObject());
         JsonObject jsonWorld = jsonObject.getAsJsonObject(world.getName());
         if (!jsonWorld.has("type")) {
-            jsonWorld.addProperty("type", world.getWorldType().name());
+            WorldType type = world.getWorldType();
+            if (type == null) type = WorldType.NORMAL;
+            jsonWorld.addProperty("type", type.name());
         }
-        if (!jsonWorld.has("environment")) {
-            jsonWorld.addProperty("environment", world.getEnvironment().name());
-        }
-        if (!jsonWorld.has("seed")) {
-            jsonWorld.addProperty("seed", world.getSeed());
-        }
+        if (!jsonWorld.has("environment")) jsonWorld.addProperty("environment", world.getEnvironment().name());
+        if (!jsonWorld.has("seed")) jsonWorld.addProperty("seed", world.getSeed());
         if (!jsonWorld.has("generator")) {
-            for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-                if (plugin != null) {
-                    ChunkGenerator generator = plugin.getDefaultWorldGenerator(world.getName(), null);
-                    if (generator != null && generator.equals(world.getGenerator())) {
-                        jsonWorld.addProperty("generator", plugin.getName());
-                        break;
-                    }
-                }
-            }
+            Plugin generator = getGenerator(world);
+            if (generator != null) jsonWorld.addProperty("generator", generator.getName());
         }
         getSaves().save();
     }
@@ -71,22 +60,14 @@ public class WorldUtil {
     @Nullable
     public Plugin getGenerator(@Nonnull World world) {
         for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-            if (plugin != null) {
-                ChunkGenerator generator = plugin.getDefaultWorldGenerator(world.getName(), null);
-                if (generator != null) {
-                    if (generator.equals(world.getGenerator())) {
-                        return plugin;
-                    }
-                }
-            }
+            ChunkGenerator generator = plugin.getDefaultWorldGenerator(world.getName(), null);
+            if (generator != null && generator.equals(world.getGenerator())) return plugin;
         }
         return null;
     }
 
     public void loadWorlds() {
-        for (String s : getWorlds()) {
-            loadWorld(s);
-        }
+        for (String s : getWorlds()) loadWorld(s);
     }
 
     public void loadWorld(@Nonnull String name) {
@@ -101,29 +82,22 @@ public class WorldUtil {
                             Plugin plugin = Bukkit.getPluginManager().getPlugin(world.get("generator").getAsString());
                             if (plugin != null && plugin.isEnabled()) {
                                 worldCreator.generator(plugin.getDefaultWorldGenerator(name, null));
-                            } else {
-                                worldCreator.generator(((ChunkGenerator) null));
-                            }
-                        } else {
-                            worldCreator.generator(((ChunkGenerator) null));
-                        }
+                            } else worldCreator.generator(((ChunkGenerator) null));
+                        } else worldCreator.generator(((ChunkGenerator) null));
                         if (world.has("type")) {
                             worldCreator.type(Objects.getOrDefault(WorldType.getByName(world.get("type").getAsString()), WorldType.NORMAL));
-                        } else {
-                            worldCreator.type(WorldType.NORMAL);
-                        }
+                        } else worldCreator.type(WorldType.NORMAL);
                         if (world.has("environment")) {
-                            worldCreator.environment(Environment.getByName(world.get("environment").getAsString()).getEnvironment());
-                        } else {
-                            worldCreator.environment(World.Environment.NORMAL);
-                        }
-                        if (world.has("seed")) {
-                            worldCreator.seed(world.get("seed").getAsLong());
-                        }
-                        Logger.debug.println("§7Loaded world§8: §6" + worldCreator.createWorld().getName());
+                            Environment environment = Environment.getByName(world.get("environment").getAsString());
+                            if (environment != null) worldCreator.environment(environment.getEnvironment());
+                        } else worldCreator.environment(World.Environment.NORMAL);
+                        if (world.has("seed")) worldCreator.seed(world.get("seed").getAsLong());
+                        World created = worldCreator.createWorld();
+                        if (created != null) Logger.debug.println("Loaded world: " + created.getName());
+                        else Logger.error.println("Could not create world");
                     }
                 } catch (Exception e) {
-                    Logger.error.println("Failed to load world §8'§4" + name + "§8'", e);
+                    Logger.error.println("Failed to load world '" + name + "'", e);
                 }
             }
         }

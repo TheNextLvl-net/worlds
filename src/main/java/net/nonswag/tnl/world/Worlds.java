@@ -14,37 +14,37 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class Worlds extends JavaPlugin {
 
-    protected static Worlds instance = null;
+    @Nullable
+    private static Worlds instance = null;
 
     @Override
     public void onEnable() {
         setInstance(this);
-        for (World world : Bukkit.getWorlds()) {
-            WorldUtil.getInstance().save(world);
-        }
+        for (World world : Bukkit.getWorlds()) WorldUtil.getInstance().save(world);
         WorldUtil.getInstance().loadWorlds();
         CommandManager commandManager = new CommandManager(this);
-        EventManager eventManager = new EventManager(this);
         commandManager.registerCommand("world", "tnl.world", new WorldCommand(), new WorldCommandTabCompleter());
+        EventManager eventManager = EventManager.cast(this);
         eventManager.registerListener(new WorldListener());
-        if (Settings.AUTO_UPDATER.getValue()) {
-            new PluginUpdate(this).downloadUpdate();
-        }
+        if (Settings.AUTO_UPDATER.getValue()) new PluginUpdate(this).downloadUpdate();
     }
 
     @Override
-    public ChunkGenerator getDefaultWorldGenerator(@Nonnull String worldName, @Nonnull String id) {
+    public ChunkGenerator getDefaultWorldGenerator(@Nonnull String worldName, @Nullable String id) {
         return new BuildWorldGenerator();
     }
 
+    @Nonnull
     public static Worlds getInstance() {
+        assert instance != null;
         return instance;
     }
 
-    public static void setInstance(Worlds instance) {
+    private static void setInstance(@Nonnull Worlds instance) {
         Worlds.instance = instance;
     }
 }
