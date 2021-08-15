@@ -19,8 +19,9 @@ public class BuildWorldGenerator extends ChunkGenerator {
         return generator;
     }
 
+    @Nonnull
     @Override
-    public ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomeGrid) {
+    public ChunkData generateChunkData(@Nonnull World world, @Nonnull Random random, int chunkX, int chunkZ, @Nonnull BiomeGrid biomeGrid) {
         ChunkData chunk = createChunkData(world);
         getGenerator().setScale(0.01D);
         for (int x = 0; x < 16; x++) {

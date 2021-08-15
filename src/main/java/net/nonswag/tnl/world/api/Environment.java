@@ -6,14 +6,18 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public enum Environment {
-    NORMAL(World.Environment.NORMAL),
-    NETHER(World.Environment.NETHER),
-    THE_END(World.Environment.THE_END);
+    NORMAL(World.Environment.NORMAL, "normal"),
+    NETHER(World.Environment.NETHER, "nether"),
+    THE_END(World.Environment.THE_END, "end");
 
-    @Nonnull private final World.Environment environment;
+    @Nonnull
+    private final World.Environment environment;
+    @Nonnull
+    private final String name;
 
-    Environment(@Nonnull World.Environment environment) {
+    Environment(@Nonnull World.Environment environment, @Nonnull String name) {
         this.environment = environment;
+        this.name = name;
     }
 
     @Nonnull
@@ -21,11 +25,9 @@ public enum Environment {
         return environment;
     }
 
-    @Override
-    public String toString() {
-        return "Environment{" +
-                "environment=" + environment +
-                '}';
+    @Nonnull
+    public String getName() {
+        return name;
     }
 
     @Nullable
@@ -33,6 +35,9 @@ public enum Environment {
         try {
             return valueOf(name.toUpperCase());
         } catch (IllegalArgumentException e) {
+            for (Environment environment : values()) {
+                if (environment.getName().equalsIgnoreCase(name)) return environment;
+            }
             return null;
         }
     }
