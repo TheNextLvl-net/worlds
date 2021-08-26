@@ -7,7 +7,6 @@ import net.nonswag.tnl.listener.api.settings.Settings;
 import net.nonswag.tnl.world.api.WorldUtil;
 import net.nonswag.tnl.world.api.generator.BuildWorldGenerator;
 import net.nonswag.tnl.world.commands.WorldCommand;
-import net.nonswag.tnl.world.completer.WorldCommandTabCompleter;
 import net.nonswag.tnl.world.listeners.WorldListener;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,8 +23,7 @@ public class Worlds extends JavaPlugin {
     public void onEnable() {
         setInstance(this);
         WorldUtil.getInstance().exportAll();
-        CommandManager commandManager = CommandManager.cast(this);
-        commandManager.registerCommand("world", "tnl.world", new WorldCommand(), new WorldCommandTabCompleter());
+        CommandManager.registerCommands(new WorldCommand());
         EventManager eventManager = EventManager.cast(this);
         eventManager.registerListener(new WorldListener());
         try {

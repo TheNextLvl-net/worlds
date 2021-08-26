@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="TNLWorlds" target="8" />
+      <module name="TNLWorlds" target="16" />
     </bytecodeTargetLevel>
   </component>
 </project>
