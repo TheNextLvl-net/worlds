@@ -3,7 +3,6 @@ package net.nonswag.tnl.world.commands;
 import net.nonswag.tnl.listener.api.command.CommandSource;
 import net.nonswag.tnl.listener.api.command.Invocation;
 import net.nonswag.tnl.listener.api.command.TNLCommand;
-import net.nonswag.tnl.listener.api.message.ChatComponent;
 import net.nonswag.tnl.listener.api.message.Message;
 import net.nonswag.tnl.listener.api.player.TNLPlayer;
 import net.nonswag.tnl.world.api.Environment;
@@ -47,7 +46,7 @@ public class WorldCommand extends TNLCommand {
                                             if (generator != null) {
                                                 new WorldCreator(args[1]).generator(generator).environment(environment.getEnvironment()).type(type.getWorldType()).createWorld();
                                             } else {
-                                                source.sendMessage(Message.PREFIX.getText() + "§4" + plugin.getName() + "§c has no default generator");
+                                                source.sendMessage("%prefix% §4" + plugin.getName() + "§c has no default generator");
                                             }
                                         } else {
                                             source.sendMessage("%prefix% §c/world create " + args[1] + " " + args[2] + " " + environment.name() + " §8(§6Plugin§8)");
@@ -55,25 +54,25 @@ public class WorldCommand extends TNLCommand {
                                     } else {
                                         World world = new WorldCreator(args[1]).type(type.getWorldType()).environment(environment.getEnvironment()).createWorld();
                                         if (world != null) {
-                                            source.sendMessage(ChatComponent.getText("%prefix% §7Created World§8: §6" + args[1]));
+                                            source.sendMessage("%prefix% §7Created World§8: §6" + args[1]);
                                         } else {
-                                            source.sendMessage(ChatComponent.getText("%prefix% §cFailed to create World §4" + args[1]));
+                                            source.sendMessage("%prefix% §cFailed to create World §4" + args[1]);
                                         }
                                     }
                                 } else {
-                                    source.sendMessage(ChatComponent.getText("%prefix% §c/world create " + args[1] + " " + args[2] + " §8[§6Environment§8] §8(§6Plugin§8)"));
+                                    source.sendMessage("%prefix% §c/world create " + args[1] + " " + args[2] + " §8[§6Environment§8] §8(§6Plugin§8)");
                                 }
                             } else {
-                                source.sendMessage(ChatComponent.getText("%prefix% §c/world create " + args[1] + " " + args[2] + " §8[§6Environment§8] §8(§6Plugin§8)"));
+                                source.sendMessage("%prefix% §c/world create " + args[1] + " " + args[2] + " §8[§6Environment§8] §8(§6Plugin§8)");
                             }
                         } else {
-                            source.sendMessage(ChatComponent.getText("%prefix% §c/world create " + args[1] + " §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)"));
+                            source.sendMessage("%prefix% §c/world create " + args[1] + " §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
                         }
                     } else {
-                        source.sendMessage(ChatComponent.getText("%prefix% §cA world named §4" + args[1] + "§c already exist"));
+                        source.sendMessage("%prefix% §cA world named §4" + args[1] + "§c already exist");
                     }
                 } else {
-                    source.sendMessage(ChatComponent.getText("%prefix% §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)"));
+                    source.sendMessage("%prefix% §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
                 }
             } else if (args[0].equalsIgnoreCase("tp")) {
                 if (args.length == 2) {
@@ -128,9 +127,9 @@ public class WorldCommand extends TNLCommand {
                             world = creator.createWorld();
                         }
                         if (world != null) {
-                            source.sendMessage(ChatComponent.getText("%prefix% §7Imported World§8: §6" + args[1]));
+                            source.sendMessage("%prefix% §7Imported World§8: §6" + args[1]);
                         } else {
-                            source.sendMessage(ChatComponent.getText("%prefix% §cFailed to import World §4" + args[1]));
+                            source.sendMessage("%prefix% §cFailed to import World §4" + args[1]);
                         }
                     } else source.sendMessage("%prefix% §cA world with this name already exist");
                 } else source.sendMessage("%prefix% §c/world import §8[§6World§8]");
@@ -167,9 +166,9 @@ public class WorldCommand extends TNLCommand {
                     if (world == null) {
                         world = WorldUtil.getInstance().loadWorld(args[1]);
                         if (world != null) {
-                            source.sendMessage(ChatComponent.getText("%prefix% §7Loaded World§8: §6" + args[1]));
+                            source.sendMessage("%prefix% §7Loaded World§8: §6" + args[1]);
                         } else {
-                            source.sendMessage(ChatComponent.getText("%prefix% §cFailed to load World §4" + args[1]));
+                            source.sendMessage("%prefix% §cFailed to load World §4" + args[1]);
                         }
                     } else source.sendMessage("%prefix% §cA world with this name already exist");
                 } else source.sendMessage("%prefix% §c/world load §8[§6World§8]");
@@ -188,32 +187,22 @@ public class WorldCommand extends TNLCommand {
                 List<String> worlds = new ArrayList<>();
                 Bukkit.getWorlds().forEach(world -> worlds.add(world.getName()));
                 source.sendMessage("%prefix% §7Loaded Worlds §8(§6" + worlds.size() + "§8): §a" + String.join("§8, §a", worlds));
-            } else {
-                source.sendMessage("%prefix% §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
-                source.sendMessage("%prefix% §c/world tp §8[§6Player§8] §8[§6World§8]");
-                source.sendMessage("%prefix% §c/world delete §8[§6World§8]");
-                source.sendMessage("%prefix% §c/world import §8[§6Name§8]");
-                source.sendMessage("%prefix% §c/world unload §8[§6World§8]");
-                source.sendMessage("%prefix% §c/world export §8[§6World§8]");
-                source.sendMessage("%prefix% §c/world load §8[§6Name§8]");
-                source.sendMessage("%prefix% §c/world tp §8[§6World§8]");
-                source.sendMessage("%prefix% §c/world setspawn");
-                source.sendMessage("%prefix% §c/world spawn");
-                source.sendMessage("%prefix% §c/world list");
-            }
-        } else {
-            source.sendMessage("%prefix% §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
-            source.sendMessage("%prefix% §c/world tp §8[§6Player§8] §8[§6World§8]");
-            source.sendMessage("%prefix% §c/world delete §8[§6World§8]");
-            source.sendMessage("%prefix% §c/world import §8[§6Name§8]");
-            source.sendMessage("%prefix% §c/world unload §8[§6World§8]");
-            source.sendMessage("%prefix% §c/world export §8[§6World§8]");
-            source.sendMessage("%prefix% §c/world load §8[§6Name§8]");
-            source.sendMessage("%prefix% §c/world tp §8[§6World§8]");
-            source.sendMessage("%prefix% §c/world setspawn");
-            source.sendMessage("%prefix% §c/world spawn");
-            source.sendMessage("%prefix% §c/world list");
-        }
+            } else help(source);
+        } else help(source);
+    }
+
+    private void help(@Nonnull CommandSource source) {
+        source.sendMessage("%prefix% §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
+        source.sendMessage("%prefix% §c/world tp §8[§6Player§8] §8[§6World§8]");
+        source.sendMessage("%prefix% §c/world delete §8[§6World§8]");
+        source.sendMessage("%prefix% §c/world import §8[§6Name§8]");
+        source.sendMessage("%prefix% §c/world unload §8[§6World§8]");
+        source.sendMessage("%prefix% §c/world export §8[§6World§8]");
+        source.sendMessage("%prefix% §c/world load §8[§6Name§8]");
+        source.sendMessage("%prefix% §c/world tp §8[§6World§8]");
+        source.sendMessage("%prefix% §c/world setspawn");
+        source.sendMessage("%prefix% §c/world spawn");
+        source.sendMessage("%prefix% §c/world list");
     }
 
     @Nonnull
