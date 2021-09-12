@@ -3,18 +3,18 @@ package net.nonswag.tnl.world;
 import net.nonswag.tnl.listener.api.command.CommandManager;
 import net.nonswag.tnl.listener.api.event.EventManager;
 import net.nonswag.tnl.listener.api.plugin.PluginUpdate;
+import net.nonswag.tnl.listener.api.plugin.TNLPlugin;
 import net.nonswag.tnl.listener.api.settings.Settings;
 import net.nonswag.tnl.world.api.WorldUtil;
 import net.nonswag.tnl.world.api.generator.BuildWorldGenerator;
 import net.nonswag.tnl.world.commands.WorldCommand;
 import net.nonswag.tnl.world.listeners.WorldListener;
 import org.bukkit.generator.ChunkGenerator;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class Worlds extends JavaPlugin {
+public class Worlds extends TNLPlugin {
 
     @Nullable
     private static Worlds instance = null;

@@ -2,8 +2,8 @@ package net.nonswag.tnl.world.api;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.nonswag.tnl.listener.api.config.JsonConfig;
-import net.nonswag.tnl.listener.api.file.FileHelper;
+import net.nonswag.tnl.listener.api.file.formats.JsonFile;
+import net.nonswag.tnl.listener.api.file.helper.FileHelper;
 import net.nonswag.tnl.listener.api.logger.Logger;
 import net.nonswag.tnl.listener.api.object.Objects;
 import net.nonswag.tnl.listener.api.player.TNLPlayer;
@@ -29,7 +29,7 @@ public class WorldUtil {
     protected static final WorldUtil instance = new WorldUtil();
 
     @Nonnull
-    private final JsonConfig saves = new JsonConfig("plugins/Worlds/", "saves.json");
+    private final JsonFile saves = new JsonFile("plugins/Worlds/", "saves.json");
 
     private WorldUtil() {
     }
@@ -128,7 +128,7 @@ public class WorldUtil {
     }
 
     @Nonnull
-    private JsonConfig getSaves() {
+    public JsonFile getSaves() {
         return saves;
     }
 
