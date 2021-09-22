@@ -1,7 +1,5 @@
 package net.nonswag.tnl.world;
 
-import net.nonswag.tnl.listener.api.command.CommandManager;
-import net.nonswag.tnl.listener.api.event.EventManager;
 import net.nonswag.tnl.listener.api.plugin.PluginUpdate;
 import net.nonswag.tnl.listener.api.plugin.TNLPlugin;
 import net.nonswag.tnl.listener.api.settings.Settings;
@@ -23,9 +21,8 @@ public class Worlds extends TNLPlugin {
     public void onEnable() {
         setInstance(this);
         WorldUtil.getInstance().exportAll();
-        CommandManager.registerCommands(new WorldCommand());
-        EventManager eventManager = EventManager.cast(this);
-        eventManager.registerListener(new WorldListener());
+        getCommandManager().registerCommands(new WorldCommand());
+        getEventManager().registerListener(new WorldListener());
         try {
             WorldUtil.getInstance().loadWorlds();
         } catch (Exception e) {
