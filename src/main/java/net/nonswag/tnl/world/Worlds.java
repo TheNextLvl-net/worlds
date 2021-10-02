@@ -18,10 +18,10 @@ public class Worlds extends TNLPlugin {
     private static Worlds instance = null;
 
     @Override
-    public void onEnable() {
+    public void enable() {
         setInstance(this);
         WorldUtil.getInstance().exportAll();
-        getCommandManager().registerCommands(new WorldCommand());
+        getCommandManager().registerCommand(new WorldCommand());
         getEventManager().registerListener(new WorldListener());
         try {
             WorldUtil.getInstance().loadWorlds();
@@ -32,7 +32,7 @@ public class Worlds extends TNLPlugin {
     }
 
     @Override
-    public void onDisable() {
+    public void disable() {
         WorldUtil.getInstance().saveWorlds();
     }
 

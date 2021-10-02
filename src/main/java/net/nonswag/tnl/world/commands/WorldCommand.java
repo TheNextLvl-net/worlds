@@ -4,6 +4,7 @@ import net.nonswag.tnl.listener.api.command.CommandSource;
 import net.nonswag.tnl.listener.api.command.Invocation;
 import net.nonswag.tnl.listener.api.command.TNLCommand;
 import net.nonswag.tnl.listener.api.message.Message;
+import net.nonswag.tnl.listener.api.message.Placeholder;
 import net.nonswag.tnl.listener.api.player.TNLPlayer;
 import net.nonswag.tnl.world.api.Environment;
 import net.nonswag.tnl.world.api.WorldType;
@@ -153,12 +154,13 @@ public class WorldCommand extends TNLCommand {
                     World world = Bukkit.getWorld(args[1]);
                     if (world != null) {
                         world.save();
-                        source.sendMessage(Message.WORLD_SAVED_EN.getText());
-                    } else {
-                        source.sendMessage("%prefix% §c/world export §8[§6World§8]");
-                    }
+                        source.sendMessage(Message.WORLD_SAVED_EN.getText(new Placeholder("world", world.getName())));
+                    } else source.sendMessage("%prefix% §c/world export §8(§6World§8)");
                 } else {
-                    source.sendMessage("%prefix% §c/world export §8[§6World§8]");
+                    for (World world : Bukkit.getWorlds()) {
+                        world.save();
+                        source.sendMessage(Message.WORLD_SAVED_EN.getText(new Placeholder("world", world.getName())));
+                    }
                 }
             } else if (args[0].equalsIgnoreCase("load")) {
                 if (args.length >= 2) {
@@ -197,7 +199,7 @@ public class WorldCommand extends TNLCommand {
         source.sendMessage("%prefix% §c/world delete §8[§6World§8]");
         source.sendMessage("%prefix% §c/world import §8[§6Name§8]");
         source.sendMessage("%prefix% §c/world unload §8[§6World§8]");
-        source.sendMessage("%prefix% §c/world export §8[§6World§8]");
+        source.sendMessage("%prefix% §c/world export §8(§6World§8)");
         source.sendMessage("%prefix% §c/world load §8[§6Name§8]");
         source.sendMessage("%prefix% §c/world tp §8[§6World§8]");
         source.sendMessage("%prefix% §c/world setspawn");
