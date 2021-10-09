@@ -2,10 +2,10 @@ package net.nonswag.tnl.world.api;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.nonswag.tnl.listener.api.file.formats.JsonFile;
-import net.nonswag.tnl.listener.api.file.helper.FileHelper;
-import net.nonswag.tnl.listener.api.logger.Logger;
-import net.nonswag.tnl.listener.api.object.Objects;
+import net.nonswag.tnl.core.api.file.formats.JsonFile;
+import net.nonswag.tnl.core.api.file.helper.FileHelper;
+import net.nonswag.tnl.core.api.logger.Logger;
+import net.nonswag.tnl.core.api.object.Objects;
 import net.nonswag.tnl.listener.api.player.TNLPlayer;
 import net.nonswag.tnl.world.api.events.WorldDeleteEvent;
 import org.bukkit.Bukkit;
