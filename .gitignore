@@ -1,2 +1,6 @@
 # Project exclude paths
 /out/
+/.idea/
+/src/test/
+/TNLWorlds.iml/
+/target/
