@@ -46,7 +46,10 @@ public class WorldCommand extends TNLCommand {
                                         if (plugin != null && plugin.isEnabled()) {
                                             ChunkGenerator generator = plugin.getDefaultWorldGenerator(args[1], null);
                                             if (generator != null) {
-                                                new WorldCreator(args[1]).generator(generator).environment(environment.getEnvironment()).type(type.getWorldType()).createWorld();
+                                                World world = new WorldCreator(args[1]).generator(generator).environment(environment.getEnvironment()).type(type.getWorldType()).createWorld();
+                                                if (world != null) {
+                                                    source.sendMessage("%prefix% §aGenerated world §6" + world.getName());
+                                                } else source.sendMessage("%prefix% §cFailed to generate world");
                                             } else {
                                                 source.sendMessage("%prefix% §4" + plugin.getName() + "§c has no default generator");
                                             }
