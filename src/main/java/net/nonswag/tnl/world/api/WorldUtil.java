@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
@@ -80,6 +81,7 @@ public class WorldUtil {
                 else player.disconnect("%prefix%\n§cThere are no loaded worlds");
             }
         }
+        ((CraftWorld) world).getHandle().getPlayers().clear();
         return Bukkit.unloadWorld(world, save);
     }
 
