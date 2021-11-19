@@ -9,6 +9,7 @@ import net.nonswag.tnl.world.api.WorldUtil;
 import net.nonswag.tnl.world.api.errors.WorldCloneException;
 import net.nonswag.tnl.world.commands.WorldCommand;
 import net.nonswag.tnl.world.listeners.WorldListener;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
@@ -44,8 +45,8 @@ public class Worlds extends TNLPlugin {
     @Nonnull
     public World clone(@Nonnull World world, @Nonnull String name) throws WorldCloneException {
         try {
-            File file = new File(name);
-            LinuxUtil.runShellCommand("cp -r " + new File(world.getName()).getAbsolutePath() + " " + file.getAbsolutePath(), null);
+            File file = new File(Bukkit.getWorldContainer(), name);
+            LinuxUtil.runShellCommand("cp -r " + new File(Bukkit.getWorldContainer(), world.getName()).getAbsolutePath() + " " + file.getAbsolutePath());
             FileHelper.deleteDirectory(new File(file, "uid.dat"));
             FileHelper.deleteDirectory(new File(file, "session.lock"));
         } catch (IOException | InterruptedException e) {
@@ -54,6 +55,12 @@ public class Worlds extends TNLPlugin {
         World clone = new WorldCreator(name).copy(world).createWorld();
         if (clone != null) return clone;
         throw new WorldCloneException();
+    }
+
+    public boolean isCorrectLoaded(@Nullable World world) {
+        if (world == null) return false;
+        if (world.getLoadedChunks().length == 0) return false;
+        return new File(Bukkit.getWorldContainer(), world.getName()).exists();
     }
 
     @Nonnull
