@@ -85,7 +85,7 @@ public class WorldCommand extends TNLCommand {
                         World world = Bukkit.getWorld(args[1]);
                         if (world != null) {
                             TNLPlayer player = (TNLPlayer) source.player();
-                            player.teleport(world.getSpawnLocation());
+                            player.worldManager().teleport(world.getSpawnLocation());
                             source.sendMessage("%prefix% §7Teleported§8: §6" + world.getName());
                         } else source.sendMessage("%prefix% §c/world tp §8[§6World§8]");
                     } else source.sendMessage("%prefix% §c/world tp §8[§6Player§8] §8[§6World§8]");
@@ -94,7 +94,7 @@ public class WorldCommand extends TNLCommand {
                     if (arg != null) {
                         World world = Bukkit.getWorld(args[2]);
                         if (world != null) {
-                            arg.teleport(world.getSpawnLocation());
+                            arg.worldManager().teleport(world.getSpawnLocation());
                             if (source.equals(arg)) {
                                 source.sendMessage("%prefix% §aTeleported you to the world spawn of world §6" + world.getName());
                             } else {
@@ -179,15 +179,15 @@ public class WorldCommand extends TNLCommand {
             } else if (args[0].equalsIgnoreCase("setspawn")) {
                 if (source.isPlayer()) {
                     TNLPlayer player = (TNLPlayer) source.player();
-                    player.getWorld().setSpawnLocation(player.getLocation());
-                    Location l = player.getWorld().getSpawnLocation();
+                    player.worldManager().getWorld().setSpawnLocation(player.worldManager().getLocation());
+                    Location l = player.worldManager().getWorld().getSpawnLocation();
                     source.sendMessage("%prefix% §aSuccessfully set the spawn location to §6" + l.getX() + "§8, §6" + l.getY() + "§8, §6" + l.getZ());
                 } else throw new SourceMismatchException();
             } else if (args[0].equalsIgnoreCase("spawn")) {
                 if (source.isPlayer()) {
                     TNLPlayer player = (TNLPlayer) source.player();
-                    player.teleport(player.getWorld().getSpawnLocation());
-                    source.sendMessage("%prefix% §aTeleported you to the world spawn of world §6" + player.getWorld().getName());
+                    player.worldManager().teleport(player.worldManager().getWorld().getSpawnLocation());
+                    source.sendMessage("%prefix% §aTeleported you to the world spawn of world §6" + player.worldManager().getWorld().getName());
                 } else throw new SourceMismatchException();
             } else if (args[0].equalsIgnoreCase("list")) {
                 List<String> worlds = new ArrayList<>();

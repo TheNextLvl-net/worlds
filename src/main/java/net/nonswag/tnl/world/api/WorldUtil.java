@@ -77,7 +77,7 @@ public class WorldUtil {
             for (World bukkit : Bukkit.getWorlds()) if (world != bukkit) to = bukkit;
             for (Player all : world.getPlayers()) {
                 TNLPlayer player = TNLPlayer.cast(all);
-                if (to != null) player.teleport(to.getSpawnLocation());
+                if (to != null) player.worldManager().teleport(to.getSpawnLocation());
                 else player.disconnect("%prefix%\n§cThere are no loaded worlds");
             }
         }
