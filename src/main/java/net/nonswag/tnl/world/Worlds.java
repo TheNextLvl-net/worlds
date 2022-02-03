@@ -24,7 +24,7 @@ public class Worlds extends TNLPlugin {
     private static Worlds instance = null;
 
     @Override
-    protected void enable() {
+    public void enable() {
         setInstance(this);
         WorldUtil.getInstance().exportAll();
         getCommandManager().registerCommand(new WorldCommand());
@@ -34,11 +34,13 @@ public class Worlds extends TNLPlugin {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (Settings.AUTO_UPDATER.getValue()) new PluginUpdate(this).downloadUpdate();
+        async(() -> {
+            if (Settings.AUTO_UPDATER.getValue()) new PluginUpdate(this).downloadUpdate();
+        });
     }
 
     @Override
-    protected void disable() {
+    public void disable() {
         WorldUtil.getInstance().saveWorlds();
     }
 
