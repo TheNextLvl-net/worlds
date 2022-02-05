@@ -8,6 +8,8 @@ import net.nonswag.tnl.listener.api.settings.Settings;
 import net.nonswag.tnl.world.api.WorldUtil;
 import net.nonswag.tnl.world.api.errors.WorldCloneException;
 import net.nonswag.tnl.world.commands.WorldCommand;
+import net.nonswag.tnl.world.generators.FlatGenerator;
+import net.nonswag.tnl.world.generators.VoidGenerator;
 import net.nonswag.tnl.world.listeners.WorldListener;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -26,6 +28,8 @@ public class Worlds extends TNLPlugin {
     @Override
     public void enable() {
         setInstance(this);
+        VoidGenerator.getInstance().register();
+        FlatGenerator.getInstance().register();
         WorldUtil.getInstance().exportAll();
         getCommandManager().registerCommand(new WorldCommand());
         getEventManager().registerListener(new WorldListener());

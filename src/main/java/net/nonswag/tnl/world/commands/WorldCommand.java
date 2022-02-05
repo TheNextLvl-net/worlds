@@ -7,9 +7,11 @@ import net.nonswag.tnl.core.api.message.key.MessageKey;
 import net.nonswag.tnl.listener.api.command.TNLCommand;
 import net.nonswag.tnl.listener.api.command.exceptions.SourceMismatchException;
 import net.nonswag.tnl.listener.api.player.TNLPlayer;
+import net.nonswag.tnl.listener.api.plugin.PluginManager;
 import net.nonswag.tnl.world.api.Environment;
 import net.nonswag.tnl.world.api.WorldType;
 import net.nonswag.tnl.world.api.WorldUtil;
+import net.nonswag.tnl.world.generators.CustomGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -20,6 +22,7 @@ import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class WorldCommand extends TNLCommand {
@@ -34,7 +37,7 @@ public class WorldCommand extends TNLCommand {
         String[] args = invocation.arguments();
         if (args.length >= 1) {
             if (args[0].equalsIgnoreCase("create")) {
-                if (args.length >= 2) {
+                if (args.length >= 2 && !args[1].isEmpty()) {
                     if (Bukkit.getWorld(args[1]) == null) {
                         if (args.length >= 3) {
                             WorldType type = WorldType.valueOf(args[2].toUpperCase());
@@ -42,7 +45,16 @@ public class WorldCommand extends TNLCommand {
                                 Environment environment = Environment.getByName(args[3]);
                                 if (environment != null) {
                                     if (args.length >= 5) {
-                                        Plugin plugin = Bukkit.getPluginManager().getPlugin(args[4]);
+                                        List<Plugin> plugins = new ArrayList<>();
+                                        plugins.addAll(Arrays.asList(PluginManager.getPlugins()));
+                                        plugins.addAll(CustomGenerator.getAdditionalGenerators());
+                                        Plugin plugin = null;
+                                        for (Plugin pl : plugins) {
+                                            if (pl.getName().equalsIgnoreCase(args[4])) {
+                                                plugin = pl;
+                                                break;
+                                            }
+                                        }
                                         if (plugin != null && plugin.isEnabled()) {
                                             ChunkGenerator generator = plugin.getDefaultWorldGenerator(args[1], null);
                                             if (generator != null) {
@@ -60,9 +72,7 @@ public class WorldCommand extends TNLCommand {
                                         World world = new WorldCreator(args[1]).type(type.getWorldType()).environment(environment.getEnvironment()).createWorld();
                                         if (world != null) {
                                             source.sendMessage("%prefix% §7Created World§8: §6" + args[1]);
-                                        } else {
-                                            source.sendMessage("%prefix% §cFailed to create World §4" + args[1]);
-                                        }
+                                        } else source.sendMessage("%prefix% §cFailed to create World §4" + args[1]);
                                     }
                                 } else {
                                     source.sendMessage("%prefix% §c/world create " + args[1] + " " + args[2] + " §8[§6Environment§8] §8(§6Plugin§8)");
@@ -73,9 +83,7 @@ public class WorldCommand extends TNLCommand {
                         } else {
                             source.sendMessage("%prefix% §c/world create " + args[1] + " §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
                         }
-                    } else {
-                        source.sendMessage("%prefix% §cA world named §4" + args[1] + "§c already exist");
-                    }
+                    } else source.sendMessage("%prefix% §cA world named §4" + args[1] + "§c already exist");
                 } else {
                     source.sendMessage("%prefix% §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
                 }
@@ -255,7 +263,10 @@ public class WorldCommand extends TNLCommand {
             }
         } else if (args.length == 5) {
             if (args[0].equalsIgnoreCase("create")) {
-                for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+                List<Plugin> plugins = new ArrayList<>();
+                plugins.addAll(Arrays.asList(PluginManager.getPlugins()));
+                plugins.addAll(CustomGenerator.getAdditionalGenerators());
+                for (Plugin plugin : plugins) {
                     if (plugin.getDefaultWorldGenerator(args[1], null) != null) suggestions.add(plugin.getName());
                 }
             }
