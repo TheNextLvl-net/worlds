@@ -56,14 +56,29 @@ public class WorldCommand extends TNLCommand {
                                             }
                                         }
                                         if (plugin != null && plugin.isEnabled()) {
-                                            ChunkGenerator generator = plugin.getDefaultWorldGenerator(args[1], null);
-                                            if (generator != null) {
-                                                World world = new WorldCreator(args[1]).generator(generator).environment(environment.getEnvironment()).type(type.getWorldType()).createWorld();
+                                            WorldCreator creator = null;
+                                            if (plugin instanceof CustomGenerator generator) {
+                                                creator = generator.getWorldCreator(args[1]);
+                                            }
+                                            ChunkGenerator generator = null;
+                                            if (creator == null) {
+                                                generator = plugin.getDefaultWorldGenerator(args[1], null);
+                                            }
+                                            if (generator != null || creator != null) {
+                                                source.sendMessage("%prefix% §aGenerating world §6" + args[1]);
+                                                World world;
+                                                if (generator != null) {
+                                                    world = new WorldCreator(args[1]).generator(generator).environment(environment.getEnvironment()).type(type.getWorldType()).createWorld();
+                                                } else world = creator.createWorld();
                                                 if (world != null) {
                                                     source.sendMessage("%prefix% §aGenerated world §6" + world.getName());
+                                                    if (source.isPlayer()) {
+                                                        TNLPlayer player = (TNLPlayer) source.player();
+                                                        player.worldManager().teleport(world.getSpawnLocation());
+                                                    }
                                                 } else source.sendMessage("%prefix% §cFailed to generate world");
                                             } else {
-                                                source.sendMessage("%prefix% §4" + plugin.getName() + "§c has no default generator");
+                                                source.sendMessage("%prefix% §4" + plugin.getName() + "§c is not a world generator");
                                             }
                                         } else {
                                             source.sendMessage("%prefix% §c/world create " + args[1] + " " + args[2] + " " + environment.name() + " §8(§6Plugin§8)");

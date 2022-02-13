@@ -18,6 +18,7 @@ public class VoidGenerator extends CustomGenerator {
         super("VoidGenerator");
     }
 
+    @Nonnull
     @Override
     public ChunkGenerator getDefaultWorldGenerator(@Nonnull String name, @Nullable String id) {
         return new ChunkGenerator() {

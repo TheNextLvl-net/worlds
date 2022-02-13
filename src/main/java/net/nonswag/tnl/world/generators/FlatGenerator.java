@@ -18,6 +18,7 @@ public class FlatGenerator extends CustomGenerator {
         super("FlatGenerator");
     }
 
+    @Nonnull
     @Override
     public ChunkGenerator getDefaultWorldGenerator(@Nonnull String name, @Nullable String id) {
         return new ChunkGenerator() {
