@@ -32,13 +32,7 @@ public enum Environment {
 
     @Nullable
     public static Environment getByName(@Nonnull String name) {
-        try {
-            return valueOf(name.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            for (Environment environment : values()) {
-                if (environment.getName().equalsIgnoreCase(name)) return environment;
-            }
-            return null;
-        }
+        for (Environment environment : values()) if (environment.getName().equalsIgnoreCase(name)) return environment;
+        return null;
     }
 }

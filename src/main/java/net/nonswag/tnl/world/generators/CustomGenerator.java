@@ -16,6 +16,7 @@ public abstract class CustomGenerator extends PluginBuilder {
 
     protected CustomGenerator(@Nonnull String name) {
         super(name);
+        this.enabled = true;
     }
 
     @Nonnull

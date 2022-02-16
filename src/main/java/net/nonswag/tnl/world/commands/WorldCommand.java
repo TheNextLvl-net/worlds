@@ -40,60 +40,63 @@ public class WorldCommand extends TNLCommand {
                 if (args.length >= 2 && !args[1].isEmpty()) {
                     if (Bukkit.getWorld(args[1]) == null) {
                         if (args.length >= 3) {
-                            WorldType type = WorldType.valueOf(args[2].toUpperCase());
-                            if (args.length >= 4) {
-                                Environment environment = Environment.getByName(args[3]);
-                                if (environment != null) {
-                                    if (args.length >= 5) {
-                                        List<Plugin> plugins = new ArrayList<>();
-                                        plugins.addAll(Arrays.asList(PluginManager.getPlugins()));
-                                        plugins.addAll(CustomGenerator.getAdditionalGenerators());
-                                        Plugin plugin = null;
-                                        for (Plugin pl : plugins) {
-                                            if (pl.getName().equalsIgnoreCase(args[4])) {
+                            WorldType type = WorldType.getByName(args[2]);
+                            if (type != null) {
+                                if (args.length >= 4) {
+                                    Environment environment = Environment.getByName(args[3]);
+                                    if (environment != null) {
+                                        if (args.length >= 5) {
+                                            List<Plugin> plugins = new ArrayList<>();
+                                            plugins.addAll(Arrays.asList(PluginManager.getPlugins()));
+                                            plugins.addAll(CustomGenerator.getAdditionalGenerators());
+                                            Plugin plugin = null;
+                                            for (Plugin pl : plugins) {
+                                                if (!pl.getName().equalsIgnoreCase(args[4])) continue;
                                                 plugin = pl;
                                                 break;
                                             }
-                                        }
-                                        if (plugin != null && plugin.isEnabled()) {
-                                            WorldCreator creator = null;
-                                            if (plugin instanceof CustomGenerator generator) {
-                                                creator = generator.getWorldCreator(args[1]);
-                                            }
-                                            ChunkGenerator generator = null;
-                                            if (creator == null) {
-                                                generator = plugin.getDefaultWorldGenerator(args[1], null);
-                                            }
-                                            if (generator != null || creator != null) {
-                                                source.sendMessage("%prefix% §aGenerating world §6" + args[1]);
-                                                World world;
-                                                if (generator != null) {
-                                                    world = new WorldCreator(args[1]).generator(generator).environment(environment.getEnvironment()).type(type.getWorldType()).createWorld();
-                                                } else world = creator.createWorld();
-                                                if (world != null) {
-                                                    source.sendMessage("%prefix% §aGenerated world §6" + world.getName());
-                                                    if (source.isPlayer()) {
-                                                        TNLPlayer player = (TNLPlayer) source.player();
-                                                        player.worldManager().teleport(world.getSpawnLocation());
-                                                    }
-                                                } else source.sendMessage("%prefix% §cFailed to generate world");
+                                            if (plugin != null && plugin.isEnabled()) {
+                                                WorldCreator creator = null;
+                                                if (plugin instanceof CustomGenerator generator) {
+                                                    creator = generator.getWorldCreator(args[1]);
+                                                }
+                                                ChunkGenerator generator = null;
+                                                if (creator == null) {
+                                                    generator = plugin.getDefaultWorldGenerator(args[1], null);
+                                                }
+                                                if (generator != null || creator != null) {
+                                                    source.sendMessage("%prefix% §aGenerating world §6" + args[1]);
+                                                    World world;
+                                                    if (generator != null) {
+                                                        world = new WorldCreator(args[1]).generator(generator).environment(environment.getEnvironment()).type(type.getWorldType()).createWorld();
+                                                    } else world = creator.createWorld();
+                                                    if (world != null) {
+                                                        source.sendMessage("%prefix% §aGenerated world §6" + world.getName());
+                                                        if (source.isPlayer()) {
+                                                            TNLPlayer player = (TNLPlayer) source.player();
+                                                            player.worldManager().teleport(world.getSpawnLocation());
+                                                        }
+                                                    } else source.sendMessage("%prefix% §cFailed to generate world");
+                                                } else {
+                                                    source.sendMessage("%prefix% §4" + plugin.getName() + "§c is not a world generator");
+                                                }
                                             } else {
-                                                source.sendMessage("%prefix% §4" + plugin.getName() + "§c is not a world generator");
+                                                source.sendMessage("%prefix% §c/world create " + args[1] + " " + args[2] + " " + environment.getName() + " §8(§6Plugin§8)");
                                             }
                                         } else {
-                                            source.sendMessage("%prefix% §c/world create " + args[1] + " " + args[2] + " " + environment.name() + " §8(§6Plugin§8)");
+                                            World world = new WorldCreator(args[1]).type(type.getWorldType()).environment(environment.getEnvironment()).createWorld();
+                                            if (world != null) {
+                                                source.sendMessage("%prefix% §7Created World§8: §6" + args[1]);
+                                            } else source.sendMessage("%prefix% §cFailed to create World §4" + args[1]);
                                         }
                                     } else {
-                                        World world = new WorldCreator(args[1]).type(type.getWorldType()).environment(environment.getEnvironment()).createWorld();
-                                        if (world != null) {
-                                            source.sendMessage("%prefix% §7Created World§8: §6" + args[1]);
-                                        } else source.sendMessage("%prefix% §cFailed to create World §4" + args[1]);
+                                        source.sendMessage("%prefix% §c/world create " + args[1] + " " + args[2] + " §8[§6Environment§8] §8(§6Plugin§8)");
                                     }
                                 } else {
                                     source.sendMessage("%prefix% §c/world create " + args[1] + " " + args[2] + " §8[§6Environment§8] §8(§6Plugin§8)");
                                 }
                             } else {
-                                source.sendMessage("%prefix% §c/world create " + args[1] + " " + args[2] + " §8[§6Environment§8] §8(§6Plugin§8)");
+                                source.sendMessage("%prefix% §c/world create " + args[1] + " §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
                             }
                         } else {
                             source.sendMessage("%prefix% §c/world create " + args[1] + " §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
