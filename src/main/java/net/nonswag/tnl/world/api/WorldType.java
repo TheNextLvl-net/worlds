@@ -24,7 +24,9 @@ public enum WorldType {
 
     @Nullable
     public static WorldType getByName(@Nonnull String name) {
-        for (WorldType type : values()) if (type.getName().equalsIgnoreCase(name)) return type;
+        for (WorldType type : values()) {
+            if (type.getName().equalsIgnoreCase(name) || type.name().equalsIgnoreCase(name)) return type;
+        }
         return null;
     }
 }

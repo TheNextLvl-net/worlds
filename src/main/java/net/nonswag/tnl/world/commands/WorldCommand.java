@@ -72,6 +72,7 @@ public class WorldCommand extends TNLCommand {
                                                     } else world = creator.createWorld();
                                                     if (world != null) {
                                                         source.sendMessage("%prefix% §aGenerated world §6" + world.getName());
+                                                        WorldUtil.getWorldTypes().put(world, type);
                                                         if (source.isPlayer()) {
                                                             TNLPlayer player = (TNLPlayer) source.player();
                                                             player.worldManager().teleport(world.getSpawnLocation());
@@ -87,6 +88,11 @@ public class WorldCommand extends TNLCommand {
                                             World world = new WorldCreator(args[1]).type(type.getWorldType()).environment(environment.getEnvironment()).createWorld();
                                             if (world != null) {
                                                 source.sendMessage("%prefix% §7Created World§8: §6" + args[1]);
+                                                WorldUtil.getWorldTypes().put(world, type);
+                                                if (source.isPlayer()) {
+                                                    TNLPlayer player = (TNLPlayer) source.player();
+                                                    player.worldManager().teleport(world.getSpawnLocation());
+                                                }
                                             } else source.sendMessage("%prefix% §cFailed to create World §4" + args[1]);
                                         }
                                     } else {

@@ -10,7 +10,6 @@ import net.nonswag.tnl.world.api.errors.WorldCloneException;
 import net.nonswag.tnl.world.commands.WorldCommand;
 import net.nonswag.tnl.world.generators.FlatGenerator;
 import net.nonswag.tnl.world.generators.VoidGenerator;
-import net.nonswag.tnl.world.listeners.WorldListener;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -32,7 +31,6 @@ public class Worlds extends TNLPlugin {
         FlatGenerator.getInstance().register();
         WorldUtil.getInstance().exportAll();
         getCommandManager().registerCommand(new WorldCommand());
-        getEventManager().registerListener(new WorldListener());
         try {
             WorldUtil.getInstance().loadWorlds();
         } catch (Exception e) {
@@ -45,7 +43,7 @@ public class Worlds extends TNLPlugin {
 
     @Override
     public void disable() {
-        WorldUtil.getInstance().saveWorlds();
+        WorldUtil.getInstance().exportAll();
     }
 
     @Nonnull

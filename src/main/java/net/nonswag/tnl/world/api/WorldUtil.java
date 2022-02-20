@@ -2,16 +2,15 @@ package net.nonswag.tnl.world.api;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import lombok.Getter;
 import net.nonswag.tnl.core.api.file.formats.JsonFile;
 import net.nonswag.tnl.core.api.file.helper.FileHelper;
 import net.nonswag.tnl.core.api.logger.Logger;
-import net.nonswag.tnl.core.api.object.Objects;
 import net.nonswag.tnl.listener.api.player.TNLPlayer;
 import net.nonswag.tnl.world.api.events.WorldDeleteEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
@@ -21,14 +20,20 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class WorldUtil {
 
+    @Getter
     @Nonnull
-    protected static final WorldUtil instance = new WorldUtil();
+    private static final WorldUtil instance = new WorldUtil();
+    @Getter
+    @Nonnull
+    private static final HashMap<World, net.nonswag.tnl.world.api.WorldType> worldTypes = new HashMap<>();
 
+    @Getter
     @Nonnull
     private final JsonFile saves = new JsonFile("plugins/Worlds/", "saves.json");
 
@@ -43,14 +48,11 @@ public class WorldUtil {
         return strings;
     }
 
-    @SuppressWarnings("deprecation")
     public void export(@Nonnull World world) {
         JsonObject jsonObject = getSaves().getJsonElement().getAsJsonObject();
         if (!jsonObject.has(world.getName())) jsonObject.add(world.getName(), new JsonObject());
         JsonObject jsonWorld = jsonObject.getAsJsonObject(world.getName());
-        WorldType type = world.getWorldType();
-        if (type == null) type = WorldType.NORMAL;
-        jsonWorld.addProperty("type", type.name());
+        jsonWorld.addProperty("type", getWorldTypes().getOrDefault(world, WorldType.NORMAL).name());
         jsonWorld.addProperty("environment", world.getEnvironment().name());
         jsonWorld.addProperty("seed", world.getSeed());
         Plugin generator = getGenerator(world);
@@ -59,6 +61,7 @@ public class WorldUtil {
 
     public void exportAll() {
         for (World world : Bukkit.getWorlds()) export(world);
+        getSaves().save();
     }
 
     @Nullable
@@ -115,31 +118,20 @@ public class WorldUtil {
                 worldCreator.generator(plugin.getDefaultWorldGenerator(name, null));
             } else worldCreator.generator(((ChunkGenerator) null));
         } else worldCreator.generator(((ChunkGenerator) null));
-        if (world.has("type")) {
-            worldCreator.type(Objects.getOrDefault(WorldType.getByName(world.get("type").getAsString()), WorldType.NORMAL));
-        } else worldCreator.type(WorldType.NORMAL);
+        WorldType worldType;
+        if (world.has("type") && (worldType = WorldType.getByName(world.get("type").getAsString())) != null) {
+            worldCreator.type(worldType.getWorldType());
+        } else worldCreator.type((worldType = WorldType.NORMAL).getWorldType());
         if (world.has("environment")) {
             Environment environment = Environment.getByName(world.get("environment").getAsString());
             if (environment != null) worldCreator.environment(environment.getEnvironment());
         } else worldCreator.environment(World.Environment.NORMAL);
         if (world.has("seed")) worldCreator.seed(world.get("seed").getAsLong());
         World created = worldCreator.createWorld();
-        if (created != null) Logger.debug.println("Loaded world: " + created.getName());
-        else Logger.error.println("Could not create world");
+        if (created != null) {
+            Logger.debug.println("Loaded world: " + created.getName());
+            getWorldTypes().put(created, worldType);
+        } else Logger.error.println("Could not create world");
         return created;
-    }
-
-    @Nonnull
-    public JsonFile getSaves() {
-        return saves;
-    }
-
-    public void saveWorlds() {
-        getSaves().save();
-    }
-
-    @Nonnull
-    public static WorldUtil getInstance() {
-        return instance;
     }
 }
