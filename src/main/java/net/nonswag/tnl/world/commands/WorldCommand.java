@@ -21,6 +21,7 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -75,7 +76,7 @@ public class WorldCommand extends TNLCommand {
                                                         WorldUtil.getWorldTypes().put(world, type);
                                                         if (source.isPlayer()) {
                                                             TNLPlayer player = (TNLPlayer) source.player();
-                                                            player.worldManager().teleport(world.getSpawnLocation());
+                                                            player.worldManager().teleport(world.getSpawnLocation().add(0.5, 0, 0.5));
                                                         }
                                                     } else source.sendMessage("%prefix% §cFailed to generate world");
                                                 } else {
@@ -91,7 +92,7 @@ public class WorldCommand extends TNLCommand {
                                                 WorldUtil.getWorldTypes().put(world, type);
                                                 if (source.isPlayer()) {
                                                     TNLPlayer player = (TNLPlayer) source.player();
-                                                    player.worldManager().teleport(world.getSpawnLocation());
+                                                    player.worldManager().teleport(world.getSpawnLocation().add(0.5, 0, 0.5));
                                                 }
                                             } else source.sendMessage("%prefix% §cFailed to create World §4" + args[1]);
                                         }
@@ -117,7 +118,7 @@ public class WorldCommand extends TNLCommand {
                         World world = Bukkit.getWorld(args[1]);
                         if (world != null) {
                             TNLPlayer player = (TNLPlayer) source.player();
-                            player.worldManager().teleport(world.getSpawnLocation());
+                            player.worldManager().teleport(world.getSpawnLocation().add(0.5, 0, 0.5));
                             source.sendMessage("%prefix% §7Teleported§8: §6" + world.getName());
                         } else source.sendMessage("%prefix% §c/world tp §8[§6World§8]");
                     } else source.sendMessage("%prefix% §c/world tp §8[§6Player§8] §8[§6World§8]");
@@ -126,9 +127,9 @@ public class WorldCommand extends TNLCommand {
                     if (arg != null) {
                         World world = Bukkit.getWorld(args[2]);
                         if (world != null) {
-                            arg.worldManager().teleport(world.getSpawnLocation());
+                            arg.worldManager().teleport(world.getSpawnLocation().add(0.5, 0, 0.5));
                             if (source.equals(arg)) {
-                                source.sendMessage("%prefix% §aTeleported you to the world spawn of world §6" + world.getName());
+                                source.sendMessage("%prefix% §aTeleported§8: §6" + world.getName());
                             } else {
                                 source.sendMessage("%prefix% §7Teleported §8(§a" + arg.getName() + "§8): §6" + world.getName());
                             }
@@ -149,7 +150,7 @@ public class WorldCommand extends TNLCommand {
                         if (WorldUtil.getInstance().deleteWorld(world)) {
                             source.sendMessage("%prefix% §7Deleted World§8: §6" + world.getName());
                         } else {
-                            source.sendMessage("%prefix% §cFailed to delete World §4" + world.getName());
+                            source.sendMessage("%prefix% §cFailed to delete world §4" + world.getName());
                         }
                     } else source.sendMessage("%prefix% §c/world delete §8[§6World§8]");
                 } else source.sendMessage("%prefix% §c/world delete §8[§6World§8]");
@@ -157,18 +158,22 @@ public class WorldCommand extends TNLCommand {
                 if (args.length >= 2) {
                     World world = Bukkit.getWorld(args[1]);
                     if (world == null) {
-                        world = WorldUtil.getInstance().loadWorld(args[1]);
-                        if (world == null) {
-                            WorldCreator creator = new WorldCreator(args[1]);
-                            creator.type(org.bukkit.WorldType.NORMAL);
-                            creator.environment(World.Environment.NORMAL);
-                            world = creator.createWorld();
-                        }
-                        if (world != null) {
-                            source.sendMessage("%prefix% §7Imported World§8: §6" + args[1]);
-                        } else {
-                            source.sendMessage("%prefix% §cFailed to import World §4" + args[1]);
-                        }
+                        File file = new File(Bukkit.getWorldContainer(), args[1]);
+                        if (file.exists() && file.isDirectory()) {
+                            world = WorldUtil.getInstance().loadWorld(args[1]);
+                            if (world == null) {
+                                WorldCreator creator = new WorldCreator(args[1]);
+                                creator.type(org.bukkit.WorldType.NORMAL);
+                                creator.environment(World.Environment.NORMAL);
+                                world = creator.createWorld();
+                            }
+                            if (world != null) {
+                                source.sendMessage("%prefix% §7Imported world§8: §6" + args[1]);
+                                if (source.isPlayer()) {
+                                    ((TNLPlayer) source.player()).worldManager().teleport(world.getSpawnLocation().add(0.5, 0, 0.5));
+                                }
+                            } else source.sendMessage("%prefix% §cFailed to import world §4" + args[1]);
+                        } else source.sendMessage("%prefix% §cCan't find the folder §4" + file.getAbsolutePath());
                     } else source.sendMessage("%prefix% §cA world with this name already exist");
                 } else source.sendMessage("%prefix% §c/world import §8[§6World§8]");
             } else if (args[0].equalsIgnoreCase("unload")) {
@@ -176,9 +181,9 @@ public class WorldCommand extends TNLCommand {
                     World world = Bukkit.getWorld(args[1]);
                     if (world != null) {
                         if (WorldUtil.getInstance().unloadWorld(world, true)) {
-                            source.sendMessage("%prefix% §7Unloaded World§8: §6" + world.getName());
+                            source.sendMessage("%prefix% §7Unloaded world§8: §6" + world.getName());
                         } else {
-                            source.sendMessage("%prefix% §cFailed to unload World §4" + world.getName());
+                            source.sendMessage("%prefix% §cFailed to unload world §4" + world.getName());
                         }
                     } else {
                         source.sendMessage("%prefix% §c/world unload §8[§6World§8]");
@@ -191,6 +196,7 @@ public class WorldCommand extends TNLCommand {
                     World world = Bukkit.getWorld(args[1]);
                     if (world != null) {
                         world.save();
+                        WorldUtil.getInstance().export(world);
                         source.sendMessage(MessageKey.WORLD_SAVED, new Placeholder("world", world.getName()));
                     } else source.sendMessage("%prefix% §c/world export §8(§6World§8)");
                 } else {
@@ -198,6 +204,7 @@ public class WorldCommand extends TNLCommand {
                         world.save();
                         source.sendMessage(MessageKey.WORLD_SAVED, new Placeholder("world", world.getName()));
                     }
+                    WorldUtil.getInstance().exportAll();
                 }
             } else if (args[0].equalsIgnoreCase("load")) {
                 if (args.length >= 2) {
@@ -205,20 +212,20 @@ public class WorldCommand extends TNLCommand {
                     if (world == null) {
                         world = WorldUtil.getInstance().loadWorld(args[1]);
                         if (world != null) source.sendMessage("%prefix% §7Loaded World§8: §6" + args[1]);
-                        else source.sendMessage("%prefix% §cFailed to load World §4" + args[1]);
+                        else source.sendMessage("%prefix% §cFailed to load world §4" + args[1]);
                     } else source.sendMessage("%prefix% §cA world with this name already exist");
                 } else source.sendMessage("%prefix% §c/world load §8[§6World§8]");
             } else if (args[0].equalsIgnoreCase("setspawn")) {
                 if (source.isPlayer()) {
                     TNLPlayer player = (TNLPlayer) source.player();
-                    player.worldManager().getWorld().setSpawnLocation(player.worldManager().getLocation());
+                    player.worldManager().getWorld().setSpawnLocation(player.worldManager().getLocation().getBlock().getLocation());
                     Location l = player.worldManager().getWorld().getSpawnLocation();
                     source.sendMessage("%prefix% §aSuccessfully set the spawn location to §6" + l.getX() + "§8, §6" + l.getY() + "§8, §6" + l.getZ());
                 } else throw new SourceMismatchException();
             } else if (args[0].equalsIgnoreCase("spawn")) {
                 if (source.isPlayer()) {
                     TNLPlayer player = (TNLPlayer) source.player();
-                    player.worldManager().teleport(player.worldManager().getWorld().getSpawnLocation());
+                    player.worldManager().teleport(player.worldManager().getWorld().getSpawnLocation().add(0.5, 0, 0.5));
                     source.sendMessage("%prefix% §aTeleported you to the world spawn of world §6" + player.worldManager().getWorld().getName());
                 } else throw new SourceMismatchException();
             } else if (args[0].equalsIgnoreCase("list")) {

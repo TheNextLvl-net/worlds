@@ -3,14 +3,15 @@ package net.nonswag.tnl.world.api;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
+import net.minecraft.server.v1_16_R3.WorldServer;
 import net.nonswag.tnl.core.api.file.formats.JsonFile;
 import net.nonswag.tnl.core.api.file.helper.FileHelper;
 import net.nonswag.tnl.core.api.logger.Logger;
-import net.nonswag.tnl.listener.api.player.TNLPlayer;
 import net.nonswag.tnl.world.api.events.WorldDeleteEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
@@ -50,13 +51,13 @@ public class WorldUtil {
 
     public void export(@Nonnull World world) {
         JsonObject jsonObject = getSaves().getJsonElement().getAsJsonObject();
-        if (!jsonObject.has(world.getName())) jsonObject.add(world.getName(), new JsonObject());
-        JsonObject jsonWorld = jsonObject.getAsJsonObject(world.getName());
-        jsonWorld.addProperty("type", getWorldTypes().getOrDefault(world, WorldType.NORMAL).name());
-        jsonWorld.addProperty("environment", world.getEnvironment().name());
-        jsonWorld.addProperty("seed", world.getSeed());
+        JsonObject object = new JsonObject();
+        object.addProperty("type", getWorldTypes().getOrDefault(world, WorldType.NORMAL).name());
+        object.addProperty("environment", world.getEnvironment().name());
+        object.addProperty("seed", world.getSeed());
         Plugin generator = getGenerator(world);
-        if (generator != null) jsonWorld.addProperty("generator", generator.getName());
+        if (generator != null) object.addProperty("generator", generator.getName());
+        jsonObject.add(world.getName(), object);
     }
 
     public void exportAll() {
@@ -75,21 +76,23 @@ public class WorldUtil {
     }
 
     public boolean unloadWorld(@Nonnull World world, boolean save) {
-        if (!world.getPlayers().isEmpty()) {
-            World to = null;
-            for (World bukkit : Bukkit.getWorlds()) if (world != bukkit) to = bukkit;
-            for (Player all : world.getPlayers()) {
-                TNLPlayer player = TNLPlayer.cast(all);
-                if (to != null) player.worldManager().teleport(to.getSpawnLocation());
-                else player.disconnect("%prefix%\n§cThere are no loaded worlds");
-            }
+        CraftServer craftServer = (CraftServer) Bukkit.getServer();
+        WorldServer server = ((CraftWorld) world).getHandle();
+        if (!craftServer.getServer().worldServer.containsKey(server.getDimensionKey())) return false;
+        if (server.getDimensionKey() == net.minecraft.server.v1_16_R3.World.OVERWORLD) return false;
+        if (!server.getPlayers().isEmpty()) {
+            List<World> worlds = Bukkit.getWorlds();
+            worlds.remove(world);
+            World to = worlds.isEmpty() ? null : worlds.get(0);
+            if (to == null) return false;
+            for (Player all : world.getPlayers()) all.teleport(to.getSpawnLocation());
+            server.getPlayers().clear();
         }
-        ((CraftWorld) world).getHandle().getPlayers().clear();
         return Bukkit.unloadWorld(world, save);
     }
 
     public boolean deleteWorld(@Nonnull World world) {
-        if (unloadWorld(world, false) && new WorldDeleteEvent(world).call()) {
+        if (new WorldDeleteEvent(world).call() && unloadWorld(world, false)) {
             File file = new File(Bukkit.getWorldContainer(), world.getName());
             FileHelper.deleteDirectory(file);
             JsonObject root = getSaves().getJsonElement().getAsJsonObject();
@@ -128,10 +131,8 @@ public class WorldUtil {
         } else worldCreator.environment(World.Environment.NORMAL);
         if (world.has("seed")) worldCreator.seed(world.get("seed").getAsLong());
         World created = worldCreator.createWorld();
-        if (created != null) {
-            Logger.debug.println("Loaded world: " + created.getName());
-            getWorldTypes().put(created, worldType);
-        } else Logger.error.println("Could not create world");
+        if (created != null) getWorldTypes().put(created, worldType);
+        else Logger.error.println("Could not create world");
         return created;
     }
 }
