@@ -26,7 +26,7 @@ public class Worlds extends TNLPlugin {
 
     @Override
     public void enable() {
-        setInstance(this);
+        instance = this;
         VoidGenerator.getInstance().register();
         FlatGenerator.getInstance().register();
         WorldUtil.getInstance().exportAll();
@@ -71,9 +71,5 @@ public class Worlds extends TNLPlugin {
     public static Worlds getInstance() {
         assert instance != null;
         return instance;
-    }
-
-    private static void setInstance(@Nonnull Worlds instance) {
-        Worlds.instance = instance;
     }
 }
