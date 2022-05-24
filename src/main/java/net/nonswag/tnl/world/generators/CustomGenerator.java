@@ -1,6 +1,7 @@
 package net.nonswag.tnl.world.generators;
 
 import net.nonswag.tnl.listener.api.plugin.PluginBuilder;
+import net.nonswag.tnl.world.Worlds;
 import org.bukkit.WorldCreator;
 import org.bukkit.generator.ChunkGenerator;
 
@@ -15,7 +16,7 @@ public abstract class CustomGenerator extends PluginBuilder {
     private static final List<CustomGenerator> additionalGenerators = new ArrayList<>();
 
     protected CustomGenerator(@Nonnull String name) {
-        super(name);
+        super(name, Worlds.getInstance());
         this.enabled = true;
     }
 
