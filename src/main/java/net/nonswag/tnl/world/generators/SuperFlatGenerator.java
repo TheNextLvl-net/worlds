@@ -1,5 +1,6 @@
 package net.nonswag.tnl.world.generators;
 
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -9,13 +10,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Random;
 
-public class FlatGenerator extends CustomGenerator {
+public class SuperFlatGenerator extends CustomGenerator {
 
+    @Getter
     @Nonnull
-    private static final FlatGenerator instance = new FlatGenerator();
+    private static final SuperFlatGenerator instance = new SuperFlatGenerator();
 
-    private FlatGenerator() {
-        super("FlatGenerator");
+    private SuperFlatGenerator() {
+        super("super-flat");
     }
 
     @Nonnull
@@ -41,10 +43,5 @@ public class FlatGenerator extends CustomGenerator {
                 return new Location(world, 0.5, 40, 0.5, 0, 0);
             }
         };
-    }
-
-    @Nonnull
-    public static FlatGenerator getInstance() {
-        return instance;
     }
 }

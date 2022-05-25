@@ -1,6 +1,7 @@
 package net.nonswag.tnl.world;
 
 import net.nonswag.tnl.core.api.file.helper.FileHelper;
+import net.nonswag.tnl.core.api.logger.Logger;
 import net.nonswag.tnl.core.utils.LinuxUtil;
 import net.nonswag.tnl.listener.api.plugin.PluginUpdate;
 import net.nonswag.tnl.listener.api.plugin.TNLPlugin;
@@ -8,7 +9,8 @@ import net.nonswag.tnl.listener.api.settings.Settings;
 import net.nonswag.tnl.world.api.WorldUtil;
 import net.nonswag.tnl.world.api.errors.WorldCloneException;
 import net.nonswag.tnl.world.commands.WorldCommand;
-import net.nonswag.tnl.world.generators.FlatGenerator;
+import net.nonswag.tnl.world.generators.SimplexOctaveGenerator;
+import net.nonswag.tnl.world.generators.SuperFlatGenerator;
 import net.nonswag.tnl.world.generators.VoidGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -28,13 +30,14 @@ public class Worlds extends TNLPlugin {
     public void enable() {
         instance = this;
         VoidGenerator.getInstance().register();
-        FlatGenerator.getInstance().register();
+        SuperFlatGenerator.getInstance().register();
+        SimplexOctaveGenerator.getInstance().register();
         WorldUtil.getInstance().exportAll();
         getCommandManager().registerCommand(new WorldCommand());
         try {
             WorldUtil.getInstance().loadWorlds();
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.error.println(e);
         }
         async(() -> {
             if (Settings.AUTO_UPDATER.getValue()) new PluginUpdate(this).downloadUpdate();

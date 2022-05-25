@@ -1,5 +1,6 @@
 package net.nonswag.tnl.world.generators;
 
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -11,11 +12,12 @@ import java.util.Random;
 
 public class VoidGenerator extends CustomGenerator {
 
+    @Getter
     @Nonnull
     private static final VoidGenerator instance = new VoidGenerator();
 
     private VoidGenerator() {
-        super("VoidGenerator");
+        super("void");
     }
 
     @Nonnull
@@ -36,10 +38,5 @@ public class VoidGenerator extends CustomGenerator {
                 return new Location(world, 0.5, 100, 0.5, 0, 0);
             }
         };
-    }
-
-    @Nonnull
-    public static VoidGenerator getInstance() {
-        return instance;
     }
 }

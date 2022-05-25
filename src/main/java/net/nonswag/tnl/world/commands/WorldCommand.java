@@ -64,11 +64,13 @@ public class WorldCommand extends TNLCommand {
                                                 ChunkGenerator generator = null;
                                                 if (creator == null) {
                                                     generator = plugin.getDefaultWorldGenerator(args[1], null);
+                                                } else {
+                                                    creator.type(type.getWorldType()).environment(environment.getEnvironment());
                                                 }
                                                 if (generator != null || creator != null) {
                                                     source.sendMessage("%prefix% §aGenerating world §6" + args[1]);
                                                     World world;
-                                                    if (generator != null) {
+                                                    if (creator == null) {
                                                         world = new WorldCreator(args[1]).generator(generator).environment(environment.getEnvironment()).type(type.getWorldType()).createWorld();
                                                     } else world = creator.createWorld();
                                                     if (world != null) {

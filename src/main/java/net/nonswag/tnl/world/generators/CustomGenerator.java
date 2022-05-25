@@ -27,9 +27,11 @@ public abstract class CustomGenerator extends PluginBuilder {
         return this;
     }
 
+    @Nonnull
     @Override
-    public void unregister() {
+    public CustomGenerator unregister() {
         additionalGenerators.remove(this);
+        return this;
     }
 
     @Override
