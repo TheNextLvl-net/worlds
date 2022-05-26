@@ -51,6 +51,9 @@ public class Worlds extends TNLPlugin {
 
     @Nonnull
     public World clone(@Nonnull World world, @Nonnull String name) throws WorldCloneException {
+        if (Bukkit.getWorld(name) != null) {
+            throw new WorldCloneException("A world named <'" + name + "'> does already exist");
+        }
         try {
             File file = new File(Bukkit.getWorldContainer(), name);
             LinuxUtil.runShellCommand("cp -r " + new File(Bukkit.getWorldContainer(), world.getName()).getAbsolutePath() + " " + file.getAbsolutePath());
