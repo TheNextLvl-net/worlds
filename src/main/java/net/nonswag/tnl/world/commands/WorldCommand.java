@@ -110,7 +110,7 @@ public class WorldCommand extends TNLCommand {
                         } else {
                             source.sendMessage("%prefix% §c/world create " + args[1] + " §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
                         }
-                    } else source.sendMessage("%prefix% §cA world named §4" + args[1] + "§c already exist");
+                    } else source.sendMessage("%prefix% §cA world named §4" + args[1] + "§c already exists");
                 } else {
                     source.sendMessage("%prefix% §c/world create §8[§6Name§8] §8[§6Type§8] §8[§6Environment§8] §8(§6Plugin§8)");
                 }

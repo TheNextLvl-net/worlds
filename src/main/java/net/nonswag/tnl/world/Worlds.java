@@ -57,8 +57,8 @@ public class Worlds extends TNLPlugin {
         try {
             File file = new File(Bukkit.getWorldContainer(), name);
             LinuxUtil.runShellCommand("cp -r " + new File(Bukkit.getWorldContainer(), world.getName()).getAbsolutePath() + " " + file.getAbsolutePath());
-            FileHelper.deleteDirectory(new File(file, "uid.dat"));
-            FileHelper.deleteDirectory(new File(file, "session.lock"));
+            FileHelper.delete(new File(file, "uid.dat"));
+            FileHelper.delete(new File(file, "session.lock"));
         } catch (IOException | InterruptedException e) {
             throw new WorldCloneException("an error has occurred while copying the world", e);
         }

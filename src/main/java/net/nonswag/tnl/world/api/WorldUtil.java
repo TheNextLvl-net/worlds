@@ -94,7 +94,7 @@ public class WorldUtil {
     public boolean deleteWorld(@Nonnull World world) {
         if (new WorldDeleteEvent(world).call() && unloadWorld(world, false)) {
             File file = new File(Bukkit.getWorldContainer(), world.getName());
-            FileHelper.deleteDirectory(file);
+            FileHelper.delete(file);
             JsonObject root = getSaves().getJsonElement().getAsJsonObject();
             root.remove(world.getName());
             return !file.exists();
@@ -112,7 +112,7 @@ public class WorldUtil {
         JsonObject root = getSaves().getJsonElement().getAsJsonObject();
         if (!root.has(name) || !root.get(name).isJsonObject()) return null;
         File sessionLock = new File(new File(Bukkit.getWorldContainer(), name), "session.lock");
-        if (sessionLock.exists()) FileHelper.deleteDirectory(sessionLock);
+        if (sessionLock.exists()) FileHelper.delete(sessionLock);
         JsonObject world = root.getAsJsonObject(name);
         WorldCreator worldCreator = new WorldCreator(name);
         if (world.has("generator")) {
