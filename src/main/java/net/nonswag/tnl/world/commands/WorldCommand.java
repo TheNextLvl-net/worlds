@@ -82,7 +82,6 @@ public class WorldCommand extends TNLCommand {
                                                         }
                                                     }
                                                     if (world != null) {
-                                                        world.register();
                                                         source.sendMessage("%prefix% §aGenerated world §6" + world.bukkit().getName());
                                                         if (source.isPlayer()) {
                                                             TNLPlayer player = (TNLPlayer) source.player();
