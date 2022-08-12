@@ -39,11 +39,6 @@ public abstract class CustomGenerator extends PluginBuilder {
         return additionalGenerators.contains(this);
     }
 
-    @Nonnull
-    public static List<CustomGenerator> getAdditionalGenerators() {
-        return new ArrayList<>(additionalGenerators);
-    }
-
     @Nullable
     @Override
     public ChunkGenerator getDefaultWorldGenerator(@Nonnull String name, @Nullable String id) {
@@ -52,6 +47,18 @@ public abstract class CustomGenerator extends PluginBuilder {
 
     @Nullable
     public WorldCreator getWorldCreator(@Nonnull String name) {
+        return null;
+    }
+
+    @Nonnull
+    public static List<CustomGenerator> getAdditionalGenerators() {
+        return new ArrayList<>(additionalGenerators);
+    }
+
+    @Nullable
+    public static CustomGenerator getGenerator(@Nonnull String name) {
+        for (CustomGenerator g : additionalGenerators) if (g.getName().equals(name)) return g;
+        for (CustomGenerator g : additionalGenerators) if (g.getName().equalsIgnoreCase(name)) return g;
         return null;
     }
 }

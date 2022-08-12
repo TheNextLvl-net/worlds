@@ -1,17 +1,18 @@
 package net.nonswag.tnl.world;
 
 import net.nonswag.tnl.core.api.file.helper.FileHelper;
-import net.nonswag.tnl.core.api.logger.Logger;
 import net.nonswag.tnl.core.utils.LinuxUtil;
 import net.nonswag.tnl.listener.api.plugin.PluginUpdate;
 import net.nonswag.tnl.listener.api.plugin.TNLPlugin;
 import net.nonswag.tnl.listener.api.settings.Settings;
 import net.nonswag.tnl.world.api.WorldUtil;
 import net.nonswag.tnl.world.api.errors.WorldCloneException;
+import net.nonswag.tnl.world.api.world.TNLWorld;
 import net.nonswag.tnl.world.commands.WorldCommand;
 import net.nonswag.tnl.world.generators.SimplexOctaveGenerator;
 import net.nonswag.tnl.world.generators.SuperFlatGenerator;
 import net.nonswag.tnl.world.generators.VoidGenerator;
+import net.nonswag.tnl.world.listeners.PacketListener;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -32,13 +33,10 @@ public class Worlds extends TNLPlugin {
         VoidGenerator.getInstance().register();
         SuperFlatGenerator.getInstance().register();
         SimplexOctaveGenerator.getInstance().register();
-        WorldUtil.getInstance().exportAll();
         getCommandManager().registerCommand(new WorldCommand());
-        try {
-            WorldUtil.getInstance().loadWorlds();
-        } catch (Exception e) {
-            Logger.error.println(e);
-        }
+        getEventManager().registerListener(new PacketListener());
+        WorldUtil.loadWorlds();
+        WorldUtil.exportAll();
         async(() -> {
             if (Settings.AUTO_UPDATER.getValue()) new PluginUpdate(this).downloadUpdate();
         });
@@ -46,7 +44,7 @@ public class Worlds extends TNLPlugin {
 
     @Override
     public void disable() {
-        WorldUtil.getInstance().exportAll();
+        WorldUtil.exportAll();
     }
 
     @Nonnull
@@ -62,9 +60,10 @@ public class Worlds extends TNLPlugin {
         } catch (IOException | InterruptedException e) {
             throw new WorldCloneException("an error has occurred while copying the world", e);
         }
+        TNLWorld original = TNLWorld.cast(world);
         World clone = new WorldCreator(name).copy(world).createWorld();
-        if (clone != null) return clone;
-        throw new WorldCloneException();
+        if (clone == null) throw new WorldCloneException();
+        return new TNLWorld(clone, original.environment(), original.type(), original.generator(), original.fullBright()).register().bukkit();
     }
 
     public boolean isCorrectLoaded(@Nullable World world) {

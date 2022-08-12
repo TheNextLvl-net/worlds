@@ -7,13 +7,18 @@ import net.minecraft.server.v1_16_R3.WorldServer;
 import net.nonswag.tnl.core.api.file.formats.JsonFile;
 import net.nonswag.tnl.core.api.file.helper.FileHelper;
 import net.nonswag.tnl.core.api.logger.Logger;
+import net.nonswag.tnl.core.utils.LinuxUtil;
+import net.nonswag.tnl.listener.api.plugin.PluginManager;
 import net.nonswag.tnl.world.api.events.WorldDeleteEvent;
+import net.nonswag.tnl.world.api.world.Environment;
+import net.nonswag.tnl.world.api.world.TNLWorld;
+import net.nonswag.tnl.world.api.world.WorldType;
+import net.nonswag.tnl.world.generators.CustomGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
 
@@ -21,7 +26,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,110 +33,98 @@ public class WorldUtil {
 
     @Getter
     @Nonnull
-    private static final WorldUtil instance = new WorldUtil();
-    @Getter
-    @Nonnull
-    private static final HashMap<World, net.nonswag.tnl.world.api.WorldType> worldTypes = new HashMap<>();
-
-    @Getter
-    @Nonnull
-    private final JsonFile saves = new JsonFile("plugins/Worlds/", "saves.json");
-
-    private WorldUtil() {
-    }
+    private static final JsonFile saves = new JsonFile("plugins/Worlds/", "saves.json");
 
     @Nonnull
-    public List<String> getWorlds() {
+    public static List<String> getWorlds() {
         List<String> strings = new ArrayList<>();
         JsonObject root = getSaves().getJsonElement().getAsJsonObject();
         for (Map.Entry<String, JsonElement> entry : root.entrySet()) strings.add(entry.getKey());
         return strings;
     }
 
-    public void export(@Nonnull World world) {
+    public static void export(@Nonnull TNLWorld world) {
         JsonObject jsonObject = getSaves().getJsonElement().getAsJsonObject();
         JsonObject object = new JsonObject();
-        object.addProperty("type", getWorldTypes().getOrDefault(world, WorldType.NORMAL).name());
-        object.addProperty("environment", world.getEnvironment().name());
-        object.addProperty("seed", world.getSeed());
-        Plugin generator = getGenerator(world);
-        if (generator != null) object.addProperty("generator", generator.getName());
-        jsonObject.add(world.getName(), object);
+        object.addProperty("type", world.type().name());
+        object.addProperty("environment", world.environment().name());
+        object.addProperty("seed", world.bukkit().getSeed());
+        object.addProperty("full-bright", world.fullBright());
+        if (world.generator() != null) object.addProperty("generator", world.generator());
+        jsonObject.add(world.bukkit().getName(), object);
     }
 
-    public void exportAll() {
-        for (World world : Bukkit.getWorlds()) export(world);
+    public static void exportAll() {
+        TNLWorld.cast(Bukkit.getWorlds()).forEach(WorldUtil::export);
         getSaves().save();
     }
 
-    @Nullable
-    public Plugin getGenerator(@Nonnull World world) {
-        if (world.getGenerator() == null) return null;
-        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-            ChunkGenerator generator = plugin.getDefaultWorldGenerator(world.getName(), null);
-            if (generator != null && generator.getClass().equals(world.getGenerator().getClass())) return plugin;
-        }
-        return null;
-    }
-
-    public boolean unloadWorld(@Nonnull World world, boolean save) {
+    public static boolean unloadWorld(@Nonnull TNLWorld world, boolean save) {
         CraftServer craftServer = (CraftServer) Bukkit.getServer();
-        WorldServer server = ((CraftWorld) world).getHandle();
+        WorldServer server = ((CraftWorld) world.bukkit()).getHandle();
         if (!craftServer.getServer().worldServer.containsKey(server.getDimensionKey())) return false;
         if (server.getDimensionKey() == net.minecraft.server.v1_16_R3.World.OVERWORLD) return false;
         if (!server.getPlayers().isEmpty()) {
             List<World> worlds = Bukkit.getWorlds();
-            worlds.remove(world);
+            worlds.remove(world.bukkit());
             World to = worlds.isEmpty() ? null : worlds.get(0);
             if (to == null) return false;
-            for (Player all : world.getPlayers()) all.teleport(to.getSpawnLocation());
+            world.bukkit().getPlayers().forEach(all -> all.teleport(to.getSpawnLocation()));
             server.getPlayers().clear();
         }
-        return Bukkit.unloadWorld(world, save);
+        return Bukkit.unloadWorld(world.unregister().bukkit(), save);
     }
 
-    public boolean deleteWorld(@Nonnull World world) {
+    public static boolean deleteWorld(@Nonnull TNLWorld world) {
         if (new WorldDeleteEvent(world).call() && unloadWorld(world, false)) {
-            File file = new File(Bukkit.getWorldContainer(), world.getName());
+            File file = new File(Bukkit.getWorldContainer(), world.bukkit().getName());
             FileHelper.delete(file);
             JsonObject root = getSaves().getJsonElement().getAsJsonObject();
-            root.remove(world.getName());
+            root.remove(world.bukkit().getName());
             return !file.exists();
         } else return false;
     }
 
-    public void loadWorlds() {
-        for (String s : getWorlds()) loadWorld(s);
+    public static void loadWorlds() {
+        try {
+            getWorlds().forEach(WorldUtil::loadWorld);
+        } catch (Exception e) {
+            LinuxUtil.Suppressed.runShellCommand("cp %s broken-%s".formatted(getSaves().getFile().getName(), getSaves().getFile().getName()), getSaves().getFile().getAbsoluteFile().getParentFile());
+        }
     }
 
     @Nullable
-    public World loadWorld(@Nonnull String name) {
-        World bukkit = Bukkit.getWorld(name);
-        if (bukkit != null) return bukkit;
+    public static TNLWorld loadWorld(@Nonnull String name) {
         JsonObject root = getSaves().getJsonElement().getAsJsonObject();
         if (!root.has(name) || !root.get(name).isJsonObject()) return null;
         File sessionLock = new File(new File(Bukkit.getWorldContainer(), name), "session.lock");
         if (sessionLock.exists()) FileHelper.delete(sessionLock);
-        JsonObject world = root.getAsJsonObject(name);
+        JsonObject object = root.getAsJsonObject(name);
         WorldCreator worldCreator = new WorldCreator(name);
-        if (world.has("generator")) {
-            Plugin plugin = Bukkit.getPluginManager().getPlugin(world.get("generator").getAsString());
-            if (plugin != null && plugin.isEnabled()) {
-                worldCreator.generator(plugin.getDefaultWorldGenerator(name, null));
-            } else worldCreator.generator(((ChunkGenerator) null));
-        } else worldCreator.generator(((ChunkGenerator) null));
         WorldType worldType;
-        if (world.has("type") && (worldType = WorldType.getByName(world.get("type").getAsString())) != null) {
+        Environment environment;
+        String generator = null;
+        boolean fullBright = object.has("full-bright") && object.get("full-bright").getAsBoolean();
+        if (object.has("generator") && !(generator = object.get("generator").getAsString()).isEmpty()) {
+            Plugin plugin = PluginManager.getPlugin(generator);
+            if (plugin == null) plugin = CustomGenerator.getGenerator(generator);
+            if (plugin == null || (!plugin.isEnabled() && !(plugin instanceof CustomGenerator))) {
+                worldCreator.generator(((ChunkGenerator) null));
+            } else worldCreator.generator(plugin.getDefaultWorldGenerator(name, null));
+            if (plugin == null) Logger.error.printf("Generator <'%s'> not found", generator).println();
+        } else worldCreator.generator(((ChunkGenerator) null));
+        if (object.has("type") && (worldType = WorldType.getByName(object.get("type").getAsString())) != null) {
             worldCreator.type(worldType.getWorldType());
         } else worldCreator.type((worldType = WorldType.NORMAL).getWorldType());
-        if (world.has("environment")) {
-            Environment environment = Environment.getByName(world.get("environment").getAsString());
+        if (object.has("environment")) {
+            environment = Environment.getByName(object.get("environment").getAsString());
             if (environment != null) worldCreator.environment(environment.getEnvironment());
-        } else worldCreator.environment(World.Environment.NORMAL);
-        if (world.has("seed")) worldCreator.seed(world.get("seed").getAsLong());
+            else environment = Environment.NORMAL;
+        } else worldCreator.environment((environment = Environment.NORMAL).getEnvironment());
+        if (!object.has("full-bright")) fullBright = environment.equals(Environment.NETHER);
+        if (object.has("seed")) worldCreator.seed(object.get("seed").getAsLong());
         World created = worldCreator.createWorld();
-        if (created != null) getWorldTypes().put(created, worldType);
-        else Logger.error.println("Could not create world");
-        return created;
+        if (created == null) return null;
+        return new TNLWorld(created, environment, worldType, generator, fullBright).register();
     }
 }

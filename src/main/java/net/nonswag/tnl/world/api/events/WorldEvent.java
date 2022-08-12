@@ -1,23 +1,20 @@
 package net.nonswag.tnl.world.api.events;
 
+import lombok.Getter;
 import net.nonswag.tnl.listener.api.event.TNLEvent;
-import org.bukkit.World;
+import net.nonswag.tnl.world.api.world.TNLWorld;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
 
+@Getter
 public abstract class WorldEvent extends TNLEvent {
 
     @Nonnull
-    private final World world;
+    private final TNLWorld world;
 
-    protected WorldEvent(@Nonnull World world) {
+    protected WorldEvent(@Nonnull TNLWorld world) {
         this.world = world;
-    }
-
-    @Nonnull
-    public World getWorld() {
-        return world;
     }
 
     @Override

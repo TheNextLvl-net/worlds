@@ -1,4 +1,4 @@
-package net.nonswag.tnl.world.api;
+package net.nonswag.tnl.world.api.world;
 
 import lombok.Getter;
 
@@ -28,5 +28,12 @@ public enum WorldType {
             if (type.getName().equalsIgnoreCase(name) || type.name().equalsIgnoreCase(name)) return type;
         }
         return null;
+    }
+
+    @Nonnull
+    public static WorldType valueOf(@Nullable org.bukkit.WorldType bukkit) {
+        if (bukkit == null) return NORMAL;
+        for (WorldType type : values()) if (type.getWorldType().equals(bukkit)) return type;
+        return NORMAL;
     }
 }

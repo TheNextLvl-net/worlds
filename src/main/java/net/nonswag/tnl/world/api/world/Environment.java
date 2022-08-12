@@ -1,4 +1,4 @@
-package net.nonswag.tnl.world.api;
+package net.nonswag.tnl.world.api.world;
 
 import org.bukkit.World;
 
@@ -32,9 +32,16 @@ public enum Environment {
 
     @Nullable
     public static Environment getByName(@Nonnull String name) {
-        for (Environment e : values()) {
-            if (e.getName().equalsIgnoreCase(name) || e.name().equalsIgnoreCase(name)) return e;
+        for (Environment environment : values()) {
+            if(environment.getName().equalsIgnoreCase(name)) return environment;
+            if (environment.name().equalsIgnoreCase(name)) return environment;
         }
         return null;
+    }
+
+    @Nonnull
+    public static Environment valueOf(@Nonnull World.Environment bukkit) {
+        Environment environment = getByName(bukkit.name());
+        return environment != null ? environment : NORMAL;
     }
 }
