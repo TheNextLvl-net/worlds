@@ -5,6 +5,7 @@ import net.minecraft.server.v1_16_R3.PacketPlayOutRespawn;
 import net.nonswag.tnl.core.api.reflection.Reflection;
 import net.nonswag.tnl.listener.events.PlayerPacketEvent;
 import net.nonswag.tnl.world.api.world.TNLWorld;
+import net.nonswag.tnl.world.api.world.WorldType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -16,8 +17,9 @@ public class PacketListener implements Listener {
     public void onPacket(@Nonnull PlayerPacketEvent event) {
         if (!event.getDirection().isOutgoing()) return;
         if (!(event.getPacket() instanceof PacketPlayOutRespawn packet)) return;
-        float light = TNLWorld.cast(event.getPlayer().worldManager().getWorld()).fullBright() ? 1 : 0;
+        TNLWorld world = TNLWorld.cast(event.getPlayer().worldManager().getWorld());
         DimensionManager manager = event.<DimensionManager>getPacketField("a").nonnull();
-        Reflection.setField(manager, "ambientLight", light);
+        Reflection.setField(manager, "ambientLight", world.fullBright() ? 1 : 0);
+        event.setPacketField("g", world.type().equals(WorldType.FLAT));
     }
 }
