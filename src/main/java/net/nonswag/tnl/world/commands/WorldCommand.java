@@ -3,16 +3,16 @@ package net.nonswag.tnl.world.commands;
 import net.nonswag.tnl.core.api.command.CommandSource;
 import net.nonswag.tnl.core.api.command.Invocation;
 import net.nonswag.tnl.core.api.message.Placeholder;
-import net.nonswag.tnl.core.api.message.key.MessageKey;
 import net.nonswag.tnl.listener.api.command.TNLCommand;
 import net.nonswag.tnl.listener.api.command.exceptions.SourceMismatchException;
 import net.nonswag.tnl.listener.api.player.TNLPlayer;
 import net.nonswag.tnl.listener.api.plugin.PluginManager;
+import net.nonswag.tnl.world.api.WorldUtil;
 import net.nonswag.tnl.world.api.world.Environment;
 import net.nonswag.tnl.world.api.world.TNLWorld;
 import net.nonswag.tnl.world.api.world.WorldType;
-import net.nonswag.tnl.world.api.WorldUtil;
 import net.nonswag.tnl.world.generators.CustomGenerator;
+import net.nonswag.tnl.world.utils.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -214,12 +214,12 @@ public class WorldCommand extends TNLCommand {
                     if (world != null) {
                         world.bukkit().save();
                         WorldUtil.export(world);
-                        source.sendMessage(MessageKey.WORLD_SAVED, new Placeholder("world", world.bukkit().getName()));
+                        source.sendMessage(Messages.WORLD_SAVED, new Placeholder("world", world.bukkit().getName()));
                     } else source.sendMessage("%prefix% §c/world export §8(§6World§8)");
                 } else {
                     for (World world : Bukkit.getWorlds()) {
                         world.save();
-                        source.sendMessage(MessageKey.WORLD_SAVED, new Placeholder("world", world.getName()));
+                        source.sendMessage(Messages.WORLD_SAVED, new Placeholder("world", world.getName()));
                     }
                     WorldUtil.exportAll();
                 }
