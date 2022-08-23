@@ -13,6 +13,7 @@ import net.nonswag.tnl.world.generators.SimplexOctaveGenerator;
 import net.nonswag.tnl.world.generators.SuperFlatGenerator;
 import net.nonswag.tnl.world.generators.VoidGenerator;
 import net.nonswag.tnl.world.listeners.PacketListener;
+import net.nonswag.tnl.world.utils.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -37,9 +38,8 @@ public class Worlds extends TNLPlugin {
         getEventManager().registerListener(new PacketListener());
         WorldUtil.loadWorlds();
         WorldUtil.exportAll();
-        async(() -> {
-            if (Settings.AUTO_UPDATER.getValue()) new PluginUpdate(this).downloadUpdate();
-        });
+        Messages.loadAll();
+        if (Settings.AUTO_UPDATER.getValue()) async(() -> new PluginUpdate(this).downloadUpdate());
     }
 
     @Override
