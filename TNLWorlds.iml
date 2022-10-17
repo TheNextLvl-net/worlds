@@ -13,8 +13,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="TNLListener" level="project" />
-    <orderEntry type="library" name="spigot-1.16.5" level="project" />
-    <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.22" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.projectlombok:lombok:1.18.24" level="project" />
+    <orderEntry type="library" name="Maven: net.nonswag.tnl:listener:5.1" level="project" />
+    <orderEntry type="library" name="Maven: net.nonswag.core:core-api:1.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.destroystokyo.paper:papermc:1.16.5" level="project" />
   </component>
 </module>
