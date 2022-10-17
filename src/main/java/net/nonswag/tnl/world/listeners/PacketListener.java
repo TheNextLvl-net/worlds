@@ -1,7 +1,7 @@
 package net.nonswag.tnl.world.listeners;
 
 import net.minecraft.server.v1_16_R3.PacketPlayOutRespawn;
-import net.nonswag.tnl.core.api.reflection.Reflection;
+import net.nonswag.core.api.reflection.Reflection;
 import net.nonswag.tnl.listener.events.PlayerPacketEvent;
 import net.nonswag.tnl.world.api.world.TNLWorld;
 import net.nonswag.tnl.world.api.world.WorldType;

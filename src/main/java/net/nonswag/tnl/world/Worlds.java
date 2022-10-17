@@ -1,7 +1,7 @@
 package net.nonswag.tnl.world;
 
-import net.nonswag.tnl.core.api.file.helper.FileHelper;
-import net.nonswag.tnl.core.utils.LinuxUtil;
+import net.nonswag.core.api.file.helper.FileHelper;
+import net.nonswag.core.utils.LinuxUtil;
 import net.nonswag.tnl.listener.api.plugin.PluginUpdate;
 import net.nonswag.tnl.listener.api.plugin.TNLPlugin;
 import net.nonswag.tnl.listener.api.settings.Settings;

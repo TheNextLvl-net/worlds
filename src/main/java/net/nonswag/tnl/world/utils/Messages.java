@@ -1,7 +1,7 @@
 package net.nonswag.tnl.world.utils;
 
-import net.nonswag.tnl.core.api.message.Message;
-import net.nonswag.tnl.core.api.message.key.MessageKey;
+import net.nonswag.core.api.message.Message;
+import net.nonswag.core.api.message.key.MessageKey;
 
 import javax.annotation.Nonnull;
 

@@ -1,11 +1,9 @@
 package net.nonswag.tnl.world.api.errors;
 
-import net.nonswag.tnl.core.api.errors.TNLException;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class WorldCloneException extends TNLException {
+public class WorldCloneException extends Exception {
 
     public WorldCloneException() {
     }
