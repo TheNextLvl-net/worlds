@@ -287,7 +287,9 @@ public class WorldCommand extends TNLCommand {
                 for (World world : Bukkit.getWorlds()) suggestions.add(world.getName());
             } else if (args[0].equalsIgnoreCase("import") || args[0].equalsIgnoreCase("create")) {
                 File[] files = Bukkit.getWorldContainer().listFiles((file, name) -> file.isDirectory() && !file.getName().contains(" "));
-                if (files != null) for (File file : files) suggestions.add(file.getName());
+                if (files != null) for (File file : files) {
+                    if (Bukkit.getWorld(file.getName()) == null) suggestions.add(file.getName());
+                }
             } else if (args[0].equalsIgnoreCase("tp")) {
                 for (World world : Bukkit.getWorlds()) suggestions.add(world.getName());
                 for (Player all : Bukkit.getOnlinePlayers()) suggestions.add(all.getName());
