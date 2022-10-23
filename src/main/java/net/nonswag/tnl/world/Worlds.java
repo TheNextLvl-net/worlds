@@ -5,6 +5,7 @@ import net.nonswag.core.utils.LinuxUtil;
 import net.nonswag.tnl.listener.api.plugin.PluginUpdate;
 import net.nonswag.tnl.listener.api.plugin.TNLPlugin;
 import net.nonswag.tnl.listener.api.settings.Settings;
+import net.nonswag.tnl.listener.api.version.Version;
 import net.nonswag.tnl.world.api.WorldUtil;
 import net.nonswag.tnl.world.api.errors.WorldCloneException;
 import net.nonswag.tnl.world.api.world.TNLWorld;
@@ -35,7 +36,7 @@ public class Worlds extends TNLPlugin {
         SuperFlatGenerator.getInstance().register();
         SimplexOctaveGenerator.getInstance().register();
         getCommandManager().registerCommand(new WorldCommand());
-        getEventManager().registerListener(new PacketListener());
+        getEventManager().registerListener(Version.v1_16_4, PacketListener::new);
         WorldUtil.loadWorlds();
         WorldUtil.exportAll();
         Messages.loadAll();

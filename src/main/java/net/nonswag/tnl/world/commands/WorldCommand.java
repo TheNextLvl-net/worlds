@@ -83,8 +83,7 @@ public class WorldCommand extends TNLCommand {
                                                     }
                                                     if (world != null) {
                                                         source.sendMessage("%prefix% §aGenerated world §6" + world.bukkit().getName());
-                                                        if (source.isPlayer()) {
-                                                            TNLPlayer player = (TNLPlayer) source.player();
+                                                        if (source instanceof TNLPlayer player) {
                                                             player.worldManager().teleport(world.bukkit().getSpawnLocation().add(0.5, 0, 0.5));
                                                         }
                                                     } else source.sendMessage("%prefix% §cFailed to generate world");
@@ -99,8 +98,7 @@ public class WorldCommand extends TNLCommand {
                                             if (world != null) {
                                                 world.register();
                                                 source.sendMessage("%prefix% §7Created World§8: §6" + args[1]);
-                                                if (source.isPlayer()) {
-                                                    TNLPlayer player = (TNLPlayer) source.player();
+                                                if (source instanceof TNLPlayer player) {
                                                     player.worldManager().teleport(world.bukkit().getSpawnLocation().add(0.5, 0, 0.5));
                                                 }
                                             } else source.sendMessage("%prefix% §cFailed to create World §4" + args[1]);
@@ -123,10 +121,9 @@ public class WorldCommand extends TNLCommand {
                 }
             } else if (args[0].equalsIgnoreCase("tp")) {
                 if (args.length == 2) {
-                    if (source.isPlayer()) {
+                    if (source instanceof TNLPlayer player) {
                         World world = Bukkit.getWorld(args[1]);
                         if (world != null) {
-                            TNLPlayer player = (TNLPlayer) source.player();
                             player.worldManager().teleport(world.getSpawnLocation().add(0.5, 0, 0.5));
                             source.sendMessage("%prefix% §7Teleported§8: §6" + world.getName());
                         } else source.sendMessage("%prefix% §c/world tp §8[§6World§8]");
@@ -176,8 +173,8 @@ public class WorldCommand extends TNLCommand {
                             }
                             if (world != null) {
                                 source.sendMessage("%prefix% §7Imported world§8: §6" + args[1]);
-                                if (source.isPlayer()) {
-                                    ((TNLPlayer) source.player()).worldManager().teleport(world.bukkit().getSpawnLocation().add(0.5, 0, 0.5));
+                                if (source instanceof TNLPlayer player) {
+                                    player.worldManager().teleport(world.bukkit().getSpawnLocation().add(0.5, 0, 0.5));
                                 }
                             } else source.sendMessage("%prefix% §cFailed to import world §4" + args[1]);
                         } else source.sendMessage("%prefix% §cCan't find the folder §4" + file.getAbsolutePath());
@@ -233,15 +230,13 @@ public class WorldCommand extends TNLCommand {
                     } else source.sendMessage("%prefix% §cA world with this name already exist");
                 } else source.sendMessage("%prefix% §c/world load §8[§6World§8]");
             } else if (args[0].equalsIgnoreCase("setspawn")) {
-                if (source.isPlayer()) {
-                    TNLPlayer player = (TNLPlayer) source.player();
+                if (source instanceof TNLPlayer player) {
                     player.worldManager().getWorld().setSpawnLocation(player.worldManager().getLocation().getBlock().getLocation());
                     Location l = player.worldManager().getWorld().getSpawnLocation();
                     source.sendMessage("%prefix% §aSuccessfully set the spawn location to §6" + l.getX() + "§8, §6" + l.getY() + "§8, §6" + l.getZ());
                 } else throw new SourceMismatchException();
             } else if (args[0].equalsIgnoreCase("spawn")) {
-                if (source.isPlayer()) {
-                    TNLPlayer player = (TNLPlayer) source.player();
+                if (source instanceof TNLPlayer player) {
                     player.worldManager().teleport(player.worldManager().getWorld().getSpawnLocation().add(0.5, 0, 0.5));
                     source.sendMessage("%prefix% §aTeleported you to the spawn of world §6" + player.worldManager().getWorld().getName());
                 } else throw new SourceMismatchException();
@@ -290,6 +285,9 @@ public class WorldCommand extends TNLCommand {
                     || args[0].equalsIgnoreCase("unload")
                     || args[0].equalsIgnoreCase("info")) {
                 for (World world : Bukkit.getWorlds()) suggestions.add(world.getName());
+            } else if (args[0].equalsIgnoreCase("import") || args[0].equalsIgnoreCase("create")) {
+                File[] files = Bukkit.getWorldContainer().listFiles((file, name) -> file.isDirectory() && !file.getName().contains(" "));
+                if (files != null) for (File file : files) suggestions.add(file.getName());
             } else if (args[0].equalsIgnoreCase("tp")) {
                 for (World world : Bukkit.getWorlds()) suggestions.add(world.getName());
                 for (Player all : Bukkit.getOnlinePlayers()) suggestions.add(all.getName());

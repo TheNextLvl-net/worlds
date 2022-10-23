@@ -3,12 +3,13 @@ package net.nonswag.tnl.world.api;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
-import net.minecraft.server.v1_16_R3.WorldServer;
 import net.nonswag.core.api.file.formats.JsonFile;
 import net.nonswag.core.api.file.helper.FileHelper;
 import net.nonswag.core.api.logger.Logger;
 import net.nonswag.core.utils.LinuxUtil;
 import net.nonswag.tnl.listener.api.plugin.PluginManager;
+import net.nonswag.tnl.listener.api.world.Dimension;
+import net.nonswag.tnl.listener.api.world.WorldHelper;
 import net.nonswag.tnl.world.api.events.WorldDeleteEvent;
 import net.nonswag.tnl.world.api.world.Environment;
 import net.nonswag.tnl.world.api.world.TNLWorld;
@@ -17,8 +18,6 @@ import net.nonswag.tnl.world.generators.CustomGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
-import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
 
@@ -60,17 +59,16 @@ public class WorldUtil {
     }
 
     public static boolean unloadWorld(@Nonnull TNLWorld world, boolean save) {
-        CraftServer craftServer = (CraftServer) Bukkit.getServer();
-        WorldServer server = ((CraftWorld) world.bukkit()).getHandle();
-        if (!craftServer.getServer().worldServer.containsKey(server.getDimensionKey())) return false;
-        if (server.getDimensionKey() == net.minecraft.server.v1_16_R3.World.OVERWORLD) return false;
-        if (!server.getPlayers().isEmpty()) {
+        Dimension dimension = WorldHelper.getInstance().getDimension(world.bukkit());
+        if (!WorldHelper.getInstance().isRegistered(dimension)) return false;
+        if (dimension.equals(Dimension.OVERWORLD)) return false;
+        if (!WorldHelper.getInstance().hasPlayers(world.bukkit())) {
             List<World> worlds = Bukkit.getWorlds();
             worlds.remove(world.bukkit());
             World to = worlds.isEmpty() ? null : worlds.get(0);
             if (to == null) return false;
             world.bukkit().getPlayers().forEach(all -> all.teleport(to.getSpawnLocation()));
-            server.getPlayers().clear();
+            WorldHelper.getInstance().removePlayers(world.bukkit());
         }
         return Bukkit.unloadWorld(world.unregister().bukkit(), save);
     }
