@@ -62,7 +62,7 @@ public class WorldUtil {
         Dimension dimension = WorldHelper.getInstance().getDimension(world.bukkit());
         if (!WorldHelper.getInstance().isRegistered(dimension)) return false;
         if (dimension.equals(Dimension.OVERWORLD)) return false;
-        if (!WorldHelper.getInstance().hasPlayers(world.bukkit())) {
+        if (WorldHelper.getInstance().hasPlayers(world.bukkit())) {
             List<World> worlds = Bukkit.getWorlds();
             worlds.remove(world.bukkit());
             World to = worlds.isEmpty() ? null : worlds.get(0);
