@@ -11,7 +11,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="TNLWorlds" target="16" />
+      <module name="TNLWorlds" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>
