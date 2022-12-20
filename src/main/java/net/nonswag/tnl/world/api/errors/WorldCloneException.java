@@ -1,22 +1,23 @@
 package net.nonswag.tnl.world.api.errors;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+@ParametersAreNonnullByDefault
 public class WorldCloneException extends Exception {
 
     public WorldCloneException() {
     }
 
-    public WorldCloneException(@Nonnull String message) {
+    public WorldCloneException(String message) {
         super(message);
     }
 
-    public WorldCloneException(@Nonnull String message, @Nonnull Throwable cause) {
+    public WorldCloneException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public WorldCloneException(@Nonnull Throwable cause) {
+    public WorldCloneException(Throwable cause) {
         super(cause);
     }
 

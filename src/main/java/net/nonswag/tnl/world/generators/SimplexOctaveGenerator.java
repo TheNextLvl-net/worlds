@@ -13,16 +13,14 @@ import java.util.Random;
 public class SimplexOctaveGenerator extends CustomGenerator {
 
     @Getter
-    @Nonnull
     private static final SimplexOctaveGenerator instance = new SimplexOctaveGenerator();
 
     private SimplexOctaveGenerator() {
         super("simplex-octave");
     }
 
-    @Nonnull
     @Override
-    public ChunkGenerator getDefaultWorldGenerator(@Nonnull String name, @Nullable String id) {
+    public ChunkGenerator getDefaultWorldGenerator(String name, @Nullable String id) {
         return new ChunkGenerator() {
 
             int currentHeight = 64;
@@ -39,7 +37,8 @@ public class SimplexOctaveGenerator extends CustomGenerator {
 
             @Nonnull
             @Override
-            public ChunkData generateChunkData(@Nonnull World world, @Nonnull Random random, int chunkX, int chunkZ, @Nonnull BiomeGrid biome) {
+            @Deprecated
+            public ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ, BiomeGrid biome) {
                 org.bukkit.util.noise.SimplexOctaveGenerator generator = new org.bukkit.util.noise.SimplexOctaveGenerator(world, 8);
                 ChunkData chunk = createChunkData(world);
                 generator.setScale(0.005D);
@@ -62,9 +61,8 @@ public class SimplexOctaveGenerator extends CustomGenerator {
                 return chunk;
             }
 
-            @Nonnull
             @Override
-            public Location getFixedSpawnLocation(@Nonnull World world, @Nonnull Random random) {
+            public Location getFixedSpawnLocation(World world, Random random) {
                 return new Location(world, 0.5, 70, 0.5, 0, 0);
             }
         };

@@ -11,28 +11,25 @@ import java.util.Random;
 public class VoidGenerator extends CustomGenerator {
 
     @Getter
-    @Nonnull
     private static final VoidGenerator instance = new VoidGenerator();
 
     private VoidGenerator() {
         super("void");
     }
 
-    @Nonnull
     @Override
-    public ChunkGenerator getDefaultWorldGenerator(@Nonnull String name, @Nullable String id) {
+    public ChunkGenerator getDefaultWorldGenerator(String name, @Nullable String id) {
         return new ChunkGenerator() {
             @Nonnull
             @Override
-            public ChunkData generateChunkData(@Nonnull World world, @Nonnull Random random, int chunkX, int chunkZ, @Nonnull BiomeGrid biome) {
+            public ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ, BiomeGrid biome) {
                 ChunkData chunkData = createChunkData(world);
                 if (chunkX == 0 && chunkZ == 0) chunkData.setBlock(0, 63, 0, Material.BEDROCK);
                 return chunkData;
             }
 
-            @Nonnull
             @Override
-            public Location getFixedSpawnLocation(@Nonnull World world, @Nonnull Random random) {
+            public Location getFixedSpawnLocation(World world, Random random) {
                 return new Location(world, 0.5, 64, 0.5, 0, 0);
             }
         };

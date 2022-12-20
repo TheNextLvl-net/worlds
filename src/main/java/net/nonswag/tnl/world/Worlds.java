@@ -2,10 +2,10 @@ package net.nonswag.tnl.world;
 
 import net.nonswag.core.api.file.helper.FileHelper;
 import net.nonswag.core.utils.LinuxUtil;
+import net.nonswag.tnl.listener.api.packets.outgoing.RespawnPacket;
 import net.nonswag.tnl.listener.api.plugin.PluginUpdate;
 import net.nonswag.tnl.listener.api.plugin.TNLPlugin;
 import net.nonswag.tnl.listener.api.settings.Settings;
-import net.nonswag.tnl.listener.api.version.Version;
 import net.nonswag.tnl.world.api.WorldUtil;
 import net.nonswag.tnl.world.api.errors.WorldCloneException;
 import net.nonswag.tnl.world.api.world.TNLWorld;
@@ -13,7 +13,6 @@ import net.nonswag.tnl.world.commands.WorldCommand;
 import net.nonswag.tnl.world.generators.SimplexOctaveGenerator;
 import net.nonswag.tnl.world.generators.SuperFlatGenerator;
 import net.nonswag.tnl.world.generators.VoidGenerator;
-import net.nonswag.tnl.world.listeners.PacketListener;
 import net.nonswag.tnl.world.utils.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -36,7 +35,11 @@ public class Worlds extends TNLPlugin {
         SuperFlatGenerator.getInstance().register();
         SimplexOctaveGenerator.getInstance().register();
         getCommandManager().registerCommand(new WorldCommand());
-        getEventManager().registerListener(Version.v1_16_4, PacketListener::new);
+        getEventManager().registerPacketWriter(RespawnPacket.class, (player, packet, cancelled) -> {
+            TNLWorld world = TNLWorld.cast(player.worldManager().getWorld());
+            // Reflection.Field.set(Objects.requireNonNull(event.getPacketField("a")), "ambientLight", world.fullBright() ? 1 : 0);
+            // event.setPacketField("g", world.type().equals(WorldType.FLAT));
+        });
         WorldUtil.loadWorlds();
         WorldUtil.exportAll();
         Messages.loadAll();

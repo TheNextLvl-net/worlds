@@ -11,22 +11,19 @@ import javax.annotation.Nullable;
 import java.util.Random;
 
 public class SuperFlatGenerator extends CustomGenerator {
-
     @Getter
-    @Nonnull
     private static final SuperFlatGenerator instance = new SuperFlatGenerator();
 
     private SuperFlatGenerator() {
         super("super-flat");
     }
 
-    @Nonnull
     @Override
-    public ChunkGenerator getDefaultWorldGenerator(@Nonnull String name, @Nullable String id) {
+    public ChunkGenerator getDefaultWorldGenerator(String name, @Nullable String id) {
         return new ChunkGenerator() {
             @Nonnull
             @Override
-            public ChunkGenerator.ChunkData generateChunkData(@Nonnull World world, @Nonnull Random random, int chunkX, int chunkZ, @Nonnull ChunkGenerator.BiomeGrid biome) {
+            public ChunkGenerator.ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ, ChunkGenerator.BiomeGrid biome) {
                 ChunkGenerator.ChunkData chunkData = createChunkData(world);
                 for (int x = 0; x < 16; x++) {
                     for (int z = 0; z < 16; z++) {
@@ -37,9 +34,8 @@ public class SuperFlatGenerator extends CustomGenerator {
                 return chunkData;
             }
 
-            @Nonnull
             @Override
-            public Location getFixedSpawnLocation(@Nonnull World world, @Nonnull Random random) {
+            public Location getFixedSpawnLocation(World world, Random random) {
                 return new Location(world, 0.5, 40, 0.5, 0, 0);
             }
         };
