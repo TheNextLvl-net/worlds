@@ -11,6 +11,6 @@ Simple but efficient world management system
 <dependency>
     <groupId>net.nonswag.tnl</groupId>
     <artifactId>worlds</artifactId>
-    <version>2.1</version>
+    <version>3.0.0</version>
 </dependency>
  ```

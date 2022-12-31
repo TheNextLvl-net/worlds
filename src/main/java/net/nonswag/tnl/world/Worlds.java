@@ -1,11 +1,11 @@
 package net.nonswag.tnl.world;
 
+import net.nonswag.core.api.annotation.FieldsAreNullableByDefault;
+import net.nonswag.core.api.annotation.MethodsReturnNonnullByDefault;
 import net.nonswag.core.api.file.helper.FileHelper;
 import net.nonswag.core.utils.LinuxUtil;
 import net.nonswag.tnl.listener.api.packets.outgoing.RespawnPacket;
-import net.nonswag.tnl.listener.api.plugin.PluginUpdate;
 import net.nonswag.tnl.listener.api.plugin.TNLPlugin;
-import net.nonswag.tnl.listener.api.settings.Settings;
 import net.nonswag.tnl.world.api.WorldUtil;
 import net.nonswag.tnl.world.api.errors.WorldCloneException;
 import net.nonswag.tnl.world.api.world.TNLWorld;
@@ -20,13 +20,15 @@ import org.bukkit.WorldCreator;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
 import java.io.IOException;
 
+@FieldsAreNullableByDefault
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class Worlds extends TNLPlugin {
-
-    @Nullable
-    private static Worlds instance = null;
+    private static Worlds instance;
 
     @Override
     public void enable() {
@@ -35,15 +37,10 @@ public class Worlds extends TNLPlugin {
         SuperFlatGenerator.getInstance().register();
         SimplexOctaveGenerator.getInstance().register();
         getCommandManager().registerCommand(new WorldCommand());
-        getEventManager().registerPacketWriter(RespawnPacket.class, (player, packet, cancelled) -> {
-            TNLWorld world = TNLWorld.cast(player.worldManager().getWorld());
-            // Reflection.Field.set(Objects.requireNonNull(event.getPacketField("a")), "ambientLight", world.fullBright() ? 1 : 0);
-            // event.setPacketField("g", world.type().equals(WorldType.FLAT));
-        });
+        // registerPacketWriters();
         WorldUtil.loadWorlds();
         WorldUtil.exportAll();
-        Messages.loadAll();
-        if (Settings.AUTO_UPDATER.getValue()) async(() -> new PluginUpdate(this).downloadUpdate());
+        Messages.init();
     }
 
     @Override
@@ -51,8 +48,16 @@ public class Worlds extends TNLPlugin {
         WorldUtil.exportAll();
     }
 
+    private void registerPacketWriters() {
+        getEventManager().registerPacketWriter(RespawnPacket.class, (player, packet, cancelled) -> {
+            TNLWorld world = TNLWorld.cast(player.worldManager().getWorld());
+            // Reflection.Field.set(Objects.requireNonNull(event.getPacketField("a")), "ambientLight", world.fullBright() ? 1 : 0);
+            // event.setPacketField("g", world.type().equals(WorldType.FLAT));
+        });
+    }
+
     @Nonnull
-    public World clone(@Nonnull World world, @Nonnull String name) throws WorldCloneException {
+    public World clone(World world, String name) throws WorldCloneException {
         if (Bukkit.getWorld(name) != null) {
             throw new WorldCloneException("A world named <'" + name + "'> does already exist");
         }
@@ -76,7 +81,6 @@ public class Worlds extends TNLPlugin {
         return new File(Bukkit.getWorldContainer(), world.getName()).exists();
     }
 
-    @Nonnull
     public static Worlds getInstance() {
         assert instance != null;
         return instance;

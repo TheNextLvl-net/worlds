@@ -35,6 +35,7 @@ public class WorldCommand extends TNLCommand {
 
     @Override
     @SuppressWarnings("deprecation")
+    // i am so sorry for this, will be fixed in the future
     protected void execute(@Nonnull Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();

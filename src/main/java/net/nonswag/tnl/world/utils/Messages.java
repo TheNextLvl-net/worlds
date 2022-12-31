@@ -1,30 +1,31 @@
 package net.nonswag.tnl.world.utils;
 
-import net.nonswag.core.api.message.Message;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import net.nonswag.core.api.annotation.FieldsAreNonnullByDefault;
+import net.nonswag.core.api.file.formats.MessageFile;
+import net.nonswag.core.api.language.Language;
 import net.nonswag.core.api.message.key.MessageKey;
 
-import javax.annotation.Nonnull;
-
+@FieldsAreNonnullByDefault
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Messages {
-
-    @Nonnull
     public static final MessageKey WORLD_SAVED = new MessageKey("world-saved").register();
 
-    private Messages() {
+    public static void init() {
+        initEnglish();
+        initGerman();
     }
 
-    public static void loadAll() {
-        loadEnglish();
-        loadGerman();
+    private static void initEnglish() {
+        MessageFile english = MessageFile.getOrCreate(Language.AMERICAN_ENGLISH);
+        english.setDefault(WORLD_SAVED, "%prefix%§a Saved the world §6%world%");
+        english.save();
     }
 
-    private static void loadEnglish() {
-        Message.getEnglish().setDefault(WORLD_SAVED, "%prefix%§a Saved the world §6%world%");
-        Message.getEnglish().save();
-    }
-
-    private static void loadGerman() {
-        Message.getGerman().setDefault(WORLD_SAVED, "%prefix%§a Die welt §6%world%§a wurde gespeichert");
-        Message.getGerman().save();
+    private static void initGerman() {
+        MessageFile german = MessageFile.getOrCreate(Language.GERMAN);
+        german.setDefault(WORLD_SAVED, "%prefix%§a Die welt §6%world%§a wurde gespeichert");
+        german.save();
     }
 }
