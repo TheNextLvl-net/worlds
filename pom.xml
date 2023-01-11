@@ -36,7 +36,7 @@
     <distributionManagement>
         <repository>
             <id>releases</id>
-            <url>https://repo.thenextlvl.net/repository/maven-public/</url>
+            <url>https://repo.thenextlvl.net/releases</url>
         </repository>
     </distributionManagement>
 
@@ -47,7 +47,7 @@
         </repository>
         <repository>
             <id>releases</id>
-            <url>https://repo.thenextlvl.net/repository/maven-public</url>
+            <url>https://repo.thenextlvl.net/releases</url>
         </repository>
     </repositories>
 
