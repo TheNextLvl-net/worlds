@@ -6,7 +6,7 @@
 
     <groupId>net.nonswag.tnl</groupId>
     <artifactId>worlds</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
 
     <build>
         <plugins>
@@ -61,7 +61,7 @@
         <dependency>
             <groupId>net.nonswag.tnl</groupId>
             <artifactId>listener</artifactId>
-            <version>6.3.0</version>
+            <version>6.3.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

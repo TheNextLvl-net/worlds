@@ -37,13 +37,13 @@ public class WorldUtil {
     @Nonnull
     public static List<String> getWorlds() {
         List<String> strings = new ArrayList<>();
-        JsonObject root = getSaves().getJsonElement().getAsJsonObject();
+        JsonObject root = getSaves().getRoot().getAsJsonObject();
         for (Map.Entry<String, JsonElement> entry : root.entrySet()) strings.add(entry.getKey());
         return strings;
     }
 
     public static void export(@Nonnull TNLWorld world) {
-        JsonObject jsonObject = getSaves().getJsonElement().getAsJsonObject();
+        JsonObject jsonObject = getSaves().getRoot().getAsJsonObject();
         JsonObject object = new JsonObject();
         object.addProperty("type", world.type().name());
         object.addProperty("environment", world.environment().name());
@@ -77,7 +77,7 @@ public class WorldUtil {
         if (new WorldDeleteEvent(world).call() && unloadWorld(world, false)) {
             File file = new File(Bukkit.getWorldContainer(), world.bukkit().getName());
             FileHelper.delete(file);
-            JsonObject root = getSaves().getJsonElement().getAsJsonObject();
+            JsonObject root = getSaves().getRoot().getAsJsonObject();
             root.remove(world.bukkit().getName());
             return !file.exists();
         } else return false;
@@ -93,7 +93,7 @@ public class WorldUtil {
 
     @Nullable
     public static TNLWorld loadWorld(@Nonnull String name) {
-        JsonObject root = getSaves().getJsonElement().getAsJsonObject();
+        JsonObject root = getSaves().getRoot().getAsJsonObject();
         if (!root.has(name) || !root.get(name).isJsonObject()) return null;
         File sessionLock = new File(new File(Bukkit.getWorldContainer(), name), "session.lock");
         if (sessionLock.exists()) FileHelper.delete(sessionLock);

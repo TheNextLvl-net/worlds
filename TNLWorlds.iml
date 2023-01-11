@@ -42,9 +42,14 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.ow2.asm:asm-commons:9.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.ow2.asm:asm-tree:9.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.ow2.asm:asm-analysis:9.2" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: net.nonswag.tnl:listener:6.3.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: net.nonswag.core:core-api:1.6.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.nonswag.tnl:listener:6.3.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.nonswag.core:core-api:2.0.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.zaxxer:HikariCP:5.0.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: jakarta.xml.bind:jakarta.xml.bind-api:4.0.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: jakarta.activation:jakarta.activation-api:2.1.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.sun.xml.bind:jaxb-impl:4.0.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.sun.xml.bind:jaxb-core:4.0.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.angus:angus-activation:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.24" level="project" />
   </component>
 </module>
