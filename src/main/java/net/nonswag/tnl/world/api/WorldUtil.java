@@ -3,9 +3,10 @@ package net.nonswag.tnl.world.api;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
+import net.nonswag.core.api.annotation.FieldsAreNonnullByDefault;
+import net.nonswag.core.api.annotation.MethodsReturnNonnullByDefault;
 import net.nonswag.core.api.file.formats.JsonFile;
 import net.nonswag.core.api.file.helper.FileHelper;
-import net.nonswag.core.api.logger.Logger;
 import net.nonswag.core.utils.LinuxUtil;
 import net.nonswag.tnl.listener.api.plugin.PluginManager;
 import net.nonswag.tnl.listener.api.world.Dimension;
@@ -20,21 +21,25 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@FieldsAreNonnullByDefault
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class WorldUtil {
 
     @Getter
-    @Nonnull
     private static final JsonFile saves = new JsonFile("plugins/Worlds/", "saves.json");
+    private static final Logger logger = LoggerFactory.getLogger(WorldUtil.class);
 
-    @Nonnull
     public static List<String> getWorlds() {
         List<String> strings = new ArrayList<>();
         JsonObject root = getSaves().getRoot().getAsJsonObject();
@@ -42,7 +47,7 @@ public class WorldUtil {
         return strings;
     }
 
-    public static void export(@Nonnull TNLWorld world) {
+    public static void export(TNLWorld world) {
         JsonObject jsonObject = getSaves().getRoot().getAsJsonObject();
         JsonObject object = new JsonObject();
         object.addProperty("type", world.type().name());
@@ -58,7 +63,7 @@ public class WorldUtil {
         getSaves().save();
     }
 
-    public static boolean unloadWorld(@Nonnull TNLWorld world, boolean save) {
+    public static boolean unloadWorld(TNLWorld world, boolean save) {
         Dimension dimension = WorldHelper.getInstance().getDimension(world.bukkit());
         if (!WorldHelper.getInstance().isRegistered(dimension)) return false;
         if (dimension.equals(Dimension.OVERWORLD)) return false;
@@ -73,7 +78,7 @@ public class WorldUtil {
         return Bukkit.unloadWorld(world.unregister().bukkit(), save);
     }
 
-    public static boolean deleteWorld(@Nonnull TNLWorld world) {
+    public static boolean deleteWorld(TNLWorld world) {
         if (new WorldDeleteEvent(world).call() && unloadWorld(world, false)) {
             File file = new File(Bukkit.getWorldContainer(), world.bukkit().getName());
             FileHelper.delete(file);
@@ -92,7 +97,7 @@ public class WorldUtil {
     }
 
     @Nullable
-    public static TNLWorld loadWorld(@Nonnull String name) {
+    public static TNLWorld loadWorld(String name) {
         JsonObject root = getSaves().getRoot().getAsJsonObject();
         if (!root.has(name) || !root.get(name).isJsonObject()) return null;
         File sessionLock = new File(new File(Bukkit.getWorldContainer(), name), "session.lock");
@@ -109,7 +114,7 @@ public class WorldUtil {
             if (plugin == null || (!plugin.isEnabled() && !(plugin instanceof CustomGenerator))) {
                 worldCreator.generator(((ChunkGenerator) null));
             } else worldCreator.generator(plugin.getDefaultWorldGenerator(name, null));
-            if (plugin == null) Logger.error.printf("Generator <'%s'> not found", generator).println();
+            if (plugin == null) logger.error("Generator <'{}'> not found", generator);
         } else worldCreator.generator(((ChunkGenerator) null));
         if (object.has("type") && (worldType = WorldType.getByName(object.get("type").getAsString())) != null) {
             worldCreator.type(worldType.getWorldType());

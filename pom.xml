@@ -61,14 +61,14 @@
         <dependency>
             <groupId>net.nonswag.tnl</groupId>
             <artifactId>listener</artifactId>
-            <version>6.3.3</version>
+            <version>6.4.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.24</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
