@@ -1,4 +1,4 @@
-# TNLWorlds
+# worlds
 Simple but efficient world management system
 ```xml
 <repository>
