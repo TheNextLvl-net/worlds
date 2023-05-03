@@ -1,0 +1,8 @@
+@FieldsAreNonnullByDefault
+@ParametersAreNonnullByDefault
+@MethodsReturnNullableByDefault
+package net.thenextlvl.worlds.generator;
+
+import core.annotation.FieldsAreNonnullByDefault;
+import core.annotation.MethodsReturnNullableByDefault;
+import core.annotation.ParametersAreNonnullByDefault;

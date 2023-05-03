@@ -8,9 +8,10 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 @Getter
 @RequiredArgsConstructor
@@ -24,19 +25,18 @@ public abstract class WorldGenerator {
     /**
      * @see Plugin#getDefaultWorldGenerator(String, String)
      */
-    @Nullable
-    public ChunkGenerator getWorldGenerator(@NotNull String worldName, @Nullable String id) {
+    public ChunkGenerator getWorldGenerator(String worldName, @Nullable String id) {
         return getOwner().getDefaultWorldGenerator(worldName, id);
     }
 
     /**
      * @see Plugin#getDefaultBiomeProvider(String, String)
      */
-    @Nullable
-    public BiomeProvider getBiomeProvider(@NotNull String worldName, @Nullable String id) {
+    public BiomeProvider getBiomeProvider(String worldName, @Nullable String id) {
         return getOwner().getDefaultBiomeProvider(worldName, id);
     }
 
+    @NotNull
     public WorldGenerator register() {
         var set = Collections.<WorldGenerator>newSetFromMap(new WeakHashMap<>());
         var generators = GENERATORS.getOrDefault(getOwner(), set);
@@ -57,7 +57,6 @@ public abstract class WorldGenerator {
         return generators != null && generators.contains(this);
     }
 
-    @Nullable
     public static WorldGenerator getGenerator(Plugin plugin, String name) {
         return GENERATORS.get(plugin).stream()
                 .filter(generator -> generator.getName().equalsIgnoreCase(name))
@@ -65,7 +64,6 @@ public abstract class WorldGenerator {
                 .orElse(null);
     }
 
-    @Nullable
     public static WorldGenerator getGenerator(String name) {
         for (var plugin : GENERATORS.keySet()) {
             var generator = getGenerator(plugin, name);
