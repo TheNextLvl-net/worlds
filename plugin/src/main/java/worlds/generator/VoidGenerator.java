@@ -1,29 +1,38 @@
 package worlds.generator;
 
 import lombok.Getter;
-import org.bukkit.*;
+import net.thenextlvl.worlds.generator.WorldGenerator;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.generator.WorldInfo;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import worlds.Worlds;
 
 import java.util.Random;
 
-public class VoidGenerator extends CustomGenerator {
-
+public class VoidGenerator extends WorldGenerator {
     @Getter
     private static final VoidGenerator instance = new VoidGenerator();
 
     private VoidGenerator() {
-        super("void");
+        super(JavaPlugin.getPlugin(Worlds.class), "the void");
     }
 
     @Override
-    public ChunkGenerator getDefaultWorldGenerator(String name, @Nullable String id) {
+    public ChunkGenerator getWorldGenerator(String worldName, @Nullable String id) {
         return new ChunkGenerator() {
-            @Nonnull
             @Override
-            public ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ, BiomeGrid biome) {
-                ChunkData chunkData = createChunkData(world);
+            public void generateSurface(WorldInfo worldInfo, Random random, int chunkX, int chunkZ, ChunkData chunkData) {
                 if (chunkX == 0 && chunkZ == 0) chunkData.setBlock(0, 63, 0, Material.BEDROCK);
-                return chunkData;
+            }
+
+            @Override
+            public boolean shouldGenerateSurface(@NotNull WorldInfo worldInfo, @NotNull Random random, int chunkX, int chunkZ) {
+                return chunkX == 0 && chunkZ == 0;
             }
 
             @Override
