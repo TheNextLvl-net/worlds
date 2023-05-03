@@ -59,16 +59,18 @@ public abstract class WorldGenerator {
 
     @Nullable
     public static WorldGenerator getGenerator(Plugin plugin, String name) {
-
+        return GENERATORS.get(plugin).stream()
+                .filter(generator -> generator.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
     }
 
     @Nullable
     public static WorldGenerator getGenerator(String name) {
-        for (var entry : GENERATORS.entrySet())
-            return entry.getValue().stream()
-                    .filter(generator -> generator.getName().equalsIgnoreCase(name))
-                    .findFirst()
-                    .orElse(null);
+        for (var plugin : GENERATORS.keySet()) {
+            var generator = getGenerator(plugin, name);
+            if (generator != null) return generator;
+        }
         return null;
     }
 }
