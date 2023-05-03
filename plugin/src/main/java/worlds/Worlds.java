@@ -5,12 +5,11 @@ import core.api.placeholder.Placeholder;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
+import org.bukkit.plugin.java.JavaPlugin;
 import worlds.command.world.WorldCommand;
-import worlds.generator.SimplexOctaveGenerator;
-import worlds.generator.SuperFlatGenerator;
+import worlds.generator.BuildersDreamGenerator;
 import worlds.generator.VoidGenerator;
 import worlds.util.Placeholders;
-import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
 @FieldsAreNonnullByDefault
@@ -26,8 +25,7 @@ public class Worlds extends JavaPlugin {
     @Override
     public void onEnable() {
         VoidGenerator.getInstance().register();
-        SuperFlatGenerator.getInstance().register();
-        SimplexOctaveGenerator.getInstance().register();
+        BuildersDreamGenerator.getInstance().register();
         registerCommands();
     }
 
