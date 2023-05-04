@@ -1,8 +1,8 @@
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault
-@MethodsReturnNullableByDefault
-package net.thenextlvl.worlds.generator;
+@MethodsReturnNonnullByDefault
+package net.thenextlvl.worlds.volume;
 
 import core.annotation.FieldsAreNonnullByDefault;
-import core.annotation.MethodsReturnNullableByDefault;
+import core.annotation.MethodsReturnNonnullByDefault;
 import core.annotation.ParametersAreNonnullByDefault;

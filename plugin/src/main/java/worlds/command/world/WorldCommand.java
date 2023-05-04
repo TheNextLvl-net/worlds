@@ -19,7 +19,7 @@ public class WorldCommand {
         var builder = manager.commandBuilder("world").permission("worlds.command.world");
         // manager.command(WorldCreateCommand.create(builder));
 
-        // TODO: 03.05.23 commands 
+        // TODO: 03.05.23 commands
         // /world create [name] (-t type) (-e environment) (-g generator)
         // /world import [file] (-t type) (-e environment) (-g generator)
         // /world tp [world] (player)
