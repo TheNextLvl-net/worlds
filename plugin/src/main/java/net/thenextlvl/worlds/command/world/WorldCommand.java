@@ -17,19 +17,19 @@ public class WorldCommand {
         manager.registerAsynchronousCompletions();
         manager.registerBrigadier();
         var builder = manager.commandBuilder("world").permission("worlds.command.world");
-        // manager.command(WorldCreateCommand.create(builder));
+        manager.command(WorldCreateCommand.create(builder));
+        manager.command(WorldDeleteCommand.create(builder));
+        manager.command(WorldInfoCommand.create(builder));
+        manager.command(WorldListCommand.create(builder));
 
         // TODO: 03.05.23 commands
         // /world create [name] (-t type) (-e environment) (-g generator)
         // /world import [file] (-t type) (-e environment) (-g generator)
         // /world tp [world] (player)
         // /world unload [world]
-        // /world delete [world]
         // /world export [world]
-        // /world info [world]
         // /world load [world]
         // /world setspawn
         // /world spawn
-        // /world list
     }
 }
