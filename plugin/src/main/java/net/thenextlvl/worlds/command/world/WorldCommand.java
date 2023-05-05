@@ -23,7 +23,6 @@ public class WorldCommand {
         manager.command(WorldListCommand.create(builder));
 
         // TODO: 03.05.23 commands
-        // /world create [name] (-t type) (-e environment) (-g generator)
         // /world import [file] (-t type) (-e environment) (-g generator)
         // /world tp [world] (player)
         // /world unload [world]
