@@ -20,7 +20,7 @@ public class CustomExceptionHandler {
                         .replace("<", "\\<").replace(">", "\\>")
                         .replace("[", "<dark_gray>[<gold>").replace("]", "<dark_gray>]")
                         .replace("\\<", "<dark_gray><<gold>").replace("\\>", "<dark_gray>>")
-                        .replace("|", "<dark_gray>|<red>");
+                        .replace("|", "<dark_gray>|<red>").replace("--", "<red>--");
                 return MiniMessage.miniMessage().deserialize(Messages.PREFIX.message() + " <red>/" + syntax);
             })
             .withHandler(INVALID_SENDER, (sender, exception) -> {
