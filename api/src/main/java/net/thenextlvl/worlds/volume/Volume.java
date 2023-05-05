@@ -79,6 +79,12 @@ public class Volume {
         return volumes.get(world.getUID());
     }
 
+    public static Volume getOrCreate(World world) {
+        if (!volumes.containsKey(world.getUID()))
+            volumes.put(world.getUID(), new Volume(world, Generator.of(world)));
+        return volumes.get(world.getUID());
+    }
+
     public static List<File> findVolumes() {
         var files = DATA_FOLDER.listFiles((file, name) -> file.isFile() && name.endsWith(".json"));
         return files != null ? Arrays.asList(files) : Collections.emptyList();
