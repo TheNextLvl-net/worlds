@@ -2,6 +2,7 @@ package net.thenextlvl.worlds.command.world;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.flags.CommandFlag;
+import cloud.commandframework.arguments.standard.LongArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import core.api.placeholder.Placeholder;
@@ -45,6 +46,8 @@ class WorldCreateCommand {
                 .flag(CommandFlag.builder("identifier").withAliases("i")
                         .withArgument(StringArgument.builder("identifier")
                                 .greedyFlagYielding()))
+                .flag(CommandFlag.builder("seed").withAliases("s")
+                        .withArgument(LongArgument.builder("seed")))
                 .handler(WorldCreateCommand::execute);
     }
 
