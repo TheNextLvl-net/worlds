@@ -5,8 +5,6 @@ import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import core.api.placeholder.Placeholder;
 import net.kyori.adventure.audience.Audience;
-import net.thenextlvl.town.town.Town;
-import net.thenextlvl.town.util.Messages;
 import net.thenextlvl.worlds.volume.Volume;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -37,11 +35,11 @@ class WorldDeleteCommand {
             sender.sendRichMessage(Messages.WORLD_NOT_FOUND.message(locale, sender, placeholder));
             return;
         }
-        var result = Volume.get(world).delete();
-        if (result) {
-            sender.sendRichMessage(Messages.WORLD_DELETE_SUCCEEDED.message(locale, sender, placeholder));
-        } else {
-            sender.sendRichMessage(Messages.WORLD_DELETE_FAILED.message(locale, sender, placeholder));
-        }
+        var result = Volume.getOrCreate(world).delete();
+        sender.sendRichMessage((switch (result) {
+            case DELETE_FAILED -> Messages.WORLD_DELETE_FAILED;
+            case UNLOAD_FAILED -> Messages.WORLD_UNLOAD_FAILED;
+            case SUCCESS -> Messages.WORLD_DELETE_SUCCEEDED;
+        }).message(locale, sender, placeholder));
     }
 }
