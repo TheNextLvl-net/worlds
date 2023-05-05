@@ -1,4 +1,4 @@
-package worlds.generator;
+package net.thenextlvl.worlds.generator;
 
 import lombok.Getter;
 import net.thenextlvl.worlds.generator.CustomGenerator;

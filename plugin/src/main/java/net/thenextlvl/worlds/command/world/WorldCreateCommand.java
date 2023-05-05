@@ -1,25 +1,28 @@
-package worlds.command.world;
+package net.thenextlvl.worlds.command.world;
 
 import cloud.commandframework.Command;
+import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import core.api.placeholder.Placeholder;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.audience.Audience;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.generator.WorldInfo;
 import worlds.util.Messages;
 
-class WorldListCommand {
+class WorldCreateCommand {
 
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
-        return builder.literal("list").handler(WorldListCommand::execute);
+        return builder
+                .literal("create")
+                .argument(StringArgument.of("name"))
+                .handler(WorldCreateCommand::execute);
     }
 
     private static void execute(CommandContext<CommandSender> context) {
-        var towns = Bukkit.getWorlds().stream().map(WorldInfo::getName).toList();
+        var name = context.<String>get("name");
         var sender = context.getSender();
+        var placeholder = Placeholder.<Audience>of("world", name);
         var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
-        sender.sendRichMessage(Messages.WORLD_LIST.message(locale, sender,
-                Placeholder.of("amount", towns.size()), Placeholder.of("towns", String.join(", ", towns))));
+        // TODO: 04.05.23 do stuff
     }
 }

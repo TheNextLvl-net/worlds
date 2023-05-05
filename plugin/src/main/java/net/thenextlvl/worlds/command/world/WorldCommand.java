@@ -1,10 +1,10 @@
-package worlds.command.world;
+package net.thenextlvl.worlds.command.world;
 
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.paper.PaperCommandManager;
-import worlds.Worlds;
-import worlds.command.CustomExceptionHandler;
-import worlds.command.CustomSyntaxFormatter;
+import net.thenextlvl.worlds.Worlds;
+import net.thenextlvl.worlds.command.CustomSyntaxFormatter;
+import net.thenextlvl.worlds.command.CustomExceptionHandler;
 
 import java.util.function.Function;
 

@@ -1,7 +1,7 @@
-package worlds.util;
+package net.thenextlvl.worlds.util;
 
 import core.api.placeholder.Placeholder;
-import worlds.Worlds;
+import net.thenextlvl.worlds.Worlds;
 
 public class Placeholders {
     public static void init(Worlds plugin) {

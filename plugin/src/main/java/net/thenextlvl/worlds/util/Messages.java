@@ -1,4 +1,4 @@
-package worlds.util;
+package net.thenextlvl.worlds.util;
 
 import core.annotation.FieldsAreNonnullByDefault;
 import core.api.file.format.MessageFile;

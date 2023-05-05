@@ -1,4 +1,4 @@
-package worlds;
+package net.thenextlvl.worlds;
 
 import core.annotation.FieldsAreNonnullByDefault;
 import core.api.placeholder.Placeholder;

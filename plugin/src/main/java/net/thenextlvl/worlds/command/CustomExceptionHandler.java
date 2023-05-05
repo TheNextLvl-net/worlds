@@ -1,12 +1,12 @@
-package worlds.command;
+package net.thenextlvl.worlds.command;
 
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import core.annotation.FieldsAreNonnullByDefault;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.thenextlvl.worlds.util.Messages;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import worlds.util.Messages;
 
 import java.util.regex.Pattern;
 

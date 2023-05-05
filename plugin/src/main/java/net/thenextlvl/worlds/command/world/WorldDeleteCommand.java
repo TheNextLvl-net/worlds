@@ -1,4 +1,4 @@
-package worlds.command.world;
+package net.thenextlvl.worlds.command.world;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.standard.StringArgument;
@@ -12,7 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.WorldInfo;
-import worlds.util.Messages;
+import net.thenextlvl.worlds.util.Messages;
 
 class WorldDeleteCommand {
 

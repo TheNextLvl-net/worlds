@@ -1,4 +1,4 @@
-package worlds.command;
+package net.thenextlvl.worlds.command;
 
 import cloud.commandframework.arguments.StandardCommandSyntaxFormatter;
 import core.annotation.MethodsReturnNonnullByDefault;
