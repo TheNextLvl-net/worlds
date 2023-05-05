@@ -1,13 +1,21 @@
 package net.thenextlvl.worlds.command.world;
 
 import cloud.commandframework.Command;
+import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import core.api.placeholder.Placeholder;
 import net.kyori.adventure.audience.Audience;
+import net.thenextlvl.worlds.volume.Generator;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import worlds.util.Messages;
+import org.bukkit.plugin.Plugin;
+import net.thenextlvl.worlds.util.Messages;
+
+import java.util.Arrays;
 
 class WorldCreateCommand {
 
@@ -15,6 +23,28 @@ class WorldCreateCommand {
         return builder
                 .literal("create")
                 .argument(StringArgument.of("name"))
+                .flag(CommandFlag.builder("type").withAliases("t")
+                        .withArgument(StringArgument.builder("type").withSuggestionsProvider((context, token) ->
+                                Arrays.stream(WorldType.values())
+                                        .map(type -> type.name().toLowerCase().replace("_", "-"))
+                                        .filter(s -> s.startsWith(token))
+                                        .toList())))
+                .flag(CommandFlag.builder("environment").withAliases("e")
+                        .withArgument(StringArgument.builder("environment").withSuggestionsProvider((context, token) ->
+                                Arrays.stream(World.Environment.values())
+                                        .map(type -> type.name().toLowerCase().replace("_", "-"))
+                                        .filter(s -> s.startsWith(token))
+                                        .toList())))
+                .flag(CommandFlag.builder("generator").withAliases("g")
+                        .withArgument(StringArgument.builder("generator").withSuggestionsProvider((context, token) ->
+                                Arrays.stream(Bukkit.getPluginManager().getPlugins())
+                                        .filter(plugin -> Generator.isProvided(plugin.getClass()))
+                                        .map(Plugin::getName)
+                                        .filter(s -> s.startsWith(token))
+                                        .toList())))
+                .flag(CommandFlag.builder("identifier").withAliases("i")
+                        .withArgument(StringArgument.builder("identifier")
+                                .greedyFlagYielding()))
                 .handler(WorldCreateCommand::execute);
     }
 
