@@ -20,6 +20,6 @@ class WorldListCommand {
         var sender = context.getSender();
         var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
         sender.sendRichMessage(Messages.WORLD_LIST.message(locale, sender,
-                Placeholder.of("amount", towns.size()), Placeholder.of("towns", String.join(", ", towns))));
+                Placeholder.of("amount", towns.size()), Placeholder.of("worlds", String.join(", ", towns))));
     }
 }
