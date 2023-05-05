@@ -1,7 +1,5 @@
 package net.thenextlvl.worlds.generator;
 
-import lombok.Getter;
-import net.thenextlvl.worlds.generator.CustomGenerator;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -9,25 +7,16 @@ import org.bukkit.block.Biome;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.generator.WorldInfo;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import worlds.Worlds;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class BuildersDreamGenerator extends CustomGenerator {
-    @Getter
-    private static final BuildersDreamGenerator instance = new BuildersDreamGenerator();
+public class BuildersDreamGenerator {
+    public static final String NAME = "builders dream";
 
-    private BuildersDreamGenerator() {
-        super(JavaPlugin.getPlugin(Worlds.class), "builders dream");
-    }
-
-    @Override
-    public ChunkGenerator getWorldGenerator(String worldName, @Nullable String id) {
+    public static ChunkGenerator getWorldGenerator(String worldName) {
         return new ChunkGenerator() {
             @Override
             public void generateSurface(WorldInfo worldInfo, Random random, int chunkX, int chunkZ, ChunkData chunkData) {
@@ -72,8 +61,7 @@ public class BuildersDreamGenerator extends CustomGenerator {
         };
     }
 
-    @Override
-    public BiomeProvider getBiomeProvider(String worldName, @Nullable String id) {
+    public static BiomeProvider getBiomeProvider(String worldName) {
         return new BiomeProvider() {
             @NotNull
             @Override
