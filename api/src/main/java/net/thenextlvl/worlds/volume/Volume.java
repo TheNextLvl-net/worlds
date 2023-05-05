@@ -67,9 +67,11 @@ public class Volume {
         return file.delete();
     }
 
+    @Nullable
     public static Volume load(File file) {
         var gson = new GsonFile<WorldImage>(file, WorldImage.class);
-        return new Volume(gson.getRoot().build(), gson.getRoot().generator());
+        var world = gson.getRoot().build();
+        return world != null ? new Volume(world, gson.getRoot().generator()) : null;
     }
 
     @Nullable
