@@ -55,7 +55,7 @@ public class Volume {
     public DeleteResult delete() {
         if (!forceUnload()) return DeleteResult.UNLOAD_FAILED;
         if (!delete(world.getWorldFolder())) return DeleteResult.DELETE_FAILED;
-        if (!file.delete()) return DeleteResult.DELETE_FAILED;
+        if (file.getFile().exists() && !file.delete()) return DeleteResult.DELETE_FAILED;
         return DeleteResult.SUCCESS;
     }
 
