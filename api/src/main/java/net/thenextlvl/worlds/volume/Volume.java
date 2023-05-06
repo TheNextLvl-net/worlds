@@ -93,7 +93,7 @@ public class Volume {
 
     public static Volume getOrCreate(World world) {
         if (!volumes.containsKey(world.getUID()))
-            volumes.put(world.getUID(), new Volume(world, Generator.of(world)));
+            return new Volume(world).register();
         return volumes.get(world.getUID());
     }
 
