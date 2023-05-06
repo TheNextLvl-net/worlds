@@ -33,7 +33,7 @@ public class CustomExceptionHandler {
             })
             .withHandler(ARGUMENT_PARSING, (sender, exception) -> {
                 var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
-                return MiniMessage.miniMessage().deserialize(Messages.INCOMPLETE_ARGUMENT.message(locale, sender));
+                return MiniMessage.miniMessage().deserialize(Messages.INVALID_ARGUMENT.message(locale, sender));
             })
             .withCommandExecutionHandler();
     private static final Pattern SPECIAL_CHARACTERS_PATTERN = Pattern.compile("[^\\s\\w\\-]");

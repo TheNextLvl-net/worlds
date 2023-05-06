@@ -33,7 +33,7 @@ public class Messages {
 
     public static final MessageKey<Audience> NO_PERMISSION = new MessageKey<>("command.permission", plugin.formatter()).register();
     public static final MessageKey<Audience> INVALID_SENDER = new MessageKey<>("command.sender", plugin.formatter()).register();
-    public static final MessageKey<Audience> INCOMPLETE_ARGUMENT = new MessageKey<>("command.argument", plugin.formatter()).register();
+    public static final MessageKey<Audience> INVALID_ARGUMENT = new MessageKey<>("command.argument.invalid", plugin.formatter()).register();
 
     static {
         initRoot();
@@ -62,7 +62,7 @@ public class Messages {
         file.setDefault(WORLD_DELETE_FAILED, "%prefix% <red>Failed to deleted the world <dark_red>%world%");
         file.setDefault(NO_PERMISSION, "%prefix% <red>You have no rights <dark_gray>(<dark_red>%permission%<dark_gray>)");
         file.setDefault(INVALID_SENDER, "%prefix% <red>You cannot use this command");
-        file.setDefault(INCOMPLETE_ARGUMENT, "%prefix% <red>Incomplete command argument");
+        file.setDefault(INVALID_ARGUMENT, "%prefix% <red>Invalid command argument");
         file.save();
     }
 
@@ -81,7 +81,7 @@ public class Messages {
         file.setDefault(WORLD_DELETE_FAILED, "%prefix% <red>Die Welt <dark_red>%world%<red> konnte nicht gelöscht werden");
         file.setDefault(NO_PERMISSION, "%prefix%<red> Darauf hast du keine rechte <dark_gray>(<dark_red>%permission%<dark_gray>)");
         file.setDefault(INVALID_SENDER, "%prefix%<red> Du kannst diesen command nicht nutzen");
-        file.setDefault(INCOMPLETE_ARGUMENT, "%prefix% <red>Unvollständiges command Argument");
+        file.setDefault(INVALID_ARGUMENT, "%prefix% <red>Ungültiges command Argument");
         file.save();
     }
 }
