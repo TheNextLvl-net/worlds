@@ -1,9 +1,11 @@
-package worlds.command;
+package net.thenextlvl.worlds.command;
 
 import cloud.commandframework.arguments.StandardCommandSyntaxFormatter;
 import core.annotation.MethodsReturnNonnullByDefault;
+import core.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 public class CustomSyntaxFormatter<C> extends StandardCommandSyntaxFormatter<C> {
     @Override
     protected FormattingInstance createInstance() {

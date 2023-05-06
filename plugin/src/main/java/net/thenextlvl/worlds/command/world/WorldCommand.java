@@ -1,10 +1,10 @@
-package worlds.command.world;
+package net.thenextlvl.worlds.command.world;
 
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.paper.PaperCommandManager;
-import worlds.Worlds;
-import worlds.command.CustomExceptionHandler;
-import worlds.command.CustomSyntaxFormatter;
+import net.thenextlvl.worlds.Worlds;
+import net.thenextlvl.worlds.command.CustomSyntaxFormatter;
+import net.thenextlvl.worlds.command.CustomExceptionHandler;
 
 import java.util.function.Function;
 
@@ -17,19 +17,18 @@ public class WorldCommand {
         manager.registerAsynchronousCompletions();
         manager.registerBrigadier();
         var builder = manager.commandBuilder("world").permission("worlds.command.world");
-        // manager.command(WorldCreateCommand.create(builder));
+        manager.command(WorldCreateCommand.create(builder));
+        manager.command(WorldDeleteCommand.create(builder));
+        manager.command(WorldInfoCommand.create(builder));
+        manager.command(WorldListCommand.create(builder));
 
-        // TODO: 03.05.23 commands 
-        // /world create [name] (-t type) (-e environment) (-g generator)
+        // TODO: 03.05.23 commands
         // /world import [file] (-t type) (-e environment) (-g generator)
         // /world tp [world] (player)
         // /world unload [world]
-        // /world delete [world]
         // /world export [world]
-        // /world info [world]
         // /world load [world]
         // /world setspawn
         // /world spawn
-        // /world list
     }
 }

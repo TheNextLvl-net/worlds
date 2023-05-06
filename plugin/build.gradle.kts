@@ -29,6 +29,11 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.26")
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 
 tasks {
     shadowJar {

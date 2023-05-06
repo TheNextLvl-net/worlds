@@ -9,8 +9,8 @@ Simple but efficient world management system
  * Artifact Information:
 ```xml
 <dependency>
-    <groupId>net.nonswag.tnl</groupId>
-    <artifactId>worlds</artifactId>
-    <version>4.0.0</version>
+    <groupId>net.thenextlvl.worlds</groupId>
+    <artifactId>api</artifactId>
+    <version>1.0.0</version>
 </dependency>
  ```

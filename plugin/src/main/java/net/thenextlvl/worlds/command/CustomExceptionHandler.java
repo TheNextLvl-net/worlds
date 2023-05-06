@@ -1,12 +1,12 @@
-package worlds.command;
+package net.thenextlvl.worlds.command;
 
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import core.annotation.FieldsAreNonnullByDefault;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.thenextlvl.worlds.util.Messages;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import worlds.util.Messages;
 
 import java.util.regex.Pattern;
 
@@ -20,7 +20,7 @@ public class CustomExceptionHandler {
                         .replace("<", "\\<").replace(">", "\\>")
                         .replace("[", "<dark_gray>[<gold>").replace("]", "<dark_gray>]")
                         .replace("\\<", "<dark_gray><<gold>").replace("\\>", "<dark_gray>>")
-                        .replace("|", "<dark_gray>|<red>");
+                        .replace("|", "<dark_gray>|<red>").replace("--", "<red>--");
                 return MiniMessage.miniMessage().deserialize(Messages.PREFIX.message() + " <red>/" + syntax);
             })
             .withHandler(INVALID_SENDER, (sender, exception) -> {
@@ -31,7 +31,10 @@ public class CustomExceptionHandler {
                 var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
                 return MiniMessage.miniMessage().deserialize(Messages.NO_PERMISSION.message(locale, sender));
             })
-            .withCommandExecutionHandler()
-            .withArgumentParsingHandler();
+            .withHandler(ARGUMENT_PARSING, (sender, exception) -> {
+                var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
+                return MiniMessage.miniMessage().deserialize(Messages.INVALID_ARGUMENT.message(locale, sender));
+            })
+            .withCommandExecutionHandler();
     private static final Pattern SPECIAL_CHARACTERS_PATTERN = Pattern.compile("[^\\s\\w\\-]");
 }
