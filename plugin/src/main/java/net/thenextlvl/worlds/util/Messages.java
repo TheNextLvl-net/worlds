@@ -17,7 +17,9 @@ public class Messages {
 
     public static final SystemMessageKey<Audience> PREFIX = new SystemMessageKey<>("worlds.prefix", plugin.formatter()).register();
 
-    public static final MessageKey<Audience> WORLD_SAVED = new MessageKey<>("world-saved", plugin.formatter()).register();
+    public static final MessageKey<Audience> WORLD_SAVED = new MessageKey<>("world.saved", plugin.formatter()).register();
+    public static final MessageKey<Audience> WORLD_CREATE_SUCCEEDED = new MessageKey<>("world.create.success", plugin.formatter()).register();
+    public static final MessageKey<Audience> WORLD_CREATE_FAILED = new MessageKey<>("world.create.failed", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_LIST = new MessageKey<>("world.list", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_EXISTS = new MessageKey<>("world.exists", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_NOT_FOUND = new MessageKey<>("world.exists.not", plugin.formatter()).register();
@@ -50,6 +52,8 @@ public class Messages {
     private static void initEnglish() {
         var file = MessageFile.getOrCreate(ENGLISH);
         file.setDefault(WORLD_SAVED, "%prefix% <white>Saved the world <green>%world%");
+        file.setDefault(WORLD_CREATE_SUCCEEDED, "%prefix% <white>Successfully created the world <green>%world%");
+        file.setDefault(WORLD_CREATE_FAILED, "%prefix% <red>Failed to create the world <dark_red>%world%");
         file.setDefault(WORLD_LIST, "%prefix% <gray>Worlds <dark_gray>(<green>%amount%<dark_gray>): <white>%worlds%");
         file.setDefault(WORLD_EXISTS, "%prefix% <red>A world called <dark_red>%world%<red> does already exist");
         file.setDefault(WORLD_NOT_FOUND, "%prefix% <red>A world called <dark_red>%world%<red> does not exist");
@@ -68,7 +72,9 @@ public class Messages {
 
     private static void initGerman() {
         var file = MessageFile.getOrCreate(Locale.forLanguageTag("de-DE"));
-        file.setDefault(WORLD_SAVED, "%prefix% <white>Die welt <green>%world% <white>wurde gespeichert");
+        file.setDefault(WORLD_SAVED, "%prefix% <white>Die Welt <green>%world% <white>wurde gespeichert");
+        file.setDefault(WORLD_CREATE_SUCCEEDED, "%prefix% <white>Die Welt <green>%world% <white>wurde erfolgreich erstellt");
+        file.setDefault(WORLD_CREATE_FAILED, "%prefix% <red>Die Welt <dark_red>%world% <red>konnte nicht gelöscht werden");
         file.setDefault(WORLD_LIST, "%prefix% <gray>Welten <dark_gray>(<green>%amount%<dark_gray>): <white>%worlds%");
         file.setDefault(WORLD_EXISTS, "%prefix% <red>Eine Welt mit dem namen <dark_red>%world%<red> existiert bereits");
         file.setDefault(WORLD_NOT_FOUND, "%prefix% <red>Eine Welt mit dem namen <dark_red>%world%<red> existiert nicht");
