@@ -1,13 +1,12 @@
 package net.thenextlvl.worlds.image;
 
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
+import core.api.file.format.GsonFile;
+import org.bukkit.*;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.Objects;
 
 public record WorldImage(
@@ -22,7 +21,7 @@ public record WorldImage(
 
     @Nullable
     public World build() {
-        var creator = WorldCreator.name(name)
+        var creator = new WorldCreator(name, new NamespacedKey("worlds", name.toLowerCase().replace(" ", "_")))
                 .generator(resolveChunkGenerator())
                 .biomeProvider(resolveBiomeProvider())
                 .generateStructures(generateStructures())
@@ -53,6 +52,11 @@ public record WorldImage(
 
     public static WorldImage of(World world) {
         return of(world, null);
+    }
+
+    @Nullable
+    public static WorldImage of(File file) {
+        return file.isFile() ? new GsonFile<WorldImage>(file, WorldImage.class).getRoot() : null;
     }
 
     @SuppressWarnings("deprecation")

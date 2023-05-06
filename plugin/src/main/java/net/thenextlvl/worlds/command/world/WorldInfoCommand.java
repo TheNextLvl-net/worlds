@@ -6,7 +6,7 @@ import cloud.commandframework.context.CommandContext;
 import core.api.placeholder.Placeholder;
 import net.kyori.adventure.audience.Audience;
 import net.thenextlvl.worlds.util.Messages;
-import net.thenextlvl.worlds.volume.Volume;
+import net.thenextlvl.worlds.image.Image;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
@@ -42,7 +42,7 @@ class WorldInfoCommand {
         }
         var name = Placeholder.<Audience>of("world", world != null ? world.getName() : target.get());
         if (world != null) {
-            var volume = Volume.getOrCreate(world);
+            var volume = Image.getOrCreate(world);
             var environment = Placeholder.<Audience>of("environment", () -> switch (world.getEnvironment()) {
                 case THE_END -> "The End";
                 case NETHER -> "Nether";
