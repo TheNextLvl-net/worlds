@@ -30,10 +30,11 @@ public class BuildersDreamGenerator {
                     default -> Material.GRASS_BLOCK;
                 };
                 int minHeight = chunkData.getMinHeight();
+                int maxHeight = chunkData.getMaxHeight() / 5;
                 for (int x = 0; x < 16; x++) {
                     for (int z = 0; z < 16; z++) {
-                        chunkData.setBlock(x, chunkData.getMaxHeight() - minHeight * 2, z, top);
-                        for (int y = minHeight; y < chunkData.getMaxHeight() - minHeight * 2; y++) {
+                        chunkData.setBlock(x, maxHeight, z, top);
+                        for (int y = minHeight; y < maxHeight; y++) {
                             chunkData.setBlock(x, y, z, filler);
                         }
                     }
