@@ -17,6 +17,7 @@ public class WorldCommand {
         manager.registerAsynchronousCompletions();
         manager.registerBrigadier();
         var builder = manager.commandBuilder("world").permission("worlds.command.world");
+        manager.command(WorldTeleportCommand.create(builder));
         manager.command(WorldCreateCommand.create(builder));
         manager.command(WorldImportCommand.create(builder));
         manager.command(WorldDeleteCommand.create(builder));
@@ -24,11 +25,8 @@ public class WorldCommand {
         manager.command(WorldListCommand.create(builder));
 
         // TODO: 03.05.23 commands
-        // /world tp [world] (player)
-        // /world unload [world]
+        // /world unlink [world] [world]
+        // /world link [world] [world]
         // /world export [world]
-        // /world load [world]
-        // /world setspawn
-        // /world spawn
     }
 }
