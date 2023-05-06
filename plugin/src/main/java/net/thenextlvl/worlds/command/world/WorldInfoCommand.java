@@ -9,6 +9,7 @@ import net.thenextlvl.worlds.util.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.WorldInfo;
 
@@ -23,16 +24,22 @@ class WorldInfoCommand {
                                 .map(WorldInfo::getName)
                                 .filter(s -> s.startsWith(token))
                                 .toList())
-                        .build())
+                        .asOptional().build())
                 .handler(WorldInfoCommand::execute);
     }
 
     @SuppressWarnings("deprecation")
     private static void execute(CommandContext<CommandSender> context) {
         var sender = context.getSender();
-        var world = Bukkit.getWorld(context.<String>get("world"));
-        var name = Placeholder.<Audience>of("world", world != null ? world.getName() : context.get("world"));
+        var target = context.<String>getOptional("world");
+        var world = target.isPresent() ? Bukkit.getWorld(target.get()) :
+                sender instanceof Entity entity ? entity.getWorld() : null;
         var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
+        if (world == null && target.isEmpty()) {
+            sender.sendRichMessage(Messages.ENTER_WORLD_NAME.message(locale, sender));
+            return;
+        }
+        var name = Placeholder.<Audience>of("world", world != null ? world.getName() : target.get());
         if (world != null) {
             var environment = Placeholder.<Audience>of("environment", switch (world.getEnvironment()) {
                 case THE_END -> "The End";

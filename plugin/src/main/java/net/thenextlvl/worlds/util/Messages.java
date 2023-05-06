@@ -36,6 +36,7 @@ public class Messages {
     public static final MessageKey<Audience> WORLD_UNLOAD_FAILED = new MessageKey<>("world.unload.failed", plugin.formatter()).register();
 
     public static final MessageKey<Audience> VOLUME_NOT_FOUND = new MessageKey<>("volume.exists.not", plugin.formatter()).register();
+    public static final MessageKey<Audience> ENTER_WORLD_NAME = new MessageKey<>("world.name.absent", plugin.formatter()).register();
 
     public static final MessageKey<Audience> NO_PERMISSION = new MessageKey<>("command.permission", plugin.formatter()).register();
     public static final MessageKey<Audience> INVALID_SENDER = new MessageKey<>("command.sender", plugin.formatter()).register();
@@ -71,6 +72,7 @@ public class Messages {
         file.setDefault(WORLD_UNLOAD_FAILED, "%prefix% <red>Failed to unload the world <dark_red>%world%");
         file.setDefault(WORLD_DELETE_FAILED, "%prefix% <red>Failed to deleted the world <dark_red>%world%");
         file.setDefault(VOLUME_NOT_FOUND, "%prefix% <red>No volume found in directory <dark_red>%directory%");
+        file.setDefault(ENTER_WORLD_NAME, "%prefix% <red>You have to provide a world");
         file.setDefault(NO_PERMISSION, "%prefix% <red>You have no rights <dark_gray>(<dark_red>%permission%<dark_gray>)");
         file.setDefault(INVALID_SENDER, "%prefix% <red>You cannot use this command");
         file.setDefault(INVALID_ARGUMENT, "%prefix% <red>Invalid command argument");
@@ -95,6 +97,7 @@ public class Messages {
         file.setDefault(WORLD_UNLOAD_FAILED, "%prefix% <red>Die Welt <green>%world%<red> konnte nicht entladen werden");
         file.setDefault(WORLD_DELETE_FAILED, "%prefix% <red>Die Welt <dark_red>%world%<red> konnte nicht gelöscht werden");
         file.setDefault(VOLUME_NOT_FOUND, "%prefix% <red>Es konnte kein volume im Ordner <dark_red>%directory% <red>gefunden werden");
+        file.setDefault(ENTER_WORLD_NAME, "%prefix% <red>Du musst einen Welt angeben");
         file.setDefault(NO_PERMISSION, "%prefix%<red> Darauf hast du keine rechte <dark_gray>(<dark_red>%permission%<dark_gray>)");
         file.setDefault(INVALID_SENDER, "%prefix%<red> Du kannst diesen command nicht nutzen");
         file.setDefault(INVALID_ARGUMENT, "%prefix% <red>Ungültiges command Argument");
