@@ -17,9 +17,8 @@ public class CustomExceptionHandler {
     public static final MinecraftExceptionHandler<CommandSender> INSTANCE = new MinecraftExceptionHandler<CommandSender>()
             .withHandler(INVALID_SYNTAX, e -> {
                 var syntax = ((InvalidSyntaxException) e).getCorrectSyntax()
-                        .replace("<", "\\<").replace(">", "\\>")
                         .replace("[", "<dark_gray>[<gold>").replace("]", "<dark_gray>]")
-                        .replace("\\<", "<dark_gray><<gold>").replace("\\>", "<dark_gray>>")
+                        .replace("(", "<dark_gray>(<gold>").replace(")", "<dark_gray>)")
                         .replace("|", "<dark_gray>|<red>").replace("--", "<red>--");
                 return MiniMessage.miniMessage().deserialize(Messages.PREFIX.message() + " <red>/" + syntax);
             })
