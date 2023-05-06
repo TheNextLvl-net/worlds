@@ -50,25 +50,21 @@ public record WorldImage(
         return plugin.getDefaultBiomeProvider(name(), generator().id());
     }
 
-    public static WorldImage of(World world) {
-        return of(world, null);
-    }
-
-    @Nullable
-    public static WorldImage of(File file) {
-        return file.isFile() ? new GsonFile<WorldImage>(file, WorldImage.class).getRoot() : null;
-    }
-
     @SuppressWarnings("deprecation")
-    public static WorldImage of(World world, @Nullable Generator generator) {
+    public static WorldImage of(World world) {
         return new WorldImage(
                 world.getName(),
-                generator,
+                null,
                 world.getEnvironment(),
                 Objects.requireNonNullElse(world.getWorldType(), WorldType.NORMAL),
                 world.canGenerateStructures(),
                 world.isHardcore(),
                 world.getSeed()
         );
+    }
+
+    @Nullable
+    public static WorldImage of(File file) {
+        return file.isFile() ? new GsonFile<WorldImage>(file, WorldImage.class).getRoot() : null;
     }
 }
