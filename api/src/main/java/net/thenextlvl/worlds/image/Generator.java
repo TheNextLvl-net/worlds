@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.volume;
+package net.thenextlvl.worlds.image;
 
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;

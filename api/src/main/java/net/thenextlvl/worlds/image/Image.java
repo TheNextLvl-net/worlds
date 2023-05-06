@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.volume;
+package net.thenextlvl.worlds.image;
 
 import core.api.file.format.GsonFile;
 import lombok.Getter;
@@ -12,22 +12,18 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
-public class Volume {
-    private static final Map<UUID, Volume> volumes = new HashMap<>();
+public class Image {
+    private static final Map<UUID, Image> images = new HashMap<>();
     private final GsonFile<WorldImage> file;
     private final World world;
 
-    public Volume(World world, WorldImage image) {
+    private Image(World world, WorldImage image) {
         this.world = world;
-        var file = new File(world.getWorldFolder(), ".volume");
+        var file = new File(Bukkit.getWorldContainer(), image.name() + ".image");
         this.file = new GsonFile<>(file, image);
     }
 
-    public Volume(World world, @Nullable Generator generator) {
-        this(world, WorldImage.of(world, generator));
-    }
-
-    public Volume(World world) {
+    private Image(World world) {
         this(world, WorldImage.of(world));
     }
 
@@ -38,12 +34,12 @@ public class Volume {
         return location != null ? location : world.getSpawnLocation().clone().add(0.5, 0, 0.5);
     }
 
-    public Volume register() {
-        volumes.put(getWorld().getUID(), this);
+    private Image register() {
+        images.put(getWorld().getUID(), this);
         return this;
     }
 
-    public Volume save() {
+    public Image save() {
         file.save();
         return this;
     }
@@ -64,10 +60,10 @@ public class Volume {
         return Bukkit.unloadWorld(world, false);
     }
 
-    public DeleteResult delete() {
+    public DeleteResult delete(boolean image) {
         if (!forceUnload()) return DeleteResult.UNLOAD_FAILED;
-        if (!delete(world.getWorldFolder())) return DeleteResult.DELETE_FAILED;
-        if (file.getFile().exists() && !file.delete()) return DeleteResult.DELETE_FAILED;
+        if (!delete(world.getWorldFolder())) return DeleteResult.WORLD_DELETE_FAILED;
+        if (image && !file.delete()) return DeleteResult.IMAGE_DELETE_FAILED;
         return DeleteResult.SUCCESS;
     }
 
@@ -80,21 +76,22 @@ public class Volume {
     }
 
     @Nullable
-    public static Volume load(File file) {
-        var gson = new GsonFile<WorldImage>(file, WorldImage.class);
-        var world = gson.getRoot().build();
-        return world != null ? new Volume(world, gson.getRoot()) : null;
+    public static Image load(@Nullable WorldImage image) {
+        if (image == null) return null;
+        if (Bukkit.getWorld(image.name()) != null) return null;
+        var build = image.build();
+        return build != null ? new Image(build, image).save().register() : null;
     }
 
     @Nullable
-    public static Volume get(World world) {
-        return volumes.get(world.getUID());
+    public static Image get(World world) {
+        return images.get(world.getUID());
     }
 
-    public static Volume getOrCreate(World world) {
-        if (!volumes.containsKey(world.getUID()))
-            return new Volume(world).register();
-        return volumes.get(world.getUID());
+    public static Image getOrCreate(World world) {
+        if (!images.containsKey(world.getUID()))
+            return new Image(world).save().register();
+        return images.get(world.getUID());
     }
 
     public static List<File> findWorlds() {
@@ -103,17 +100,20 @@ public class Volume {
         return files != null ? Arrays.asList(files) : Collections.emptyList();
     }
 
-    public static List<File> findVolumes() {
-        return findWorlds().stream()
-                .map(file -> new File(file, ".volume"))
-                .filter(File::isFile).toList();
+    public static List<File> findImageFiles() {
+        var files = Bukkit.getWorldContainer().listFiles(file ->
+                file.isFile() && file.getName().endsWith(".image"));
+        return files != null ? Arrays.asList(files) : Collections.emptyList();
     }
 
-    public static List<Volume> loadVolumes() {
-        return findVolumes().stream().map(Volume::load).toList();
+    public static List<WorldImage> findImages() {
+        return findImageFiles().stream()
+                .map(WorldImage::of)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     public enum DeleteResult {
-        DELETE_FAILED, UNLOAD_FAILED, SUCCESS
+        WORLD_DELETE_FAILED, IMAGE_DELETE_FAILED, UNLOAD_FAILED, SUCCESS
     }
 }
