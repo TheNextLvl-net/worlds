@@ -18,12 +18,12 @@ public class WorldCommand {
         manager.registerBrigadier();
         var builder = manager.commandBuilder("world").permission("worlds.command.world");
         manager.command(WorldCreateCommand.create(builder));
+        manager.command(WorldImportCommand.create(builder));
         manager.command(WorldDeleteCommand.create(builder));
         manager.command(WorldInfoCommand.create(builder));
         manager.command(WorldListCommand.create(builder));
 
         // TODO: 03.05.23 commands
-        // /world import [file] (-t type) (-e environment) (-g generator)
         // /world tp [world] (player)
         // /world unload [world]
         // /world export [world]

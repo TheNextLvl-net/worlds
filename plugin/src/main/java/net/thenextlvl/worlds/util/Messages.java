@@ -20,6 +20,8 @@ public class Messages {
     public static final MessageKey<Audience> WORLD_SAVED = new MessageKey<>("world.saved", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_CREATE_SUCCEEDED = new MessageKey<>("world.create.success", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_CREATE_FAILED = new MessageKey<>("world.create.failed", plugin.formatter()).register();
+    public static final MessageKey<Audience> WORLD_IMPORT_SUCCEEDED = new MessageKey<>("world.import.success", plugin.formatter()).register();
+    public static final MessageKey<Audience> WORLD_IMPORT_FAILED = new MessageKey<>("world.import.failed", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_LIST = new MessageKey<>("world.list", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_EXISTS = new MessageKey<>("world.exists", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_NOT_FOUND = new MessageKey<>("world.exists.not", plugin.formatter()).register();
@@ -32,6 +34,8 @@ public class Messages {
     public static final MessageKey<Audience> WORLD_DELETE_SUCCEEDED = new MessageKey<>("world.delete.success", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_DELETE_FAILED = new MessageKey<>("world.delete.failed", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_UNLOAD_FAILED = new MessageKey<>("world.unload.failed", plugin.formatter()).register();
+
+    public static final MessageKey<Audience> VOLUME_NOT_FOUND = new MessageKey<>("volume.exists.not", plugin.formatter()).register();
 
     public static final MessageKey<Audience> NO_PERMISSION = new MessageKey<>("command.permission", plugin.formatter()).register();
     public static final MessageKey<Audience> INVALID_SENDER = new MessageKey<>("command.sender", plugin.formatter()).register();
@@ -54,6 +58,8 @@ public class Messages {
         file.setDefault(WORLD_SAVED, "%prefix% <white>Saved the world <green>%world%");
         file.setDefault(WORLD_CREATE_SUCCEEDED, "%prefix% <white>Successfully created the world <green>%world%");
         file.setDefault(WORLD_CREATE_FAILED, "%prefix% <red>Failed to create the world <dark_red>%world%");
+        file.setDefault(WORLD_IMPORT_SUCCEEDED, "%prefix% <white>Successfully imported the world <green>%world%");
+        file.setDefault(WORLD_IMPORT_FAILED, "%prefix% <red>Failed to import the world <dark_red>%world%");
         file.setDefault(WORLD_LIST, "%prefix% <gray>Worlds <dark_gray>(<green>%amount%<dark_gray>): <white>%worlds%");
         file.setDefault(WORLD_EXISTS, "%prefix% <red>A world called <dark_red>%world%<red> does already exist");
         file.setDefault(WORLD_NOT_FOUND, "%prefix% <red>A world called <dark_red>%world%<red> does not exist");
@@ -64,6 +70,7 @@ public class Messages {
         file.setDefault(WORLD_DELETE_SUCCEEDED, "%prefix% <white>Successfully deleted the world <green>%world%");
         file.setDefault(WORLD_UNLOAD_FAILED, "%prefix% <red>Failed to unload the world <dark_red>%world%");
         file.setDefault(WORLD_DELETE_FAILED, "%prefix% <red>Failed to deleted the world <dark_red>%world%");
+        file.setDefault(VOLUME_NOT_FOUND, "%prefix% <red>No volume found in directory <dark_red>%directory%");
         file.setDefault(NO_PERMISSION, "%prefix% <red>You have no rights <dark_gray>(<dark_red>%permission%<dark_gray>)");
         file.setDefault(INVALID_SENDER, "%prefix% <red>You cannot use this command");
         file.setDefault(INVALID_ARGUMENT, "%prefix% <red>Invalid command argument");
@@ -74,7 +81,9 @@ public class Messages {
         var file = MessageFile.getOrCreate(Locale.forLanguageTag("de-DE"));
         file.setDefault(WORLD_SAVED, "%prefix% <white>Die Welt <green>%world% <white>wurde gespeichert");
         file.setDefault(WORLD_CREATE_SUCCEEDED, "%prefix% <white>Die Welt <green>%world% <white>wurde erfolgreich erstellt");
-        file.setDefault(WORLD_CREATE_FAILED, "%prefix% <red>Die Welt <dark_red>%world% <red>konnte nicht gelöscht werden");
+        file.setDefault(WORLD_CREATE_FAILED, "%prefix% <red>Die Welt <dark_red>%world% <red>konnte nicht erstellt werden");
+        file.setDefault(WORLD_IMPORT_SUCCEEDED, "%prefix% <white>Die Welt <green>%world% <white>wurde erfolgreich importiert");
+        file.setDefault(WORLD_IMPORT_FAILED, "%prefix% <red>Die Welt <dark_red>%world% <red>konnte nicht importiert werden");
         file.setDefault(WORLD_LIST, "%prefix% <gray>Welten <dark_gray>(<green>%amount%<dark_gray>): <white>%worlds%");
         file.setDefault(WORLD_EXISTS, "%prefix% <red>Eine Welt mit dem namen <dark_red>%world%<red> existiert bereits");
         file.setDefault(WORLD_NOT_FOUND, "%prefix% <red>Eine Welt mit dem namen <dark_red>%world%<red> existiert nicht");
@@ -85,6 +94,7 @@ public class Messages {
         file.setDefault(WORLD_DELETE_SUCCEEDED, "%prefix% <white>Die Welt <green>%world%<white> wurde erfolgreich gelöscht");
         file.setDefault(WORLD_UNLOAD_FAILED, "%prefix% <red>Die Welt <green>%world%<red> konnte nicht entladen werden");
         file.setDefault(WORLD_DELETE_FAILED, "%prefix% <red>Die Welt <dark_red>%world%<red> konnte nicht gelöscht werden");
+        file.setDefault(VOLUME_NOT_FOUND, "%prefix% <red>Es konnte kein volume im Ordner <dark_red>%directory% <red>gefunden werden");
         file.setDefault(NO_PERMISSION, "%prefix%<red> Darauf hast du keine rechte <dark_gray>(<dark_red>%permission%<dark_gray>)");
         file.setDefault(INVALID_SENDER, "%prefix%<red> Du kannst diesen command nicht nutzen");
         file.setDefault(INVALID_ARGUMENT, "%prefix% <red>Ungültiges command Argument");
