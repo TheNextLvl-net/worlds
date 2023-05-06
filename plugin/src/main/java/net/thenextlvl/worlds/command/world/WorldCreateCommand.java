@@ -23,7 +23,6 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Random;
 
 import static org.bukkit.World.Environment.CUSTOM;
 import static org.bukkit.World.Environment.NORMAL;
@@ -104,13 +103,11 @@ class WorldCreateCommand {
         var seed = context.flags().<Long>getValue("seed").orElse(0L);
 
         var world = new WorldImage(name, generator, environment, type, structures, hardcore, seed).build();
-
-        if (world != null) new Volume(world, generator).register().save();
+        Volume volume = null;
+        if (world != null) volume = new Volume(world, generator).register().save();
         var message = world != null ? Messages.WORLD_CREATE_SUCCEEDED : Messages.WORLD_CREATE_FAILED;
         sender.sendRichMessage(message.message(locale, sender, placeholder));
-        if (world == null || !(sender instanceof Entity entity)) return;
-        var location = world.getGenerator() != null ? world.getGenerator().getFixedSpawnLocation(world, new Random()) : null;
-        if (location == null) location = world.getSpawnLocation().clone().add(0.5, 0, 0.5);
-        entity.teleportAsync(location, PlayerTeleportEvent.TeleportCause.COMMAND);
+        if (volume == null || !(sender instanceof Entity entity)) return;
+        entity.teleportAsync(volume.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
     }
 }

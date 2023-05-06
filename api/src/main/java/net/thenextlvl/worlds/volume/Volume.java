@@ -3,11 +3,13 @@ package net.thenextlvl.worlds.volume;
 import core.api.file.format.GsonFile;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
 public class Volume {
@@ -27,6 +29,13 @@ public class Volume {
 
     public Volume(World world) {
         this(world, WorldImage.of(world));
+    }
+
+    public Location getSpawnLocation() {
+        var random = ThreadLocalRandom.current();
+        var generator = getWorld().getGenerator();
+        var location = generator != null ? generator.getFixedSpawnLocation(world, random) : null;
+        return location != null ? location : world.getSpawnLocation().clone().add(0.5, 0, 0.5);
     }
 
     public Volume register() {
