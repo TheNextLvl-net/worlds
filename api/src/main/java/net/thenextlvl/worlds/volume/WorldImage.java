@@ -12,12 +12,16 @@ public record WorldImage(
         @Nullable Generator generator,
         World.Environment environment,
         WorldType type,
+        boolean generateStructures,
+        boolean hardcore,
         long seed
 ) {
 
     @Nullable
     public World build() {
-        var creator = WorldCreator.name(name()).type(type()).seed(seed()).environment(environment());
+        var creator = WorldCreator.name(name()).type(type()).seed(seed())
+                .hardcore(hardcore()).environment(environment())
+                .generateStructures(generateStructures());
         if (generator != null) creator.generator(generator.toString());
         return creator.createWorld();
     }
@@ -29,6 +33,8 @@ public record WorldImage(
                 generator,
                 world.getEnvironment(),
                 Objects.requireNonNullElse(world.getWorldType(), WorldType.NORMAL),
+                world.canGenerateStructures(),
+                world.isHardcore(),
                 world.getSeed()
         );
     }
