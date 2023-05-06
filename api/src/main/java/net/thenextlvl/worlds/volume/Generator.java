@@ -17,9 +17,18 @@ public record Generator(String plugin, @Nullable String id) {
         return new Generator(pluginLoader.getPlugin().getName(), null);
     }
 
-    public static boolean isProvided(Class<? extends Plugin> clazz) {
+    public static boolean hasChunkGenerator(Class<? extends Plugin> clazz) {
         try {
             return clazz.getMethod("getDefaultWorldGenerator", String.class, String.class).getDeclaringClass().equals(clazz);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean hasBiomeProvider(Class<? extends Plugin> clazz) {
+        try {
+            return clazz.getMethod("getDefaultBiomeProvider", String.class, String.class).getDeclaringClass().equals(clazz);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
             return false;
