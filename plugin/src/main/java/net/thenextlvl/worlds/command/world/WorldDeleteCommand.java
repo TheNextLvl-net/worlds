@@ -7,11 +7,11 @@ import cloud.commandframework.context.CommandContext;
 import core.api.placeholder.Placeholder;
 import net.kyori.adventure.audience.Audience;
 import net.thenextlvl.worlds.image.Image;
+import net.thenextlvl.worlds.util.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.WorldInfo;
-import net.thenextlvl.worlds.util.Messages;
 
 class WorldDeleteCommand {
 
@@ -23,7 +23,7 @@ class WorldDeleteCommand {
                                 .filter(s -> s.startsWith(token))
                                 .toList())
                         .build())
-                .flag(CommandFlag.builder("delete-image").withAliases("v"))
+                .flag(CommandFlag.builder("delete-image"))
                 .handler(WorldDeleteCommand::execute);
     }
 
