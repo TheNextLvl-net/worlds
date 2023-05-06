@@ -1,8 +1,11 @@
 package net.thenextlvl.worlds.volume;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
+import org.bukkit.generator.BiomeProvider;
+import org.bukkit.generator.ChunkGenerator;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -19,11 +22,37 @@ public record WorldImage(
 
     @Nullable
     public World build() {
-        var creator = WorldCreator.name(name()).type(type()).seed(seed())
-                .hardcore(hardcore()).environment(environment())
-                .generateStructures(generateStructures());
-        if (generator != null) creator.generator(generator.toString());
+        var creator = WorldCreator.name(name)
+                .generator(resolveChunkGenerator())
+                .biomeProvider(resolveBiomeProvider())
+                .generateStructures(generateStructures())
+                .environment(environment())
+                .hardcore(hardcore())
+                .type(type())
+                .seed(seed());
         return creator.createWorld();
+    }
+
+    @Nullable
+    private ChunkGenerator resolveChunkGenerator() {
+        if (generator() == null) return null;
+        var plugin = Bukkit.getPluginManager().getPlugin(generator().plugin());
+        if (plugin == null || !plugin.isEnabled())
+            throw new IllegalArgumentException();
+        return plugin.getDefaultWorldGenerator(name(), generator().id());
+    }
+
+    @Nullable
+    private BiomeProvider resolveBiomeProvider() {
+        if (generator() == null) return null;
+        var plugin = Bukkit.getPluginManager().getPlugin(generator().plugin());
+        if (plugin == null || !plugin.isEnabled())
+            throw new IllegalArgumentException();
+        return plugin.getDefaultBiomeProvider(name(), generator().id());
+    }
+
+    public static WorldImage of(World world) {
+        return of(world, null);
     }
 
     @SuppressWarnings("deprecation")

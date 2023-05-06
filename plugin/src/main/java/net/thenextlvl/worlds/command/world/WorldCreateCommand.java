@@ -11,19 +11,17 @@ import net.kyori.adventure.audience.Audience;
 import net.thenextlvl.worlds.util.Messages;
 import net.thenextlvl.worlds.volume.Generator;
 import net.thenextlvl.worlds.volume.Volume;
+import net.thenextlvl.worlds.volume.WorldImage;
 import org.bukkit.Bukkit;
 import org.bukkit.World.Environment;
-import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.generator.BiomeProvider;
-import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -35,7 +33,12 @@ class WorldCreateCommand {
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
         return builder
                 .literal("create")
-                .argument(StringArgument.of("name"))
+                .argument(StringArgument.<CommandSender>builder("name").withSuggestionsProvider((context, token) ->
+                        Volume.findWorlds().stream()
+                                .map(File::getName)
+                                .filter(s -> s.startsWith(token))
+                                .filter(s -> Bukkit.getWorld(s) == null)
+                                .toList()))
                 .flag(CommandFlag.builder("type").withAliases("t")
                         .withArgument(StringArgument.builder("type").withSuggestionsProvider((context, token) ->
                                 Arrays.stream(WorldType.values())
@@ -96,44 +99,18 @@ class WorldCreateCommand {
         var identifier = context.flags().<String>get("identifier");
         var plugin = context.flags().<String>get("generator");
         var generator = plugin != null ? new Generator(plugin, identifier) : null;
-        var structures = context.flags().<Boolean>get("structures");
-        var hardcore = context.flags().<Boolean>get("hardcore");
-        var seed = context.flags().<Long>get("seed");
+        var structures = context.flags().<Boolean>getValue("structures").orElse(true);
+        var hardcore = context.flags().<Boolean>getValue("hardcore").orElse(false);
+        var seed = context.flags().<Long>getValue("seed").orElse(0L);
 
-        var creator = WorldCreator.name(name)
-                .generator(resolveChunkGenerator(generator, name))
-                .biomeProvider(resolveBiomeProvider(generator, name))
-                .generateStructures(Boolean.TRUE.equals(structures))
-                .hardcore(Boolean.TRUE.equals(hardcore))
-                .seed(seed != null ? seed : 0)
-                .environment(environment)
-                .type(type);
+        var world = new WorldImage(name, generator, environment, type, structures, hardcore, seed).build();
 
-        var world = creator.createWorld();
-        if (world != null) new Volume(world, generator);
+        if (world != null) new Volume(world, generator).register().save();
         var message = world != null ? Messages.WORLD_CREATE_SUCCEEDED : Messages.WORLD_CREATE_FAILED;
         sender.sendRichMessage(message.message(locale, sender, placeholder));
         if (world == null || !(sender instanceof Entity entity)) return;
         var location = world.getGenerator() != null ? world.getGenerator().getFixedSpawnLocation(world, new Random()) : null;
         if (location == null) location = world.getSpawnLocation().clone().add(0.5, 0, 0.5);
         entity.teleportAsync(location, PlayerTeleportEvent.TeleportCause.COMMAND);
-    }
-
-    @Nullable
-    private static ChunkGenerator resolveChunkGenerator(@Nullable Generator generator, String worldName) {
-        if (generator == null) return null;
-        var plugin = Bukkit.getPluginManager().getPlugin(generator.plugin());
-        if (plugin == null || !plugin.isEnabled())
-            throw new IllegalArgumentException();
-        return plugin.getDefaultWorldGenerator(worldName, generator.id());
-    }
-
-    @Nullable
-    private static BiomeProvider resolveBiomeProvider(@Nullable Generator generator, String worldName) {
-        if (generator == null) return null;
-        var plugin = Bukkit.getPluginManager().getPlugin(generator.plugin());
-        if (plugin == null || !plugin.isEnabled())
-            throw new IllegalArgumentException();
-        return plugin.getDefaultBiomeProvider(worldName, generator.id());
     }
 }

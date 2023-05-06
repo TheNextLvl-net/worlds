@@ -12,18 +12,21 @@ import java.util.*;
 @Getter
 public class Volume {
     private static final Map<UUID, Volume> volumes = new HashMap<>();
-    public static final File DATA_FOLDER = new File("worlds");
     private final GsonFile<WorldImage> file;
     private final World world;
 
-    public Volume(World world, @Nullable Generator generator) {
+    public Volume(World world, WorldImage image) {
         this.world = world;
-        var file = new File(DATA_FOLDER, world.getName() + ".json");
-        this.file = new GsonFile<>(file, WorldImage.of(world, generator));
+        var file = new File(world.getWorldFolder(), ".volume");
+        this.file = new GsonFile<>(file, image);
+    }
+
+    public Volume(World world, @Nullable Generator generator) {
+        this(world, WorldImage.of(world, generator));
     }
 
     public Volume(World world) {
-        this(world, null);
+        this(world, WorldImage.of(world));
     }
 
     public Volume register() {
@@ -31,9 +34,9 @@ public class Volume {
         return this;
     }
 
-    public void save() {
-        world.save();
+    public Volume save() {
         file.save();
+        return this;
     }
 
     public WorldImage getWorldImage() {
@@ -85,9 +88,16 @@ public class Volume {
         return volumes.get(world.getUID());
     }
 
-    public static List<File> findVolumes() {
-        var files = DATA_FOLDER.listFiles((file, name) -> file.isFile() && name.endsWith(".json"));
+    public static List<File> findWorlds() {
+        var files = Bukkit.getWorldContainer().listFiles(file ->
+                file.isDirectory() && new File(file, "level.dat").isFile());
         return files != null ? Arrays.asList(files) : Collections.emptyList();
+    }
+
+    public static List<File> findVolumes() {
+        return findWorlds().stream()
+                .map(file -> new File(file, ".volume"))
+                .filter(File::isFile).toList();
     }
 
     public static List<Volume> loadVolumes() {
