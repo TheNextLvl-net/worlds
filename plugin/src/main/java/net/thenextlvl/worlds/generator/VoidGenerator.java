@@ -20,7 +20,7 @@ public class VoidGenerator {
         return new ChunkGenerator() {
             @Override
             public void generateSurface(WorldInfo worldInfo, Random random, int chunkX, int chunkZ, ChunkData chunkData) {
-                if (chunkX == 0 && chunkZ == 0) chunkData.setBlock(0, 63, 0, Material.BEDROCK);
+                if (chunkX == 0 && chunkZ == 0) chunkData.setBlock(0, 64, 0, Material.BEDROCK);
             }
 
             @Override
@@ -30,7 +30,7 @@ public class VoidGenerator {
 
             @Override
             public Location getFixedSpawnLocation(World world, Random random) {
-                return new Location(world, 0.5, 64, 0.5, 0, 0);
+                return new Location(world, 0.5, 65, 0.5, 0, 0);
             }
         };
     }
