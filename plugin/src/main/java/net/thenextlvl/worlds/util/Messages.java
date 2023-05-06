@@ -36,8 +36,10 @@ public class Messages {
     public static final MessageKey<Audience> WORLD_DELETE_FAILED = new MessageKey<>("world.delete.failed", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_UNLOAD_FAILED = new MessageKey<>("world.unload.failed", plugin.formatter()).register();
 
-    public static final MessageKey<Audience> VOLUME_NOT_FOUND = new MessageKey<>("volume.exists.not", plugin.formatter()).register();
+    public static final MessageKey<Audience> IMAGE_DELETE_FAILED = new MessageKey<>("image.delete.failed", plugin.formatter()).register();
+    public static final MessageKey<Audience> IMAGE_NOT_FOUND = new MessageKey<>("image.exists.not", plugin.formatter()).register();
     public static final MessageKey<Audience> ENTER_WORLD_NAME = new MessageKey<>("world.name.absent", plugin.formatter()).register();
+    public static final MessageKey<Audience> PLAYER_NOT_ONLINE = new MessageKey<>("player.not.online", plugin.formatter());
 
     public static final MessageKey<Audience> NO_PERMISSION = new MessageKey<>("command.permission", plugin.formatter()).register();
     public static final MessageKey<Audience> INVALID_SENDER = new MessageKey<>("command.sender", plugin.formatter()).register();
@@ -73,8 +75,10 @@ public class Messages {
         file.setDefault(WORLD_DELETE_SUCCEEDED, "%prefix% <white>Successfully deleted the world <green>%world%");
         file.setDefault(WORLD_UNLOAD_FAILED, "%prefix% <red>Failed to unload the world <dark_red>%world%");
         file.setDefault(WORLD_DELETE_FAILED, "%prefix% <red>Failed to deleted the world <dark_red>%world%");
-        file.setDefault(VOLUME_NOT_FOUND, "%prefix% <red>No volume found in directory <dark_red>%directory%");
+        file.setDefault(IMAGE_DELETE_FAILED, "%prefix% <red>Failed to deleted the image <dark_red>%image%");
+        file.setDefault(IMAGE_NOT_FOUND, "%prefix% <red>An image called <dark_red>%image% <red>does not exist");
         file.setDefault(ENTER_WORLD_NAME, "%prefix% <red>You have to provide a world");
+        file.setDefault(PLAYER_NOT_ONLINE, "%prefix% <red>The player <dark_red>%player%<red> is not online");
         file.setDefault(NO_PERMISSION, "%prefix% <red>You have no rights <dark_gray>(<dark_red>%permission%<dark_gray>)");
         file.setDefault(INVALID_SENDER, "%prefix% <red>You cannot use this command");
         file.setDefault(INVALID_ARGUMENT, "%prefix% <red>Invalid command argument");
@@ -99,8 +103,10 @@ public class Messages {
         file.setDefault(WORLD_DELETE_SUCCEEDED, "%prefix% <white>Die Welt <green>%world%<white> wurde erfolgreich gelöscht");
         file.setDefault(WORLD_UNLOAD_FAILED, "%prefix% <red>Die Welt <green>%world%<red> konnte nicht entladen werden");
         file.setDefault(WORLD_DELETE_FAILED, "%prefix% <red>Die Welt <dark_red>%world%<red> konnte nicht gelöscht werden");
-        file.setDefault(VOLUME_NOT_FOUND, "%prefix% <red>Es konnte kein volume im Ordner <dark_red>%directory% <red>gefunden werden");
+        file.setDefault(IMAGE_DELETE_FAILED, "%prefix% <red>Das Abbild <dark_red>%image%<red> konnte nicht gelöscht werden");
+        file.setDefault(IMAGE_NOT_FOUND, "%prefix% <red>Ein Abbild mit dem namen <dark_red>%image% <red>existiert nicht");
         file.setDefault(ENTER_WORLD_NAME, "%prefix% <red>Du musst einen Welt angeben");
+        file.setDefault(PLAYER_NOT_ONLINE, "%prefix% <red>Der Spieler <dark_red>%player%<red> ist nicht online");
         file.setDefault(NO_PERMISSION, "%prefix%<red> Darauf hast du keine rechte <dark_gray>(<dark_red>%permission%<dark_gray>)");
         file.setDefault(INVALID_SENDER, "%prefix%<red> Du kannst diesen command nicht nutzen");
         file.setDefault(INVALID_ARGUMENT, "%prefix% <red>Ungültiges command Argument");
