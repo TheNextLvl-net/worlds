@@ -10,6 +10,7 @@ import net.thenextlvl.worlds.command.world.WorldCommand;
 import net.thenextlvl.worlds.generator.BuildersDreamGenerator;
 import net.thenextlvl.worlds.generator.VoidGenerator;
 import net.thenextlvl.worlds.util.Placeholders;
+import net.thenextlvl.worlds.image.Image;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -29,12 +30,15 @@ public class Worlds extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        // TODO: 06.05.23 world links (for portals)
+        Image.findImages().forEach(Image::load);
         registerCommands();
     }
 
     private void registerCommands() {
         try {
             WorldCommand.register(this);
+            // TODO: 06.05.23 /seed (World)
         } catch (Exception e) {
             e.printStackTrace();
         }
