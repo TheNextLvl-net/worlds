@@ -2,16 +2,15 @@ package net.thenextlvl.worlds.command.world;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.standard.BooleanArgument;
 import cloud.commandframework.arguments.standard.LongArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import core.api.placeholder.Placeholder;
 import net.kyori.adventure.audience.Audience;
 import net.thenextlvl.worlds.util.Messages;
-import net.thenextlvl.worlds.volume.Generator;
-import net.thenextlvl.worlds.volume.Volume;
-import net.thenextlvl.worlds.volume.WorldImage;
+import net.thenextlvl.worlds.image.Generator;
+import net.thenextlvl.worlds.image.Image;
+import net.thenextlvl.worlds.image.WorldImage;
 import org.bukkit.Bukkit;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldType;
@@ -33,7 +32,7 @@ class WorldCreateCommand {
         return builder
                 .literal("create")
                 .argument(StringArgument.<CommandSender>builder("name").withSuggestionsProvider((context, token) ->
-                        Volume.findWorlds().stream()
+                        Image.findWorlds().stream()
                                 .map(File::getName)
                                 .filter(s -> s.startsWith(token))
                                 .filter(s -> Bukkit.getWorld(s) == null)
@@ -63,10 +62,8 @@ class WorldCreateCommand {
                         .withArgument(StringArgument.builder("identifier").quoted()))
                 .flag(CommandFlag.builder("seed").withAliases("s")
                         .withArgument(LongArgument.builder("seed")))
-                .flag(CommandFlag.builder("structures")
-                        .withArgument(BooleanArgument.builder("structures")))
-                .flag(CommandFlag.builder("hardcore")
-                        .withArgument(BooleanArgument.builder("hardcore")))
+                .flag(CommandFlag.builder("structures"))
+                .flag(CommandFlag.builder("hardcore"))
                 .handler(WorldCreateCommand::execute);
     }
 
@@ -98,16 +95,14 @@ class WorldCreateCommand {
         var identifier = context.flags().<String>get("identifier");
         var plugin = context.flags().<String>get("generator");
         var generator = plugin != null ? new Generator(plugin, identifier) : null;
-        var structures = context.flags().<Boolean>getValue("structures").orElse(true);
-        var hardcore = context.flags().<Boolean>getValue("hardcore").orElse(false);
         var seed = context.flags().<Long>getValue("seed").orElse(0L);
+        var structures = context.flags().contains("structures");
+        var hardcore = context.flags().contains("hardcore");
 
-        var world = new WorldImage(name, generator, environment, type, structures, hardcore, seed).build();
-        Volume volume = null;
-        if (world != null) volume = new Volume(world, generator).register().save();
-        var message = world != null ? Messages.WORLD_CREATE_SUCCEEDED : Messages.WORLD_CREATE_FAILED;
+        var image = Image.load(new WorldImage(name, generator, environment, type, structures, hardcore, seed));
+        var message = image != null ? Messages.WORLD_CREATE_SUCCEEDED : Messages.WORLD_CREATE_FAILED;
         sender.sendRichMessage(message.message(locale, sender, placeholder));
-        if (volume == null || !(sender instanceof Entity entity)) return;
-        entity.teleportAsync(volume.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
+        if (image == null || !(sender instanceof Entity entity)) return;
+        entity.teleportAsync(image.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
     }
 }
