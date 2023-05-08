@@ -3,8 +3,8 @@ package net.thenextlvl.worlds.command.world;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.paper.PaperCommandManager;
 import net.thenextlvl.worlds.Worlds;
-import net.thenextlvl.worlds.command.CustomSyntaxFormatter;
 import net.thenextlvl.worlds.command.CustomExceptionHandler;
+import net.thenextlvl.worlds.command.CustomSyntaxFormatter;
 
 import java.util.function.Function;
 
@@ -23,7 +23,6 @@ public class WorldCommand {
         manager.command(WorldDeleteCommand.create(builder));
         manager.command(WorldInfoCommand.create(builder));
         manager.command(WorldListCommand.create(builder));
-
         // TODO: 03.05.23 commands
         // /world unlink [world] [world]
         // /world link [world] [world]
