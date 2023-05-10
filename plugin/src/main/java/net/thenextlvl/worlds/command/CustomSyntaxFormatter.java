@@ -12,12 +12,12 @@ public class CustomSyntaxFormatter<C> extends StandardCommandSyntaxFormatter<C> 
         return new FormattingInstance() {
             @Override
             public String getOptionalPrefix() {
-                return "<";
+                return "(";
             }
 
             @Override
             public String getOptionalSuffix() {
-                return ">";
+                return ")";
             }
 
             @Override

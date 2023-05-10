@@ -7,13 +7,13 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
 import net.thenextlvl.worlds.command.world.WorldCommand;
-import net.thenextlvl.worlds.generator.BuildersDreamGenerator;
-import net.thenextlvl.worlds.generator.VoidGenerator;
+import net.thenextlvl.worlds.image.Image;
+import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.util.Placeholders;
-import org.bukkit.generator.BiomeProvider;
-import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
 
 @Getter
 @FieldsAreNonnullByDefault
@@ -29,34 +29,37 @@ public class Worlds extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        Image.findImages().forEach(Image::load);
+        registerListeners();
         registerCommands();
+        saveDefaultPresets();
+    }
+
+    private void registerListeners() {
+        Bukkit.getPluginManager().registerEvents(new WorldListener(), this);
     }
 
     private void registerCommands() {
         try {
             WorldCommand.register(this);
+            // TODO: 06.05.23 /seed (World)
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    @Nullable
-    @Override
-    public ChunkGenerator getDefaultWorldGenerator(String worldName, @Nullable String id) {
-        if (VoidGenerator.NAME.equalsIgnoreCase(id))
-            return VoidGenerator.getWorldGenerator(worldName);
-        if (BuildersDreamGenerator.NAME.equalsIgnoreCase(id))
-            return BuildersDreamGenerator.getWorldGenerator(worldName);
-        return null;
+    private void saveDefaultPresets() {
+        saveDefaultPreset("presets/bottomless-pit.json");
+        saveDefaultPreset("presets/desert.json");
+        saveDefaultPreset("presets/overworld.json");
+        saveDefaultPreset("presets/redstone-ready.json");
+        saveDefaultPreset("presets/snowy-kingdom.json");
+        saveDefaultPreset("presets/the-void.json");
+        saveDefaultPreset("presets/water-world.json");
     }
 
-    @Nullable
-    @Override
-    public BiomeProvider getDefaultBiomeProvider(String worldName, @Nullable String id) {
-        if (VoidGenerator.NAME.equalsIgnoreCase(id))
-            return VoidGenerator.getBiomeProvider(worldName);
-        if (BuildersDreamGenerator.NAME.equalsIgnoreCase(id))
-            return BuildersDreamGenerator.getBiomeProvider(worldName);
-        return null;
+    private void saveDefaultPreset(String preset) {
+        if (!new File(getDataFolder(), preset).isFile())
+            saveResource(preset, false);
     }
 }

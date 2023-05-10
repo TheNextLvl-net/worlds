@@ -2,40 +2,48 @@ package net.thenextlvl.worlds.command.world;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.standard.BooleanArgument;
 import cloud.commandframework.arguments.standard.LongArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
+import com.google.gson.JsonParseException;
 import core.api.placeholder.Placeholder;
 import net.kyori.adventure.audience.Audience;
+import net.thenextlvl.worlds.Worlds;
+import net.thenextlvl.worlds.image.Generator;
+import net.thenextlvl.worlds.image.Image;
+import net.thenextlvl.worlds.image.WorldImage;
+import net.thenextlvl.worlds.preset.Preset;
 import net.thenextlvl.worlds.util.Messages;
-import net.thenextlvl.worlds.volume.Generator;
-import net.thenextlvl.worlds.volume.Volume;
 import org.bukkit.Bukkit;
 import org.bukkit.World.Environment;
-import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.generator.BiomeProvider;
-import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.Nullable;
+import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.Arrays;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.bukkit.World.Environment.CUSTOM;
 import static org.bukkit.World.Environment.NORMAL;
 
 class WorldCreateCommand {
 
+    private static final File presets = new File(JavaPlugin.getPlugin(Worlds.class).getDataFolder(), "presets");
+
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
         return builder
                 .literal("create")
-                .argument(StringArgument.of("name"))
+                .argument(StringArgument.<CommandSender>builder("name").withSuggestionsProvider((context, token) ->
+                        Image.findWorlds().stream()
+                                .map(File::getName)
+                                .filter(s -> s.startsWith(token))
+                                .filter(s -> Bukkit.getWorld(s) == null)
+                                .toList()))
                 .flag(CommandFlag.builder("type").withAliases("t")
                         .withArgument(StringArgument.builder("type").withSuggestionsProvider((context, token) ->
                                 Arrays.stream(WorldType.values())
@@ -57,23 +65,29 @@ class WorldCreateCommand {
                                         .map(Plugin::getName)
                                         .filter(s -> s.startsWith(token))
                                         .toList())))
+                .flag(CommandFlag.builder("preset")
+                        .withArgument(StringArgument.builder("preset").withSuggestionsProvider((context, token) ->
+                                Preset.findPresets(presets).stream()
+                                        .map(file -> file.getName().substring(0, file.getName().length() - 5))
+                                        .filter(s -> s.startsWith(token) && !s.contains(" "))
+                                        .toList())))
                 .flag(CommandFlag.builder("identifier").withAliases("i")
                         .withArgument(StringArgument.builder("identifier").quoted()))
                 .flag(CommandFlag.builder("seed").withAliases("s")
                         .withArgument(LongArgument.builder("seed")))
-                .flag(CommandFlag.builder("structures")
-                        .withArgument(BooleanArgument.builder("structures")))
-                .flag(CommandFlag.builder("hardcore")
-                        .withArgument(BooleanArgument.builder("hardcore")))
+                .flag(CommandFlag.builder("structures"))
+                .flag(CommandFlag.builder("hardcore"))
                 .handler(WorldCreateCommand::execute);
     }
 
     private static void execute(CommandContext<CommandSender> context) {
+        var sender = context.getSender();
+        var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
         try {
             handleCreate(context);
+        } catch (JsonParseException e) {
+            sender.sendRichMessage(Messages.WORLD_PRESET_INVALID.message(locale, sender));
         } catch (Exception e) {
-            var sender = context.getSender();
-            var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
             sender.sendRichMessage(Messages.INVALID_ARGUMENT.message(locale, sender));
         }
     }
@@ -92,48 +106,39 @@ class WorldCreateCommand {
         var environment = context.flags().<String>getValue("environment").map(s ->
                 Environment.valueOf(s.toUpperCase().replace("-", "_"))).orElse(NORMAL);
         var type = context.flags().<String>getValue("type").map(s ->
-                WorldType.valueOf(s.toUpperCase().replace("-", "_"))).orElse(WorldType.NORMAL);
+                        WorldType.valueOf(s.toUpperCase().replace("-", "_")))
+                .orElse(context.flags().contains("preset") ? WorldType.FLAT : WorldType.NORMAL);
         var identifier = context.flags().<String>get("identifier");
         var plugin = context.flags().<String>get("generator");
         var generator = plugin != null ? new Generator(plugin, identifier) : null;
-        var structures = context.flags().<Boolean>get("structures");
-        var hardcore = context.flags().<Boolean>get("hardcore");
-        var seed = context.flags().<Long>get("seed");
+        var seed = context.flags().<Long>getValue("seed").orElse(ThreadLocalRandom.current().nextLong());
+        var structures = context.flags().contains("structures");
+        var hardcore = context.flags().contains("hardcore");
+        var preset = context.flags().<String>get("preset");
 
-        var creator = WorldCreator.name(name)
-                .generator(resolveChunkGenerator(generator, name))
-                .biomeProvider(resolveBiomeProvider(generator, name))
-                .generateStructures(Boolean.TRUE.equals(structures))
-                .hardcore(Boolean.TRUE.equals(hardcore))
-                .seed(seed != null ? seed : 0)
-                .environment(environment)
-                .type(type);
+        if (preset != null && generator != null) {
+            sender.sendRichMessage(Messages.FLAG_COMBINATION.message(locale, sender,
+                    Placeholder.of("flag-1", "generator"),
+                    Placeholder.of("flag-2", "preset")));
+            return;
+        } else if (preset != null && !type.equals(WorldType.FLAT)) {
+            sender.sendRichMessage(Messages.WORLD_PRESET_FLAT.message(locale, sender));
+            return;
+        } else if (preset != null) {
+            final var fileName = preset + ".json";
+            var match = Preset.findPresets(presets).stream()
+                    .filter(file -> file.getName().equals(fileName))
+                    .findFirst()
+                    .map(Preset::of)
+                    .orElse(null);
+            if (match != null) preset = match.settings().toString();
+            structures = true;
+        }
 
-        var world = creator.createWorld();
-        if (world != null) new Volume(world, generator);
-        var message = world != null ? Messages.WORLD_CREATE_SUCCEEDED : Messages.WORLD_CREATE_FAILED;
+        var image = Image.load(new WorldImage(name, preset, generator, environment, type, structures, hardcore, seed));
+        var message = image != null ? Messages.WORLD_CREATE_SUCCEEDED : Messages.WORLD_CREATE_FAILED;
         sender.sendRichMessage(message.message(locale, sender, placeholder));
-        if (world == null || !(sender instanceof Entity entity)) return;
-        var location = world.getGenerator() != null ? world.getGenerator().getFixedSpawnLocation(world, new Random()) : null;
-        if (location == null) location = world.getSpawnLocation().clone().add(0.5, 0, 0.5);
-        entity.teleportAsync(location, PlayerTeleportEvent.TeleportCause.COMMAND);
-    }
-
-    @Nullable
-    private static ChunkGenerator resolveChunkGenerator(@Nullable Generator generator, String worldName) {
-        if (generator == null) return null;
-        var plugin = Bukkit.getPluginManager().getPlugin(generator.plugin());
-        if (plugin == null || !plugin.isEnabled())
-            throw new IllegalArgumentException();
-        return plugin.getDefaultWorldGenerator(worldName, generator.id());
-    }
-
-    @Nullable
-    private static BiomeProvider resolveBiomeProvider(@Nullable Generator generator, String worldName) {
-        if (generator == null) return null;
-        var plugin = Bukkit.getPluginManager().getPlugin(generator.plugin());
-        if (plugin == null || !plugin.isEnabled())
-            throw new IllegalArgumentException();
-        return plugin.getDefaultBiomeProvider(worldName, generator.id());
+        if (image == null || !(sender instanceof Entity entity)) return;
+        entity.teleportAsync(image.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
     }
 }

@@ -1,0 +1,30 @@
+{
+  "biome": "minecraft:plains",
+  "lakes": true,
+  "features": true,
+  "layers": [
+    {
+      "block": "minecraft:bedrock",
+      "height": 1
+    },
+    {
+      "block": "minecraft:stone",
+      "height": 59
+    },
+    {
+      "block": "minecraft:dirt",
+      "height": 3
+    },
+    {
+      "block": "minecraft:grass_block",
+      "height": 1
+    }
+  ],
+  "structure_overrides": [
+    "minecraft:mineshafts",
+    "minecraft:pillager_outposts",
+    "minecraft:ruined_portals",
+    "minecraft:strongholds",
+    "minecraft:villages"
+  ]
+}

@@ -1,8 +1,10 @@
 package net.thenextlvl.worlds.command;
 
 import cloud.commandframework.exceptions.InvalidSyntaxException;
+import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import core.annotation.FieldsAreNonnullByDefault;
+import core.api.placeholder.Placeholder;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.thenextlvl.worlds.util.Messages;
 import org.bukkit.command.CommandSender;
@@ -17,9 +19,8 @@ public class CustomExceptionHandler {
     public static final MinecraftExceptionHandler<CommandSender> INSTANCE = new MinecraftExceptionHandler<CommandSender>()
             .withHandler(INVALID_SYNTAX, e -> {
                 var syntax = ((InvalidSyntaxException) e).getCorrectSyntax()
-                        .replace("<", "\\<").replace(">", "\\>")
                         .replace("[", "<dark_gray>[<gold>").replace("]", "<dark_gray>]")
-                        .replace("\\<", "<dark_gray><<gold>").replace("\\>", "<dark_gray>>")
+                        .replace("(", "<dark_gray>(<gold>").replace(")", "<dark_gray>)")
                         .replace("|", "<dark_gray>|<red>").replace("--", "<red>--");
                 return MiniMessage.miniMessage().deserialize(Messages.PREFIX.message() + " <red>/" + syntax);
             })
@@ -29,7 +30,8 @@ public class CustomExceptionHandler {
             })
             .withHandler(NO_PERMISSION, (sender, exception) -> {
                 var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
-                return MiniMessage.miniMessage().deserialize(Messages.NO_PERMISSION.message(locale, sender));
+                return MiniMessage.miniMessage().deserialize(Messages.NO_PERMISSION.message(locale, sender,
+                        Placeholder.of("permission", ((NoPermissionException) exception).getMissingPermission())));
             })
             .withHandler(ARGUMENT_PARSING, (sender, exception) -> {
                 var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;

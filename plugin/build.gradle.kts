@@ -24,7 +24,7 @@ dependencies {
     compileOnly("cloud.commandframework:cloud-minecraft-extras:1.8.3")
 
     implementation(project(":api"))
-    implementation("net.thenextlvl.core:api:3.1.10")
+    implementation("net.thenextlvl.core:api:3.1.12")
 
     annotationProcessor("org.projectlombok:lombok:1.18.26")
 }
