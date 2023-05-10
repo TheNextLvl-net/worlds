@@ -11,6 +11,7 @@ import java.util.Objects;
 
 public record WorldImage(
         String name,
+        @Nullable String settings,
         @Nullable Generator generator,
         World.Environment environment,
         WorldType type,
@@ -25,6 +26,7 @@ public record WorldImage(
                 .generator(resolveChunkGenerator())
                 .biomeProvider(resolveBiomeProvider())
                 .generateStructures(generateStructures())
+                .generatorSettings(settings() != null ? settings() : "")
                 .environment(environment())
                 .hardcore(hardcore())
                 .type(type())
@@ -54,7 +56,7 @@ public record WorldImage(
     public static WorldImage of(World world) {
         return new WorldImage(
                 world.getName(),
-                null,
+                null, null,
                 world.getEnvironment(),
                 Objects.requireNonNullElse(world.getWorldType(), WorldType.NORMAL),
                 world.canGenerateStructures(),

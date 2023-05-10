@@ -1,5 +1,6 @@
 package net.thenextlvl.worlds.image;
 
+import com.google.gson.GsonBuilder;
 import core.api.file.format.GsonFile;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -20,7 +21,12 @@ public class Image {
     private Image(World world, WorldImage image) {
         this.world = world;
         var file = new File(Bukkit.getWorldContainer(), image.name() + ".image");
-        this.file = new GsonFile<>(file, image);
+        this.file = new GsonFile<>(file, image) {
+            @Override
+            public GsonBuilder load(GsonBuilder builder) {
+                return new GsonBuilder().setPrettyPrinting();
+            }
+        };
     }
 
     private Image(World world) {

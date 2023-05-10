@@ -1,0 +1,34 @@
+{
+  "biome": "minecraft:deep_ocean",
+  "layers": [
+    {
+      "block": "minecraft:bedrock",
+      "height": 1
+    },
+    {
+      "block": "minecraft:deepslate",
+      "height": 64
+    },
+    {
+      "block": "minecraft:stone",
+      "height": 5
+    },
+    {
+      "block": "minecraft:dirt",
+      "height": 5
+    },
+    {
+      "block": "minecraft:gravel",
+      "height": 5
+    },
+    {
+      "block": "minecraft:water",
+      "height": 90
+    }
+  ],
+  "structure_overrides": [
+    "minecraft:ocean_monuments",
+    "minecraft:ocean_ruins",
+    "minecraft:shipwrecks"
+  ]
+}

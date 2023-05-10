@@ -26,6 +26,5 @@ public class WorldCommand {
         // TODO: 03.05.23 commands
         // /world unlink [world] [world]
         // /world link [world] [world]
-        // /world export [world]
     }
 }
