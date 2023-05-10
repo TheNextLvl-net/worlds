@@ -60,10 +60,10 @@ public class Image {
         return Bukkit.unloadWorld(world, false);
     }
 
-    public DeleteResult delete(boolean image) {
+    public DeleteResult delete(boolean keepImage) {
         if (!forceUnload()) return DeleteResult.UNLOAD_FAILED;
         if (!delete(world.getWorldFolder())) return DeleteResult.WORLD_DELETE_FAILED;
-        if (image && !file.delete()) return DeleteResult.IMAGE_DELETE_FAILED;
+        if (!keepImage && !file.delete()) return DeleteResult.IMAGE_DELETE_FAILED;
         return DeleteResult.SUCCESS;
     }
 
@@ -92,6 +92,10 @@ public class Image {
         if (!images.containsKey(world.getUID()))
             return new Image(world).save().register();
         return images.get(world.getUID());
+    }
+
+    public static Image getOrDefault(World world) {
+        return images.getOrDefault(world.getUID(), new Image(world));
     }
 
     public static List<File> findWorlds() {

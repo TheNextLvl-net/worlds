@@ -23,7 +23,7 @@ class WorldDeleteCommand {
                                 .filter(s -> s.startsWith(token))
                                 .toList())
                         .build())
-                .flag(CommandFlag.builder("delete-image"))
+                .flag(CommandFlag.builder("keep-image"))
                 .handler(WorldDeleteCommand::execute);
     }
 
@@ -37,8 +37,8 @@ class WorldDeleteCommand {
             sender.sendRichMessage(Messages.WORLD_NOT_FOUND.message(locale, sender, placeholder));
             return;
         }
-        var image = context.flags().contains("delete-image");
-        var result = Image.getOrCreate(world).delete(image);
+        var keepImage = context.flags().contains("keep-image");
+        var result = Image.getOrDefault(world).delete(keepImage);
         sender.sendRichMessage((switch (result) {
             case WORLD_DELETE_FAILED -> Messages.WORLD_DELETE_FAILED;
             case IMAGE_DELETE_FAILED -> Messages.IMAGE_DELETE_FAILED;
