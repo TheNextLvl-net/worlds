@@ -34,10 +34,7 @@ public class Image {
     }
 
     public Location getSpawnLocation() {
-        var random = ThreadLocalRandom.current();
-        var generator = getWorld().getGenerator();
-        var location = generator != null ? generator.getFixedSpawnLocation(world, random) : null;
-        return location != null ? location : world.getSpawnLocation().clone().add(0.5, 0, 0.5);
+        return getSpawnLocation(getWorld());
     }
 
     private Image register() {
@@ -64,11 +61,6 @@ public class Image {
 
     public boolean forceUnload() {
         return Bukkit.unloadWorld(world, false);
-    }
-
-    public DeleteResult invokeDeletion() {
-        if (getWorldImage().deletion().equals(DeletionType.NONE)) return DeleteResult.NONE;
-        return delete(getWorldImage().deletion().equals(DeletionType.WORLD));
     }
 
     public DeleteResult delete(boolean keepImage) {
@@ -126,6 +118,13 @@ public class Image {
                 .map(WorldImage::of)
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+    public static Location getSpawnLocation(World world) {
+        var random = ThreadLocalRandom.current();
+        var generator = world.getGenerator();
+        var location = generator != null ? generator.getFixedSpawnLocation(world, random) : null;
+        return location != null ? location : world.getSpawnLocation().clone().add(0.5, 0, 0.5);
     }
 
     public enum DeleteResult {
