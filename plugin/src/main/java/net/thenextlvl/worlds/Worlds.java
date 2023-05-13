@@ -6,15 +6,18 @@ import core.api.placeholder.Placeholder;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.thenextlvl.worlds.command.world.WorldCommand;
 import net.thenextlvl.worlds.image.Image;
 import net.thenextlvl.worlds.image.WorldImage;
 import net.thenextlvl.worlds.listener.WorldListener;
+import net.thenextlvl.worlds.util.Messages;
 import net.thenextlvl.worlds.util.Placeholders;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.Objects;
 
 @Getter
 @FieldsAreNonnullByDefault
@@ -36,6 +39,20 @@ public class Worlds extends JavaPlugin {
         registerListeners();
         registerCommands();
         saveDefaultPresets();
+    }
+
+    @Override
+    public void onDisable() {
+        Bukkit.getWorlds().stream()
+                .map(Image::get)
+                .filter(Objects::nonNull)
+                .forEach(image -> {
+                    var worldImage = image.getWorldImage();
+                    if (worldImage.deletion() == null) return;
+                    image.getWorld().getPlayers().forEach(player -> player.kick(MiniMessage.miniMessage()
+                            .deserialize(Messages.KICK_WORLD_DELETED.message(player.locale(), player))));
+                    image.delete(worldImage.deletion().keepImage());
+                });
     }
 
     private void registerListeners() {

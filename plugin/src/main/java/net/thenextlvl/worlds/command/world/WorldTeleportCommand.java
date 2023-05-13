@@ -41,6 +41,6 @@ class WorldTeleportCommand {
                 sender instanceof Player self ? self : null;
         if (player == null) sender.sendRichMessage(Messages.PLAYER_NOT_ONLINE.message(locale, sender));
         else if (world == null) sender.sendRichMessage(Messages.ENTER_WORLD_NAME.message(locale, sender));
-        else player.teleportAsync(Image.getOrCreate(world).getSpawnLocation(), COMMAND);
+        else player.teleportAsync(Image.getSpawnLocation(world), COMMAND);
     }
 }
