@@ -26,6 +26,7 @@ public class WorldImage {
     private boolean generateStructures;
     private boolean hardcore;
     private boolean loadOnStart;
+    private boolean deleteOnShutdown;
     private long seed;
 
     @Nullable
@@ -69,7 +70,7 @@ public class WorldImage {
                 Objects.requireNonNullElse(world.getWorldType(), WorldType.NORMAL),
                 world.canGenerateStructures(),
                 world.isHardcore(),
-                true,
+                true, false,
                 world.getSeed()
         );
     }
