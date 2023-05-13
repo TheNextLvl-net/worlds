@@ -1,6 +1,10 @@
 package net.thenextlvl.worlds.image;
 
 import core.api.file.format.GsonFile;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.bukkit.*;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
@@ -9,17 +13,20 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.Objects;
 
-public record WorldImage(
-        String name,
-        @Nullable String settings,
-        @Nullable Generator generator,
-        World.Environment environment,
-        WorldType type,
-        boolean generateStructures,
-        boolean hardcore,
-        boolean loadOnStart,
-        long seed
-) {
+@Setter
+@Getter
+@AllArgsConstructor
+@Accessors(fluent = true)
+public class WorldImage {
+    private String name;
+    private @Nullable String settings;
+    private @Nullable Generator generator;
+    private World.Environment environment;
+    private WorldType type;
+    private boolean generateStructures;
+    private boolean hardcore;
+    private boolean loadOnStart;
+    private long seed;
 
     @Nullable
     public World build() {
