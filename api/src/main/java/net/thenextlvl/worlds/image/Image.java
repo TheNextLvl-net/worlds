@@ -64,10 +64,15 @@ public class Image {
     }
 
     public DeleteResult delete(boolean keepImage) {
-        if (!forceUnload()) return DeleteResult.UNLOAD_FAILED;
-        if (!delete(world.getWorldFolder())) return DeleteResult.WORLD_DELETE_FAILED;
-        if (!keepImage && !file.delete()) return DeleteResult.IMAGE_DELETE_FAILED;
-        return DeleteResult.SUCCESS;
+        if (getWorld().getKey().toString().equals("minecraft:overworld"))
+            return DeleteResult.DELETE_NOT_ALLOWED;
+        if (!forceUnload())
+            return DeleteResult.UNLOAD_FAILED;
+        if (!delete(world.getWorldFolder()))
+            return DeleteResult.WORLD_DELETE_FAILED;
+        if (keepImage || !file.getFile().exists() || file.delete())
+            return DeleteResult.SUCCESS;
+        return DeleteResult.IMAGE_DELETE_FAILED;
     }
 
     private boolean delete(File file) {
@@ -128,6 +133,6 @@ public class Image {
     }
 
     public enum DeleteResult {
-        WORLD_DELETE_FAILED, IMAGE_DELETE_FAILED, UNLOAD_FAILED, SUCCESS, NONE
+        DELETE_NOT_ALLOWED, WORLD_DELETE_FAILED, IMAGE_DELETE_FAILED, UNLOAD_FAILED, SUCCESS
     }
 }

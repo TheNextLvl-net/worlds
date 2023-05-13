@@ -19,6 +19,7 @@ class WorldDeleteCommand {
         return builder.literal("delete")
                 .argument(StringArgument.<CommandSender>builder("world")
                         .withSuggestionsProvider((context, token) -> Bukkit.getWorlds().stream()
+                                .filter(world -> !world.getKey().toString().equals("minecraft:overworld"))
                                 .map(WorldInfo::getName)
                                 .filter(s -> s.startsWith(token))
                                 .toList())
@@ -41,6 +42,7 @@ class WorldDeleteCommand {
         var image = Image.getOrDefault(world);
         var result = image.delete(keepImage);
         sender.sendRichMessage((switch (result) {
+            case DELETE_NOT_ALLOWED -> Messages.WORLD_DELETE_DISALLOWED;
             case WORLD_DELETE_FAILED -> Messages.WORLD_DELETE_FAILED;
             case IMAGE_DELETE_FAILED -> Messages.IMAGE_DELETE_FAILED;
             case UNLOAD_FAILED -> Messages.WORLD_UNLOAD_FAILED;
