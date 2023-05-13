@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
 import net.thenextlvl.worlds.command.world.WorldCommand;
 import net.thenextlvl.worlds.image.Image;
+import net.thenextlvl.worlds.image.WorldImage;
 import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.util.Placeholders;
 import org.bukkit.Bukkit;
@@ -29,7 +30,9 @@ public class Worlds extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        Image.findImages().forEach(Image::load);
+        Image.findImages().stream()
+                .filter(WorldImage::loadOnStart)
+                .forEach(Image::load);
         registerListeners();
         registerCommands();
         saveDefaultPresets();
