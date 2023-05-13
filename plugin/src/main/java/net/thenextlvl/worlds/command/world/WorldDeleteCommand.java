@@ -38,12 +38,16 @@ class WorldDeleteCommand {
             return;
         }
         var keepImage = context.flags().contains("keep-image");
-        var result = Image.getOrDefault(world).delete(keepImage);
+        var image = Image.getOrDefault(world);
+        var result = image.delete(keepImage);
         sender.sendRichMessage((switch (result) {
             case WORLD_DELETE_FAILED -> Messages.WORLD_DELETE_FAILED;
             case IMAGE_DELETE_FAILED -> Messages.IMAGE_DELETE_FAILED;
             case UNLOAD_FAILED -> Messages.WORLD_UNLOAD_FAILED;
             case SUCCESS -> Messages.WORLD_DELETE_SUCCEEDED;
         }).message(locale, sender, placeholder));
+        if (!keepImage) return;
+        image.getWorldImage().loadOnStart(false);
+        image.save();
     }
 }
