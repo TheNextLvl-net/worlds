@@ -21,12 +21,12 @@ public class WorldImage {
     private String name;
     private @Nullable String settings;
     private @Nullable Generator generator;
+    private DeletionType deletion;
     private World.Environment environment;
     private WorldType type;
     private boolean generateStructures;
     private boolean hardcore;
     private boolean loadOnStart;
-    private boolean deleteOnShutdown;
     private long seed;
 
     @Nullable
@@ -66,11 +66,12 @@ public class WorldImage {
         return new WorldImage(
                 world.getName(),
                 null, null,
+                DeletionType.NONE,
                 world.getEnvironment(),
                 Objects.requireNonNullElse(world.getWorldType(), WorldType.NORMAL),
                 world.canGenerateStructures(),
                 world.isHardcore(),
-                true, false,
+                true,
                 world.getSeed()
         );
     }
