@@ -66,6 +66,11 @@ public class Image {
         return Bukkit.unloadWorld(world, false);
     }
 
+    public DeleteResult invokeDeletion() {
+        if (getWorldImage().deletion().equals(DeletionType.NONE)) return DeleteResult.NONE;
+        return delete(getWorldImage().deletion().equals(DeletionType.WORLD));
+    }
+
     public DeleteResult delete(boolean keepImage) {
         if (!forceUnload()) return DeleteResult.UNLOAD_FAILED;
         if (!delete(world.getWorldFolder())) return DeleteResult.WORLD_DELETE_FAILED;
