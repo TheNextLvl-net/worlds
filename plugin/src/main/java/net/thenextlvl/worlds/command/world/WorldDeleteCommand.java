@@ -24,7 +24,7 @@ class WorldDeleteCommand {
                                 .filter(s -> s.startsWith(token))
                                 .toList())
                         .build())
-                .flag(CommandFlag.builder("keep-image"))
+                .flag(CommandFlag.builder("keep-image").withAliases("k"))
                 .handler(WorldDeleteCommand::execute);
     }
 
