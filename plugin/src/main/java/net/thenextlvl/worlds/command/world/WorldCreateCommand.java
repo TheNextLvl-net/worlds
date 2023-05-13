@@ -77,6 +77,7 @@ class WorldCreateCommand {
                         .withArgument(LongArgument.builder("seed")))
                 .flag(CommandFlag.builder("structures"))
                 .flag(CommandFlag.builder("hardcore"))
+                .flag(CommandFlag.builder("load-manual"))
                 .handler(WorldCreateCommand::execute);
     }
 
@@ -112,6 +113,7 @@ class WorldCreateCommand {
         var plugin = context.flags().<String>get("generator");
         var generator = plugin != null ? new Generator(plugin, identifier) : null;
         var seed = context.flags().<Long>getValue("seed").orElse(ThreadLocalRandom.current().nextLong());
+        var loadManual = context.flags().contains("load-manual");
         var structures = context.flags().contains("structures");
         var hardcore = context.flags().contains("hardcore");
         var preset = context.flags().<String>get("preset");
@@ -135,7 +137,7 @@ class WorldCreateCommand {
             structures = true;
         }
 
-        var image = Image.load(new WorldImage(name, preset, generator, environment, type, structures, hardcore, true, seed));
+        var image = Image.load(new WorldImage(name, preset, generator, environment, type, structures, hardcore, !loadManual, seed));
         var message = image != null ? Messages.WORLD_CREATE_SUCCEEDED : Messages.WORLD_CREATE_FAILED;
         sender.sendRichMessage(message.message(locale, sender, placeholder));
         if (image == null || !(sender instanceof Entity entity)) return;
