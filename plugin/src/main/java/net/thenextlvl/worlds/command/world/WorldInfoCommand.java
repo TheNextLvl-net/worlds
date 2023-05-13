@@ -58,11 +58,13 @@ class WorldInfoCommand {
             var players = Placeholder.<Audience>of("players", () -> world.getPlayers().size());
             var generator = Placeholder.<Audience>of("generator", () ->
                     Objects.requireNonNullElse(volume.getWorldImage().generator(), "Vanilla"));
+            var seed = Placeholder.<Audience>of("seed", world::getSeed);
             sender.sendRichMessage(Messages.WORLD_INFO_NAME.message(locale, sender, name));
             sender.sendRichMessage(Messages.WORLD_INFO_PLAYERS.message(locale, sender, players));
             sender.sendRichMessage(Messages.WORLD_INFO_TYPE.message(locale, sender, type));
             sender.sendRichMessage(Messages.WORLD_INFO_ENVIRONMENT.message(locale, sender, environment));
             sender.sendRichMessage(Messages.WORLD_INFO_GENERATOR.message(locale, sender, generator));
+            sender.sendRichMessage(Messages.WORLD_INFO_SEED.message(locale, sender, seed));
         } else sender.sendRichMessage(Messages.WORLD_NOT_FOUND.message(locale, sender, name));
     }
 }

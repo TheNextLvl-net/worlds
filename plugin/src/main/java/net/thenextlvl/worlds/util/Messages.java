@@ -33,6 +33,7 @@ public class Messages {
     public static final MessageKey<Audience> WORLD_INFO_TYPE = new MessageKey<>("world.info.type", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_INFO_ENVIRONMENT = new MessageKey<>("world.info.environment", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_INFO_GENERATOR = new MessageKey<>("world.info.generator", plugin.formatter()).register();
+    public static final MessageKey<Audience> WORLD_INFO_SEED = new MessageKey<>("world.info.seed", plugin.formatter()).register();
 
     public static final MessageKey<Audience> WORLD_DELETE_DISALLOWED = new MessageKey<>("world.delete.disallowed", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_DELETE_SUCCEEDED = new MessageKey<>("world.delete.success", plugin.formatter()).register();
@@ -79,6 +80,7 @@ public class Messages {
         file.setDefault(WORLD_INFO_TYPE, "%prefix% <gray>Type<dark_gray>: <white>%type%");
         file.setDefault(WORLD_INFO_ENVIRONMENT, "%prefix% <gray>Environment<dark_gray>: <white>%environment%");
         file.setDefault(WORLD_INFO_GENERATOR, "%prefix% <gray>Generator<dark_gray>: <white>%generator%");
+        file.setDefault(WORLD_INFO_SEED, "%prefix% <gray>Seed<dark_gray>: <white>%seed%");
         file.setDefault(WORLD_DELETE_DISALLOWED, "%prefix% <red>The world <dark_red>%world% <red>is not deletable");
         file.setDefault(WORLD_DELETE_SUCCEEDED, "%prefix% <white>Successfully deleted the world <green>%world%");
         file.setDefault(WORLD_UNLOAD_FAILED, "%prefix% <red>Failed to unload the world <dark_red>%world%");
@@ -112,6 +114,7 @@ public class Messages {
         file.setDefault(WORLD_INFO_TYPE, "%prefix% <gray>Typ<dark_gray>: <white>%type%");
         file.setDefault(WORLD_INFO_ENVIRONMENT, "%prefix% <gray>Umfeld<dark_gray>: <white>%environment%");
         file.setDefault(WORLD_INFO_GENERATOR, "%prefix% <gray>Generator<dark_gray>: <white>%generator%");
+        file.setDefault(WORLD_INFO_SEED, "%prefix% <gray>Startwert<dark_gray>: <white>%seed%");
         file.setDefault(WORLD_DELETE_DISALLOWED, "%prefix% <red>Die Welt <dark_red>%world% <red>ist nicht löschbar");
         file.setDefault(WORLD_DELETE_SUCCEEDED, "%prefix% <white>Die Welt <green>%world%<white> wurde erfolgreich gelöscht");
         file.setDefault(WORLD_UNLOAD_FAILED, "%prefix% <red>Die Welt <green>%world%<red> konnte nicht entladen werden");
