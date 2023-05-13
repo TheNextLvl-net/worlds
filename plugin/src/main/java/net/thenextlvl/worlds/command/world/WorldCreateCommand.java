@@ -9,6 +9,7 @@ import com.google.gson.JsonParseException;
 import core.api.placeholder.Placeholder;
 import net.kyori.adventure.audience.Audience;
 import net.thenextlvl.worlds.Worlds;
+import net.thenextlvl.worlds.image.DeletionType;
 import net.thenextlvl.worlds.image.Generator;
 import net.thenextlvl.worlds.image.Image;
 import net.thenextlvl.worlds.image.WorldImage;
@@ -73,12 +74,18 @@ class WorldCreateCommand {
                                         .toList())))
                 .flag(CommandFlag.builder("identifier").withAliases("i")
                         .withArgument(StringArgument.builder("identifier").quoted()))
+                .flag(CommandFlag.builder("deletion")
+                        .withArgument(StringArgument.builder("deletion").withSuggestionsProvider((context, token) ->
+                                Arrays.stream(DeletionType.values())
+                                        .filter(type -> !type.equals(DeletionType.NONE))
+                                        .map(type -> type.name().toLowerCase().replace("_", "-"))
+                                        .filter(s -> s.startsWith(token))
+                                        .toList())))
                 .flag(CommandFlag.builder("seed").withAliases("s")
                         .withArgument(LongArgument.builder("seed")))
                 .flag(CommandFlag.builder("structures"))
                 .flag(CommandFlag.builder("hardcore"))
                 .flag(CommandFlag.builder("load-manual"))
-                .flag(CommandFlag.builder("temp"))
                 .handler(WorldCreateCommand::execute);
     }
 
@@ -114,8 +121,10 @@ class WorldCreateCommand {
         var plugin = context.flags().<String>get("generator");
         var generator = plugin != null ? new Generator(plugin, identifier) : null;
         var seed = context.flags().<Long>getValue("seed").orElse(ThreadLocalRandom.current().nextLong());
+        var deletion = context.flags().<String>getValue("deletion").map(s ->
+                        DeletionType.valueOf(s.toUpperCase().replace("-", "_")))
+                .orElse(DeletionType.NONE);
         var loadManual = context.flags().contains("load-manual");
-        var deleteOnShutdown = context.flags().contains("temp");
         var structures = context.flags().contains("structures");
         var hardcore = context.flags().contains("hardcore");
         var preset = context.flags().<String>get("preset");
@@ -139,8 +148,8 @@ class WorldCreateCommand {
             structures = true;
         }
 
-        var image = Image.load(new WorldImage(name, preset, generator, environment, type,
-                structures, hardcore, !loadManual, deleteOnShutdown, seed));
+        var image = Image.load(new WorldImage(name, preset, generator, deletion,
+                environment, type, structures, hardcore, !loadManual, seed));
         var message = image != null ? Messages.WORLD_CREATE_SUCCEEDED : Messages.WORLD_CREATE_FAILED;
         sender.sendRichMessage(message.message(locale, sender, placeholder));
         if (image == null || !(sender instanceof Entity entity)) return;
