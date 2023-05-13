@@ -135,7 +135,7 @@ class WorldCreateCommand {
             structures = true;
         }
 
-        var image = Image.load(new WorldImage(name, preset, generator, environment, type, structures, hardcore, seed));
+        var image = Image.load(new WorldImage(name, preset, generator, environment, type, structures, hardcore, true, seed));
         var message = image != null ? Messages.WORLD_CREATE_SUCCEEDED : Messages.WORLD_CREATE_FAILED;
         sender.sendRichMessage(message.message(locale, sender, placeholder));
         if (image == null || !(sender instanceof Entity entity)) return;

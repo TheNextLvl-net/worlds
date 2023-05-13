@@ -17,6 +17,7 @@ public record WorldImage(
         WorldType type,
         boolean generateStructures,
         boolean hardcore,
+        boolean loadOnStart,
         long seed
 ) {
 
@@ -61,6 +62,7 @@ public record WorldImage(
                 Objects.requireNonNullElse(world.getWorldType(), WorldType.NORMAL),
                 world.canGenerateStructures(),
                 world.isHardcore(),
+                true,
                 world.getSeed()
         );
     }
