@@ -124,6 +124,6 @@ public class Image {
     }
 
     public enum DeleteResult {
-        WORLD_DELETE_FAILED, IMAGE_DELETE_FAILED, UNLOAD_FAILED, SUCCESS
+        WORLD_DELETE_FAILED, IMAGE_DELETE_FAILED, UNLOAD_FAILED, SUCCESS, NONE
     }
 }

@@ -44,7 +44,7 @@ class WorldDeleteCommand {
             case WORLD_DELETE_FAILED -> Messages.WORLD_DELETE_FAILED;
             case IMAGE_DELETE_FAILED -> Messages.IMAGE_DELETE_FAILED;
             case UNLOAD_FAILED -> Messages.WORLD_UNLOAD_FAILED;
-            case SUCCESS -> Messages.WORLD_DELETE_SUCCEEDED;
+            default -> Messages.WORLD_DELETE_SUCCEEDED;
         }).message(locale, sender, placeholder));
         if (!keepImage) return;
         image.getWorldImage().loadOnStart(false);
