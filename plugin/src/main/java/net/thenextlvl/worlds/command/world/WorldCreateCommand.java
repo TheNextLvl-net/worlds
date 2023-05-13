@@ -77,7 +77,6 @@ class WorldCreateCommand {
                 .flag(CommandFlag.builder("deletion")
                         .withArgument(StringArgument.builder("deletion").withSuggestionsProvider((context, token) ->
                                 Arrays.stream(DeletionType.values())
-                                        .filter(type -> !type.equals(DeletionType.NONE))
                                         .map(type -> type.name().toLowerCase().replace("_", "-"))
                                         .filter(s -> s.startsWith(token))
                                         .toList())))
@@ -123,7 +122,7 @@ class WorldCreateCommand {
         var seed = context.flags().<Long>getValue("seed").orElse(ThreadLocalRandom.current().nextLong());
         var deletion = context.flags().<String>getValue("deletion").map(s ->
                         DeletionType.valueOf(s.toUpperCase().replace("-", "_")))
-                .orElse(DeletionType.NONE);
+                .orElse(null);
         var loadManual = context.flags().contains("load-manual");
         var structures = context.flags().contains("structures");
         var hardcore = context.flags().contains("hardcore");
