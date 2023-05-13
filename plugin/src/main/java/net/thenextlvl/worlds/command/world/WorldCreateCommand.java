@@ -2,7 +2,6 @@ package net.thenextlvl.worlds.command.world;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.standard.LongArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import com.google.gson.JsonParseException;
@@ -81,7 +80,7 @@ class WorldCreateCommand {
                                         .filter(s -> s.startsWith(token))
                                         .toList())))
                 .flag(CommandFlag.builder("seed").withAliases("s")
-                        .withArgument(LongArgument.builder("seed")))
+                        .withArgument(StringArgument.builder("seed")))
                 .flag(CommandFlag.builder("structures"))
                 .flag(CommandFlag.builder("hardcore"))
                 .flag(CommandFlag.builder("load-manual"))
@@ -119,7 +118,13 @@ class WorldCreateCommand {
         var identifier = context.flags().<String>get("identifier");
         var plugin = context.flags().<String>get("generator");
         var generator = plugin != null ? new Generator(plugin, identifier) : null;
-        var seed = context.flags().<Long>getValue("seed").orElse(ThreadLocalRandom.current().nextLong());
+        var seed = context.flags().<String>getValue("seed").map(s -> {
+            try {
+                return Long.parseLong(s);
+            } catch (NumberFormatException e) {
+                return s.hashCode();
+            }
+        }).orElse(ThreadLocalRandom.current().nextLong()).longValue();
         var deletion = context.flags().<String>getValue("deletion").map(s ->
                         DeletionType.valueOf(s.toUpperCase().replace("-", "_")))
                 .orElse(null);
