@@ -73,7 +73,7 @@ class WorldCreateCommand {
                                         .toList())))
                 .flag(CommandFlag.builder("identifier").withAliases("i")
                         .withArgument(StringArgument.builder("identifier").quoted()))
-                .flag(CommandFlag.builder("deletion")
+                .flag(CommandFlag.builder("deletion").withAliases("d")
                         .withArgument(StringArgument.builder("deletion").withSuggestionsProvider((context, token) ->
                                 Arrays.stream(DeletionType.values())
                                         .map(type -> type.name().toLowerCase().replace("_", "-"))
