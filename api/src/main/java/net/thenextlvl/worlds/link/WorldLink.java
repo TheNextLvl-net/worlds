@@ -14,4 +14,8 @@ public record WorldLink(
     public static @Nullable WorldLink of(File file) {
         return new GsonFile<WorldLink>(file, WorldLink.class).getRoot();
     }
+
+    public static WorldLink empty() {
+        return new WorldLink(null, null, null, null);
+    }
 }

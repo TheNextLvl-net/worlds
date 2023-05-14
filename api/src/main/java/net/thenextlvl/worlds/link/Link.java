@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Link {
-    private static final List<Link> links = new ArrayList<>();
+    private static final HashMap<UUID, Link> links = new HashMap<>();
     private final GsonFile<WorldLink> file;
     private final UUID uniqueId;
 
@@ -29,7 +29,7 @@ public class Link {
     }
 
     private Link register() {
-        if (!links.contains(this)) links.add(this);
+        links.put(getUniqueId(), this);
         return this;
     }
 
@@ -38,8 +38,13 @@ public class Link {
         return this;
     }
 
+    public static Link getOrCreate(UUID uuid) {
+        if (!links.containsKey(uuid)) new Link(WorldLink.empty(), uuid);
+        return links.get(uuid);
+    }
+
     public static Stream<WorldLink> links() {
-        return links.stream().map(Link::getFile).map(FileIO::getRoot);
+        return links.values().stream().map(Link::getFile).map(FileIO::getRoot);
     }
 
     public static List<File> findLinkFiles() {
