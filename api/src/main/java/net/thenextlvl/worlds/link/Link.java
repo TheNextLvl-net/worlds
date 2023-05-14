@@ -13,6 +13,7 @@ import java.util.*;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Link {
+    @Getter
     private static final List<Link> links = new ArrayList<>();
     private final GsonFile<WorldLink> file;
     private final UUID uniqueId;
