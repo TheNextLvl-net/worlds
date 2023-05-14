@@ -2,7 +2,9 @@ package net.thenextlvl.worlds.image;
 
 import com.google.gson.GsonBuilder;
 import core.api.file.format.GsonFile;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -13,20 +15,19 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Image {
     private static final Map<UUID, Image> images = new HashMap<>();
     private final GsonFile<WorldImage> file;
     private final World world;
 
     private Image(World world, WorldImage image) {
-        this.world = world;
-        var file = new File(Bukkit.getWorldContainer(), image.name() + ".image");
-        this.file = new GsonFile<>(file, image) {
+        this(new GsonFile<>(new File(Bukkit.getWorldContainer(), image.name() + ".image"), image) {
             @Override
             public GsonBuilder load(GsonBuilder builder) {
                 return new GsonBuilder().setPrettyPrinting();
             }
-        };
+        }, world);
     }
 
     private Image(World world) {
