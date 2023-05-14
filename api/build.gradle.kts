@@ -22,6 +22,12 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.26")
 }
 
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
@@ -31,8 +37,8 @@ publishing {
             maven {
                 url = uri("https://repo.thenextlvl.net/releases")
                 credentials {
-                    username = extra["RELEASES_USER"].toString()
-                    password = extra["RELEASES_PASSWORD"].toString()
+                    username = extra["RELEASES_USER"]?.toString()
+                    password = extra["RELEASES_PASSWORD"]?.toString()
                 }
             }
         }
