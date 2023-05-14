@@ -20,8 +20,8 @@ dependencies {
     compileOnly("net.thenextlvl.core:annotations:1.0.0")
     compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
 
-    compileOnly("cloud.commandframework:cloud-paper:1.8.3")
-    compileOnly("cloud.commandframework:cloud-minecraft-extras:1.8.3")
+    implementation("cloud.commandframework:cloud-paper:1.8.3")
+    implementation("cloud.commandframework:cloud-minecraft-extras:1.8.3")
 
     implementation(project(":api"))
     implementation("net.thenextlvl.core:api:3.1.12")
@@ -48,8 +48,4 @@ bukkit {
     load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
     website = "https://thenextlvl.net"
     authors = listOf("NonSwag")
-    libraries = listOf(
-            "cloud.commandframework:cloud-paper:1.8.3",
-            "cloud.commandframework:cloud-minecraft-extras:1.8.3"
-    )
 }
