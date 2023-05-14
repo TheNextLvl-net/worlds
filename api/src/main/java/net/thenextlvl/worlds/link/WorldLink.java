@@ -15,6 +15,10 @@ public record WorldLink(
         return new GsonFile<WorldLink>(file, WorldLink.class).getRoot();
     }
 
+    public static WorldLink of(File file, WorldLink defaultValue) {
+        return new GsonFile<>(file, defaultValue).getRoot();
+    }
+
     public static WorldLink empty() {
         return new WorldLink(null, null, null, null);
     }
