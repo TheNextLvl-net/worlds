@@ -10,6 +10,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.thenextlvl.worlds.command.world.WorldCommand;
 import net.thenextlvl.worlds.image.Image;
 import net.thenextlvl.worlds.image.WorldImage;
+import net.thenextlvl.worlds.link.Link;
 import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.util.Messages;
 import net.thenextlvl.worlds.util.Placeholders;
@@ -33,6 +34,9 @@ public class Worlds extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        Link.findLinkFiles().stream()
+                .map(Link::of)
+                .forEach(Link::register);
         Image.findImages().stream()
                 .filter(WorldImage::loadOnStart)
                 .forEach(Image::load);
@@ -62,7 +66,6 @@ public class Worlds extends JavaPlugin {
     private void registerCommands() {
         try {
             WorldCommand.register(this);
-            // TODO: 06.05.23 /seed (World)
         } catch (Exception e) {
             e.printStackTrace();
         }
