@@ -38,10 +38,10 @@ publishing {
                 url = uri("https://repo.thenextlvl.net/releases")
                 credentials {
                     if (extra.has("RELEASES_USER")) {
-                        username = extra["RELEASES_USER"].toString();
+                        username = extra["RELEASES_USER"].toString()
                     }
                     if (extra.has("RELEASES_PASSWORD")) {
-                        password = extra["RELEASES_PASSWORD"].toString();
+                        password = extra["RELEASES_PASSWORD"].toString()
                     }
                 }
             }
