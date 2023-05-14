@@ -8,7 +8,8 @@ import java.io.File;
 public record WorldLink(
         @Nullable String overworld,
         @Nullable String nether,
-        @Nullable String end
+        @Nullable String end,
+        @Nullable String custom
 ) {
     public static @Nullable WorldLink of(File file) {
         return new GsonFile<WorldLink>(file, WorldLink.class).getRoot();
