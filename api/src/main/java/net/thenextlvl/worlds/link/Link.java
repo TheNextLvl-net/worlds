@@ -5,7 +5,6 @@ import core.api.file.format.GsonFile;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.thenextlvl.worlds.image.Image;
 import org.bukkit.Bukkit;
 
 import java.io.File;
@@ -14,7 +13,7 @@ import java.util.*;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Link {
-    private static final Map<UUID, Image> images = new HashMap<>();
+    private static final List<Link> links = new ArrayList<>();
     private final GsonFile<WorldLink> file;
     private final UUID uniqueId;
 
@@ -25,6 +24,16 @@ public class Link {
                 return new GsonBuilder().setPrettyPrinting();
             }
         }, uuid);
+    }
+
+    private Link register() {
+        if (!links.contains(this)) links.add(this);
+        return this;
+    }
+
+    public Link save() {
+        file.save();
+        return this;
     }
 
     public static List<File> findLinkFiles() {
