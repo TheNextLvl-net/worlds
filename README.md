@@ -4,6 +4,8 @@ Simple, modern, efficient and blazingly fast world management system
 
 ## Commands
 
+### /world
+
 | Argument | Description                                     | Usage                            |
 |----------|-------------------------------------------------|----------------------------------|
 | create   | build an image and create a world based on that | /world create [name] (flags)     |
