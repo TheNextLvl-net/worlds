@@ -10,7 +10,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.thenextlvl.worlds.command.world.WorldCommand;
 import net.thenextlvl.worlds.image.Image;
 import net.thenextlvl.worlds.image.WorldImage;
-import net.thenextlvl.worlds.link.Link;
+import net.thenextlvl.worlds.link.LinkFile;
 import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.util.Messages;
 import net.thenextlvl.worlds.util.Placeholders;
@@ -21,11 +21,12 @@ import java.io.File;
 import java.util.Objects;
 
 @Getter
+@Accessors(fluent = true)
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault
 public class Worlds extends JavaPlugin {
-    @Accessors(fluent = true)
     private final Placeholder.Formatter<Audience> formatter = new Placeholder.Formatter<>();
+    private final LinkFile linkFile = new LinkFile(new File(Bukkit.getWorldContainer(), ".links"));
 
     @Override
     public void onLoad() {
@@ -34,9 +35,6 @@ public class Worlds extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        Link.findLinkFiles().stream()
-                .map(Link::of)
-                .forEach(Link::register);
         Image.findImages().stream()
                 .filter(WorldImage::loadOnStart)
                 .forEach(Image::load);
@@ -60,7 +58,7 @@ public class Worlds extends JavaPlugin {
     }
 
     private void registerListeners() {
-        Bukkit.getPluginManager().registerEvents(new WorldListener(), this);
+        Bukkit.getPluginManager().registerEvents(new WorldListener(this), this);
     }
 
     private void registerCommands() {
