@@ -23,8 +23,6 @@ public class WorldCommand {
         manager.command(WorldDeleteCommand.create(builder));
         manager.command(WorldInfoCommand.create(builder));
         manager.command(WorldListCommand.create(builder));
-        // TODO: 03.05.23 commands
-        // /world unlink [world] [world]
-        // /world link [world] [world]
+        WorldLinkCommand.register(manager, builder.literal("link"));
     }
 }
