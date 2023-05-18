@@ -56,6 +56,7 @@ class WorldLinkCommand {
                                 .filter(s -> s.startsWith(token))
                                 .toList())
                         .build())
+                .argument(StringArgument.of("identifier"))
                 .handler(WorldLinkCommand::executeCreate);
     }
 
