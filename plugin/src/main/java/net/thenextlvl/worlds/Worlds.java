@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.thenextlvl.worlds.command.link.LinkCommand;
 import net.thenextlvl.worlds.command.world.WorldCommand;
 import net.thenextlvl.worlds.image.Image;
 import net.thenextlvl.worlds.image.WorldImage;
@@ -63,6 +64,7 @@ public class Worlds extends JavaPlugin {
 
     private void registerCommands() {
         try {
+            LinkCommand.register(this);
             WorldCommand.register(this);
         } catch (Exception e) {
             e.printStackTrace();
