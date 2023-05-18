@@ -12,4 +12,10 @@ public record Link(
         @SerializedName("destination")
         @Nullable String second
 ) {
+    @Override
+    public String toString() {
+        return portalType().name().toLowerCase().replace("_", "-")
+                + ": " + first()
+                + " -> " + second();
+    }
 }

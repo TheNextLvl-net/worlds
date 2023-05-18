@@ -17,12 +17,12 @@ Simple, modern, efficient and blazingly fast world management system
 
 ### /link
 
-| Argument | Description                            | Usage                                                          |
-|----------|----------------------------------------|----------------------------------------------------------------|
-| create   | create a new world link                | /link create [source] [destination] [portal-type] [identifier] |
-| delete   | delete an existing world link          | /link delete [link]                                            |
-| info     | receive information about a world link | /link info [link]                                              |
-| list     | receive a list of all world links      | /link list                                                     |
+| Argument | Description                            | Usage                                             |
+|----------|----------------------------------------|---------------------------------------------------|
+| create   | create a new world link                | /link create [source] [destination] [portal-type] |
+| delete   | delete an existing world link          | /link delete [link]                               |
+| info     | receive information about a world link | /link info [link]                                 |
+| list     | receive a list of all world links      | /link list                                        |
 
 ### Flags
 
