@@ -40,8 +40,10 @@ public class Messages {
     public static final MessageKey<Audience> WORLD_DELETE_FAILED = new MessageKey<>("world.delete.failed", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_UNLOAD_FAILED = new MessageKey<>("world.unload.failed", plugin.formatter()).register();
 
-    public static final MessageKey<Audience> LINK_DUPLICATE = new MessageKey<>("link.duplicate", plugin.formatter()).register();
+    public static final MessageKey<Audience> LINK_EXISTS = new MessageKey<>("link.exists", plugin.formatter()).register();
+    public static final MessageKey<Audience> LINK_NOT_FOUND = new MessageKey<>("link.exists.not", plugin.formatter()).register();
 
+    public static final MessageKey<Audience> LINK_DELETED = new MessageKey<>("link.deleted", plugin.formatter()).register();
     public static final MessageKey<Audience> LINK_CREATED = new MessageKey<>("link.created", plugin.formatter()).register();
     public static final MessageKey<Audience> LINK_LIST_EMPTY = new MessageKey<>("link.list.empty", plugin.formatter()).register();
     public static final MessageKey<Audience> LINK_LIST = new MessageKey<>("link.list", plugin.formatter()).register();
@@ -92,7 +94,9 @@ public class Messages {
         file.setDefault(WORLD_DELETE_SUCCEEDED, "%prefix% <white>Successfully deleted the world <green>%world%");
         file.setDefault(WORLD_UNLOAD_FAILED, "%prefix% <red>Failed to unload the world <dark_red>%world%");
         file.setDefault(WORLD_DELETE_FAILED, "%prefix% <red>Failed to deleted the world <dark_red>%world%");
-        file.setDefault(LINK_DUPLICATE, "%prefix% <red>The link <dark_red>%link% <red>does already exists");
+        file.setDefault(LINK_EXISTS, "%prefix% <red>The link <dark_red>%link% <red>does already exists");
+        file.setDefault(LINK_NOT_FOUND, "%prefix% <red>The link <dark_red>%link% <red>does not exist");
+        file.setDefault(LINK_DELETED, "%prefix% <white>Deleted the link <green>%link%");
         file.setDefault(LINK_CREATED, "%prefix% <white>Created a new link <green>%link%");
         file.setDefault(LINK_LIST_EMPTY, "%prefix% <red>There are no links yet");
         file.setDefault(LINK_LIST, "%prefix% <gray>Links <dark_gray>(<green>%amount%<dark_gray>): <white>%links%");
@@ -132,7 +136,9 @@ public class Messages {
         file.setDefault(WORLD_UNLOAD_FAILED, "%prefix% <red>Die Welt <green>%world%<red> konnte nicht entladen werden");
         file.setDefault(WORLD_DELETE_FAILED, "%prefix% <red>Die Welt <dark_red>%world%<red> konnte nicht gelöscht werden");
         file.setDefault(IMAGE_DELETE_FAILED, "%prefix% <red>Das Abbild <dark_red>%image%<red> konnte nicht gelöscht werden");
-        file.setDefault(LINK_DUPLICATE, "%prefix% <red>Der Link <dark_red>%link% <red>existiert bereits");
+        file.setDefault(LINK_EXISTS, "%prefix% <red>Der Link <dark_red>%link% <red>existiert bereits");
+        file.setDefault(LINK_NOT_FOUND, "%prefix% <red>Der Link <dark_red>%link% <red>existiert nicht");
+        file.setDefault(LINK_DELETED, "%prefix% <white>Der Link <green>%link% <white>wurde gelöscht");
         file.setDefault(LINK_CREATED, "%prefix% <white>Der Link <green>%link% <white>wurde erstellt");
         file.setDefault(LINK_LIST_EMPTY, "%prefix% <red>Es existieren noch keine links");
         file.setDefault(LINK_LIST, "%prefix% <gray>Links <dark_gray>(<green>%amount%<dark_gray>): <white>%links%");

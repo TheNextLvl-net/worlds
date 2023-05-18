@@ -62,14 +62,13 @@ class LinkCreateCommand {
         var link = new Link(portalType, source, destination);
         var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
         if (plugin.linkFile().links().contains(link)) {
-            sender.sendRichMessage(Messages.LINK_DUPLICATE.message(locale, sender,
+            sender.sendRichMessage(Messages.LINK_EXISTS.message(locale, sender,
                     Placeholder.of("link", () -> link.portalType().name().toLowerCase().replace("_", "-")
                             + ": " + link.first() + " -> " + link.second())));
         } else {
             sender.sendRichMessage(Messages.LINK_CREATED.message(locale, sender,
                     Placeholder.of("link", link)));
             plugin.linkFile().links().add(link);
-            plugin.linkFile().save();
         }
     }
 }

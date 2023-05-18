@@ -56,6 +56,7 @@ public class Worlds extends JavaPlugin {
                             .deserialize(Messages.KICK_WORLD_DELETED.message(player.locale(), player))));
                     image.delete(worldImage.deletion().keepImage());
                 });
+        linkFile().save();
     }
 
     private void registerListeners() {
