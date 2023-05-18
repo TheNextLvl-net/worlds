@@ -10,7 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 class LinkDeleteCommand {
     private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
 
-    private static Command.Builder<CommandSender> create(Command.Builder<CommandSender> manager) {
+    static Command.Builder<CommandSender> create(Command.Builder<CommandSender> manager) {
         return manager
                 .literal("delete")
                 .argument(StringArgument.<CommandSender>builder("link")

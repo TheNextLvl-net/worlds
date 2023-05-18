@@ -10,7 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 class LinkInfoCommand {
     private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
 
-    private static Command.Builder<CommandSender> info(Command.Builder<CommandSender> manager) {
+    static Command.Builder<CommandSender> create(Command.Builder<CommandSender> manager) {
         return manager
                 .literal("info")
                 .argument(StringArgument.<CommandSender>builder("link")

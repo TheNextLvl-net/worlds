@@ -18,6 +18,8 @@ public class LinkCommand {
         manager.registerBrigadier();
         var builder = manager.commandBuilder("world").permission("worlds.command.world");
         manager.command(LinkCreateCommand.create(builder));
-        LinkDeleteCommand.register(manager, builder.literal("link"));
+        manager.command(LinkDeleteCommand.create(builder));
+        manager.command(LinkInfoCommand.create(builder));
+        manager.command(LinkListCommand.create(builder));
     }
 }

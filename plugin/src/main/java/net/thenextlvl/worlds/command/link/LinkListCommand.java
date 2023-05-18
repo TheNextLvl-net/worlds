@@ -12,7 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 class LinkListCommand {
     private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
 
-    private static Command.Builder<CommandSender> list(Command.Builder<CommandSender> manager) {
+    static Command.Builder<CommandSender> create(Command.Builder<CommandSender> manager) {
         return manager.literal("list").handler(LinkListCommand::execute);
     }
 
