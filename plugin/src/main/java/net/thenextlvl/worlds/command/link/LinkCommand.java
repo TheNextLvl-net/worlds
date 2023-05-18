@@ -19,7 +19,6 @@ public class LinkCommand {
         var builder = manager.commandBuilder("link").permission("worlds.command.link");
         manager.command(LinkCreateCommand.create(builder));
         manager.command(LinkDeleteCommand.create(builder));
-        manager.command(LinkInfoCommand.create(builder));
         manager.command(LinkListCommand.create(builder));
     }
 }
