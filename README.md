@@ -1,6 +1,7 @@
 # Worlds
 
 Simple, modern, efficient and blazingly fast world management system
+with support for linking worlds to properly use portals with multiple worlds
 
 ## Commands
 
