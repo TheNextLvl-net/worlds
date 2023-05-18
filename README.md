@@ -18,11 +18,11 @@ with support for linking worlds to properly use portals with multiple worlds
 
 ### /link
 
-| Argument | Description                            | Usage                                             |
-|----------|----------------------------------------|---------------------------------------------------|
-| create   | create a new world link                | /link create [source] [destination] [portal-type] |
-| delete   | delete an existing world link          | /link delete [link]                               |
-| list     | receive a list of all world links      | /link list                                        |
+| Argument | Description                       | Usage                                             |
+|----------|-----------------------------------|---------------------------------------------------|
+| create   | create a new world link           | /link create [source] [destination] [portal-type] |
+| delete   | delete an existing world link     | /link delete [link]                               |
+| list     | receive a list of all world links | /link list                                        |
 
 ## Flags
 
@@ -49,6 +49,55 @@ _the aliases can be used by adding a single dash (-) in front of the alias (exam
 | Flag       | Alias | Description                                                            |
 |------------|-------|------------------------------------------------------------------------|
 | keep-image | k     | deletes the world but not its image and marks the image as load-manual |
+
+## World Images
+
+A world image file has the extension `.image` and contains a json object with the following entries
+
+| Key                | Values                                        | Description                                                                   | Optional |
+|--------------------|-----------------------------------------------|-------------------------------------------------------------------------------|----------|
+| name               | String                                        | the name of the world                                                         | No       |
+| settings           | World Preset                                  | the world settings<br/>_(only for flat maps)_                                 | Yes      |
+| generator          | World Generator                               | defines the world generator<br/>_(not combinable with settings)_              | Yes      |
+| deletion           | `WORLD`, `WORLD_AND_IMAGE`                    | what to delete on shutdown                                                    | Yes      |
+| environment        | `NORMAL`, `NETHER`, `THE_END`                 | the environment of the world                                                  | No       |
+| type               | `NORMAL`, `FLAT`, `LARGE_BIOMES`, `AMPLIFIED` | the type of the world                                                         | No       |
+| generateStructures | boolean                                       | whether to generate structures                                                | Yes      |
+| hardcore           | boolean                                       | whether the world should be in hardcore mode<br/>_(not properly working yet)_ | Yes      |
+| loadOnStart        | boolean                                       | whether the world should be loaded on startup                                 | Yes      |
+| seed               | double                                        | the seed of the world                                                         | No       |
+
+### Example
+
+```json
+{
+  "name": "example",
+  "settings": "{\"biome\":\"minecraft:the_void\",\"layers\":[]}",
+  "deletion": "WORLD",
+  "environment": "NORMAL",
+  "type": "FLAT",
+  "generateStructures": true,
+  "hardcore": false,
+  "loadOnStart": true,
+  "seed": -7920583562141293424
+}
+```
+
+## World Generator
+
+A world generator consists out of two parts: The **plugin** and the **identifier**<br/>
+The plugin is just the name of the plugin itself.<br/>
+In most cases the identifier can be null, but in case a plugin provides multiple world generators,<br/>
+you have to define which one should be used.
+
+### Example
+
+```json
+{
+  "plugin": "example-plugin",
+  "identifier": "example-generator"
+}
+```
 
 ## API
 
