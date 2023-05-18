@@ -23,12 +23,12 @@ Simple, modern, efficient and blazingly fast world management system
 | delete   | delete an existing world link          | /link delete [link]                               |
 | list     | receive a list of all world links      | /link list                                        |
 
-### Flags
+## Flags
 
 _Command flags are used by adding a double dash (--) in front of the name (example: `--generator`)_<br/>
 _the aliases can be used by adding a single dash (-) in front of the alias (example: `-g`)_
 
-#### /world create
+### /world create
 
 | Flag        | Alias | Values                                        | Description                                                                                                            |
 |-------------|-------|-----------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
@@ -43,7 +43,7 @@ _the aliases can be used by adding a single dash (-) in front of the alias (exam
 | structures  |       |                                               | whether [structures](https://minecraft.fandom.com/wiki/Structure) should generate in the world                         |
 | type        | t     | `amplified`, `flat`, `large-biomes`, `normal` | changes the [type](https://minecraft.fandom.com/wiki/Category:World_types) of the world                                |
 
-#### /world delete
+### /world delete
 
 | Flag       | Alias | Description                                                            |
 |------------|-------|------------------------------------------------------------------------|
