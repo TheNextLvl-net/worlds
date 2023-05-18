@@ -16,10 +16,10 @@ class WorldListCommand {
     }
 
     private static void execute(CommandContext<CommandSender> context) {
-        var towns = Bukkit.getWorlds().stream().map(WorldInfo::getName).toList();
+        var worlds = Bukkit.getWorlds().stream().map(WorldInfo::getName).toList();
         var sender = context.getSender();
         var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
         sender.sendRichMessage(Messages.WORLD_LIST.message(locale, sender,
-                Placeholder.of("amount", towns.size()), Placeholder.of("worlds", String.join(", ", towns))));
+                Placeholder.of("amount", worlds.size()), Placeholder.of("worlds", String.join(", ", worlds))));
     }
 }
