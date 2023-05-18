@@ -66,6 +66,10 @@ class WorldLinkCommand {
                 .handler(WorldLinkCommand::executeList);
     }
 
+    private static Command.Builder<CommandSender> list(Command.Builder<CommandSender> manager) {
+        return manager.literal("list").handler(WorldLinkCommand::executeList);
+    }
+
     private static void executeRemove(CommandContext<CommandSender> context) {
     }
 
@@ -73,5 +77,12 @@ class WorldLinkCommand {
     }
 
     private static void executeList(CommandContext<CommandSender> context) {
+        var links = plugin.linkFile().links().keySet();
+        var sender = context.getSender();
+        var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
+        if (links.isEmpty()) sender.sendRichMessage(Messages.WORLD_NO_LINKS.message(locale, sender));
+        else sender.sendRichMessage(Messages.WORLD_LINK_LIST.message(locale, sender,
+                Placeholder.of("links", String.join(", ", links)),
+                Placeholder.of("amount", links.size())));
     }
 }
