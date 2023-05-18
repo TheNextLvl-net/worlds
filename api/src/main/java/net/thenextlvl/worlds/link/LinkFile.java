@@ -6,19 +6,19 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class LinkFile {
-    private final GsonFile<Set<Link>> file;
+    private final GsonFile<Map<String, Link>> file;
 
     public LinkFile(File file) {
-        this(new GsonFile<>(file, new HashSet<>(), new TypeToken<>() {
+        this(new GsonFile<>(file, new HashMap<>(), new TypeToken<>() {
         }));
     }
 
-    public Set<Link> links() {
+    public Map<String, Link> links() {
         return file.getRoot();
     }
 

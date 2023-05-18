@@ -18,7 +18,7 @@ public class WorldListener implements Listener {
     public void onPortal(EntityPortalEvent event) {
         System.out.println(event.getEntity().getName());
         var from = event.getFrom().getWorld();
-        var target = plugin.linkFile().links().stream()
+        var target = plugin.linkFile().links().values().stream()
                 .filter(link -> switch (link.portalType()) {
                     case NETHER_PORTAL -> event.getPortalType().equals(org.bukkit.PortalType.NETHER);
                     case END_PORTAL, END_GATEWAY -> event.getPortalType().equals(org.bukkit.PortalType.ENDER);
@@ -36,7 +36,7 @@ public class WorldListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPortal(PlayerPortalEvent event) {
         var from = event.getFrom().getWorld();
-        var target = plugin.linkFile().links().stream()
+        var target = plugin.linkFile().links().values().stream()
                 .filter(link -> switch (event.getCause()) {
                     case NETHER_PORTAL -> link.portalType().equals(PortalType.NETHER_PORTAL);
                     case END_PORTAL -> link.portalType().equals(PortalType.END_PORTAL);

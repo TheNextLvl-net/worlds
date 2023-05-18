@@ -27,8 +27,7 @@ class WorldLinkCommand {
         return manager
                 .literal("remove")
                 .argument(StringArgument.<CommandSender>builder("link")
-                        .withSuggestionsProvider((context, token) -> plugin.linkFile().links().stream()
-                                .map(Link::toString) // proper short names
+                        .withSuggestionsProvider((context, token) -> plugin.linkFile().links().keySet().stream()
                                 .filter(s -> s.startsWith(token))
                                 .toList())
                         .build())
