@@ -28,9 +28,6 @@ public class Messages {
     public static final MessageKey<Audience> WORLD_PRESET_INVALID = new MessageKey<>("world.preset.invalid", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_PRESET_FLAT = new MessageKey<>("world.preset.flat", plugin.formatter()).register();
 
-    public static final MessageKey<Audience> WORLD_NO_LINKS = new MessageKey<>("world.link.list.empty", plugin.formatter()).register();
-    public static final MessageKey<Audience> WORLD_LINK_LIST = new MessageKey<>("world.link.list", plugin.formatter()).register();
-
     public static final MessageKey<Audience> WORLD_INFO_NAME = new MessageKey<>("world.info.name", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_INFO_PLAYERS = new MessageKey<>("world.info.players", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_INFO_TYPE = new MessageKey<>("world.info.type", plugin.formatter()).register();
@@ -42,6 +39,12 @@ public class Messages {
     public static final MessageKey<Audience> WORLD_DELETE_SUCCEEDED = new MessageKey<>("world.delete.success", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_DELETE_FAILED = new MessageKey<>("world.delete.failed", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_UNLOAD_FAILED = new MessageKey<>("world.unload.failed", plugin.formatter()).register();
+
+    public static final MessageKey<Audience> LINK_DUPLICATE = new MessageKey<>("link.duplicate", plugin.formatter()).register();
+
+    public static final MessageKey<Audience> LINK_CREATED = new MessageKey<>("link.created", plugin.formatter()).register();
+    public static final MessageKey<Audience> LINK_LIST_EMPTY = new MessageKey<>("link.list.empty", plugin.formatter()).register();
+    public static final MessageKey<Audience> LINK_LIST = new MessageKey<>("link.list", plugin.formatter()).register();
 
     public static final MessageKey<Audience> IMAGE_DELETE_FAILED = new MessageKey<>("image.delete.failed", plugin.formatter()).register();
     public static final MessageKey<Audience> IMAGE_NOT_FOUND = new MessageKey<>("image.exists.not", plugin.formatter()).register();
@@ -78,8 +81,6 @@ public class Messages {
         file.setDefault(WORLD_NOT_FOUND, "%prefix% <red>A world called <dark_red>%world%<red> does not exist");
         file.setDefault(WORLD_PRESET_INVALID, "%prefix% <red>The world preset is not a valid json string");
         file.setDefault(WORLD_PRESET_FLAT, "%prefix% <red>Presets are only applicable on flat maps");
-        file.setDefault(WORLD_NO_LINKS, "%prefix% <red>There are no links yet");
-        file.setDefault(WORLD_LINK_LIST, "%prefix% <gray>Links <dark_gray>(<green>%amount%<dark_gray>): <white>%links%");
         file.setDefault(WORLD_INFO_NAME, "%prefix% <gray>Name<dark_gray>: <white>%world%");
         file.setDefault(WORLD_INFO_PLAYERS, "%prefix% <gray>Players<dark_gray>: <white>%players%");
         file.setDefault(WORLD_INFO_TYPE, "%prefix% <gray>Type<dark_gray>: <white>%type%");
@@ -91,6 +92,10 @@ public class Messages {
         file.setDefault(WORLD_DELETE_SUCCEEDED, "%prefix% <white>Successfully deleted the world <green>%world%");
         file.setDefault(WORLD_UNLOAD_FAILED, "%prefix% <red>Failed to unload the world <dark_red>%world%");
         file.setDefault(WORLD_DELETE_FAILED, "%prefix% <red>Failed to deleted the world <dark_red>%world%");
+        file.setDefault(LINK_DUPLICATE, "%prefix% <red>The link <dark_red>%link% <red>does already exists");
+        file.setDefault(LINK_CREATED, "%prefix% <white>Created a new link <green>%link%");
+        file.setDefault(LINK_LIST_EMPTY, "%prefix% <red>There are no links yet");
+        file.setDefault(LINK_LIST, "%prefix% <gray>Links <dark_gray>(<green>%amount%<dark_gray>): <white>%links%");
         file.setDefault(IMAGE_DELETE_FAILED, "%prefix% <red>Failed to deleted the image <dark_red>%image%");
         file.setDefault(IMAGE_NOT_FOUND, "%prefix% <red>An image called <dark_red>%image% <red>does not exist");
         file.setDefault(ENTER_WORLD_NAME, "%prefix% <red>You have to provide a world");
@@ -115,8 +120,6 @@ public class Messages {
         file.setDefault(WORLD_NOT_FOUND, "%prefix% <red>Eine Welt mit dem namen <dark_red>%world%<red> existiert nicht");
         file.setDefault(WORLD_PRESET_INVALID, "%prefix% <red>Die Welten Voreinstellung ist kein gültiger json Text");
         file.setDefault(WORLD_PRESET_FLAT, "%prefix% <red>Voreinstellungen sind nur auf flache Welten anwendbar");
-        file.setDefault(WORLD_NO_LINKS, "%prefix% <red>Es existieren noch keine links");
-        file.setDefault(WORLD_LINK_LIST, "%prefix% <gray>Links <dark_gray>(<green>%amount%<dark_gray>): <white>%links%");
         file.setDefault(WORLD_INFO_NAME, "%prefix% <gray>Name<dark_gray>: <white>%world%");
         file.setDefault(WORLD_INFO_PLAYERS, "%prefix% <gray>Spieler<dark_gray>: <white>%players%");
         file.setDefault(WORLD_INFO_TYPE, "%prefix% <gray>Typ<dark_gray>: <white>%type%");
@@ -129,6 +132,10 @@ public class Messages {
         file.setDefault(WORLD_UNLOAD_FAILED, "%prefix% <red>Die Welt <green>%world%<red> konnte nicht entladen werden");
         file.setDefault(WORLD_DELETE_FAILED, "%prefix% <red>Die Welt <dark_red>%world%<red> konnte nicht gelöscht werden");
         file.setDefault(IMAGE_DELETE_FAILED, "%prefix% <red>Das Abbild <dark_red>%image%<red> konnte nicht gelöscht werden");
+        file.setDefault(LINK_DUPLICATE, "%prefix% <red>Der Link <dark_red>%link% <red>existiert bereits");
+        file.setDefault(LINK_CREATED, "%prefix% <white>Der Link <green>%link% <white>wurde erstellt");
+        file.setDefault(LINK_LIST_EMPTY, "%prefix% <red>Es existieren noch keine links");
+        file.setDefault(LINK_LIST, "%prefix% <gray>Links <dark_gray>(<green>%amount%<dark_gray>): <white>%links%");
         file.setDefault(IMAGE_NOT_FOUND, "%prefix% <red>Ein Abbild mit dem namen <dark_red>%image% <red>existiert nicht");
         file.setDefault(ENTER_WORLD_NAME, "%prefix% <red>Du musst einen Welt angeben");
         file.setDefault(PLAYER_NOT_ONLINE, "%prefix% <red>Der Spieler <dark_red>%player%<red> ist nicht online");
