@@ -15,6 +15,15 @@ Simple, modern, efficient and blazingly fast world management system
 | list     | receive a list of all existing worlds           | /world list                      |
 | teleport | teleport you or someone else to a certain world | /world teleport [world] (player) |
 
+### /link
+
+| Argument | Description                            | Usage                                                          |
+|----------|----------------------------------------|----------------------------------------------------------------|
+| create   | create a new world link                | /link create [source] [destination] [portal-type] [identifier] |
+| delete   | delete an existing world link          | /link delete [link]                                            |
+| info     | receive information about a world link | /link info [link]                                              |
+| list     | receive a list of all world links      | /link list                                                     |
+
 ### Flags
 
 _Command flags are used by adding a double dash (--) in front of the name (example: `--generator`)_<br/>

@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.command.world;
+package net.thenextlvl.worlds.command.link;
 
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.paper.PaperCommandManager;
@@ -8,7 +8,7 @@ import net.thenextlvl.worlds.command.CustomSyntaxFormatter;
 
 import java.util.function.Function;
 
-public class WorldCommand {
+public class LinkCommand {
 
     public static void register(Worlds plugin) throws Exception {
         var manager = new PaperCommandManager<>(plugin, CommandExecutionCoordinator.simpleCoordinator(), Function.identity(), Function.identity());
@@ -17,11 +17,7 @@ public class WorldCommand {
         manager.registerAsynchronousCompletions();
         manager.registerBrigadier();
         var builder = manager.commandBuilder("world").permission("worlds.command.world");
-        manager.command(WorldTeleportCommand.create(builder));
-        manager.command(WorldCreateCommand.create(builder));
-        manager.command(WorldImportCommand.create(builder));
-        manager.command(WorldDeleteCommand.create(builder));
-        manager.command(WorldInfoCommand.create(builder));
-        manager.command(WorldListCommand.create(builder));
+        manager.command(LinkCreateCommand.create(builder));
+        LinkDeleteCommand.register(manager, builder.literal("link"));
     }
 }
