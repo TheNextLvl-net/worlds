@@ -16,7 +16,6 @@ public class WorldListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPortal(EntityPortalEvent event) {
-        System.out.println(event.getEntity().getName());
         var from = event.getFrom().getWorld();
         var target = plugin.linkFile().links().stream()
                 .filter(link -> switch (link.portalType()) {
