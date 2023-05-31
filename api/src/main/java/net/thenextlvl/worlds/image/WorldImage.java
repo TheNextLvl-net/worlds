@@ -17,7 +17,7 @@ import java.util.Objects;
 @Getter
 @AllArgsConstructor
 @Accessors(fluent = true)
-public class WorldImage {
+public class WorldImage implements Cloneable {
     private String name;
     private @Nullable String settings;
     private @Nullable Generator generator;
@@ -78,5 +78,14 @@ public class WorldImage {
     @Nullable
     public static WorldImage of(File file) {
         return file.isFile() ? new GsonFile<WorldImage>(file, WorldImage.class).getRoot() : null;
+    }
+
+    @Override
+    public WorldImage clone() {
+        try {
+            return (WorldImage) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }
