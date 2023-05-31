@@ -12,7 +12,7 @@ import net.thenextlvl.worlds.image.DeletionType;
 import net.thenextlvl.worlds.image.Generator;
 import net.thenextlvl.worlds.image.Image;
 import net.thenextlvl.worlds.image.WorldImage;
-import net.thenextlvl.worlds.preset.Preset;
+import net.thenextlvl.worlds.preset.PresetFile;
 import net.thenextlvl.worlds.util.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.World.Environment;
@@ -67,7 +67,7 @@ class WorldCreateCommand {
                                         .toList())))
                 .flag(CommandFlag.builder("preset")
                         .withArgument(StringArgument.builder("preset").withSuggestionsProvider((context, token) ->
-                                Preset.findPresets(presets).stream()
+                                PresetFile.findPresets(presets).stream()
                                         .map(file -> file.getName().substring(0, file.getName().length() - 5))
                                         .filter(s -> s.startsWith(token) && !s.contains(" "))
                                         .toList())))
@@ -143,10 +143,10 @@ class WorldCreateCommand {
             return;
         } else if (preset != null) {
             final var fileName = preset + ".json";
-            var match = Preset.findPresets(presets).stream()
+            var match = PresetFile.findPresets(presets).stream()
                     .filter(file -> file.getName().equals(fileName))
                     .findFirst()
-                    .map(Preset::of)
+                    .map(PresetFile::of)
                     .orElse(null);
             if (match != null) preset = match.settings().toString();
             structures = true;
