@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -21,16 +20,24 @@ import java.util.List;
 @Setter
 @Accessors(chain = true, fluent = true)
 public class Preset implements Cloneable {
-    private Biome biome = Biome.literal("minecraft:plains");
+    private Biome biome = Biome.minecraft("plains");
     private boolean lakes;
     private boolean features;
+    private boolean decoration;
 
-    @Setter(AccessLevel.PRIVATE)
-    private List<Layer> layers = new ArrayList<>();
-    @Setter(AccessLevel.PRIVATE)
+    private final List<Layer> layers = new ArrayList<>();
     @SerializedName("structure_overrides")
-    private List<Structure> structures = new ArrayList<>();
+    private final List<Structure> structures = new ArrayList<>();
 
+    public Preset addLayer(Layer layer) {
+        layers().add(layer);
+        return this;
+    }
+
+    public Preset addStructure(Structure structure) {
+        structures().add(structure);
+        return this;
+    }
 
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Structure.class, new StructureTypeAdapter())

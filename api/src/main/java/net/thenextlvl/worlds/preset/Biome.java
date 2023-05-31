@@ -15,6 +15,8 @@ public record Biome(String provider, String biome) {
     public static Biome literal(String string) {
         var split = string.split(":", 2);
         Preconditions.checkArgument(split.length == 2, "Not a valid biome: " + string);
+        Preconditions.checkArgument(!split[0].isBlank(), "Biome provider cannot be empty");
+        Preconditions.checkArgument(!split[1].isBlank(), "Biome name cannot be empty");
         return new Biome(split[0], split[1]);
     }
 
