@@ -24,7 +24,8 @@ class WorldDeleteCommand {
                                 .filter(s -> s.startsWith(token))
                                 .toList())
                         .build())
-                .flag(CommandFlag.builder("keep-image").withAliases("k"))
+                .flag(CommandFlag.builder("keep-image"))
+                .flag(CommandFlag.builder("keep-world"))
                 .handler(WorldDeleteCommand::execute);
     }
 
@@ -39,8 +40,9 @@ class WorldDeleteCommand {
             return;
         }
         var keepImage = context.flags().contains("keep-image");
+        var keepWorld = context.flags().contains("keep-world");
         var image = Image.getOrDefault(world);
-        var result = image.delete(keepImage);
+        var result = image.delete(keepImage, keepWorld);
         sender.sendRichMessage((switch (result) {
             case DELETE_NOT_ALLOWED -> Messages.WORLD_DELETE_DISALLOWED;
             case WORLD_DELETE_FAILED -> Messages.WORLD_DELETE_FAILED;

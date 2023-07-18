@@ -64,12 +64,12 @@ public class Image {
         return Bukkit.unloadWorld(world, false);
     }
 
-    public DeleteResult delete(boolean keepImage) {
+    public DeleteResult delete(boolean keepImage, boolean keepWorld) {
         if (getWorld().getKey().toString().equals("minecraft:overworld"))
             return DeleteResult.DELETE_NOT_ALLOWED;
         if (!forceUnload())
             return DeleteResult.UNLOAD_FAILED;
-        if (!delete(world.getWorldFolder()))
+        if (!keepWorld && !delete(world.getWorldFolder()))
             return DeleteResult.WORLD_DELETE_FAILED;
         if (keepImage || !file.getFile().exists() || file.delete())
             return DeleteResult.SUCCESS;

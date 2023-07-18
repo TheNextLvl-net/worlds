@@ -46,9 +46,10 @@ _the aliases can be used by adding a single dash (-) in front of the alias (exam
 
 ### /world delete
 
-| Flag       | Alias | Description                                                            |
-|------------|-------|------------------------------------------------------------------------|
-| keep-image | k     | deletes the world but not its image and marks the image as load-manual |
+| Flag       | Description                                                            |
+|------------|------------------------------------------------------------------------|
+| keep-image | deletes the world but not its image and marks the image as load-manual |
+| keep-world | unloads the world _(no files will be deleted)_                         |
 
 ## World Images
 

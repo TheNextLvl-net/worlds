@@ -3,8 +3,8 @@ plugins {
     id("maven-publish")
 }
 
-group = "net.thenextlvl.worlds"
-version = "1.0.0"
+group = rootProject.group
+version = rootProject.version
 
 repositories {
     mavenCentral()

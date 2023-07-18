@@ -3,11 +3,11 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 plugins {
     id("java")
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
+    id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
 }
 
-group = "net.thenextlvl.worlds"
-version = "1.0.1"
+group = rootProject.group
+version = "1.0.2"
 
 repositories {
     mavenCentral()
@@ -18,7 +18,7 @@ repositories {
 dependencies {
     compileOnly("org.projectlombok:lombok:1.18.26")
     compileOnly("net.thenextlvl.core:annotations:1.0.0")
-    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
 
     implementation("cloud.commandframework:cloud-paper:1.8.3")
     implementation("cloud.commandframework:cloud-minecraft-extras:1.8.3")
@@ -35,10 +35,8 @@ java {
 }
 
 
-tasks {
-    shadowJar {
-        minimize()
-    }
+tasks.shadowJar {
+    minimize()
 }
 
 bukkit {
