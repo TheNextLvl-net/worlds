@@ -29,8 +29,7 @@ public class WorldImage implements Cloneable {
     private boolean loadOnStart;
     private long seed;
 
-    @Nullable
-    public World build() {
+    public @Nullable World build() {
         var creator = new WorldCreator(name, new NamespacedKey("worlds", name.toLowerCase().replace(" ", "_")))
                 .generator(resolveChunkGenerator())
                 .biomeProvider(resolveBiomeProvider())
@@ -40,11 +39,18 @@ public class WorldImage implements Cloneable {
                 .hardcore(hardcore())
                 .type(type())
                 .seed(seed());
-        return creator.createWorld();
+        return revalidate(creator.createWorld());
     }
 
-    @Nullable
-    private ChunkGenerator resolveChunkGenerator() {
+    public @Nullable World revalidate(@Nullable World world) {
+        if (world == null) return null;
+        this.generateStructures = world.canGenerateStructures();
+        this.hardcore = world.isHardcore();
+        this.seed = world.getSeed();
+        return world;
+    }
+
+    private @Nullable ChunkGenerator resolveChunkGenerator() {
         if (generator() == null) return null;
         var plugin = Bukkit.getPluginManager().getPlugin(generator().plugin());
         if (plugin == null || !plugin.isEnabled())
@@ -52,8 +58,7 @@ public class WorldImage implements Cloneable {
         return plugin.getDefaultWorldGenerator(name(), generator().id());
     }
 
-    @Nullable
-    private BiomeProvider resolveBiomeProvider() {
+    private @Nullable BiomeProvider resolveBiomeProvider() {
         if (generator() == null) return null;
         var plugin = Bukkit.getPluginManager().getPlugin(generator().plugin());
         if (plugin == null || !plugin.isEnabled())
@@ -75,8 +80,7 @@ public class WorldImage implements Cloneable {
         );
     }
 
-    @Nullable
-    public static WorldImage of(File file) {
+    public static @Nullable WorldImage of(File file) {
         return file.isFile() ? new GsonFile<WorldImage>(file, WorldImage.class).getRoot() : null;
     }
 
