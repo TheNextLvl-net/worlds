@@ -33,6 +33,7 @@ _the aliases can be used by adding a single dash (-) in front of the alias (exam
 
 | Flag        | Alias | Values                                        | Description                                                                                                            |
 |-------------|-------|-----------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| base        | b     | world                                         | creates a world based on another world                                                                                 |
 | deletion    |       | `world`, `world-and-image`                    | automatically deletes the world (_and its image_) on shutdown                                                          |
 | environment | e     | `nether`, `normal`, `the-end`                 | changes the [environment](https://minecraft.fandom.com/wiki/Dimension) of the world                                    |
 | generator   | g     | world generator plugin                        | uses a custom generator and biome provider for the world creation                                                      |
@@ -99,6 +100,8 @@ you have to define which one should be used.
   "identifier": "example-generator"
 }
 ```
+
+## World Presets
 
 ## API
 

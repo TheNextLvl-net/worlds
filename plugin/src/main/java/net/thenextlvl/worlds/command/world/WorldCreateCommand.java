@@ -21,10 +21,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.generator.WorldInfo;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -63,6 +67,12 @@ class WorldCreateCommand {
                                         .filter(plugin -> Generator.hasChunkGenerator(plugin.getClass())
                                                 || Generator.hasBiomeProvider(plugin.getClass()))
                                         .map(Plugin::getName)
+                                        .filter(s -> s.startsWith(token))
+                                        .toList())))
+                .flag(CommandFlag.builder("base").withAliases("b")
+                        .withArgument(StringArgument.builder("world").withSuggestionsProvider((context, token) ->
+                                Bukkit.getWorlds().stream()
+                                        .map(WorldInfo::getName)
                                         .filter(s -> s.startsWith(token))
                                         .toList())))
                 .flag(CommandFlag.builder("preset")
@@ -125,6 +135,8 @@ class WorldCreateCommand {
                 return s.hashCode();
             }
         }).orElse(ThreadLocalRandom.current().nextLong()).longValue();
+        var base = context.flags().<String>getValue("base")
+                .map(Bukkit::getWorld).orElse(null);
         var deletion = context.flags().<String>getValue("deletion").map(s ->
                         DeletionType.valueOf(s.toUpperCase().replace("-", "_")))
                 .orElse(null);
@@ -152,6 +164,16 @@ class WorldCreateCommand {
             structures = true;
         }
 
+        if (base != null) {
+            var world = Placeholder.<CommandSender>of("world", base::getName);
+            try {
+                var target = new File(Bukkit.getWorldContainer(), name).toPath();
+                Files.copy(base.getWorldFolder().toPath(), target, StandardCopyOption.REPLACE_EXISTING);
+                sender.sendRichMessage(Messages.WORLD_COPY_SUCCESS.message(locale, sender, world));
+            } catch (IOException e) {
+                sender.sendRichMessage(Messages.WORLD_COPY_FAILED.message(locale, sender, world));
+            }
+        }
         var image = Image.load(new WorldImage(name, preset, generator, deletion,
                 environment, type, structures, hardcore, !loadManual, seed));
         var message = image != null ? Messages.WORLD_CREATE_SUCCEEDED : Messages.WORLD_CREATE_FAILED;
