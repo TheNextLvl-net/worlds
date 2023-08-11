@@ -25,11 +25,9 @@ import org.bukkit.generator.WorldInfo;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.io.*;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.bukkit.World.Environment.CUSTOM;
@@ -166,13 +164,9 @@ class WorldCreateCommand {
 
         if (base != null) {
             var world = Placeholder.<CommandSender>of("world", base::getName);
-            try {
-                var target = new File(Bukkit.getWorldContainer(), name).toPath();
-                Files.copy(base.getWorldFolder().toPath(), target, StandardCopyOption.REPLACE_EXISTING);
+            if (copy(base.getWorldFolder(), new File(Bukkit.getWorldContainer(), name)))
                 sender.sendRichMessage(Messages.WORLD_COPY_SUCCESS.message(locale, sender, world));
-            } catch (IOException e) {
-                sender.sendRichMessage(Messages.WORLD_COPY_FAILED.message(locale, sender, world));
-            }
+            else sender.sendRichMessage(Messages.WORLD_COPY_FAILED.message(locale, sender, world));
         }
         var image = Image.load(new WorldImage(name, preset, generator, deletion,
                 environment, type, structures, hardcore, !loadManual, seed));
@@ -180,5 +174,35 @@ class WorldCreateCommand {
         sender.sendRichMessage(message.message(locale, sender, placeholder));
         if (image == null || !(sender instanceof Entity entity)) return;
         entity.teleportAsync(image.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
+    }
+
+    private static boolean copy(File source, File destination) {
+        return source.isDirectory() ? copyDirectory(source, destination) : copyFile(source, destination);
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private static boolean copyDirectory(File source, File destination) {
+        if (!destination.exists()) destination.mkdir();
+        var list = source.list();
+        if (list == null) return false;
+        List.of(list).forEach(file -> copy(
+                new File(source, file),
+                new File(destination, file)
+        ));
+        return true;
+    }
+
+    private static boolean copyFile(File source, File destination) {
+        if (source.getName().equals("uid.dat")) return true;
+        try (var in = new FileInputStream(source);
+             var out = new FileOutputStream(destination)) {
+            int length;
+            var buf = new byte[1024];
+            while ((length = in.read(buf)) > 0)
+                out.write(buf, 0, length);
+            return true;
+        } catch (IOException ignored) {
+            return false;
+        }
     }
 }
