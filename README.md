@@ -1,7 +1,8 @@
 # Worlds
 
 Simple, modern, efficient and blazingly fast world management system
-with support for linking worlds to properly use portals with multiple worlds
+with support for linking worlds to properly use portals with multiple worlds<br/>
+bStat Metrics can be found [here](https://bstats.org/plugin/bukkit/TheNextLvl%20Worlds/19652)
 
 ## Commands
 
