@@ -15,6 +15,7 @@ import net.thenextlvl.worlds.link.LinkFile;
 import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.util.Messages;
 import net.thenextlvl.worlds.util.Placeholders;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -28,6 +29,7 @@ import java.util.Objects;
 public class Worlds extends JavaPlugin {
     private final Placeholder.Formatter<Audience> formatter = new Placeholder.Formatter<>();
     private final LinkFile linkFile = new LinkFile(new File(Bukkit.getWorldContainer(), ".links"));
+    private final Metrics metrics = new Metrics(this, 19652);
 
     @Override
     public void onLoad() {
@@ -56,6 +58,7 @@ public class Worlds extends JavaPlugin {
                             .deserialize(Messages.KICK_WORLD_DELETED.message(player.locale(), player))));
                     image.delete(worldImage.deletion().keepImage(), true);
                 });
+        metrics.shutdown();
         linkFile().save();
     }
 

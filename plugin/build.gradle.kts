@@ -7,7 +7,7 @@ plugins {
 }
 
 group = rootProject.group
-version = "1.0.3"
+version = "1.0.4"
 
 repositories {
     mavenCentral()
@@ -25,6 +25,7 @@ dependencies {
 
     implementation(project(":api"))
     implementation("net.thenextlvl.core:api:3.1.12")
+    implementation("org.bstats:bstats-bukkit:3.0.2")
 
     annotationProcessor("org.projectlombok:lombok:1.18.26")
 }
@@ -36,6 +37,7 @@ java {
 
 
 tasks.shadowJar {
+    relocate("org.bstats", "net.thenextlvl.tweaks.bstats")
     minimize()
 }
 
