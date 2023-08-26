@@ -54,7 +54,6 @@ public class Messages {
     public static final MessageKey<Audience> IMAGE_NOT_FOUND = new MessageKey<>("image.exists.not", plugin.formatter()).register();
     public static final MessageKey<Audience> ENTER_WORLD_NAME = new MessageKey<>("world.name.absent", plugin.formatter()).register();
     public static final MessageKey<Audience> PLAYER_NOT_ONLINE = new MessageKey<>("player.not.online", plugin.formatter());
-    public static final MessageKey<Audience> KICK_WORLD_DELETED = new MessageKey<>("kick.world.deleted", plugin.formatter()).register();
 
     public static final MessageKey<Audience> NO_PERMISSION = new MessageKey<>("command.permission", plugin.formatter()).register();
     public static final MessageKey<Audience> INVALID_SENDER = new MessageKey<>("command.sender", plugin.formatter()).register();
@@ -108,7 +107,6 @@ public class Messages {
         file.setDefault(IMAGE_NOT_FOUND, "%prefix% <red>An image called <dark_red>%image% <red>does not exist");
         file.setDefault(ENTER_WORLD_NAME, "%prefix% <red>You have to provide a world");
         file.setDefault(PLAYER_NOT_ONLINE, "%prefix% <red>The player <dark_red>%player%<red> is not online");
-        file.setDefault(KICK_WORLD_DELETED, "<red>The world you where currently in, got deleted");
         file.setDefault(NO_PERMISSION, "%prefix% <red>You have no rights <dark_gray>(<dark_red>%permission%<dark_gray>)");
         file.setDefault(INVALID_SENDER, "%prefix% <red>You cannot use this command");
         file.setDefault(INVALID_ARGUMENT, "%prefix% <red>Invalid command argument");
@@ -151,7 +149,6 @@ public class Messages {
         file.setDefault(IMAGE_NOT_FOUND, "%prefix% <red>Ein Abbild mit dem namen <dark_red>%image% <red>existiert nicht");
         file.setDefault(ENTER_WORLD_NAME, "%prefix% <red>Du musst einen Welt angeben");
         file.setDefault(PLAYER_NOT_ONLINE, "%prefix% <red>Der Spieler <dark_red>%player%<red> ist nicht online");
-        file.setDefault(KICK_WORLD_DELETED, "<red>Die Welt in der du eben warst, wurde gelöscht");
         file.setDefault(NO_PERMISSION, "%prefix%<red> Darauf hast du keine rechte <dark_gray>(<dark_red>%permission%<dark_gray>)");
         file.setDefault(INVALID_SENDER, "%prefix%<red> Du kannst diesen command nicht nutzen");
         file.setDefault(INVALID_ARGUMENT, "%prefix% <red>Ungültiges command Argument");
