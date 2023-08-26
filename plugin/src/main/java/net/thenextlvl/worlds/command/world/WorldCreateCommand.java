@@ -2,6 +2,7 @@ package net.thenextlvl.worlds.command.world;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.flags.CommandFlag;
+import cloud.commandframework.arguments.standard.BooleanArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import com.google.gson.JsonParseException;
@@ -12,7 +13,9 @@ import net.thenextlvl.worlds.image.DeletionType;
 import net.thenextlvl.worlds.image.Generator;
 import net.thenextlvl.worlds.image.Image;
 import net.thenextlvl.worlds.image.WorldImage;
+import net.thenextlvl.worlds.preset.Preset;
 import net.thenextlvl.worlds.preset.PresetFile;
+import net.thenextlvl.worlds.preset.Presets;
 import net.thenextlvl.worlds.util.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.World.Environment;
@@ -25,7 +28,10 @@ import org.bukkit.generator.WorldInfo;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -34,8 +40,7 @@ import static org.bukkit.World.Environment.CUSTOM;
 import static org.bukkit.World.Environment.NORMAL;
 
 class WorldCreateCommand {
-
-    private static final File presets = new File(JavaPlugin.getPlugin(Worlds.class).getDataFolder(), "presets");
+    private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
 
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
         return builder
@@ -75,7 +80,7 @@ class WorldCreateCommand {
                                         .toList())))
                 .flag(CommandFlag.builder("preset")
                         .withArgument(StringArgument.builder("preset").withSuggestionsProvider((context, token) ->
-                                PresetFile.findPresets(presets).stream()
+                                PresetFile.findPresets(plugin.presetsFolder()).stream()
                                         .map(file -> file.getName().substring(0, file.getName().length() - 5))
                                         .filter(s -> s.startsWith(token) && !s.contains(" "))
                                         .toList())))
@@ -89,7 +94,8 @@ class WorldCreateCommand {
                                         .toList())))
                 .flag(CommandFlag.builder("seed").withAliases("s")
                         .withArgument(StringArgument.builder("seed")))
-                .flag(CommandFlag.builder("structures"))
+                .flag(CommandFlag.builder("structures")
+                        .withArgument(BooleanArgument.of("structures")))
                 .flag(CommandFlag.builder("hardcore"))
                 .flag(CommandFlag.builder("load-manual"))
                 .handler(WorldCreateCommand::execute);
@@ -139,7 +145,7 @@ class WorldCreateCommand {
                         DeletionType.valueOf(s.toUpperCase().replace("-", "_")))
                 .orElse(null);
         var loadManual = context.flags().contains("load-manual");
-        var structures = context.flags().contains("structures");
+        var structures = context.flags().<Boolean>getValue("structures").orElse(true);
         var hardcore = context.flags().contains("hardcore");
         var preset = context.flags().<String>get("preset");
 
@@ -153,11 +159,7 @@ class WorldCreateCommand {
             return;
         } else if (preset != null) {
             final var fileName = preset + ".json";
-            var match = PresetFile.findPresets(presets).stream()
-                    .filter(file -> file.getName().equals(fileName))
-                    .findFirst()
-                    .map(PresetFile::of)
-                    .orElse(null);
+            var match = PresetFile.of(new File(WorldCreateCommand.plugin.presetsFolder(), fileName));
             if (match != null) preset = match.settings().toString();
         } else if (type.equals(WorldType.FLAT)) {
             preset = Preset.serialize(Presets.CLASSIC_FLAT).toString();
