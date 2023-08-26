@@ -53,16 +53,14 @@ public class WorldImage implements Cloneable {
     private @Nullable ChunkGenerator resolveChunkGenerator() {
         if (generator() == null) return null;
         var plugin = Bukkit.getPluginManager().getPlugin(generator().plugin());
-        if (plugin == null || !plugin.isEnabled())
-            throw new IllegalArgumentException();
+        if (plugin == null || !plugin.isEnabled()) throw new IllegalArgumentException();
         return plugin.getDefaultWorldGenerator(name(), generator().id());
     }
 
     private @Nullable BiomeProvider resolveBiomeProvider() {
         if (generator() == null) return null;
         var plugin = Bukkit.getPluginManager().getPlugin(generator().plugin());
-        if (plugin == null || !plugin.isEnabled())
-            throw new IllegalArgumentException();
+        if (plugin == null || !plugin.isEnabled()) throw new IllegalArgumentException();
         return plugin.getDefaultBiomeProvider(name(), generator().id());
     }
 
