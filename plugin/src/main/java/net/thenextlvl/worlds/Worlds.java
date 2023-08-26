@@ -76,17 +76,14 @@ public class Worlds extends JavaPlugin {
     }
 
     private void saveDefaultPresets() {
-        saveDefaultPreset("presets/bottomless-pit.json");
-        saveDefaultPreset("presets/desert.json");
-        saveDefaultPreset("presets/overworld.json");
-        saveDefaultPreset("presets/redstone-ready.json");
-        saveDefaultPreset("presets/snowy-kingdom.json");
-        saveDefaultPreset("presets/the-void.json");
-        saveDefaultPreset("presets/water-world.json");
-    }
-
-    private void saveDefaultPreset(String preset) {
-        if (!new File(getDataFolder(), preset).isFile())
-            saveResource(preset, false);
+        Presets.BOTTOMLESS_PIT.saveToFile(new File(presetsFolder(), "bottomless-pit.json"), true);
+        Presets.CLASSIC_FLAT.saveToFile(new File(presetsFolder(), "classic-flat.json"), true);
+        Presets.DESERT.saveToFile(new File(presetsFolder(), "desert.json"), true);
+        Presets.OVERWORLD.saveToFile(new File(presetsFolder(), "overworld.json"), true);
+        Presets.REDSTONE_READY.saveToFile(new File(presetsFolder(), "redstone-ready.json"), true);
+        Presets.SNOWY_KINGDOM.saveToFile(new File(presetsFolder(), "snowy-kingdom.json"), true);
+        Presets.THE_VOID.saveToFile(new File(presetsFolder(), "the-void.json"), true);
+        Presets.TUNNELERS_DREAM.saveToFile(new File(presetsFolder(), "tunnelers-dream.json"), true);
+        Presets.WATER_WORLD.saveToFile(new File(presetsFolder(), "water-world.json"), true);
     }
 }
