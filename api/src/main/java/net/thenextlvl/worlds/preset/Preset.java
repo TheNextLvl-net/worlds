@@ -29,11 +29,23 @@ public class Preset implements Cloneable {
     @SerializedName("structure_overrides")
     private final List<Structure> structures = new ArrayList<>();
 
+    /**
+     * Add a layer to the preset
+     *
+     * @param layer the layer to add
+     * @return the preset
+     */
     public Preset addLayer(Layer layer) {
         layers().add(layer);
         return this;
     }
 
+    /**
+     * Add a structure to the preset
+     *
+     * @param structure the structure to add
+     * @return the preset
+     */
     public Preset addStructure(Structure structure) {
         structures().add(structure);
         return this;
@@ -46,10 +58,22 @@ public class Preset implements Cloneable {
             .setPrettyPrinting()
             .create();
 
+    /**
+     * Serialize a preset into a json object
+     *
+     * @param preset the preset to serialize
+     * @return the serialized preset
+     */
     public static JsonObject serialize(Preset preset) {
         return gson.toJsonTree(preset).getAsJsonObject();
     }
 
+    /**
+     * Deserialize a json object into a preset
+     *
+     * @param object the object to deserialize
+     * @return the deserialized preset or null if the object is not a preset
+     */
     public static @Nullable Preset deserialize(JsonObject object) {
         return gson.fromJson(object, Preset.class);
     }
