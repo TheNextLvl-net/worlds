@@ -22,12 +22,10 @@ public class Image {
     private final World world;
 
     private Image(World world, WorldImage image) {
-        this(new GsonFile<>(new File(Bukkit.getWorldContainer(), image.name() + ".image"), image) {
-            @Override
-            public GsonBuilder load(GsonBuilder builder) {
-                return new GsonBuilder().setPrettyPrinting();
-            }
-        }, world);
+        this(new GsonFile<>(
+                new File(Bukkit.getWorldContainer(), image.name() + ".image"),
+                image, new GsonBuilder().setPrettyPrinting().create()
+        ), world);
     }
 
     private Image(World world) {
