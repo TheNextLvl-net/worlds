@@ -34,6 +34,7 @@ public class Worlds extends JavaPlugin {
     @Override
     public void onLoad() {
         Placeholders.init(this);
+        saveDefaultPresets();
     }
 
     @Override
@@ -43,7 +44,6 @@ public class Worlds extends JavaPlugin {
                 .forEach(Image::load);
         registerListeners();
         registerCommands();
-        saveDefaultPresets();
     }
 
     @Override
