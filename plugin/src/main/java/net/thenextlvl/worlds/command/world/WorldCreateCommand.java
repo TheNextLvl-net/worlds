@@ -159,7 +159,8 @@ class WorldCreateCommand {
                     .map(PresetFile::of)
                     .orElse(null);
             if (match != null) preset = match.settings().toString();
-            structures = true;
+        } else if (type.equals(WorldType.FLAT)) {
+            preset = Preset.serialize(Presets.CLASSIC_FLAT).toString();
         }
 
         if (base != null) {
