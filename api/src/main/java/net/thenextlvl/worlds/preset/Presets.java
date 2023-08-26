@@ -9,6 +9,12 @@ public class Presets {
             .addLayer(new Layer(Material.GRASS_BLOCK, 1))
             .addStructure(Structure.minecraft("villages"));
 
+    public static final Preset CLASSIC_FLAT = new Preset()
+            .addLayer(new Layer(Material.BEDROCK, 1))
+            .addLayer(new Layer(Material.DIRT, 2))
+            .addLayer(new Layer(Material.GRASS_BLOCK, 1))
+            .addStructure(Structure.minecraft("villages"));
+
     public static final Preset DESERT = new Preset()
             .features(true)
             .addLayer(new Layer(Material.BEDROCK, 1))
@@ -49,6 +55,16 @@ public class Presets {
 
     public static final Preset THE_VOID = new Preset()
             .addLayer(new Layer(Material.AIR, 1));
+
+    public static final Preset TUNNELERS_DREAM = new Preset()
+            .features(true)
+            .biome(Biome.minecraft("windswept_hills"))
+            .addLayer(new Layer(Material.BEDROCK, 1))
+            .addLayer(new Layer(Material.STONE, 230))
+            .addLayer(new Layer(Material.DIRT, 5))
+            .addLayer(new Layer(Material.GRASS_BLOCK, 1))
+            .addStructure(Structure.minecraft("mineshafts"))
+            .addStructure(Structure.minecraft("strongholds"));
 
     public static final Preset WATER_WORLD = new Preset()
             .addLayer(new Layer(Material.BEDROCK, 1))
