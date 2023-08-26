@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
+import core.api.file.format.GsonFile;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -13,6 +14,7 @@ import net.thenextlvl.worlds.preset.adapter.StructureTypeAdapter;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +51,24 @@ public class Preset implements Cloneable {
     public Preset addStructure(Structure structure) {
         structures().add(structure);
         return this;
+    }
+
+    /**
+     * Save a preset to a file
+     *
+     * @param file  the file to save the preset to
+     * @param force whether to override the file if it already exists
+     * @return whether the file could be saved
+     */
+    public boolean saveToFile(File file, boolean force) {
+        if (!force && file.exists()) return false;
+        new GsonFile<>(file, this, gson) {
+            @Override
+            public Preset load() {
+                return Preset.this;
+            }
+        }.save();
+        return true;
     }
 
     private static final Gson gson = new GsonBuilder()
