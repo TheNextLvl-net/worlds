@@ -24,7 +24,7 @@ dependencies {
     implementation("cloud.commandframework:cloud-minecraft-extras:1.8.3")
 
     implementation(project(":api"))
-    implementation("net.thenextlvl.core:api:3.1.12")
+    implementation("net.thenextlvl.core:api:3.1.13")
     implementation("org.bstats:bstats-bukkit:3.0.2")
 
     annotationProcessor("org.projectlombok:lombok:1.18.26")
