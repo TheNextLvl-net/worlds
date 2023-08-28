@@ -45,7 +45,7 @@ _the aliases can be used by adding a single dash (-) in front of the alias (exam
 | load-manual |       |                                               | prevents the world from getting automatically loaded on startup                                                        |
 | preset      |       | world preset                                  | uses a custom [world preset](https://minecraft.fandom.com/wiki/Custom_world_preset) for the world creation             |
 | seed        | s     | seed (Long/String)                            | defines the [seed](https://minecraft.fandom.com/wiki/Seed_(level_generation)) which will be used to generate the world |
-| structures  |       |                                               | whether [structures](https://minecraft.fandom.com/wiki/Structure) should generate in the world                         |
+| structures  |       | `true`, `false`                               | whether [structures](https://minecraft.fandom.com/wiki/Structure) should generate in the world                         |
 | type        | t     | `amplified`, `flat`, `large-biomes`, `normal` | changes the [type](https://minecraft.fandom.com/wiki/Category:World_types) of the world                                |
 
 ### /world delete
