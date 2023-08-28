@@ -18,25 +18,29 @@ class WorldExportCommand {
                 .argument(StringArgument.<CommandSender>builder("world")
                         .withSuggestionsProvider((context, token) -> Bukkit.getWorlds().stream()
                                 .map(WorldInfo::getName)
-                                .filter(s -> s.startsWith(token))
+                                .filter(name -> name.startsWith(token))
                                 .toList())
-                        .build())
+                        .asOptional())
                 .handler(WorldExportCommand::execute);
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     private static void execute(CommandContext<CommandSender> context) {
-        var name = context.<String>get("world");
-        var world = Bukkit.getWorld(name);
         var sender = context.getSender();
-        var placeholder = Placeholder.<Audience>of("world", world != null ? world.getName() : name);
+        var input = context.<String>getOptional("world");
+        var world = input.map(Bukkit::getWorld).orElse(sender instanceof Player player ? player.getWorld() : null);
         var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
-        if (world == null) {
-            sender.sendRichMessage(Messages.WORLD_NOT_FOUND.message(locale, sender, placeholder));
-        } else try {
-            world.save();
-            sender.sendMessage(Messages.WORLD_SAVE_SUCCEEDED.message(locale, sender, placeholder));
-        } catch (Exception e) {
-            sender.sendMessage(Messages.WORLD_SAVE_FAILED.message(locale, sender, placeholder));
-        }
+        if (world != null) {
+            var placeholder = Placeholder.<Audience>of("world", world.getName());
+            try {
+                world.save();
+                sender.sendRichMessage(Messages.WORLD_SAVE_SUCCEEDED.message(locale, sender, placeholder));
+            } catch (Exception e) {
+                sender.sendRichMessage(Messages.WORLD_SAVE_FAILED.message(locale, sender, placeholder));
+                e.printStackTrace();
+            }
+        } else input.ifPresentOrElse(name -> sender.sendRichMessage(Messages.WORLD_NOT_FOUND
+                        .message(locale, sender, Placeholder.of("world", name))),
+                () -> sender.sendRichMessage(Messages.ENTER_WORLD_NAME.message(locale, sender)));
     }
 }

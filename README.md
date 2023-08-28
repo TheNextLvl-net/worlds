@@ -8,14 +8,16 @@ bStat Metrics can be found [here](https://bstats.org/plugin/bukkit/TheNextLvl%20
 
 ### /world
 
-| Argument | Description                                     | Usage                            |
-|----------|-------------------------------------------------|----------------------------------|
-| create   | build an image and create a world based on that | /world create [name] (flags)     |
-| delete   | permanently delete a certain world              | /world delete [world] (flags)    |
-| import   | import a world from an existing image           | /world import [image]            |
-| info     | receive all important information about a world | /world info (world)              |
-| list     | receive a list of all existing worlds           | /world list                      |
-| teleport | teleport you or someone else to a certain world | /world teleport [world] (player) |
+| Argument | Description                                     | Usage                              |
+|----------|-------------------------------------------------|------------------------------------|
+| create   | build an image and create a world based on that | /world create [name] (flags)       |
+| delete   | permanently delete a certain world              | /world delete [world] (flags)      |
+| export   | save a certain world to the disk                | /world export (world)              |
+| import   | import a world from an existing image           | /world import [image]              |
+| info     | receive all important information about a world | /world info (world)                |
+| list     | receive a list of all existing worlds           | /world list                        |
+| setspawn | change the spawn point of a world               | /world setspawn (position) (angle) |
+| teleport | teleport you or someone else to a certain world | /world teleport [world] (player)   |
 
 ### /link
 
