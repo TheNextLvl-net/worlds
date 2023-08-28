@@ -17,7 +17,8 @@ public class Messages {
 
     public static final SystemMessageKey<Audience> PREFIX = new SystemMessageKey<>("worlds.prefix", plugin.formatter()).register();
 
-    public static final MessageKey<Audience> WORLD_SAVED = new MessageKey<>("world.saved", plugin.formatter()).register();
+    public static final MessageKey<Audience> WORLD_SAVE_SUCCEEDED = new MessageKey<>("world.save.success", plugin.formatter()).register();
+    public static final MessageKey<Audience> WORLD_SAVE_FAILED = new MessageKey<>("world.save.failed", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_CREATE_SUCCEEDED = new MessageKey<>("world.create.success", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_CREATE_FAILED = new MessageKey<>("world.create.failed", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_IMPORT_SUCCEEDED = new MessageKey<>("world.import.success", plugin.formatter()).register();
@@ -74,7 +75,8 @@ public class Messages {
 
     private static void initEnglish() {
         var file = MessageFile.getOrCreate(ENGLISH);
-        file.setDefault(WORLD_SAVED, "%prefix% <white>Saved the world <green>%world%");
+        file.setDefault(WORLD_SAVE_SUCCEEDED, "%prefix% <white>Saved the world <green>%world%");
+        file.setDefault(WORLD_SAVE_FAILED, "%prefix% <red>Failed to save the world <dark_red>%world%");
         file.setDefault(WORLD_CREATE_SUCCEEDED, "%prefix% <white>Successfully created the world <green>%world%");
         file.setDefault(WORLD_CREATE_FAILED, "%prefix% <red>Failed to create the world <dark_red>%world%");
         file.setDefault(WORLD_IMPORT_SUCCEEDED, "%prefix% <white>Successfully imported the world <green>%world%");
@@ -116,7 +118,8 @@ public class Messages {
 
     private static void initGerman() {
         var file = MessageFile.getOrCreate(Locale.forLanguageTag("de-DE"));
-        file.setDefault(WORLD_SAVED, "%prefix% <white>Die Welt <green>%world% <white>wurde gespeichert");
+        file.setDefault(WORLD_SAVE_SUCCEEDED, "%prefix% <white>Die Welt <green>%world% <white>wurde gespeichert");
+        file.setDefault(WORLD_SAVE_FAILED, "%prefix% <red>Die Welt <dark_red>%world% <red>konnte nicht gespeichert werden");
         file.setDefault(WORLD_CREATE_SUCCEEDED, "%prefix% <white>Die Welt <green>%world% <white>wurde erfolgreich erstellt");
         file.setDefault(WORLD_CREATE_FAILED, "%prefix% <red>Die Welt <dark_red>%world% <red>konnte nicht erstellt werden");
         file.setDefault(WORLD_IMPORT_SUCCEEDED, "%prefix% <white>Die Welt <green>%world% <white>wurde erfolgreich importiert");
