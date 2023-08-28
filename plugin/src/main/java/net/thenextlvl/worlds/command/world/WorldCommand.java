@@ -17,6 +17,7 @@ public class WorldCommand {
         manager.registerAsynchronousCompletions();
         manager.registerBrigadier();
         var builder = manager.commandBuilder("world").permission("worlds.command.world");
+        manager.command(WorldSetSpawnCommand.create(builder));
         manager.command(WorldTeleportCommand.create(builder));
         manager.command(WorldCreateCommand.create(builder));
         manager.command(WorldImportCommand.create(builder));

@@ -30,6 +30,7 @@ public class Messages {
     public static final MessageKey<Audience> WORLD_PRESET_FLAT = new MessageKey<>("world.preset.flat", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_COPY_SUCCESS = new MessageKey<>("world.copy.success", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_COPY_FAILED = new MessageKey<>("world.copy.failed", plugin.formatter()).register();
+    public static final MessageKey<Audience> WORLD_SPAWN_SET = new MessageKey<>("world.spawn.set", plugin.formatter()).register();
 
     public static final MessageKey<Audience> WORLD_INFO_NAME = new MessageKey<>("world.info.name", plugin.formatter()).register();
     public static final MessageKey<Audience> WORLD_INFO_PLAYERS = new MessageKey<>("world.info.players", plugin.formatter()).register();
@@ -88,6 +89,7 @@ public class Messages {
         file.setDefault(WORLD_PRESET_FLAT, "%prefix% <red>Presets are only applicable on flat maps");
         file.setDefault(WORLD_COPY_SUCCESS, "%prefix% <white>Successfully copied world <green>%world%");
         file.setDefault(WORLD_COPY_FAILED, "%prefix% <red>Failed to copy world <dark_red>%world%");
+        file.setDefault(WORLD_SPAWN_SET, "%prefix% <white>Set world spawn at <green>%x%, %y%, %z% <gray>[<green>%angle%<gray>]");
         file.setDefault(WORLD_INFO_NAME, "%prefix% <gray>Name<dark_gray>: <white>%world%");
         file.setDefault(WORLD_INFO_PLAYERS, "%prefix% <gray>Players<dark_gray>: <white>%players%");
         file.setDefault(WORLD_INFO_TYPE, "%prefix% <gray>Type<dark_gray>: <white>%type%");
@@ -131,6 +133,7 @@ public class Messages {
         file.setDefault(WORLD_PRESET_FLAT, "%prefix% <red>Voreinstellungen sind nur auf flache Welten anwendbar");
         file.setDefault(WORLD_COPY_SUCCESS, "%prefix% <white>Die Welt <green>%world% <white>wurde erfolgreich kopiert");
         file.setDefault(WORLD_COPY_FAILED, "%prefix% <red>Die Welt <dark_red>%world% <red>konnte nicht kopiert werden");
+        file.setDefault(WORLD_SPAWN_SET, "%prefix% <white>Der spawn ist jetzt bei <green>%x%, %y%, %z% <gray>[<green>%angle%<gray>]");
         file.setDefault(WORLD_INFO_NAME, "%prefix% <gray>Name<dark_gray>: <white>%world%");
         file.setDefault(WORLD_INFO_PLAYERS, "%prefix% <gray>Spieler<dark_gray>: <white>%players%");
         file.setDefault(WORLD_INFO_TYPE, "%prefix% <gray>Typ<dark_gray>: <white>%type%");
