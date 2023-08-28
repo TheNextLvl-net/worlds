@@ -33,7 +33,6 @@ class WorldTeleportCommand {
     }
 
     private static void execute(CommandContext<CommandSender> context) {
-        var towns = Bukkit.getWorlds().stream().map(WorldInfo::getName).toList();
         var sender = context.getSender();
         var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
         var world = Bukkit.getWorld(context.<String>get("world"));
