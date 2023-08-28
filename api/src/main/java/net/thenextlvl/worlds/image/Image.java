@@ -6,13 +6,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -30,10 +28,6 @@ public class Image {
 
     private Image(World world) {
         this(world, WorldImage.of(world));
-    }
-
-    public Location getSpawnLocation() {
-        return getSpawnLocation(getWorld());
     }
 
     private Image register() {
@@ -122,13 +116,6 @@ public class Image {
                 .map(WorldImage::of)
                 .filter(Objects::nonNull)
                 .toList();
-    }
-
-    public static Location getSpawnLocation(World world) {
-        var random = ThreadLocalRandom.current();
-        var generator = world.getGenerator();
-        var location = generator != null ? generator.getFixedSpawnLocation(world, random) : null;
-        return location != null ? location : world.getSpawnLocation().clone().add(0.5, 0, 0.5);
     }
 
     public enum DeleteResult {

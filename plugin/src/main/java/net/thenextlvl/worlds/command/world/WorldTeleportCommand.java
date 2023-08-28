@@ -3,7 +3,6 @@ package net.thenextlvl.worlds.command.world;
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
-import net.thenextlvl.worlds.image.Image;
 import net.thenextlvl.worlds.util.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -40,6 +39,6 @@ class WorldTeleportCommand {
                 sender instanceof Player self ? self : null;
         if (player == null) sender.sendRichMessage(Messages.PLAYER_NOT_ONLINE.message(locale, sender));
         else if (world == null) sender.sendRichMessage(Messages.ENTER_WORLD_NAME.message(locale, sender));
-        else player.teleportAsync(Image.getSpawnLocation(world), COMMAND);
+        else player.teleportAsync(world.getSpawnLocation().add(0.5, 0, 0.5), COMMAND);
     }
 }

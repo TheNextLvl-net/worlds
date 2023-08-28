@@ -5,13 +5,14 @@ import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import core.api.placeholder.Placeholder;
 import net.kyori.adventure.audience.Audience;
-import net.thenextlvl.worlds.util.Messages;
 import net.thenextlvl.worlds.image.Image;
 import net.thenextlvl.worlds.image.WorldImage;
+import net.thenextlvl.worlds.util.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
+
+import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 class WorldImportCommand {
 
@@ -55,6 +56,6 @@ class WorldImportCommand {
         var message = result != null ? Messages.WORLD_IMPORT_SUCCEEDED : Messages.WORLD_IMPORT_FAILED;
         sender.sendRichMessage(message.message(locale, sender, placeholder));
         if (result == null || !(sender instanceof Player player)) return;
-        player.teleportAsync(result.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
+        player.teleportAsync(result.getWorld().getSpawnLocation().add(0.5, 0, 0.5), COMMAND);
     }
 }

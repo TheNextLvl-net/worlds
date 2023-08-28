@@ -23,7 +23,6 @@ import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.generator.WorldInfo;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,6 +37,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static org.bukkit.World.Environment.CUSTOM;
 import static org.bukkit.World.Environment.NORMAL;
+import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 class WorldCreateCommand {
     private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
@@ -176,7 +176,7 @@ class WorldCreateCommand {
         var message = image != null ? Messages.WORLD_CREATE_SUCCEEDED : Messages.WORLD_CREATE_FAILED;
         sender.sendRichMessage(message.message(locale, sender, placeholder));
         if (image == null || !(sender instanceof Entity entity)) return;
-        entity.teleportAsync(image.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
+        entity.teleportAsync(image.getWorld().getSpawnLocation().add(0.5, 0, 0.5), COMMAND);
     }
 
     private static boolean copy(File source, File destination) {
