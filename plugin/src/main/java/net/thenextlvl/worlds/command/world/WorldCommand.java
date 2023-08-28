@@ -21,6 +21,7 @@ public class WorldCommand {
         manager.command(WorldCreateCommand.create(builder));
         manager.command(WorldImportCommand.create(builder));
         manager.command(WorldDeleteCommand.create(builder));
+        manager.command(WorldExportCommand.create(builder));
         manager.command(WorldInfoCommand.create(builder));
         manager.command(WorldListCommand.create(builder));
     }
