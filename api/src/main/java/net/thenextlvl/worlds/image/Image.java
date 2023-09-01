@@ -52,14 +52,10 @@ public class Image {
         return canUnload() && Bukkit.unloadWorld(world, world.isAutoSave());
     }
 
-    public boolean forceUnload() {
-        return Bukkit.unloadWorld(world, false);
-    }
-
     public DeleteResult delete(boolean keepImage, boolean keepWorld) {
         if (getWorld().getKey().toString().equals("minecraft:overworld"))
             return DeleteResult.DELETE_NOT_ALLOWED;
-        if (!forceUnload())
+        if (!Bukkit.unloadWorld(world, world.isAutoSave() && keepWorld))
             return DeleteResult.UNLOAD_FAILED;
         if (!keepWorld && !delete(world.getWorldFolder()))
             return DeleteResult.WORLD_DELETE_FAILED;
