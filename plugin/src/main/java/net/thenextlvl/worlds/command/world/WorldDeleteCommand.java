@@ -50,8 +50,6 @@ class WorldDeleteCommand {
             case UNLOAD_FAILED -> Messages.WORLD_UNLOAD_FAILED;
             case SUCCESS -> Messages.WORLD_DELETE_SUCCEEDED;
         }).message(locale, sender, placeholder, Placeholder.of("image", image.getWorldImage().name())));
-        if (!keepImage) return;
-        image.getWorldImage().loadOnStart(false);
-        image.save();
+        if (keepImage) image.save();
     }
 }
