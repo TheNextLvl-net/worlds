@@ -54,12 +54,19 @@ public class Worlds extends JavaPlugin {
                 .filter(Objects::nonNull)
                 .forEach(image -> {
                     var worldImage = image.getWorldImage();
-                    if (worldImage.deletion() == null) return;
-                    image.getWorld().getPlayers().forEach(player -> player.kick(
-                            Bukkit.shutdownMessage(),
-                            PlayerKickEvent.Cause.RESTART_COMMAND
-                    ));
-                    image.delete(worldImage.deletion().keepImage(), false);
+                    if (worldImage.deletion() != null) {
+                        image.getWorld().getPlayers().forEach(player -> player.kick(
+                                Bukkit.shutdownMessage(),
+                                PlayerKickEvent.Cause.RESTART_COMMAND
+                        ));
+                        image.delete(worldImage.deletion().keepImage(), false);
+                    } else if (!worldImage.autoSave()) {
+                        image.getWorld().getPlayers().forEach(player -> player.kick(
+                                Bukkit.shutdownMessage(),
+                                PlayerKickEvent.Cause.RESTART_COMMAND
+                        ));
+                        image.unload();
+                    }
                 });
         metrics.shutdown();
         linkFile().save();

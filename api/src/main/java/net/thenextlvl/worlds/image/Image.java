@@ -49,7 +49,7 @@ public class Image {
     }
 
     public boolean unload() {
-        return canUnload() && Bukkit.unloadWorld(world, true);
+        return canUnload() && Bukkit.unloadWorld(world, world.isAutoSave());
     }
 
     public boolean forceUnload() {

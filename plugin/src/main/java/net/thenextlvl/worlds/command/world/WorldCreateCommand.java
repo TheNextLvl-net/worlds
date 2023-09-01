@@ -94,6 +94,8 @@ class WorldCreateCommand {
                                         .toList())))
                 .flag(CommandFlag.builder("seed").withAliases("s")
                         .withArgument(StringArgument.builder("seed")))
+                .flag(CommandFlag.builder("auto-save")
+                        .withArgument(BooleanArgument.of("auto-save")))
                 .flag(CommandFlag.builder("structures")
                         .withArgument(BooleanArgument.of("structures")))
                 .flag(CommandFlag.builder("hardcore"))
@@ -124,8 +126,11 @@ class WorldCreateCommand {
             return;
         }
 
+        var base = context.flags().<String>getValue("base")
+                .map(Bukkit::getWorld).orElse(null);
         var environment = context.flags().<String>getValue("environment").map(s ->
-                Environment.valueOf(s.toUpperCase().replace("-", "_"))).orElse(NORMAL);
+                        Environment.valueOf(s.toUpperCase().replace("-", "_")))
+                .orElse(base != null ? base.getEnvironment() : NORMAL);
         var type = context.flags().<String>getValue("type").map(s ->
                         WorldType.valueOf(s.toUpperCase().replace("-", "_")))
                 .orElse(context.flags().contains("preset") ? WorldType.FLAT : WorldType.NORMAL);
@@ -138,15 +143,16 @@ class WorldCreateCommand {
             } catch (NumberFormatException e) {
                 return s.hashCode();
             }
-        }).orElse(ThreadLocalRandom.current().nextLong()).longValue();
-        var base = context.flags().<String>getValue("base")
-                .map(Bukkit::getWorld).orElse(null);
+        }).orElse(base != null ? base.getSeed() : ThreadLocalRandom.current().nextLong()).longValue();
         var deletion = context.flags().<String>getValue("deletion").map(s ->
                         DeletionType.valueOf(s.toUpperCase().replace("-", "_")))
                 .orElse(null);
         var loadManual = context.flags().contains("load-manual");
-        var structures = context.flags().<Boolean>getValue("structures").orElse(true);
-        var hardcore = context.flags().contains("hardcore");
+        var structures = context.flags().<Boolean>getValue("structures")
+                .orElse(base == null || base.canGenerateStructures());
+        var autoSave = context.flags().<Boolean>getValue("auto-save")
+                .orElse(base == null || base.isAutoSave());
+        var hardcore = context.flags().contains("hardcore") || base != null && base.isHardcore();
         var preset = context.flags().<String>get("preset");
 
         if (preset != null && generator != null) {
@@ -172,7 +178,7 @@ class WorldCreateCommand {
             else sender.sendRichMessage(Messages.WORLD_COPY_FAILED.message(locale, sender, world));
         }
         var image = Image.load(new WorldImage(name, preset, generator, deletion,
-                environment, type, structures, hardcore, !loadManual, seed));
+                environment, type, autoSave, structures, hardcore, !loadManual, seed));
         var message = image != null ? Messages.WORLD_CREATE_SUCCEEDED : Messages.WORLD_CREATE_FAILED;
         sender.sendRichMessage(message.message(locale, sender, placeholder));
         if (image == null || !(sender instanceof Entity entity)) return;

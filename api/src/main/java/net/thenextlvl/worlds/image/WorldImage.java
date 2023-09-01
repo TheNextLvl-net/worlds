@@ -24,6 +24,7 @@ public class WorldImage implements Cloneable {
     private @Nullable DeletionType deletion;
     private World.Environment environment;
     private WorldType type;
+    private boolean autoSave;
     private boolean generateStructures;
     private boolean hardcore;
     private boolean loadOnStart;
@@ -39,7 +40,9 @@ public class WorldImage implements Cloneable {
                 .hardcore(hardcore())
                 .type(type())
                 .seed(seed());
-        return revalidate(creator.createWorld());
+        var world = creator.createWorld();
+        if (world != null) world.setAutoSave(autoSave());
+        return revalidate(world);
     }
 
     public @Nullable World revalidate(@Nullable World world) {
@@ -71,6 +74,7 @@ public class WorldImage implements Cloneable {
                 null, null, null,
                 world.getEnvironment(),
                 Objects.requireNonNullElse(world.getWorldType(), WorldType.NORMAL),
+                world.isAutoSave(),
                 world.canGenerateStructures(),
                 world.isHardcore(),
                 true,
