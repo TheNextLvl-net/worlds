@@ -20,11 +20,13 @@ dependencies {
     compileOnly("net.thenextlvl.core:annotations:1.0.0")
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
 
+    testImplementation("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
+
     implementation("cloud.commandframework:cloud-paper:1.8.3")
     implementation("cloud.commandframework:cloud-minecraft-extras:1.8.3")
 
     implementation(project(":api"))
-    implementation("net.thenextlvl.core:nbt:1.0.0")
+    implementation("net.thenextlvl.core:nbt:1.0.3")
     implementation("net.thenextlvl.core:api:3.1.13")
     implementation("org.bstats:bstats-bukkit:3.0.2")
 
