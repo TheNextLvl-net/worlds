@@ -21,7 +21,6 @@ public record Generator(String plugin, @Nullable String id) {
         try {
             return clazz.getMethod("getDefaultWorldGenerator", String.class, String.class).getDeclaringClass().equals(clazz);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -30,7 +29,6 @@ public record Generator(String plugin, @Nullable String id) {
         try {
             return clazz.getMethod("getDefaultBiomeProvider", String.class, String.class).getDeclaringClass().equals(clazz);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
             return false;
         }
     }
