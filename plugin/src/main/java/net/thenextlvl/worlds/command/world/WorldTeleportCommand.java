@@ -14,8 +14,8 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 class WorldTeleportCommand {
 
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
-        return builder
-                .literal("teleport", "tp")
+        return builder.literal("teleport", "tp")
+                .permission("worlds.command.world.teleport")
                 .argument(StringArgument.<CommandSender>builder("world")
                         .withSuggestionsProvider((context, token) -> Bukkit.getWorlds().stream()
                                 .map(WorldInfo::getName)

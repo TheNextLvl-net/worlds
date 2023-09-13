@@ -15,8 +15,8 @@ class LinkDeleteCommand {
     private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
 
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> manager) {
-        return manager
-                .literal("delete")
+        return manager.literal("delete")
+                .permission("worlds.command.link.delete")
                 .argument(StringArgument.<CommandSender>builder("link")
                         .withSuggestionsProvider((context, token) -> plugin.linkFile().links().stream()
                                 .map(Link::toString)

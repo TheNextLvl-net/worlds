@@ -8,24 +8,28 @@ bStat Metrics can be found [here](https://bstats.org/plugin/bukkit/TheNextLvl%20
 
 ### /world
 
-| Argument | Description                                     | Usage                              |
-|----------|-------------------------------------------------|------------------------------------|
-| create   | build an image and create a world based on that | /world create [name] (flags)       |
-| delete   | permanently delete a certain world              | /world delete [world] (flags)      |
-| export   | save a certain world to the disk                | /world export (world)              |
-| import   | import a world from an existing image           | /world import [image]              |
-| info     | receive all important information about a world | /world info (world)                |
-| list     | receive a list of all existing worlds           | /world list                        |
-| setspawn | change the spawn point of a world               | /world setspawn (position) (angle) |
-| teleport | teleport you or someone else to a certain world | /world teleport [world] (player)   |
+To use the `/world` command, the permission `worlds.command.world` is required
+
+| Argument | Description                                     | Usage                              | Permission                    |
+|----------|-------------------------------------------------|------------------------------------|-------------------------------|
+| create   | build an image and create a world based on that | /world create [name] (flags)       | worlds.command.world.create   |
+| delete   | permanently delete a certain world              | /world delete [world] (flags)      | worlds.command.world.delete   |
+| export   | save a certain world to the disk                | /world export (world)              | worlds.command.world.export   |
+| import   | import a world from an existing image           | /world import [image]              | worlds.command.world.import   |
+| info     | receive all important information about a world | /world info (world)                | worlds.command.world.info     |
+| list     | receive a list of all existing worlds           | /world list                        | worlds.command.world.list     |
+| setspawn | change the spawn point of a world               | /world setspawn (position) (angle) | worlds.command.world.setspawn |
+| teleport | teleport you or someone else to a certain world | /world teleport [world] (player)   | worlds.command.world.teleport |
 
 ### /link
 
-| Argument | Description                       | Usage                                             |
-|----------|-----------------------------------|---------------------------------------------------|
-| create   | create a new world link           | /link create [source] [destination] [portal-type] |
-| delete   | delete an existing world link     | /link delete [link]                               |
-| list     | receive a list of all world links | /link list                                        |
+To use the `/link` command, the permission `worlds.command.link` is required
+
+| Argument | Description                       | Usage                                             | Permission                 |
+|----------|-----------------------------------|---------------------------------------------------|----------------------------|
+| create   | create a new world link           | /link create [source] [destination] [portal-type] | worlds.command.link.create |
+| delete   | delete an existing world link     | /link delete [link]                               | worlds.command.link.delete |
+| list     | receive a list of all world links | /link list                                        | worlds.command.link.list   |
 
 ## Flags
 

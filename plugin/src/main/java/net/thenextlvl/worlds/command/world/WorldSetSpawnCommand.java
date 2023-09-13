@@ -16,6 +16,7 @@ class WorldSetSpawnCommand {
 
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
         return builder.literal("setspawn")
+                .permission("worlds.command.world.setspawn")
                 .senderType(Player.class)
                 .argument(LocationArgument.optional("position"))
                 .argument(FloatArgument.optional("angle"))

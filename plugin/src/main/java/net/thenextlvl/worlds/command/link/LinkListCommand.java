@@ -14,7 +14,9 @@ class LinkListCommand {
     private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
 
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> manager) {
-        return manager.literal("list").handler(LinkListCommand::execute);
+        return manager.literal("list")
+                .permission("worlds.command.link.list")
+                .handler(LinkListCommand::execute);
     }
 
     private static void execute(CommandContext<CommandSender> context) {

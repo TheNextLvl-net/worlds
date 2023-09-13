@@ -43,8 +43,8 @@ class WorldCreateCommand {
     private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
 
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
-        return builder
-                .literal("create")
+        return builder.literal("create")
+                .permission("worlds.command.world.create")
                 .argument(StringArgument.<CommandSender>builder("name").withSuggestionsProvider((context, token) ->
                         Image.findWorlds().stream()
                                 .map(File::getName)

@@ -18,6 +18,7 @@ class WorldImportCommand {
 
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
         return builder.literal("import")
+                .permission("worlds.command.world.import")
                 .argument(StringArgument.<CommandSender>builder("image")
                         .withSuggestionsProvider((context, token) -> Image.findImages().stream()
                                 .map(WorldImage::name)

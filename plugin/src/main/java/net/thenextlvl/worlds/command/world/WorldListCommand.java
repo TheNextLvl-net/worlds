@@ -12,7 +12,9 @@ import org.bukkit.generator.WorldInfo;
 class WorldListCommand {
 
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
-        return builder.literal("list").handler(WorldListCommand::execute);
+        return builder.literal("list")
+                .permission("worlds.command.world.list")
+                .handler(WorldListCommand::execute);
     }
 
     private static void execute(CommandContext<CommandSender> context) {

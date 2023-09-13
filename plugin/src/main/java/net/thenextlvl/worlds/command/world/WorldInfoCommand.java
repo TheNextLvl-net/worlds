@@ -20,6 +20,7 @@ class WorldInfoCommand {
 
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
         return builder.literal("info")
+                .permission("worlds.command.world.info")
                 .argument(StringArgument.<CommandSender>builder("world")
                         .withSuggestionsProvider((context, token) -> Bukkit.getWorlds().stream()
                                 .map(WorldInfo::getName)

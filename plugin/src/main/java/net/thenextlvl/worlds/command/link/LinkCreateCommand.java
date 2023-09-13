@@ -20,8 +20,8 @@ class LinkCreateCommand {
     private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
 
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> manager) {
-        return manager
-                .literal("create")
+        return manager.literal("create")
+                .permission("worlds.command.link.create")
                 .argument(StringArgument.<CommandSender>builder("source")
                         .withSuggestionsProvider((context, token) -> Bukkit.getWorlds().stream()
                                 .map(WorldInfo::getName)

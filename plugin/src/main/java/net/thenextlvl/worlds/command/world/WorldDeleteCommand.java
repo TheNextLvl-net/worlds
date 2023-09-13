@@ -17,6 +17,7 @@ class WorldDeleteCommand {
 
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
         return builder.literal("delete")
+                .permission("worlds.command.world.delete")
                 .argument(StringArgument.<CommandSender>builder("world")
                         .withSuggestionsProvider((context, token) -> Bukkit.getWorlds().stream()
                                 .filter(world -> !world.getKey().toString().equals("minecraft:overworld"))

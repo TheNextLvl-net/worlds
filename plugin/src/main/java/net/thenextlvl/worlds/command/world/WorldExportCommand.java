@@ -15,6 +15,7 @@ class WorldExportCommand {
 
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
         return builder.literal("export")
+                .permission("worlds.command.world.export")
                 .argument(StringArgument.<CommandSender>builder("world")
                         .withSuggestionsProvider((context, token) -> Bukkit.getWorlds().stream()
                                 .map(WorldInfo::getName)
