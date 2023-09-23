@@ -57,7 +57,7 @@ public class Image {
     }
 
     public DeleteResult deleteOnShutdown(boolean keepImage, boolean keepWorld) {
-        if (keepImage && keepWorld)
+        if (keepWorld && (keepImage || !getFile().getFile().exists()))
             return DeleteResult.WORLD_DELETE_NOTHING;
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
