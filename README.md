@@ -20,6 +20,8 @@ bStat Metrics can be found [here](https://bstats.org/plugin/bukkit/TheNextLvl%20
 | setspawn | change the spawn point of a world               | /world setspawn (position) (angle) | worlds.command.world.setspawn |
 | teleport | teleport you or someone else to a certain world | /world teleport [world] (player)   | worlds.command.world.teleport |
 
+The perm-pack to grant all permissions: `worlds.commands.world`
+
 ### /link
 
 | Argument | Description                       | Usage                                             | Permission                 |
@@ -27,6 +29,8 @@ bStat Metrics can be found [here](https://bstats.org/plugin/bukkit/TheNextLvl%20
 | create   | create a new world link           | /link create [source] [destination] [portal-type] | worlds.command.link.create |
 | delete   | delete an existing world link     | /link delete [link]                               | worlds.command.link.delete |
 | list     | receive a list of all world links | /link list                                        | worlds.command.link.list   |
+
+The perm-pack to grant all permissions: `worlds.commands.link`
 
 ## Flags
 

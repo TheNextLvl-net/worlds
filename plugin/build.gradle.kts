@@ -52,4 +52,26 @@ paper {
     load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
     website = "https://thenextlvl.net"
     authors = listOf("NonSwag")
+
+    permissions {
+        register("worlds.commands.world") {
+            this.children = listOf(
+                    "worlds.command.world.create",
+                    "worlds.command.world.delete",
+                    "worlds.command.world.export",
+                    "worlds.command.world.import",
+                    "worlds.command.world.info",
+                    "worlds.command.world.list",
+                    "worlds.command.world.setspawn",
+                    "worlds.command.world.teleport"
+            )
+        }
+        register("worlds.commands.link") {
+            this.children = listOf(
+                    "worlds.command.link.create",
+                    "worlds.command.link.delete",
+                    "worlds.command.link.list"
+            )
+        }
+    }
 }
