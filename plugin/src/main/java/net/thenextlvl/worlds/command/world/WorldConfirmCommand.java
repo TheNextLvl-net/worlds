@@ -7,6 +7,8 @@ import static net.thenextlvl.worlds.command.world.WorldCommand.confirmationManag
 
 class WorldConfirmCommand {
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
-        return builder.literal("confirm").handler(confirmationManager.createConfirmationExecutionHandler());
+        return builder.literal("confirm")
+                .permission(sender -> confirmationManager.getPending(sender).isPresent())
+                .handler(confirmationManager.createConfirmationExecutionHandler());
     }
 }
