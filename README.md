@@ -8,8 +8,6 @@ bStat Metrics can be found [here](https://bstats.org/plugin/bukkit/TheNextLvl%20
 
 ### /world
 
-To use the `/world` command, the permission `worlds.command.world` is required
-
 | Argument | Description                                     | Usage                              | Permission                    |
 |----------|-------------------------------------------------|------------------------------------|-------------------------------|
 | create   | build an image and create a world based on that | /world create [name] (flags)       | worlds.command.world.create   |
@@ -22,8 +20,6 @@ To use the `/world` command, the permission `worlds.command.world` is required
 | teleport | teleport you or someone else to a certain world | /world teleport [world] (player)   | worlds.command.world.teleport |
 
 ### /link
-
-To use the `/link` command, the permission `worlds.command.link` is required
 
 | Argument | Description                       | Usage                                             | Permission                 |
 |----------|-----------------------------------|---------------------------------------------------|----------------------------|
