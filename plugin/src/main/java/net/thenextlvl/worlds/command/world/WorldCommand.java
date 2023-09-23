@@ -31,7 +31,7 @@ public class WorldCommand {
         confirmationManager.registerConfirmationProcessor(manager);
         manager.registerAsynchronousCompletions();
         manager.registerBrigadier();
-        var builder = manager.commandBuilder("world").permission("worlds.command.world");
+        var builder = manager.commandBuilder("world");
         manager.command(WorldSetSpawnCommand.create(builder));
         manager.command(WorldTeleportCommand.create(builder));
         manager.command(WorldConfirmCommand.create(builder));

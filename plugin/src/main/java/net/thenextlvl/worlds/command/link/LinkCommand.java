@@ -16,7 +16,7 @@ public class LinkCommand {
         manager.commandSyntaxFormatter(new CustomSyntaxFormatter<>());
         manager.registerAsynchronousCompletions();
         manager.registerBrigadier();
-        var builder = manager.commandBuilder("link").permission("worlds.command.link");
+        var builder = manager.commandBuilder("link");
         manager.command(LinkCreateCommand.create(builder));
         manager.command(LinkDeleteCommand.create(builder));
         manager.command(LinkListCommand.create(builder));
