@@ -114,7 +114,15 @@ public class Image {
                 .toList();
     }
 
+    @Getter
+    @RequiredArgsConstructor
     public enum DeleteResult {
-        DELETE_NOT_ALLOWED, WORLD_DELETE_FAILED, IMAGE_DELETE_FAILED, UNLOAD_FAILED, SUCCESS
+        DELETE_NOT_ALLOWED("world.delete.disallowed"),
+        WORLD_DELETE_FAILED("world.delete.failed"),
+        IMAGE_DELETE_FAILED("image.delete.failed"),
+        UNLOAD_FAILED("world.unload.failed"),
+        SUCCESS("world.delete.success");
+
+        private final String message;
     }
 }

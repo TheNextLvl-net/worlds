@@ -3,12 +3,10 @@ package net.thenextlvl.worlds.command.link;
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
-import core.api.placeholder.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
 import net.thenextlvl.worlds.link.Link;
-import net.thenextlvl.worlds.util.Messages;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 class LinkDeleteCommand {
@@ -33,12 +31,13 @@ class LinkDeleteCommand {
                 .filter(link1 -> link1.toString().equals(linkName))
                 .findFirst()
                 .orElse(null);
-        var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
         if (link != null) {
             plugin.linkFile().links().remove(link);
-            sender.sendRichMessage(Messages.LINK_DELETED.message(locale, sender,
-                    Placeholder.of("link", link)));
-        } else sender.sendRichMessage(Messages.LINK_NOT_FOUND.message(locale, sender,
-                Placeholder.of("link", linkName)));
+            plugin.bundle().sendMessage(sender, "link.deleted",
+                    Placeholder.parsed("type", link.portalType().toString()),
+                    Placeholder.parsed("first", String.valueOf(link.first())),
+                    Placeholder.parsed("second", String.valueOf(link.second())));
+        } else plugin.bundle().sendMessage(sender, "link.exists.not",
+                Placeholder.parsed("link", linkName));
     }
 }

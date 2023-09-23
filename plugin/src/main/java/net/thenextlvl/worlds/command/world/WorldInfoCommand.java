@@ -3,20 +3,19 @@ package net.thenextlvl.worlds.command.world;
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
-import core.api.placeholder.Placeholder;
-import net.kyori.adventure.audience.Audience;
-import net.thenextlvl.worlds.util.Messages;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.thenextlvl.worlds.Worlds;
 import net.thenextlvl.worlds.image.Image;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.generator.WorldInfo;
-
-import java.util.Objects;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 
 class WorldInfoCommand {
+    private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
 
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
         return builder.literal("info")
@@ -36,36 +35,45 @@ class WorldInfoCommand {
         var target = context.<String>getOptional("world");
         var world = target.isPresent() ? Bukkit.getWorld(target.get()) :
                 sender instanceof Entity entity ? entity.getWorld() : null;
-        var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
+
         if (world == null && target.isEmpty()) {
-            sender.sendRichMessage(Messages.ENTER_WORLD_NAME.message(locale, sender));
+            plugin.bundle().sendMessage(sender, "world.name.absent");
             return;
         }
-        var name = Placeholder.<Audience>of("world", world != null ? world.getName() : target.get());
-        if (world != null) {
-            var volume = Image.getOrCreate(world);
-            var environment = Placeholder.<Audience>of("environment", () -> switch (world.getEnvironment()) {
-                case THE_END -> "The End";
-                case NETHER -> "Nether";
-                case NORMAL -> "Normal";
-                case CUSTOM -> "Custom";
-            });
-            var type = Placeholder.<Audience>of("type", () -> switch (Objects.requireNonNullElse(world.getWorldType(), WorldType.NORMAL)) {
-                case LARGE_BIOMES -> "Large Biomes";
-                case AMPLIFIED -> "Amplified";
-                case NORMAL -> "Normal";
-                case FLAT -> "Flat";
-            });
-            var players = Placeholder.<Audience>of("players", () -> world.getPlayers().size());
-            var generator = Placeholder.<Audience>of("generator", () ->
-                    Objects.requireNonNullElse(volume.getWorldImage().generator(), "Vanilla"));
-            var seed = Placeholder.<Audience>of("seed", world::getSeed);
-            sender.sendRichMessage(Messages.WORLD_INFO_NAME.message(locale, sender, name));
-            sender.sendRichMessage(Messages.WORLD_INFO_PLAYERS.message(locale, sender, players));
-            sender.sendRichMessage(Messages.WORLD_INFO_TYPE.message(locale, sender, type));
-            sender.sendRichMessage(Messages.WORLD_INFO_ENVIRONMENT.message(locale, sender, environment));
-            sender.sendRichMessage(Messages.WORLD_INFO_GENERATOR.message(locale, sender, generator));
-            sender.sendRichMessage(Messages.WORLD_INFO_SEED.message(locale, sender, seed));
-        } else sender.sendRichMessage(Messages.WORLD_NOT_FOUND.message(locale, sender, name));
+
+        if (world == null) {
+            plugin.bundle().sendMessage(sender, "world.exists.not",
+                    Placeholder.parsed("world", target.get()));
+            return;
+        }
+
+        var volume = Image.getOrDefault(world);
+        plugin.bundle().sendMessage(sender, "world.info.name",
+                Placeholder.parsed("world", world.getName()));
+        plugin.bundle().sendMessage(sender, "world.info.players",
+                Placeholder.parsed("players", String.valueOf(world.getPlayers().size())));
+        plugin.bundle().sendMessage(sender, "world.info.type",
+                Placeholder.parsed("type", switch (notnull(world.getWorldType(), WorldType.NORMAL)) {
+                    case LARGE_BIOMES -> "Large Biomes";
+                    case AMPLIFIED -> "Amplified";
+                    case NORMAL -> "Normal";
+                    case FLAT -> "Flat";
+                }));
+        plugin.bundle().sendMessage(sender, "world.info.environment",
+                Placeholder.parsed("environment", switch (world.getEnvironment()) {
+                    case THE_END -> "The End";
+                    case NETHER -> "Nether";
+                    case NORMAL -> "Normal";
+                    case CUSTOM -> "Custom";
+                }));
+        plugin.bundle().sendMessage(sender, "world.info.generator",
+                Placeholder.parsed("generator", String.valueOf(notnull(
+                        volume.getWorldImage().generator(), "Vanilla"))));
+        plugin.bundle().sendMessage(sender, "world.info.seed",
+                Placeholder.parsed("seed", String.valueOf(world.getSeed())));
+    }
+
+    private static <V> V notnull(@Nullable V value, V defaultValue) {
+        return value != null ? value : defaultValue;
     }
 }

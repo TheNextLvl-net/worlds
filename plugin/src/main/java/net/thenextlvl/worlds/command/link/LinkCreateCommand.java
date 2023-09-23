@@ -3,14 +3,12 @@ package net.thenextlvl.worlds.command.link;
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
-import core.api.placeholder.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
 import net.thenextlvl.worlds.link.Link;
 import net.thenextlvl.worlds.link.PortalType;
-import net.thenextlvl.worlds.util.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.generator.WorldInfo;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -48,9 +46,7 @@ class LinkCreateCommand {
         try {
             handleCreate(context);
         } catch (Exception e) {
-            var sender = context.getSender();
-            var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
-            sender.sendRichMessage(Messages.INVALID_ARGUMENT.message(locale, sender));
+            plugin.bundle().sendMessage(context.getSender(), "command.argument");
         }
     }
 
@@ -60,15 +56,15 @@ class LinkCreateCommand {
         var destination = context.<String>get("destination");
         var portalType = PortalType.valueOf(context.<String>get("portal-type").toUpperCase().replace("-", "_"));
         var link = new Link(portalType, source, destination);
-        var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
-        if (plugin.linkFile().links().contains(link)) {
-            sender.sendRichMessage(Messages.LINK_EXISTS.message(locale, sender,
-                    Placeholder.of("link", () -> link.portalType().name().toLowerCase().replace("_", "-")
-                            + ": " + link.first() + " -> " + link.second())));
-        } else {
-            sender.sendRichMessage(Messages.LINK_CREATED.message(locale, sender,
-                    Placeholder.of("link", link)));
+        if (!plugin.linkFile().links().contains(link)) {
+            plugin.bundle().sendMessage(sender, "link.created",
+                    Placeholder.parsed("type", link.portalType().toString()),
+                    Placeholder.parsed("first", String.valueOf(link.first())),
+                    Placeholder.parsed("second", String.valueOf(link.second())));
             plugin.linkFile().links().add(link);
-        }
+        } else plugin.bundle().sendMessage(sender, "link.exists",
+                Placeholder.parsed("type", link.portalType().toString()),
+                Placeholder.parsed("first", String.valueOf(link.first())),
+                Placeholder.parsed("second", String.valueOf(link.second())));
     }
 }

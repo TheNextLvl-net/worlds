@@ -2,12 +2,10 @@ package net.thenextlvl.worlds.command.link;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.context.CommandContext;
-import core.api.placeholder.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
 import net.thenextlvl.worlds.link.Link;
-import net.thenextlvl.worlds.util.Messages;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 class LinkListCommand {
@@ -21,11 +19,9 @@ class LinkListCommand {
 
     private static void execute(CommandContext<CommandSender> context) {
         var links = plugin.linkFile().links().stream().map(Link::toString).toList();
-        var sender = context.getSender();
-        var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
-        if (links.isEmpty()) sender.sendRichMessage(Messages.LINK_LIST_EMPTY.message(locale, sender));
-        else sender.sendRichMessage(Messages.LINK_LIST.message(locale, sender,
-                Placeholder.of("links", String.join(", ", links)),
-                Placeholder.of("amount", links.size())));
+        if (links.isEmpty()) plugin.bundle().sendMessage(context.getSender(), "link.list.empty");
+        else plugin.bundle().sendMessage(context.getSender(), "link.list",
+                Placeholder.parsed("links", String.join(", ", links)),
+                Placeholder.parsed("amount", String.valueOf(links.size())));
     }
 }

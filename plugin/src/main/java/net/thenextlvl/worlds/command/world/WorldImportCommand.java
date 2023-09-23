@@ -3,18 +3,19 @@ package net.thenextlvl.worlds.command.world;
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
-import core.api.placeholder.Placeholder;
-import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.thenextlvl.worlds.Worlds;
 import net.thenextlvl.worlds.image.Image;
 import net.thenextlvl.worlds.image.WorldImage;
-import net.thenextlvl.worlds.util.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 class WorldImportCommand {
+    private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
 
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
         return builder.literal("import")
@@ -31,7 +32,6 @@ class WorldImportCommand {
 
     private static void execute(CommandContext<CommandSender> context) {
         var sender = context.getSender();
-        var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
 
         var imageName = context.<String>get("image");
         var image = Image.findImageFiles().stream()
@@ -44,18 +44,18 @@ class WorldImportCommand {
                 .orElse(null);
 
         if (image == null) {
-            sender.sendRichMessage(Messages.IMAGE_NOT_FOUND.message(locale, sender, Placeholder.of("image", imageName)));
+            plugin.bundle().sendMessage(sender, "image.exists.not", Placeholder.parsed("image", imageName));
             return;
         }
         var world = Bukkit.getWorld(image.name());
-        var placeholder = Placeholder.<Audience>of("world", world != null ? world.getName() : image.name());
+        var placeholder = Placeholder.parsed("world", world != null ? world.getName() : image.name());
         if (world != null) {
-            sender.sendRichMessage(Messages.WORLD_EXISTS.message(locale, sender, placeholder));
+            plugin.bundle().sendMessage(sender, "world.exists", placeholder);
             return;
         }
         var result = Image.load(image);
-        var message = result != null ? Messages.WORLD_IMPORT_SUCCEEDED : Messages.WORLD_IMPORT_FAILED;
-        sender.sendRichMessage(message.message(locale, sender, placeholder));
+        var message = result != null ? "world.import.success" : "world.import.failed";
+        plugin.bundle().sendMessage(sender, message, placeholder);
         if (result == null || !(sender instanceof Player player)) return;
         player.teleportAsync(result.getWorld().getSpawnLocation().add(0.5, 0, 0.5), COMMAND);
     }

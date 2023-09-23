@@ -4,5 +4,10 @@ public enum PortalType {
     NETHER_PORTAL,
     END_PORTAL,
     END_GATEWAY,
-    CUSTOM
+    CUSTOM;
+
+    @Override
+    public String toString() {
+        return name().toLowerCase().replace("_", " ");
+    }
 }

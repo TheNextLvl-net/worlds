@@ -14,8 +14,6 @@ public record Link(
 ) {
     @Override
     public String toString() {
-        return portalType().name().toLowerCase().replace("_", "-")
-                + ": " + first()
-                + " -> " + second();
+        return portalType() + ": " + first() + " -> " + second();
     }
 }

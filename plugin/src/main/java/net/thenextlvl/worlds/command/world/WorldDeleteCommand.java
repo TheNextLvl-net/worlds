@@ -4,16 +4,16 @@ import cloud.commandframework.Command;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
-import core.api.placeholder.Placeholder;
-import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.thenextlvl.worlds.Worlds;
 import net.thenextlvl.worlds.image.Image;
-import net.thenextlvl.worlds.util.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.generator.WorldInfo;
+import org.bukkit.plugin.java.JavaPlugin;
 
 class WorldDeleteCommand {
+    private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
 
     static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
         return builder.literal("delete")
@@ -34,23 +34,17 @@ class WorldDeleteCommand {
         var name = context.<String>get("world");
         var world = Bukkit.getWorld(name);
         var sender = context.getSender();
-        var placeholder = Placeholder.<Audience>of("world", world != null ? world.getName() : name);
-        var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
         if (world == null) {
-            sender.sendRichMessage(Messages.WORLD_NOT_FOUND.message(locale, sender, placeholder));
+            plugin.bundle().sendMessage(sender, "world.exists.not", Placeholder.parsed("world", name));
             return;
         }
         var keepImage = context.flags().contains("keep-image");
         var keepWorld = context.flags().contains("keep-world");
         var image = Image.getOrDefault(world);
         var result = image.delete(keepImage, keepWorld);
-        sender.sendRichMessage((switch (result) {
-            case DELETE_NOT_ALLOWED -> Messages.WORLD_DELETE_DISALLOWED;
-            case WORLD_DELETE_FAILED -> Messages.WORLD_DELETE_FAILED;
-            case IMAGE_DELETE_FAILED -> Messages.IMAGE_DELETE_FAILED;
-            case UNLOAD_FAILED -> Messages.WORLD_UNLOAD_FAILED;
-            case SUCCESS -> Messages.WORLD_DELETE_SUCCEEDED;
-        }).message(locale, sender, placeholder, Placeholder.of("image", image.getWorldImage().name())));
+        plugin.bundle().sendMessage(sender, result.getMessage(),
+                Placeholder.parsed("world", world.getName()),
+                Placeholder.parsed("image", image.getWorldImage().name()));
         if (keepImage) image.save();
     }
 }

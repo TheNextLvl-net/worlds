@@ -6,8 +6,7 @@ import cloud.commandframework.arguments.standard.BooleanArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import com.google.gson.JsonParseException;
-import core.api.placeholder.Placeholder;
-import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
 import net.thenextlvl.worlds.image.DeletionType;
 import net.thenextlvl.worlds.image.Generator;
@@ -16,13 +15,11 @@ import net.thenextlvl.worlds.image.WorldImage;
 import net.thenextlvl.worlds.preset.Preset;
 import net.thenextlvl.worlds.preset.PresetFile;
 import net.thenextlvl.worlds.preset.Presets;
-import net.thenextlvl.worlds.util.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.generator.WorldInfo;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -105,24 +102,22 @@ class WorldCreateCommand {
 
     private static void execute(CommandContext<CommandSender> context) {
         var sender = context.getSender();
-        var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
         try {
             handleCreate(context);
         } catch (JsonParseException e) {
-            sender.sendRichMessage(Messages.WORLD_PRESET_INVALID.message(locale, sender));
+            plugin.bundle().sendMessage(sender, "world.preset.invalid");
         } catch (Exception e) {
-            sender.sendRichMessage(Messages.INVALID_ARGUMENT.message(locale, sender));
+            plugin.bundle().sendMessage(sender, "command.argument");
         }
     }
 
     private static void handleCreate(CommandContext<CommandSender> context) {
         var sender = context.getSender();
         var name = context.<String>get("name");
-        var placeholder = Placeholder.<Audience>of("world", name);
-        var locale = sender instanceof Player player ? player.locale() : Messages.ENGLISH;
+        var placeholder = Placeholder.parsed("world", name);
 
         if (Bukkit.getWorld(name) != null) {
-            sender.sendRichMessage(Messages.WORLD_EXISTS.message(locale, sender, placeholder));
+            plugin.bundle().sendMessage(sender, "world.exists", placeholder);
             return;
         }
 
@@ -156,12 +151,12 @@ class WorldCreateCommand {
         var preset = context.flags().<String>get("preset");
 
         if (preset != null && generator != null) {
-            sender.sendRichMessage(Messages.FLAG_COMBINATION.message(locale, sender,
-                    Placeholder.of("flag-1", "generator"),
-                    Placeholder.of("flag-2", "preset")));
+            WorldCreateCommand.plugin.bundle().sendMessage(sender, "command.flag.combination",
+                    Placeholder.parsed("flag-1", "generator"),
+                    Placeholder.parsed("flag-2", "preset"));
             return;
         } else if (preset != null && !type.equals(WorldType.FLAT)) {
-            sender.sendRichMessage(Messages.WORLD_PRESET_FLAT.message(locale, sender));
+            WorldCreateCommand.plugin.bundle().sendMessage(sender, "world.preset.flat");
             return;
         } else if (preset != null) {
             final var fileName = preset + ".json";
@@ -172,15 +167,15 @@ class WorldCreateCommand {
         }
 
         if (base != null) {
-            var world = Placeholder.<CommandSender>of("world", base::getName);
+            var world = Placeholder.parsed("world", base.getName());
             if (copy(base.getWorldFolder(), new File(Bukkit.getWorldContainer(), name)))
-                sender.sendRichMessage(Messages.WORLD_COPY_SUCCESS.message(locale, sender, world));
-            else sender.sendRichMessage(Messages.WORLD_COPY_FAILED.message(locale, sender, world));
+                WorldCreateCommand.plugin.bundle().sendMessage(sender, "world.copy.success", world);
+            else WorldCreateCommand.plugin.bundle().sendMessage(sender, "world.copy.failed", world);
         }
         var image = Image.load(new WorldImage(name, preset, generator, deletion,
                 environment, type, autoSave, structures, hardcore, !loadManual, seed));
-        var message = image != null ? Messages.WORLD_CREATE_SUCCEEDED : Messages.WORLD_CREATE_FAILED;
-        sender.sendRichMessage(message.message(locale, sender, placeholder));
+        var message = image != null ? "world.create.success" : "world.create.failed";
+        WorldCreateCommand.plugin.bundle().sendMessage(sender, message, placeholder);
         if (image == null || !(sender instanceof Entity entity)) return;
         entity.teleportAsync(image.getWorld().getSpawnLocation().add(0.5, 0, 0.5), COMMAND);
     }
