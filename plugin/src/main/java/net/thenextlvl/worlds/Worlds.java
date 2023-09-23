@@ -70,7 +70,7 @@ public class Worlds extends JavaPlugin {
                                 Bukkit.shutdownMessage(),
                                 PlayerKickEvent.Cause.RESTART_COMMAND
                         ));
-                        image.delete(worldImage.deletion().keepImage(), false);
+                        image.deleteImmediately(worldImage.deletion().keepImage(), false);
                     } else if (!worldImage.autoSave()) {
                         image.getWorld().getPlayers().forEach(player -> player.kick(
                                 Bukkit.shutdownMessage(),
@@ -91,7 +91,7 @@ public class Worlds extends JavaPlugin {
     private void registerCommands() {
         try {
             LinkCommand.register(this);
-            WorldCommand.register(this);
+            WorldCommand.register();
         } catch (Exception e) {
             e.printStackTrace();
         }

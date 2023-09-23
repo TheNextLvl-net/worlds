@@ -52,16 +52,44 @@ public class Image {
         return canUnload() && Bukkit.unloadWorld(world, world.isAutoSave());
     }
 
-    public DeleteResult delete(boolean keepImage, boolean keepWorld) {
+    public DeleteResult delete(boolean keepImage, boolean keepWorld, boolean schedule) {
+        return schedule ? deleteOnShutdown(keepImage, keepWorld) : deleteImmediately(keepImage, keepWorld);
+    }
+
+    public DeleteResult deleteOnShutdown(boolean keepImage, boolean keepWorld) {
+        if (keepImage && keepWorld)
+            return DeleteResult.WORLD_DELETE_NOTHING;
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (!keepWorld) delete(getWorld().getWorldFolder());
+            if (!keepImage) getFile().delete();
+        }));
+
+        return DeleteResult.WORLD_DELETE_SCHEDULED;
+    }
+
+    public DeleteResult deleteImmediately(boolean keepImage, boolean keepWorld) {
         if (getWorld().getKey().toString().equals("minecraft:overworld"))
-            return DeleteResult.DELETE_NOT_ALLOWED;
+            return DeleteResult.WORLD_DELETE_ILLEGAL;
+
+        var fallback = Bukkit.getWorlds().get(0).getSpawnLocation();
+        getWorld().getPlayers().forEach(player -> player.teleport(fallback));
+
+        if (!keepImage && file.getFile().exists() && !file.delete())
+            return DeleteResult.IMAGE_DELETE_FAILED;
+
+        if (keepImage && keepWorld)
+            return Bukkit.unloadWorld(world, world.isAutoSave())
+                    ? DeleteResult.WORLD_UNLOADED
+                    : DeleteResult.WORLD_UNLOAD_FAILED;
+
         if (!Bukkit.unloadWorld(world, world.isAutoSave() && keepWorld))
-            return DeleteResult.UNLOAD_FAILED;
+            return DeleteResult.WORLD_UNLOAD_FAILED;
+
         if (!keepWorld && !delete(world.getWorldFolder()))
             return DeleteResult.WORLD_DELETE_FAILED;
-        if (keepImage || !file.getFile().exists() || file.delete())
-            return DeleteResult.SUCCESS;
-        return DeleteResult.IMAGE_DELETE_FAILED;
+
+        return DeleteResult.WORLD_DELETED;
     }
 
     private boolean delete(File file) {
@@ -117,11 +145,16 @@ public class Image {
     @Getter
     @RequiredArgsConstructor
     public enum DeleteResult {
-        DELETE_NOT_ALLOWED("world.delete.disallowed"),
+        WORLD_DELETE_SCHEDULED("world.delete.scheduled"),
+        WORLD_DELETE_ILLEGAL("world.delete.disallowed"),
+        WORLD_DELETE_NOTHING("world.delete.nothing"),
         WORLD_DELETE_FAILED("world.delete.failed"),
+        WORLD_DELETED("world.delete.success"),
+
         IMAGE_DELETE_FAILED("image.delete.failed"),
-        UNLOAD_FAILED("world.unload.failed"),
-        SUCCESS("world.delete.success");
+
+        WORLD_UNLOAD_FAILED("world.unload.failed"),
+        WORLD_UNLOADED("world.unload.success");
 
         private final String message;
     }
