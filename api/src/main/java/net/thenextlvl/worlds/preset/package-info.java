@@ -1,8 +1,10 @@
-@FieldsAreNonnullByDefault
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@TypesAreNotNullByDefault
+@FieldsAreNotNullByDefault
+@ParametersAreNotNullByDefault
+@MethodsReturnNotNullByDefault
 package net.thenextlvl.worlds.preset;
 
-import core.annotation.FieldsAreNonnullByDefault;
-import core.annotation.MethodsReturnNonnullByDefault;
-import core.annotation.ParametersAreNonnullByDefault;
+import core.annotation.FieldsAreNotNullByDefault;
+import core.annotation.MethodsReturnNotNullByDefault;
+import core.annotation.ParametersAreNotNullByDefault;
+import core.annotation.TypesAreNotNullByDefault;
