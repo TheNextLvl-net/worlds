@@ -7,7 +7,7 @@ plugins {
 }
 
 group = rootProject.group
-version = "1.0.8"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -27,7 +27,8 @@ dependencies {
 
     implementation(project(":api"))
     implementation("net.thenextlvl.core:nbt:1.2.0")
-    implementation("net.thenextlvl.core:api:3.0.1")
+    implementation("net.thenextlvl.core:api:4.0.1")
+    implementation("net.thenextlvl.core:i18n:1.0.7")
     implementation("org.bstats:bstats-bukkit:3.0.2")
 
     annotationProcessor("org.projectlombok:lombok:1.18.28")
