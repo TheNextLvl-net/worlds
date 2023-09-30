@@ -61,6 +61,15 @@ _the aliases can be used by adding a single dash (-) in front of the alias (exam
 | keep-image | deletes the world but not its image            |
 | keep-world | unloads the world _(no files will be deleted)_ |
 
+### /world setspawn
+
+| Flag       | Description                    |
+|------------|--------------------------------|
+| first-join | set the first join spawn world |
+| on-join    | set the join spawn world       |
+
+_The general spawn position will be overridden and only the world will be used_
+
 ## World Images
 
 A world image file has the extension `.image` and contains a json object with the following entries

@@ -2,12 +2,14 @@ package net.thenextlvl.worlds;
 
 import core.annotation.FieldsAreNotNullByDefault;
 import core.annotation.ParametersAreNotNullByDefault;
+import core.api.file.format.GsonFile;
 import core.i18n.file.ComponentBundle;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.thenextlvl.worlds.command.config.Config;
 import net.thenextlvl.worlds.command.link.LinkCommand;
 import net.thenextlvl.worlds.command.world.WorldCommand;
 import net.thenextlvl.worlds.image.Image;
@@ -39,6 +41,10 @@ public class Worlds extends JavaPlugin {
             .register("worlds", Locale.US)
             .register("worlds_german", Locale.GERMANY)
             .fallback(Locale.US);
+    private final GsonFile<Config> configFile = new GsonFile<>(
+            new File(getDataFolder(), "config.json"),
+            new Config()
+    ).saveIfAbsent();
 
     @Override
     public void onLoad() {
