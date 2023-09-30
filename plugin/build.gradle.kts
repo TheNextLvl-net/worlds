@@ -11,11 +11,14 @@ version = "1.1.1"
 
 repositories {
     mavenCentral()
+    maven("https://libraries.minecraft.net")
     maven("https://repo.thenextlvl.net/releases")
+    maven("https://repo.thenextlvl.net/snapshots")
     maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
+    compileOnly("com.mojang:brigadier:1.0.18")
     compileOnly("org.projectlombok:lombok:1.18.28")
     compileOnly("net.thenextlvl.core:annotations:2.0.0")
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
@@ -27,6 +30,7 @@ dependencies {
     implementation("net.thenextlvl.core:nbt:1.2.0")
     implementation("net.thenextlvl.core:api:4.0.1")
     implementation("net.thenextlvl.core:i18n:1.0.7")
+    implementation("net.thenextlvl.core:paper:1.1.9-pre23")
     implementation("org.bstats:bstats-bukkit:3.0.2")
 
     annotationProcessor("org.projectlombok:lombok:1.18.28")
