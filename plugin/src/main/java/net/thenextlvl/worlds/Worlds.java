@@ -10,10 +10,10 @@ import lombok.experimental.Accessors;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.thenextlvl.worlds.config.Config;
-import net.thenextlvl.worlds.config.WorldTypeAdapter;
 import net.thenextlvl.worlds.command.link.LinkCommand;
 import net.thenextlvl.worlds.command.world.WorldCommand;
+import net.thenextlvl.worlds.config.Config;
+import net.thenextlvl.worlds.config.WorldTypeAdapter;
 import net.thenextlvl.worlds.image.Image;
 import net.thenextlvl.worlds.image.WorldImage;
 import net.thenextlvl.worlds.link.LinkFile;
@@ -26,6 +26,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Locale;
@@ -45,13 +46,7 @@ public class Worlds extends JavaPlugin {
             .register("worlds", Locale.US)
             .register("worlds_german", Locale.GERMANY)
             .fallback(Locale.US);
-    private final GsonFile<Config> configFile = new GsonFile<>(
-            new File(getDataFolder(), "config.json"), new Config(),
-            new GsonBuilder()
-                    .registerTypeHierarchyAdapter(World.class, new WorldTypeAdapter())
-                    .setPrettyPrinting()
-                    .create()
-    ).saveIfAbsent();
+    private @Nullable GsonFile<Config> configFile;
 
     @Override
     public void onLoad() {
@@ -69,6 +64,7 @@ public class Worlds extends JavaPlugin {
                 .forEach(Image::load);
         registerListeners();
         registerCommands();
+        initConfig();
     }
 
     @Override
@@ -94,6 +90,16 @@ public class Worlds extends JavaPlugin {
                 });
         metrics.shutdown();
         linkFile().save();
+    }
+
+    private void initConfig() {
+        configFile = new GsonFile<>(
+                new File(getDataFolder(), "config.json"), new Config(),
+                new GsonBuilder()
+                        .registerTypeHierarchyAdapter(World.class, new WorldTypeAdapter())
+                        .setPrettyPrinting()
+                        .create()
+        ).saveIfAbsent();
     }
 
     private void registerListeners() {

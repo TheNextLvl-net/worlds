@@ -49,12 +49,14 @@ class WorldSetSpawnCommand {
     }
 
     private static void setFirstJoinWorld(World world) {
+        assert plugin.configFile() != null;
         plugin.configFile().getRoot().setFirstJoinWorld(world);
         plugin.configFile().save();
     }
 
     private static void setJoinWorld(World world) {
-        plugin.configFile().getRoot().setFirstJoinWorld(world);
+        assert plugin.configFile() != null;
+        plugin.configFile().getRoot().setJoinWorld(world);
         plugin.configFile().save();
     }
 
