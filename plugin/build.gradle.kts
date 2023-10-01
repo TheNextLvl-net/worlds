@@ -45,7 +45,7 @@ java {
 
 
 tasks.shadowJar {
-    relocate("org.bstats", "net.thenextlvl.tweaks.bstats")
+    relocate("org.bstats", "net.thenextlvl.worlds.bstats")
     minimize()
 }
 
