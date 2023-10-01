@@ -46,7 +46,10 @@ public class Worlds extends JavaPlugin {
             .fallback(Locale.US);
     private final GsonFile<Config> configFile = new GsonFile<>(
             new File(getDataFolder(), "config.json"), new Config(),
-            new GsonBuilder().registerTypeHierarchyAdapter(World.class, new WorldTypeAdapter()).create()
+            new GsonBuilder()
+                    .registerTypeHierarchyAdapter(World.class, new WorldTypeAdapter())
+                    .setPrettyPrinting()
+                    .create()
     ).saveIfAbsent();
 
     @Override
