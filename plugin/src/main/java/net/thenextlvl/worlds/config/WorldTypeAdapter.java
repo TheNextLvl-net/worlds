@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.command.config;
+package net.thenextlvl.worlds.config;
 
 import com.google.gson.*;
 import org.bukkit.Bukkit;
