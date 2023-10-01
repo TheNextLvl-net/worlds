@@ -1,5 +1,6 @@
 package net.thenextlvl.worlds;
 
+import com.google.gson.GsonBuilder;
 import core.annotation.FieldsAreNotNullByDefault;
 import core.annotation.ParametersAreNotNullByDefault;
 import core.api.file.format.GsonFile;
@@ -10,6 +11,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.thenextlvl.worlds.command.config.Config;
+import net.thenextlvl.worlds.command.config.WorldTypeAdapter;
 import net.thenextlvl.worlds.command.link.LinkCommand;
 import net.thenextlvl.worlds.command.world.WorldCommand;
 import net.thenextlvl.worlds.image.Image;
@@ -19,6 +21,7 @@ import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.preset.Presets;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -42,8 +45,8 @@ public class Worlds extends JavaPlugin {
             .register("worlds_german", Locale.GERMANY)
             .fallback(Locale.US);
     private final GsonFile<Config> configFile = new GsonFile<>(
-            new File(getDataFolder(), "config.json"),
-            new Config()
+            new File(getDataFolder(), "config.json"), new Config(),
+            new GsonBuilder().registerTypeHierarchyAdapter(World.class, new WorldTypeAdapter()).create()
     ).saveIfAbsent();
 
     @Override
