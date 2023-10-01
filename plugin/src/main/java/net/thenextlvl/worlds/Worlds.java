@@ -17,6 +17,7 @@ import net.thenextlvl.worlds.command.world.WorldCommand;
 import net.thenextlvl.worlds.image.Image;
 import net.thenextlvl.worlds.image.WorldImage;
 import net.thenextlvl.worlds.link.LinkFile;
+import net.thenextlvl.worlds.listener.ConnectionListener;
 import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.preset.Presets;
 import org.bstats.bukkit.Metrics;
@@ -96,6 +97,7 @@ public class Worlds extends JavaPlugin {
     }
 
     private void registerListeners() {
+        Bukkit.getPluginManager().registerEvents(new ConnectionListener(this), this);
         Bukkit.getPluginManager().registerEvents(new WorldListener(this), this);
     }
 
