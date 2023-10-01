@@ -1,7 +1,9 @@
+import io.papermc.hangarpublishplugin.model.Platforms
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
     id("java")
+    id("io.papermc.hangar-publish-plugin") version "0.1.0"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("net.minecrell.plugin-yml.paper") version "0.6.0"
 }
@@ -74,6 +76,28 @@ paper {
                     "worlds.command.link.delete",
                     "worlds.command.link.list"
             )
+        }
+    }
+}
+
+val versionString: String = project.version as String
+val isRelease: Boolean = !versionString.contains("-pre")
+
+hangarPublish { // docs - https://docs.papermc.io/misc/hangar-publishing
+    publications.register("plugin") {
+        id.set("Worlds")
+        version.set(project.version as String)
+        channel.set(if (isRelease) "Release" else "Snapshot")
+        if (extra.has("HANGAR_API_TOKEN"))
+            apiKey.set(extra["HANGAR_API_TOKEN"] as String)
+        platforms {
+            register(Platforms.PAPER) {
+                jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+                val versions: List<String> = (property("paperVersion") as String)
+                        .split(",")
+                        .map { it.trim() }
+                platformVersions.set(versions)
+            }
         }
     }
 }
