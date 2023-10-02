@@ -29,7 +29,7 @@ dependencies {
     implementation("cloud.commandframework:cloud-minecraft-extras:1.8.4")
 
     implementation(project(":api"))
-    implementation("net.thenextlvl.core:nbt:1.2.0")
+    implementation("net.thenextlvl.core:nbt:1.3.0")
     implementation("net.thenextlvl.core:api:4.0.1")
     implementation("net.thenextlvl.core:i18n:1.0.7")
     implementation("net.thenextlvl.core:paper:1.1.9-pre23")
