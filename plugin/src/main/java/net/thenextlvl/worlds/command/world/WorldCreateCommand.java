@@ -6,6 +6,7 @@ import cloud.commandframework.arguments.standard.BooleanArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import com.google.gson.JsonParseException;
+import core.io.IO;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
 import net.thenextlvl.worlds.image.DeletionType;
@@ -160,7 +161,7 @@ class WorldCreateCommand {
             return;
         } else if (preset != null) {
             final var fileName = preset + ".json";
-            var match = PresetFile.of(new File(WorldCreateCommand.plugin.presetsFolder(), fileName));
+            var match = PresetFile.of(IO.of(WorldCreateCommand.plugin.presetsFolder(), fileName));
             if (match != null) preset = match.settings().toString();
         } else if (type.equals(WorldType.FLAT)) {
             preset = Preset.serialize(Presets.CLASSIC_FLAT).toString();

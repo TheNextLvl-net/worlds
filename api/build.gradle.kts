@@ -3,6 +3,13 @@ plugins {
     id("maven-publish")
 }
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+    sourceCompatibility = JavaVersion.VERSION_19
+    targetCompatibility = JavaVersion.VERSION_19
+}
+
 group = rootProject.group
 version = rootProject.version
 
@@ -13,21 +20,16 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.projectlombok:lombok:1.18.28")
-    compileOnly("net.thenextlvl.core:annotations:2.0.0")
-    compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
+    compileOnly("org.projectlombok:lombok:1.18.30")
+    compileOnly("net.thenextlvl.core:annotations:2.0.1")
+    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
 
-    implementation("net.thenextlvl.core:nbt:1.2.0")
-    implementation("net.thenextlvl.core:api:4.0.1")
+    implementation("net.thenextlvl.core:nbt:1.3.9")
+    implementation("net.thenextlvl.core:files:1.0.3")
 
-    annotationProcessor("org.projectlombok:lombok:1.18.28")
+    annotationProcessor("org.projectlombok:lombok:1.18.30")
 }
 
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
 
 publishing {
     publications {

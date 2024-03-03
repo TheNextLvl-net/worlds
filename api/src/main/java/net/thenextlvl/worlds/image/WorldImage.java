@@ -1,6 +1,7 @@
 package net.thenextlvl.worlds.image;
 
-import core.api.file.format.GsonFile;
+import core.file.format.GsonFile;
+import core.io.IO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -83,7 +84,7 @@ public class WorldImage implements Cloneable {
     }
 
     public static @Nullable WorldImage of(File file) {
-        return file.isFile() ? new GsonFile<WorldImage>(file, WorldImage.class).getRoot() : null;
+        return file.isFile() ? new GsonFile<WorldImage>(IO.of(file), WorldImage.class).getRoot() : null;
     }
 
     @Override

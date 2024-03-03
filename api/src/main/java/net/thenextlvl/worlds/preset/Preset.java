@@ -4,7 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
-import core.api.file.format.GsonFile;
+import core.file.format.GsonFile;
+import core.io.IO;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -62,12 +63,7 @@ public class Preset implements Cloneable {
      */
     public boolean saveToFile(File file, boolean force) {
         if (!force && file.exists()) return false;
-        new GsonFile<>(file, this, gson) {
-            @Override
-            public Preset load() {
-                return Preset.this;
-            }
-        }.save();
+        new GsonFile<>(IO.of(file), this, gson).save();
         return true;
     }
 

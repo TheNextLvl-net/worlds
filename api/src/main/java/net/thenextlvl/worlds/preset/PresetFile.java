@@ -2,7 +2,8 @@ package net.thenextlvl.worlds.preset;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import core.api.file.format.GsonFile;
+import core.file.format.GsonFile;
+import core.io.IO;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -11,9 +12,9 @@ import java.util.List;
 
 public record PresetFile(JsonObject settings) {
 
-    public static @Nullable PresetFile of(File file) {
-        if (!file.exists()) return null;
-        var gson = new GsonFile<JsonObject>(file, JsonObject.class, new Gson());
+    public static @Nullable PresetFile of(IO io) {
+        if (!io.exists()) return null;
+        var gson = new GsonFile<JsonObject>(io, JsonObject.class, new Gson());
         if (!gson.getRoot().has("settings")) return new PresetFile(gson.getRoot());
         return new PresetFile(gson.getRoot().getAsJsonObject("settings"));
     }

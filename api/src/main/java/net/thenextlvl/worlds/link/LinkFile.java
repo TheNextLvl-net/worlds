@@ -1,11 +1,11 @@
 package net.thenextlvl.worlds.link;
 
 import com.google.gson.reflect.TypeToken;
-import core.api.file.format.GsonFile;
+import core.file.format.GsonFile;
+import core.io.IO;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,8 +13,8 @@ import java.util.Set;
 public class LinkFile {
     private final GsonFile<Set<Link>> file;
 
-    public LinkFile(File file) {
-        this(new GsonFile<>(file, new HashSet<>(), new TypeToken<>() {
+    public LinkFile(IO io) {
+        this(new GsonFile<>(io, new HashSet<>(), new TypeToken<>() {
         }));
     }
 

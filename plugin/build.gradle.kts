@@ -3,13 +3,18 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
     id("java")
-    id("io.papermc.hangar-publish-plugin") version "0.1.0"
+    id("io.papermc.hangar-publish-plugin") version "0.1.2"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("net.minecrell.plugin-yml.paper") version "0.6.0"
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_19
+    targetCompatibility = JavaVersion.VERSION_19
+}
+
 group = rootProject.group
-version = "1.1.3"
+version = "1.1.4"
 
 repositories {
     mavenCentral()
@@ -21,31 +26,28 @@ repositories {
 
 dependencies {
     compileOnly("com.mojang:brigadier:1.0.18")
-    compileOnly("org.projectlombok:lombok:1.18.28")
-    compileOnly("net.thenextlvl.core:annotations:2.0.0")
-    compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
+    compileOnly("org.projectlombok:lombok:1.18.30")
+    compileOnly("net.thenextlvl.core:annotations:2.0.1")
+    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
 
     implementation("cloud.commandframework:cloud-paper:1.8.4")
     implementation("cloud.commandframework:cloud-minecraft-extras:1.8.4")
 
     implementation(project(":api"))
-    implementation("net.thenextlvl.core:nbt:1.2.0")
-    implementation("net.thenextlvl.core:api:4.0.1")
-    implementation("net.thenextlvl.core:i18n:1.0.7")
-    implementation("net.thenextlvl.core:paper:1.1.9-pre23")
+    implementation("net.thenextlvl.core:nbt:1.3.9")
+    implementation("net.thenextlvl.core:files:1.0.3")
+    implementation("net.thenextlvl.core:i18n:1.0.13")
+    implementation("net.thenextlvl.core:paper:1.2.3")
+    implementation("net.thenextlvl.core:adapters:1.0.6")
     implementation("org.bstats:bstats-bukkit:3.0.2")
 
-    annotationProcessor("org.projectlombok:lombok:1.18.28")
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    annotationProcessor("org.projectlombok:lombok:1.18.30")
 }
 
 
 tasks.shadowJar {
     relocate("org.bstats", "net.thenextlvl.worlds.bstats")
+    archiveBaseName.set("worlds")
     minimize()
 }
 

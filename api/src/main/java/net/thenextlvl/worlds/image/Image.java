@@ -1,7 +1,8 @@
 package net.thenextlvl.worlds.image;
 
 import com.google.gson.GsonBuilder;
-import core.api.file.format.GsonFile;
+import core.file.format.GsonFile;
+import core.io.IO;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 @Getter
@@ -21,7 +23,7 @@ public class Image {
 
     private Image(World world, WorldImage image) {
         this(new GsonFile<>(
-                new File(Bukkit.getWorldContainer(), image.name() + ".image"),
+                IO.of(Bukkit.getWorldContainer(), image.name() + ".image"),
                 image, new GsonBuilder().setPrettyPrinting().create()
         ), world);
     }
@@ -57,12 +59,16 @@ public class Image {
     }
 
     public DeleteResult deleteOnShutdown(boolean keepImage, boolean keepWorld) {
-        if (keepWorld && (keepImage || !getFile().getFile().exists()))
+        if (keepWorld && (keepImage || !getFile().getIO().exists()))
             return DeleteResult.WORLD_DELETE_NOTHING;
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (!keepWorld) delete(getWorld().getWorldFolder());
-            if (!keepImage) getFile().delete();
+            if (!keepImage) try {
+                getFile().delete();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }));
 
         return DeleteResult.WORLD_DELETE_SCHEDULED;
@@ -75,8 +81,12 @@ public class Image {
         var fallback = Bukkit.getWorlds().get(0).getSpawnLocation();
         getWorld().getPlayers().forEach(player -> player.teleport(fallback));
 
-        if (!keepImage && file.getFile().exists() && !file.delete())
+        try {
+            if (!keepImage && file.getIO().exists() && !file.delete())
+                return DeleteResult.IMAGE_DELETE_FAILED;
+        } catch (IOException e) {
             return DeleteResult.IMAGE_DELETE_FAILED;
+        }
 
         if (keepImage && keepWorld)
             return Bukkit.unloadWorld(world, world.isAutoSave())

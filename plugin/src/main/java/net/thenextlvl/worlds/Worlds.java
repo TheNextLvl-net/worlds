@@ -3,8 +3,11 @@ package net.thenextlvl.worlds;
 import com.google.gson.GsonBuilder;
 import core.annotation.FieldsAreNotNullByDefault;
 import core.annotation.ParametersAreNotNullByDefault;
-import core.api.file.format.GsonFile;
+import core.file.FileIO;
+import core.file.format.GsonFile;
 import core.i18n.file.ComponentBundle;
+import core.io.IO;
+import core.paper.adapters.world.WorldAdapter;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -13,7 +16,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.thenextlvl.worlds.command.link.LinkCommand;
 import net.thenextlvl.worlds.command.world.WorldCommand;
 import net.thenextlvl.worlds.config.Config;
-import net.thenextlvl.worlds.config.WorldTypeAdapter;
 import net.thenextlvl.worlds.image.Image;
 import net.thenextlvl.worlds.image.WorldImage;
 import net.thenextlvl.worlds.link.LinkFile;
@@ -37,7 +39,7 @@ import java.util.Objects;
 @FieldsAreNotNullByDefault
 @ParametersAreNotNullByDefault
 public class Worlds extends JavaPlugin {
-    private final LinkFile linkFile = new LinkFile(new File(Bukkit.getWorldContainer(), ".links"));
+    private final LinkFile linkFile = new LinkFile(IO.of(Bukkit.getWorldContainer(), ".links"));
     private final File presetsFolder = new File(getDataFolder(), "presets");
     private final Metrics metrics = new Metrics(this, 19652);
     private final File translations = new File(getDataFolder(), "translations");
@@ -46,7 +48,7 @@ public class Worlds extends JavaPlugin {
             .register("worlds", Locale.US)
             .register("worlds_german", Locale.GERMANY)
             .fallback(Locale.US);
-    private @Nullable GsonFile<Config> configFile;
+    private @Nullable FileIO<Config> configFile;
 
     @Override
     public void onLoad() {
@@ -94,12 +96,13 @@ public class Worlds extends JavaPlugin {
 
     private void initConfig() {
         configFile = new GsonFile<>(
-                new File(getDataFolder(), "config.json"), new Config(),
+                IO.of(getDataFolder(), "config.json"), new Config(),
                 new GsonBuilder()
-                        .registerTypeHierarchyAdapter(World.class, new WorldTypeAdapter())
+                        .registerTypeHierarchyAdapter(World.class, WorldAdapter.Name.INSTANCE)
                         .setPrettyPrinting()
+                        .serializeNulls()
                         .create()
-        ).saveIfAbsent();
+        ).validate().save();
     }
 
     private void registerListeners() {
