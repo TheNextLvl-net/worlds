@@ -32,22 +32,17 @@ dependencies {
 
 
 publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-        }
-        repositories {
-            maven {
-                url = uri("https://repo.thenextlvl.net/releases")
-                credentials {
-                    if (extra.has("RELEASES_USER")) {
-                        username = extra["RELEASES_USER"].toString()
-                    }
-                    if (extra.has("RELEASES_PASSWORD")) {
-                        password = extra["RELEASES_PASSWORD"].toString()
-                    }
-                }
-            }
+    publications.create<MavenPublication>("maven") {
+        from(components["java"])
+    }
+    repositories.maven {
+        val branch = if (version.toString().contains("-pre")) "snapshots" else "releases"
+        url = uri("https://repo.thenextlvl.net/$branch")
+        credentials {
+            if (extra.has("RELEASES_USER"))
+                username = extra["RELEASES_USER"].toString()
+            if (extra.has("RELEASES_PASSWORD"))
+                password = extra["RELEASES_PASSWORD"].toString()
         }
     }
 }
