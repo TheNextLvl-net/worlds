@@ -7,6 +7,7 @@ import core.file.FileIO;
 import core.file.format.GsonFile;
 import core.i18n.file.ComponentBundle;
 import core.io.IO;
+import core.paper.adapters.world.LocationAdapter;
 import core.paper.adapters.world.WorldAdapter;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -24,6 +25,7 @@ import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.preset.Presets;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerKickEvent;
@@ -98,7 +100,8 @@ public class Worlds extends JavaPlugin {
         configFile = new GsonFile<>(
                 IO.of(getDataFolder(), "config.json"), new Config(),
                 new GsonBuilder()
-                        .registerTypeHierarchyAdapter(World.class, WorldAdapter.Name.INSTANCE)
+                        .registerTypeHierarchyAdapter(Location.class, LocationAdapter.Simple.INSTANCE)
+                        .registerTypeHierarchyAdapter(World.class, WorldAdapter.Key.INSTANCE)
                         .setPrettyPrinting()
                         .serializeNulls()
                         .create()

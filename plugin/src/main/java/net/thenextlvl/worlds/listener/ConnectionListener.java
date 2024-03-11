@@ -14,12 +14,9 @@ public class ConnectionListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSpawn(PlayerSpawnLocationEvent event) {
         assert plugin.configFile() != null;
-        if (event.getPlayer().hasPlayedBefore()) {
-            var world = plugin.configFile().getRoot().getJoinWorld();
-            if (world != null) event.setSpawnLocation(world.getSpawnLocation());
-        } else {
-            var world = plugin.configFile().getRoot().getFirstJoinWorld();
-            if (world != null) event.setSpawnLocation(world.getSpawnLocation());
-        }
+        var location = event.getPlayer().hasPlayedBefore()
+                ? plugin.configFile().getRoot().getJoinLocation()
+                : plugin.configFile().getRoot().getFirstJoinLocation();
+        if (location != null) event.setSpawnLocation(location);
     }
 }

@@ -8,7 +8,6 @@ import cloud.commandframework.context.CommandContext;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -34,30 +33,21 @@ class WorldSetSpawnCommand {
         var location = context.contains("position") ? context.<Location>get("position") : player.getLocation();
         var angle = context.contains("angle") ? context.<Float>get("angle") : player.getLocation().getYaw();
         player.getWorld().setSpawnLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ(), angle);
-        boolean firstJoinWorld = context.flags().contains("first-join");
-        boolean joinWorld = context.flags().contains("on-join");
-        if (firstJoinWorld) setFirstJoinWorld(location.getWorld());
-        else if (joinWorld) setJoinWorld(location.getWorld());
+        var firstJoinWorld = context.flags().contains("first-join");
+        var joinWorld = context.flags().contains("on-join");
+        assert plugin.configFile() != null;
+        if (firstJoinWorld) plugin.configFile().getRoot().setFirstJoinLocation(location);
+        if (joinWorld) plugin.configFile().getRoot().setJoinLocation(location);
+        if (firstJoinWorld || joinWorld) plugin.configFile().save();
         setSpawn(player, location, angle);
-        var message = firstJoinWorld ? "world.spawn.set.first" :
-                joinWorld ? "world.spawn.set.join" : "world.spawn.set";
+        var message = joinWorld ? "world.spawn.set.join"
+                : firstJoinWorld ? "world.spawn.set.first"
+                : "world.spawn.set";
         plugin.bundle().sendMessage(player, message,
                 Placeholder.parsed("x", String.valueOf(location.getBlockX())),
                 Placeholder.parsed("y", String.valueOf(location.getBlockY())),
                 Placeholder.parsed("z", String.valueOf(location.getBlockZ())),
                 Placeholder.parsed("angle", String.valueOf(angle)));
-    }
-
-    private static void setFirstJoinWorld(World world) {
-        assert plugin.configFile() != null;
-        plugin.configFile().getRoot().setFirstJoinWorld(world);
-        plugin.configFile().save();
-    }
-
-    private static void setJoinWorld(World world) {
-        assert plugin.configFile() != null;
-        plugin.configFile().getRoot().setJoinWorld(world);
-        plugin.configFile().save();
     }
 
     private static void setSpawn(Player player, Location location, float angle) {
