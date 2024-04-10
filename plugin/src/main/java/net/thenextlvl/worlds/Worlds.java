@@ -57,7 +57,7 @@ public class Worlds extends JavaPlugin {
         saveDefaultPresets();
         bundle().miniMessage(MiniMessage.builder().tags(TagResolver.resolver(
                 TagResolver.standard(),
-                Placeholder.parsed("prefix", bundle().format(Locale.US, "prefix"))
+                Placeholder.component("prefix", bundle().component(Locale.US, "prefix"))
         )).build());
     }
 
