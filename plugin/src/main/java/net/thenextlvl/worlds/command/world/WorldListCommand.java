@@ -1,7 +1,6 @@
 package net.thenextlvl.worlds.command.world;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.context.CommandContext;
+import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -11,19 +10,22 @@ import net.thenextlvl.worlds.Worlds;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.generator.WorldInfo;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.incendo.cloud.Command;
+import org.incendo.cloud.context.CommandContext;
 
+@RequiredArgsConstructor
 class WorldListCommand {
-    private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
+    private final Worlds plugin;
+    private final Command.Builder<CommandSender> builder;
 
-    static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
+    Command.Builder<CommandSender> create() {
         return builder.literal("list")
                 .permission("worlds.command.world.list")
-                .handler(WorldListCommand::execute);
+                .handler(this::execute);
     }
 
-    private static void execute(CommandContext<CommandSender> context) {
-        var sender = context.getSender();
+    private void execute(CommandContext<CommandSender> context) {
+        var sender = context.sender();
         var worlds = Bukkit.getWorlds().stream().map(WorldInfo::getName).toList();
         var joined = Component.join(JoinConfiguration.commas(true), worlds.stream()
                 .map(world -> Component.text(world)

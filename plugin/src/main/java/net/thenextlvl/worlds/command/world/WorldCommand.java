@@ -1,45 +1,65 @@
 package net.thenextlvl.worlds.command.world;
 
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
-import cloud.commandframework.paper.PaperCommandManager;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
-import net.thenextlvl.worlds.command.CustomExceptionHandler;
 import net.thenextlvl.worlds.command.CustomSyntaxFormatter;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.incendo.cloud.SenderMapper;
+import org.incendo.cloud.bukkit.parser.PlayerParser;
+import org.incendo.cloud.bukkit.parser.WorldParser;
+import org.incendo.cloud.exception.ArgumentParseException;
+import org.incendo.cloud.exception.InvalidCommandSenderException;
+import org.incendo.cloud.exception.InvalidSyntaxException;
+import org.incendo.cloud.exception.NoPermissionException;
+import org.incendo.cloud.execution.ExecutionCoordinator;
+import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
+import org.incendo.cloud.paper.PaperCommandManager;
 
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
+public class WorldCommand extends PaperCommandManager<CommandSender> {
+    private final Worlds plugin;
 
-public class WorldCommand {
-    private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
+    public WorldCommand(Worlds plugin) {
+        super(plugin, ExecutionCoordinator.simpleCoordinator(), SenderMapper.identity());
+        MinecraftExceptionHandler.<CommandSender>createNative()
+                .handler(InvalidSyntaxException.class, (formatter, context) -> {
+                    var syntax = context.exception().correctSyntax()
+                            .replace("[", "<dark_gray>[<gold>").replace("]", "<dark_gray>]")
+                            .replace("(", "<dark_gray>(<gold>").replace(")", "<dark_gray>)")
+                            .replace("|", "<dark_gray>|<red>").replace("--", "<red>--");
+                    return plugin.bundle().deserialize("<prefix> <red>/" + syntax);
+                })
+                .handler(InvalidCommandSenderException.class, (formatter, context) ->
+                        plugin.bundle().component(context.context().sender(), "command.sender"))
+                .handler(NoPermissionException.class, (formatter, context) ->
+                        plugin.bundle().component(context.context().sender(), "command.permission",
+                                Placeholder.parsed("permission", context.exception().missingPermission().permissionString())))
+                .handler(ArgumentParseException.class, (formatter, context) -> {
+                    context.exception().printStackTrace();
+                    return plugin.bundle().component(context.context().sender(), "command.argument");
+                })
+                .handler(PlayerParser.PlayerParseException.class, (formatter, context) ->
+                        plugin.bundle().component(context.context().sender(), "player.unknown",
+                                Placeholder.parsed("player", context.exception().input())))
+                .handler(WorldParser.WorldParseException.class, (formatter, context) ->
+                        plugin.bundle().component(context.context().sender(), "world.unknown",
+                                Placeholder.parsed("world", context.exception().input())))
+                .defaultCommandExecutionHandler()
+                .registerTo(this);
+        commandSyntaxFormatter(new CustomSyntaxFormatter<>(this));
+        registerAsynchronousCompletions();
+        registerBrigadier();
+        this.plugin = plugin;
+    }
 
-    static final CommandConfirmationManager<CommandSender> confirmationManager = new CommandConfirmationManager<>(
-            30, TimeUnit.SECONDS,
-            context -> plugin.bundle().sendMessage(context.getCommandContext().getSender(), "command.confirmation",
-                    Placeholder.parsed("action", "/" + context.getCommandContext().getRawInputJoined()),
-                    Placeholder.parsed("confirmation", "/world confirm"),
-                    Placeholder.parsed("time", String.valueOf(30))),
-            sender -> plugin.bundle().sendMessage(sender, "command.confirmation.pending"));
-
-    public static void register() throws Exception {
-        var manager = new PaperCommandManager<>(plugin, CommandExecutionCoordinator.simpleCoordinator(), Function.identity(), Function.identity());
-        CustomExceptionHandler.INSTANCE.apply(manager, sender -> sender);
-        manager.commandSyntaxFormatter(new CustomSyntaxFormatter<>());
-        confirmationManager.registerConfirmationProcessor(manager);
-        manager.registerAsynchronousCompletions();
-        manager.registerBrigadier();
-        var builder = manager.commandBuilder("world");
-        manager.command(WorldSetSpawnCommand.create(builder));
-        manager.command(WorldTeleportCommand.create(builder));
-        manager.command(WorldConfirmCommand.create(builder));
-        manager.command(WorldCreateCommand.create(builder));
-        manager.command(WorldImportCommand.create(builder));
-        manager.command(WorldDeleteCommand.create(builder));
-        manager.command(WorldExportCommand.create(builder));
-        manager.command(WorldInfoCommand.create(builder));
-        manager.command(WorldListCommand.create(builder));
+    public void register() {
+        var world = commandBuilder("world");
+        command(new WorldCreateCommand(plugin, world).create());
+        command(new WorldDeleteCommand(plugin, world).create());
+        command(new WorldExportCommand(plugin, world).create());
+        command(new WorldImportCommand(plugin, world).create());
+        command(new WorldInfoCommand(plugin, world).create());
+        command(new WorldListCommand(plugin, world).create());
+        command(new WorldSetSpawnCommand(plugin, world).create());
+        command(new WorldTeleportCommand(plugin, world).create());
     }
 }

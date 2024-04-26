@@ -1,47 +1,41 @@
 package net.thenextlvl.worlds.command.world;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.context.CommandContext;
+import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
-import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.generator.WorldInfo;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.incendo.cloud.Command;
+import org.incendo.cloud.bukkit.parser.PlayerParser;
+import org.incendo.cloud.bukkit.parser.WorldParser;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.exception.InvalidSyntaxException;
 
-import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
+import java.util.List;
 
+@RequiredArgsConstructor
 class WorldTeleportCommand {
-    private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
+    private final Worlds plugin;
+    private final Command.Builder<CommandSender> builder;
 
-    static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
+    Command.Builder<CommandSender> create() {
         return builder.literal("teleport", "tp")
                 .permission("worlds.command.world.teleport")
-                .argument(StringArgument.<CommandSender>builder("world")
-                        .withSuggestionsProvider((context, token) -> Bukkit.getWorlds().stream()
-                                .map(WorldInfo::getName)
-                                .filter(s -> s.startsWith(token))
-                                .toList())
-                        .build())
-                .argument(StringArgument.<CommandSender>builder("player")
-                        .withSuggestionsProvider((context, token) -> Bukkit.getOnlinePlayers().stream()
-                                .map(Player::getName)
-                                .filter(s -> s.startsWith(token))
-                                .toList())
-                        .asOptional().build())
-                .handler(WorldTeleportCommand::execute);
+                .required("world", WorldParser.worldParser())
+                .optional("player", PlayerParser.playerParser())
+                .handler(this::execute);
     }
 
-    private static void execute(CommandContext<CommandSender> context) {
-        var sender = context.getSender();
-        var world = Bukkit.getWorld(context.<String>get("world"));
-        var target = context.<String>getOptional("player");
-        var player = target.map(Bukkit::getPlayer).orElse(sender instanceof Player self ? self : null);
-        if (player == null) plugin.bundle().sendMessage(sender, "player.not.online",
-                Placeholder.parsed("player", target.orElse("null")));
-        else if (world == null) plugin.bundle().sendMessage(sender, "world.name.absent");
-        else player.teleportAsync(world.getSpawnLocation().add(0.5, 0, 0.5), COMMAND);
+    private void execute(CommandContext<CommandSender> context) {
+        var sender = context.sender();
+        var world = context.<World>get("world");
+        var player = context.<Player>optional("player").orElse(sender instanceof Player self ? self : null);
+        if (player == null) throw new InvalidSyntaxException("world teleport [world] [player]", sender, List.of());
+        player.teleportAsync(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
+        var placeholder = Placeholder.parsed("world", world.getName());
+        if (!player.equals(sender)) plugin.bundle().sendMessage(sender, "world.teleport.player.other", placeholder);
+        plugin.bundle().sendMessage(player, "world.teleport.player.self", placeholder);
     }
 }

@@ -1,32 +1,37 @@
 package net.thenextlvl.worlds.command;
 
-import cloud.commandframework.arguments.StandardCommandSyntaxFormatter;
 import core.annotation.MethodsReturnNotNullByDefault;
 import core.annotation.ParametersAreNotNullByDefault;
+import org.incendo.cloud.CommandManager;
+import org.incendo.cloud.syntax.StandardCommandSyntaxFormatter;
 
 @MethodsReturnNotNullByDefault
 @ParametersAreNotNullByDefault
 public class CustomSyntaxFormatter<C> extends StandardCommandSyntaxFormatter<C> {
+    public CustomSyntaxFormatter(CommandManager<C> manager) {
+        super(manager);
+    }
+
     @Override
     protected FormattingInstance createInstance() {
         return new FormattingInstance() {
             @Override
-            public String getOptionalPrefix() {
+            public String optionalPrefix() {
                 return "(";
             }
 
             @Override
-            public String getOptionalSuffix() {
+            public String optionalSuffix() {
                 return ")";
             }
 
             @Override
-            public String getRequiredPrefix() {
+            public String requiredPrefix() {
                 return "[";
             }
 
             @Override
-            public String getRequiredSuffix() {
+            public String requiredSuffix() {
                 return "]";
             }
 

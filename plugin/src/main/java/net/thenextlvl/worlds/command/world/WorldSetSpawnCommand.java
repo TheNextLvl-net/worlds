@@ -1,56 +1,52 @@
 package net.thenextlvl.worlds.command.world;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.standard.FloatArgument;
-import cloud.commandframework.bukkit.parsers.location.LocationArgument;
-import cloud.commandframework.context.CommandContext;
+import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.incendo.cloud.Command;
+import org.incendo.cloud.bukkit.parser.location.LocationParser;
+import org.incendo.cloud.component.DefaultValue;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.parser.standard.FloatParser;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
+@RequiredArgsConstructor
 class WorldSetSpawnCommand {
-    private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
+    private final Worlds plugin;
+    private final Command.Builder<CommandSender> builder;
 
-    static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
+    Command.Builder<Player> create() {
         return builder.literal("setspawn")
                 .permission("worlds.command.world.setspawn")
                 .senderType(Player.class)
-                .argument(LocationArgument.optional("position"))
-                .argument(FloatArgument.optional("angle"))
-                .flag(CommandFlag.builder("first-join"))
-                .flag(CommandFlag.builder("on-join"))
-                .handler(WorldSetSpawnCommand::execute);
+                .optional("position", LocationParser.locationParser(),
+                        DefaultValue.dynamic(context -> context.sender().getLocation()))
+                .optional("angle", FloatParser.floatParser(-360, 360),
+                        DefaultValue.dynamic(context -> context.sender().getYaw()))
+                .handler(this::execute);
     }
 
-    private static void execute(CommandContext<CommandSender> context) {
-        var player = (Player) context.getSender();
-        var location = context.contains("position") ? context.<Location>get("position") : player.getLocation();
-        var angle = context.contains("angle") ? context.<Float>get("angle") : player.getLocation().getYaw();
-        player.getWorld().setSpawnLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ(), angle);
-        var firstJoinWorld = context.flags().contains("first-join");
-        var joinWorld = context.flags().contains("on-join");
-        assert plugin.configFile() != null;
-        if (firstJoinWorld) plugin.configFile().getRoot().setFirstJoinLocation(location);
-        if (joinWorld) plugin.configFile().getRoot().setJoinLocation(location);
-        if (firstJoinWorld || joinWorld) plugin.configFile().save();
-        setSpawn(player, location, angle);
-        var message = joinWorld ? "world.spawn.set.join"
-                : firstJoinWorld ? "world.spawn.set.first"
-                : "world.spawn.set";
-        plugin.bundle().sendMessage(player, message,
+    private void execute(CommandContext<Player> context) {
+        var location = context.<Location>get("position");
+        float angle = context.<Float>get("angle");
+
+        var success = context.sender().getWorld().setSpawnLocation(
+                location.getBlockX(),
+                location.getBlockY(),
+                location.getBlockZ(),
+                angle
+        );
+        if (success) context.sender().teleportAsync(context.sender().getWorld().getSpawnLocation(), COMMAND);
+
+        var message = success ? "world.spawn.set.success" : "world.spawn.set.failed";
+        plugin.bundle().sendMessage(context.sender(), message,
                 Placeholder.parsed("x", String.valueOf(location.getBlockX())),
                 Placeholder.parsed("y", String.valueOf(location.getBlockY())),
                 Placeholder.parsed("z", String.valueOf(location.getBlockZ())),
                 Placeholder.parsed("angle", String.valueOf(angle)));
-    }
-
-    private static void setSpawn(Player player, Location location, float angle) {
-        player.teleportAsync(player.getWorld().getSpawnLocation().add(0.5, 0, 0.5), COMMAND);
     }
 }

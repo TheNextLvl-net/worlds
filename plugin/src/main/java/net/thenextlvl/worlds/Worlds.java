@@ -87,14 +87,9 @@ public class Worlds extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new WorldListener(this), this);
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
     private void registerCommands() {
-        try {
-            LinkCommand.register(this);
-            WorldCommand.register();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // LinkCommand.register(this);
+        new WorldCommand(this).register();
     }
 
     private void saveDefaultPresets() {

@@ -1,12 +1,9 @@
 package net.thenextlvl.worlds.command.world;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.standard.BooleanArgument;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.context.CommandContext;
 import com.google.gson.JsonParseException;
 import core.io.IO;
+import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
 import net.thenextlvl.worlds.image.DeletionType;
@@ -17,13 +14,22 @@ import net.thenextlvl.worlds.preset.Preset;
 import net.thenextlvl.worlds.preset.PresetFile;
 import net.thenextlvl.worlds.preset.Presets;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.generator.WorldInfo;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.incendo.cloud.Command;
+import org.incendo.cloud.component.TypedCommandComponent;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.minecraft.extras.RichDescription;
+import org.incendo.cloud.parser.flag.CommandFlag;
+import org.incendo.cloud.parser.standard.StringParser;
+import org.incendo.cloud.suggestion.Suggestion;
+import org.incendo.cloud.suggestion.SuggestionProvider;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,92 +39,108 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static org.bukkit.World.Environment.CUSTOM;
-import static org.bukkit.World.Environment.NORMAL;
-import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
-
+@RequiredArgsConstructor
 class WorldCreateCommand {
-    private static final Worlds plugin = JavaPlugin.getPlugin(Worlds.class);
+    private final Worlds plugin;
+    private final Command.Builder<CommandSender> builder;
 
-    static Command.Builder<CommandSender> create(Command.Builder<CommandSender> builder) {
+    Command.Builder<CommandSender> create() {
         return builder.literal("create")
                 .permission("worlds.command.world.create")
-                .argument(StringArgument.<CommandSender>builder("name").withSuggestionsProvider((context, token) ->
-                        Image.findWorlds().stream()
-                                .map(File::getName)
-                                .filter(s -> s.startsWith(token))
-                                .filter(s -> Bukkit.getWorld(s) == null)
-                                .toList()))
+                .required("name", StringParser.stringParser(),
+                        SuggestionProvider.blocking((context, input) ->
+                                Image.findWorlds().stream()
+                                        .map(File::getName)
+                                        .filter(s -> Bukkit.getWorld(s) == null)
+                                        .map(Suggestion::simple)
+                                        .toList()))
                 .flag(CommandFlag.builder("type").withAliases("t")
-                        .withArgument(StringArgument.builder("type").withSuggestionsProvider((context, token) ->
-                                Arrays.stream(WorldType.values())
-                                        .map(type -> type.name().toLowerCase().replace("_", "-"))
-                                        .filter(s -> s.startsWith(token))
-                                        .toList())))
+                        .withDescription(RichDescription.of(Component.text("The world type")))
+                        .withComponent(TypedCommandComponent.ofType(String.class, "type")
+                                .parser(StringParser.stringParser())
+                                .suggestionProvider(SuggestionProvider.blocking((context, input) ->
+                                        Arrays.stream(WorldType.values())
+                                                .map(type -> type.name().toLowerCase().replace("_", "-"))
+                                                .map(Suggestion::simple)
+                                                .toList()))))
                 .flag(CommandFlag.builder("environment").withAliases("e")
-                        .withArgument(StringArgument.builder("environment").withSuggestionsProvider((context, token) ->
-                                Arrays.stream(Environment.values())
-                                        .filter(environment -> !environment.equals(CUSTOM))
-                                        .map(type -> type.name().toLowerCase().replace("_", "-"))
-                                        .filter(s -> s.startsWith(token))
-                                        .toList())))
+                        .withDescription(RichDescription.of(Component.text("The environment")))
+                        .withComponent(TypedCommandComponent.ofType(String.class, "environment")
+                                .suggestionProvider(SuggestionProvider.blocking((context, input) ->
+                                        Arrays.stream(Environment.values())
+                                                .filter(environment -> !environment.equals(Environment.CUSTOM))
+                                                .map(type -> type.name().toLowerCase().replace("_", "-"))
+                                                .map(Suggestion::simple)
+                                                .toList()))))
                 .flag(CommandFlag.builder("generator").withAliases("g")
-                        .withArgument(StringArgument.builder("generator").withSuggestionsProvider((context, token) ->
-                                Arrays.stream(Bukkit.getPluginManager().getPlugins())
-                                        .filter(plugin -> Generator.hasChunkGenerator(plugin.getClass())
-                                                || Generator.hasBiomeProvider(plugin.getClass()))
-                                        .map(Plugin::getName)
-                                        .filter(s -> s.startsWith(token))
-                                        .toList())))
+                        .withDescription(RichDescription.of(Component.text("The generator plugin")))
+                        .withComponent(TypedCommandComponent.ofType(String.class, "generator").suggestionProvider(
+                                SuggestionProvider.blocking((context, input) ->
+                                        Arrays.stream(Bukkit.getPluginManager().getPlugins())
+                                                .filter(plugin -> Generator.hasChunkGenerator(plugin.getClass())
+                                                                  || Generator.hasBiomeProvider(plugin.getClass()))
+                                                .map(Plugin::getName)
+                                                .map(Suggestion::simple)
+                                                .toList()))))
                 .flag(CommandFlag.builder("base").withAliases("b")
-                        .withArgument(StringArgument.builder("world").withSuggestionsProvider((context, token) ->
-                                Bukkit.getWorlds().stream()
+                        .withDescription(RichDescription.of(Component.text("The world to clone")))
+                        .withComponent(TypedCommandComponent.ofType(World.class, "world").suggestionProvider(
+                                SuggestionProvider.blocking((context, input) -> Bukkit.getWorlds().stream()
                                         .map(WorldInfo::getName)
-                                        .filter(s -> s.startsWith(token))
-                                        .toList())))
+                                        .map(Suggestion::simple)
+                                        .toList()))))
                 .flag(CommandFlag.builder("preset")
-                        .withArgument(StringArgument.builder("preset").withSuggestionsProvider((context, token) ->
-                                PresetFile.findPresets(plugin.presetsFolder()).stream()
-                                        .map(file -> file.getName().substring(0, file.getName().length() - 5))
-                                        .filter(s -> s.startsWith(token) && !s.contains(" "))
-                                        .toList())))
-                .flag(CommandFlag.builder("identifier").withAliases("i")
-                        .withArgument(StringArgument.builder("identifier").quoted()))
+                        .withDescription(RichDescription.of(Component.text("The preset to use")))
+                        .withComponent(TypedCommandComponent.ofType(String.class, "preset")
+                                .suggestionProvider(SuggestionProvider.blocking((context, input) ->
+                                        PresetFile.findPresets(plugin.presetsFolder()).stream()
+                                                .map(file -> file.getName().substring(0, file.getName().length() - 5))
+                                                .map(name -> name.contains(" ") ? "\"" + name + "\"" : name)
+                                                .map(Suggestion::simple)
+                                                .toList()))))
                 .flag(CommandFlag.builder("deletion").withAliases("d")
-                        .withArgument(StringArgument.builder("deletion").withSuggestionsProvider((context, token) ->
-                                Arrays.stream(DeletionType.values())
-                                        .map(type -> type.name().toLowerCase().replace("_", "-"))
-                                        .filter(s -> s.startsWith(token))
-                                        .toList())))
+                        .withDescription(RichDescription.of(Component.text("What to do with the world on shutdown")))
+                        .withComponent(TypedCommandComponent.ofType(String.class, "deletion")
+                                .suggestionProvider(SuggestionProvider.blocking((context, input) ->
+                                        Arrays.stream(DeletionType.values())
+                                                .map(type -> type.name().toLowerCase().replace("_", "-"))
+                                                .map(Suggestion::simple)
+                                                .toList()))))
+                .flag(CommandFlag.builder("identifier").withAliases("i")
+                        .withDescription(RichDescription.of(Component.text("The identifier of the world generator")))
+                        .withComponent(TypedCommandComponent.ofType(String.class, "identifier")))
                 .flag(CommandFlag.builder("seed").withAliases("s")
-                        .withArgument(StringArgument.builder("seed")))
+                        .withDescription(RichDescription.of(Component.text("The seed")))
+                        .withComponent(TypedCommandComponent.ofType(String.class, "seed")))
                 .flag(CommandFlag.builder("auto-save")
-                        .withArgument(BooleanArgument.of("auto-save")))
+                        .withDescription(RichDescription.of(Component.text("Whether the world should auto-save")))
+                        .withComponent(TypedCommandComponent.ofType(boolean.class, "auto-save")))
                 .flag(CommandFlag.builder("structures")
-                        .withArgument(BooleanArgument.of("structures")))
-                .flag(CommandFlag.builder("hardcore"))
-                .flag(CommandFlag.builder("load-manual"))
-                .handler(WorldCreateCommand::execute);
+                        .withDescription(RichDescription.of(Component.text("Whether structures should generate")))
+                        .withComponent(TypedCommandComponent.ofType(boolean.class, "structures")))
+                .flag(CommandFlag.builder("hardcore")
+                        .withDescription(RichDescription.of(Component.text("Whether hardcore is enabled"))))
+                .flag(CommandFlag.builder("load-manual")
+                        .withDescription(RichDescription.of(Component.text("Whether the world must be loaded manual on startup"))))
+                .handler(this::execute);
     }
 
-    private static void execute(CommandContext<CommandSender> context) {
-        var sender = context.getSender();
+    private void execute(CommandContext<CommandSender> context) {
         try {
             handleCreate(context);
         } catch (JsonParseException e) {
-            plugin.bundle().sendMessage(sender, "world.preset.invalid");
+            plugin.bundle().sendMessage(context.sender(), "world.preset.invalid");
         } catch (Exception e) {
-            plugin.bundle().sendMessage(sender, "command.argument");
+            plugin.bundle().sendMessage(context.sender(), "command.argument");
         }
     }
 
-    private static void handleCreate(CommandContext<CommandSender> context) {
-        var sender = context.getSender();
+    private void handleCreate(CommandContext<CommandSender> context) {
         var name = context.<String>get("name");
         var placeholder = Placeholder.parsed("world", name);
 
         if (Bukkit.getWorld(name) != null) {
-            plugin.bundle().sendMessage(sender, "world.exists", placeholder);
+            plugin.bundle().sendMessage(context.sender(), "world.known", placeholder);
             return;
         }
 
@@ -126,7 +148,7 @@ class WorldCreateCommand {
                 .map(Bukkit::getWorld).orElse(null);
         var environment = context.flags().<String>getValue("environment").map(s ->
                         Environment.valueOf(s.toUpperCase().replace("-", "_")))
-                .orElse(base != null ? base.getEnvironment() : NORMAL);
+                .orElse(base != null ? base.getEnvironment() : Environment.NORMAL);
         var type = context.flags().<String>getValue("type").map(s ->
                         WorldType.valueOf(s.toUpperCase().replace("-", "_")))
                 .orElse(context.flags().contains("preset") ? WorldType.FLAT : WorldType.NORMAL);
@@ -152,16 +174,16 @@ class WorldCreateCommand {
         var preset = context.flags().<String>get("preset");
 
         if (preset != null && generator != null) {
-            WorldCreateCommand.plugin.bundle().sendMessage(sender, "command.flag.combination",
+            this.plugin.bundle().sendMessage(context.sender(), "command.flag.combination",
                     Placeholder.parsed("flag-1", "generator"),
                     Placeholder.parsed("flag-2", "preset"));
             return;
         } else if (preset != null && !type.equals(WorldType.FLAT)) {
-            WorldCreateCommand.plugin.bundle().sendMessage(sender, "world.preset.flat");
+            this.plugin.bundle().sendMessage(context.sender(), "world.preset.flat");
             return;
         } else if (preset != null) {
             final var fileName = preset + ".json";
-            var match = PresetFile.of(IO.of(WorldCreateCommand.plugin.presetsFolder(), fileName));
+            var match = PresetFile.of(IO.of(this.plugin.presetsFolder(), fileName));
             if (match != null) preset = match.settings().toString();
         } else if (type.equals(WorldType.FLAT)) {
             preset = Preset.serialize(Presets.CLASSIC_FLAT).toString();
@@ -170,15 +192,15 @@ class WorldCreateCommand {
         if (base != null) {
             var world = Placeholder.parsed("world", base.getName());
             if (copy(base.getWorldFolder(), new File(Bukkit.getWorldContainer(), name)))
-                WorldCreateCommand.plugin.bundle().sendMessage(sender, "world.copy.success", world);
-            else WorldCreateCommand.plugin.bundle().sendMessage(sender, "world.copy.failed", world);
+                this.plugin.bundle().sendMessage(context.sender(), "world.copy.success", world);
+            else this.plugin.bundle().sendMessage(context.sender(), "world.copy.failed", world);
         }
         var image = Image.load(new WorldImage(name, preset, generator, deletion,
                 environment, type, autoSave, structures, hardcore, !loadManual, seed));
         var message = image != null ? "world.create.success" : "world.create.failed";
-        WorldCreateCommand.plugin.bundle().sendMessage(sender, message, placeholder);
-        if (image == null || !(sender instanceof Entity entity)) return;
-        entity.teleportAsync(image.getWorld().getSpawnLocation().add(0.5, 0, 0.5), COMMAND);
+        this.plugin.bundle().sendMessage(context.sender(), message, placeholder);
+        if (image == null || !(context.sender() instanceof Entity entity)) return;
+        entity.teleportAsync(image.getWorld().getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
     }
 
     private static boolean copy(File source, File destination) {
