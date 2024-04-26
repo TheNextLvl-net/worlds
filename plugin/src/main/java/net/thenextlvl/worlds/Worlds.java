@@ -1,36 +1,25 @@
 package net.thenextlvl.worlds;
 
-import com.google.gson.GsonBuilder;
 import core.annotation.FieldsAreNotNullByDefault;
 import core.annotation.ParametersAreNotNullByDefault;
-import core.file.FileIO;
-import core.file.format.GsonFile;
 import core.i18n.file.ComponentBundle;
 import core.io.IO;
-import core.paper.adapters.world.LocationAdapter;
-import core.paper.adapters.world.WorldAdapter;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.thenextlvl.worlds.command.link.LinkCommand;
 import net.thenextlvl.worlds.command.world.WorldCommand;
-import net.thenextlvl.worlds.config.Config;
 import net.thenextlvl.worlds.image.Image;
 import net.thenextlvl.worlds.image.WorldImage;
 import net.thenextlvl.worlds.link.LinkFile;
-import net.thenextlvl.worlds.listener.ConnectionListener;
 import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.preset.Presets;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Locale;
@@ -50,7 +39,6 @@ public class Worlds extends JavaPlugin {
             .register("worlds", Locale.US)
             .register("worlds_german", Locale.GERMANY)
             .fallback(Locale.US);
-    private @Nullable FileIO<Config> configFile;
 
     @Override
     public void onLoad() {
@@ -68,7 +56,6 @@ public class Worlds extends JavaPlugin {
                 .forEach(Image::load);
         registerListeners();
         registerCommands();
-        initConfig();
     }
 
     @Override
@@ -96,20 +83,7 @@ public class Worlds extends JavaPlugin {
         linkFile().save();
     }
 
-    private void initConfig() {
-        configFile = new GsonFile<>(
-                IO.of(getDataFolder(), "config.json"), new Config(),
-                new GsonBuilder()
-                        .registerTypeHierarchyAdapter(Location.class, LocationAdapter.Simple.INSTANCE)
-                        .registerTypeHierarchyAdapter(World.class, WorldAdapter.Key.INSTANCE)
-                        .setPrettyPrinting()
-                        .serializeNulls()
-                        .create()
-        ).validate().save();
-    }
-
     private void registerListeners() {
-        Bukkit.getPluginManager().registerEvents(new ConnectionListener(this), this);
         Bukkit.getPluginManager().registerEvents(new WorldListener(this), this);
     }
 
