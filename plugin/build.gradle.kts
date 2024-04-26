@@ -63,21 +63,21 @@ paper {
     permissions {
         register("worlds.commands.world") {
             this.children = listOf(
-                    "worlds.command.world.create",
-                    "worlds.command.world.delete",
-                    "worlds.command.world.export",
-                    "worlds.command.world.import",
-                    "worlds.command.world.info",
-                    "worlds.command.world.list",
-                    "worlds.command.world.setspawn",
-                    "worlds.command.world.teleport"
+                "worlds.command.world.create",
+                "worlds.command.world.delete",
+                "worlds.command.world.export",
+                "worlds.command.world.import",
+                "worlds.command.world.info",
+                "worlds.command.world.list",
+                "worlds.command.world.setspawn",
+                "worlds.command.world.teleport"
             )
         }
         register("worlds.commands.link") {
             this.children = listOf(
-                    "worlds.command.link.create",
-                    "worlds.command.link.delete",
-                    "worlds.command.link.list"
+                "worlds.command.link.create",
+                "worlds.command.link.delete",
+                "worlds.command.link.list"
             )
         }
     }
@@ -98,8 +98,8 @@ hangarPublish { // docs - https://docs.papermc.io/misc/hangar-publishing
             register(Platforms.PAPER) {
                 jar.set(tasks.shadowJar.flatMap { it.archiveFile })
                 val versions: List<String> = (property("paperVersion") as String)
-                        .split(",")
-                        .map { it.trim() }
+                    .split(",")
+                    .map { it.trim() }
                 platformVersions.set(versions)
             }
         }
