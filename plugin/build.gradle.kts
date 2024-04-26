@@ -26,12 +26,11 @@ repositories {
 
 dependencies {
     compileOnly("com.mojang:brigadier:1.0.18")
-    compileOnly("org.projectlombok:lombok:1.18.30")
+    compileOnly("org.projectlombok:lombok:1.18.32")
     compileOnly("net.thenextlvl.core:annotations:2.0.1")
     compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
 
-    implementation("cloud.commandframework:cloud-paper:1.8.4")
-    implementation("cloud.commandframework:cloud-minecraft-extras:1.8.4")
+    implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation("org.incendo:cloud-paper:2.0.0-beta.4")
     implementation("org.incendo:cloud-processors-confirmation:1.0.0-beta.1")
     implementation("org.incendo:cloud-minecraft-extras:2.0.0-beta.4")
@@ -42,9 +41,8 @@ dependencies {
     implementation("net.thenextlvl.core:i18n:1.0.13")
     implementation("net.thenextlvl.core:paper:1.2.3")
     implementation("net.thenextlvl.core:adapters:1.0.6")
-    implementation("org.bstats:bstats-bukkit:3.0.2")
 
-    annotationProcessor("org.projectlombok:lombok:1.18.30")
+    annotationProcessor("org.projectlombok:lombok:1.18.32")
 }
 
 
