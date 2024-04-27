@@ -130,6 +130,21 @@ class WorldCreateCommand {
             return;
         }
 
+        var recoveredSeed = OptionalLong.empty();
+        var recoveredStructures = Optional.<Boolean>empty();
+        var recoveredHardcore = Optional.<Boolean>empty();
+
+        var worldFolder = new File(Bukkit.getWorldContainer(), name);
+        var dataFile = IO.of(worldFolder, "level.dat");
+        if (dataFile.exists()) {
+            var file = new NBTFile<>(dataFile, new CompoundTag());
+            var data = file.getRoot().getAsCompound("Data");
+            var worldGenSettings = data.getAsCompound("WorldGenSettings");
+            recoveredSeed = OptionalLong.of(worldGenSettings.get("seed").getAsLong());
+            recoveredStructures = Optional.of(worldGenSettings.get("generate_features").getAsBoolean());
+            recoveredHardcore = Optional.of(data.get("hardcore").getAsBoolean());
+        }
+
         var base = context.flags().<World>getValue("base");
         var key = context.flags().<NamespacedKey>getValue("key").orElse(new NamespacedKey("worlds", name));
         var environment = context.flags().<Environment>getValue("environment").orElse(Environment.NORMAL);
