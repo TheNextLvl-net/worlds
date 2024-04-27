@@ -25,7 +25,6 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.mojang:brigadier:1.0.18")
     compileOnly("org.projectlombok:lombok:1.18.32")
     compileOnly("net.thenextlvl.core:annotations:2.0.1")
     compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
@@ -37,10 +36,10 @@ dependencies {
 
     implementation(project(":api"))
     implementation("net.thenextlvl.core:nbt:1.3.9")
-    implementation("net.thenextlvl.core:files:1.0.3")
-    implementation("net.thenextlvl.core:i18n:1.0.13")
-    implementation("net.thenextlvl.core:paper:1.2.3")
-    implementation("net.thenextlvl.core:adapters:1.0.6")
+    implementation("net.thenextlvl.core:files:1.0.4")
+    implementation("net.thenextlvl.core:i18n:1.0.15")
+    implementation("net.thenextlvl.core:paper:1.2.6")
+    implementation("net.thenextlvl.core:adapters:1.0.9")
 
     annotationProcessor("org.projectlombok:lombok:1.18.32")
 }
