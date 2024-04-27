@@ -35,7 +35,7 @@ dependencies {
     implementation("org.incendo:cloud-minecraft-extras:2.0.0-beta.4")
 
     implementation(project(":api"))
-    implementation("net.thenextlvl.core:nbt:1.3.9")
+    implementation("net.thenextlvl.core:nbt:1.3.10")
     implementation("net.thenextlvl.core:files:1.0.4")
     implementation("net.thenextlvl.core:i18n:1.0.15")
     implementation("net.thenextlvl.core:paper:1.2.6")
