@@ -1,19 +1,16 @@
 package net.thenextlvl.worlds.link;
 
 import com.google.gson.annotations.SerializedName;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.bukkit.PortalType;
+import org.bukkit.World;
 
 public record Link(
-        @SerializedName("portal")
-        @NotNull PortalType portalType,
-        @SerializedName("source")
-        @Nullable String first,
-        @SerializedName("destination")
-        @Nullable String second
+        @SerializedName("portal") PortalType portalType,
+        @SerializedName("source") World source,
+        @SerializedName("destination") World destination
 ) {
     @Override
     public String toString() {
-        return portalType() + ": " + first() + " -> " + second();
+        return portalType.name().toLowerCase() + ": " + source.getName() + " -> " + destination.getName();
     }
 }
