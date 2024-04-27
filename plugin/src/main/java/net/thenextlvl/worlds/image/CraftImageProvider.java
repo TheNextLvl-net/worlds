@@ -42,14 +42,6 @@ public class CraftImageProvider implements ImageProvider {
     }
 
     @Override
-    public Image getOrCreate(World world) {
-        if (images.containsKey(world.getUID())) images.get(world.getUID());
-        var saved = new CraftImage(plugin, world).save();
-        register(saved);
-        return saved;
-    }
-
-    @Override
     public Image getOrDefault(World world) {
         return images.getOrDefault(world.getUID(), new CraftImage(plugin, world));
     }
