@@ -32,7 +32,7 @@ public class CraftWorldImage implements WorldImage {
 
     @Override
     public @Nullable World build() {
-        var creator = new WorldCreator(name, key)
+        var creator = new WorldCreator(name(), key())
                 .generator(resolveChunkGenerator())
                 .biomeProvider(resolveBiomeProvider())
                 .generateStructures(generateStructures())
