@@ -1,6 +1,9 @@
 package net.thenextlvl.worlds.image;
 
 import com.google.gson.JsonObject;
+import core.io.IO;
+import core.nbt.file.NBTFile;
+import core.nbt.tag.CompoundTag;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +13,8 @@ import org.bukkit.*;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
 
 @Getter
 @Setter
@@ -32,6 +37,11 @@ public class CraftWorldImage implements WorldImage {
 
     @Override
     public @Nullable World build() {
+        try {
+            preValidate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         var creator = new WorldCreator(name(), key())
                 .generator(resolveChunkGenerator())
                 .biomeProvider(resolveBiomeProvider())
@@ -43,15 +53,20 @@ public class CraftWorldImage implements WorldImage {
                 .seed(seed());
         var world = creator.createWorld();
         if (world != null) world.setAutoSave(autoSave());
-        return revalidate(world);
+        return world;
     }
 
-    public @Nullable World revalidate(@Nullable World world) {
-        if (world == null) return null;
-        this.generateStructures = world.canGenerateStructures();
-        this.hardcore = world.isHardcore();
-        this.seed = world.getSeed();
-        return world;
+    private void preValidate() {
+        var worldFolder = new File(Bukkit.getWorldContainer(), name());
+        var dataFile = IO.of(worldFolder, "level.dat");
+        if (!dataFile.exists()) return;
+        var file = new NBTFile<>(dataFile, new CompoundTag());
+        var data = file.getRoot().getAsCompound("Data");
+        var worldGenSettings = data.getAsCompound("WorldGenSettings");
+        worldGenSettings.add("seed", seed());
+        worldGenSettings.add("generate_features", generateStructures());
+        data.add("hardcore", hardcore());
+        file.save();
     }
 
     private @Nullable ChunkGenerator resolveChunkGenerator() {
