@@ -2,6 +2,8 @@ package net.thenextlvl.worlds.command;
 
 import com.google.gson.JsonObject;
 import core.io.IO;
+import core.nbt.file.NBTFile;
+import core.nbt.tag.CompoundTag;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -38,9 +40,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @RequiredArgsConstructor
@@ -60,13 +60,8 @@ class WorldCreateCommand {
                                         .toList()))
                 .flag(CommandFlag.builder("type").withAliases("t")
                         .withDescription(RichDescription.of(Component.text("The world type")))
-                        .withComponent(TypedCommandComponent.ofType(String.class, "type")
-                                .parser(StringParser.stringParser())
-                                .suggestionProvider(SuggestionProvider.blocking((context, input) ->
-                                        Arrays.stream(WorldType.values())
-                                                .map(type -> type.name().toLowerCase().replace("_", "-"))
-                                                .map(Suggestion::simple)
-                                                .toList()))))
+                        .withComponent(TypedCommandComponent.ofType(WorldType.class, "type")
+                                .parser(EnumParser.enumParser(WorldType.class))))
                 .flag(CommandFlag.builder("environment").withAliases("e")
                         .withDescription(RichDescription.of(Component.text("The environment")))
                         .withComponent(TypedCommandComponent.ofType(Environment.class, "environment")
@@ -74,7 +69,7 @@ class WorldCreateCommand {
                 .flag(CommandFlag.builder("generator").withAliases("g")
                         .withDescription(RichDescription.of(Component.text("The generator plugin")))
                         .withComponent(TypedCommandComponent.ofType(String.class, "generator")
-                                .parser(StringParser.stringParser())
+                                .parser(StringParser.greedyFlagYieldingStringParser())
                                 .suggestionProvider(SuggestionProvider.blocking((context, input) ->
                                         Arrays.stream(Bukkit.getPluginManager().getPlugins())
                                                 .filter(plugin -> Generator.hasChunkGenerator(plugin.getClass())
@@ -85,16 +80,11 @@ class WorldCreateCommand {
                 .flag(CommandFlag.builder("base").withAliases("b")
                         .withDescription(RichDescription.of(Component.text("The world to clone")))
                         .withComponent(TypedCommandComponent.ofType(World.class, "world")
-                                .parser(WorldParser.worldParser())
-                                .suggestionProvider(SuggestionProvider.blocking((context, input) ->
-                                        Bukkit.getWorlds().stream()
-                                                .map(WorldInfo::getName)
-                                                .map(Suggestion::simple)
-                                                .toList()))))
+                                .parser(WorldParser.worldParser())))
                 .flag(CommandFlag.builder("preset")
                         .withDescription(RichDescription.of(Component.text("The preset to use")))
                         .withComponent(TypedCommandComponent.ofType(String.class, "preset")
-                                .parser(StringParser.stringParser())
+                                .parser(StringParser.greedyFlagYieldingStringParser())
                                 .suggestionProvider(SuggestionProvider.blocking((context, input) ->
                                         PresetFile.findPresets(plugin.presetsFolder()).stream()
                                                 .map(file -> file.getName().substring(0, file.getName().length() - 5))
@@ -104,16 +94,11 @@ class WorldCreateCommand {
                 .flag(CommandFlag.builder("deletion").withAliases("d")
                         .withDescription(RichDescription.of(Component.text("What to do with the world on shutdown")))
                         .withComponent(TypedCommandComponent.ofType(DeletionType.class, "deletion")
-                                .parser(EnumParser.enumParser(DeletionType.class))
-                                .suggestionProvider(SuggestionProvider.blocking((context, input) ->
-                                        Arrays.stream(DeletionType.values())
-                                                .map(type -> type.name().toLowerCase().replace("_", "-"))
-                                                .map(Suggestion::simple)
-                                                .toList()))))
+                                .parser(EnumParser.enumParser(DeletionType.class))))
                 .flag(CommandFlag.builder("identifier").withAliases("i")
                         .withDescription(RichDescription.of(Component.text("The identifier of the world generator")))
                         .withComponent(TypedCommandComponent.ofType(String.class, "identifier")
-                                .parser(StringParser.stringParser())))
+                                .parser(StringParser.greedyFlagYieldingStringParser())))
                 .flag(CommandFlag.builder("key")
                         .withDescription(RichDescription.of(Component.text("The namespaced key")))
                         .withComponent(TypedCommandComponent.ofType(NamespacedKey.class, "key")
@@ -121,7 +106,7 @@ class WorldCreateCommand {
                 .flag(CommandFlag.builder("seed").withAliases("s")
                         .withDescription(RichDescription.of(Component.text("The seed")))
                         .withComponent(TypedCommandComponent.ofType(String.class, "seed")
-                                .parser(StringParser.stringParser())))
+                                .parser(StringParser.greedyFlagYieldingStringParser())))
                 .flag(CommandFlag.builder("auto-save")
                         .withDescription(RichDescription.of(Component.text("Whether the world should auto-save")))
                         .withComponent(TypedCommandComponent.ofType(boolean.class, "auto-save")
@@ -148,24 +133,28 @@ class WorldCreateCommand {
         var base = context.flags().<World>getValue("base");
         var key = context.flags().<NamespacedKey>getValue("key").orElse(new NamespacedKey("worlds", name));
         var environment = context.flags().<Environment>getValue("environment").orElse(Environment.NORMAL);
-        var type = context.flags().<WorldType>getValue("type").orElse(WorldType.NORMAL);
+        var type = context.flags().<WorldType>getValue("type")
+                .orElse(context.flags().contains("preset") ? WorldType.FLAT : WorldType.NORMAL);
         var identifier = context.flags().<String>getValue("identifier", null);
         var generator = context.flags().<String>getValue("generator")
                 .map(string -> new Generator(string, identifier)).orElse(null);
         var seed = context.flags().<String>getValue("seed").map(s -> {
-            try {
-                return Long.parseLong(s);
-            } catch (NumberFormatException e) {
-                return s.hashCode();
-            }
-        }).orElse(base.map(WorldInfo::getSeed).orElseGet(() -> ThreadLocalRandom.current().nextLong())).longValue();
+                    try {
+                        return Long.parseLong(s);
+                    } catch (NumberFormatException e) {
+                        return s.hashCode();
+                    }
+                }).orElse(recoveredSeed.orElse(base.map(WorldInfo::getSeed)
+                        .orElse(ThreadLocalRandom.current().nextLong())))
+                .longValue();
         var deletion = context.flags().<DeletionType>getValue("deletion", null);
         var loadManual = context.flags().contains("load-manual");
         var structures = context.flags().<Boolean>getValue("structures")
-                .orElse(base.map(World::canGenerateStructures).orElse(true));
+                .orElse(recoveredStructures.orElse(base.map(World::canGenerateStructures).orElse(true)));
         var autoSave = context.flags().<Boolean>getValue("auto-save")
                 .orElse(base.map(World::isAutoSave).orElse(true));
-        var hardcore = context.flags().contains("hardcore") || base.map(World::isHardcore).orElse(false);
+        var hardcore = context.flags().contains("hardcore") || recoveredHardcore
+                .orElse(base.map(World::isHardcore).orElse(false));
         var preset = context.flags().<String>getValue("preset", null);
         JsonObject settings = null;
 
