@@ -1,7 +1,10 @@
 package net.thenextlvl.worlds.image;
 
+import com.google.gson.GsonBuilder;
+import core.file.FileIO;
 import core.file.format.GsonFile;
 import core.io.IO;
+import core.paper.adapters.key.KeyAdapter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +23,7 @@ import java.util.Objects;
 @Accessors(fluent = true)
 public class WorldImage implements Cloneable {
     private String name;
+    private NamespacedKey key;
     private @Nullable String settings;
     private @Nullable Generator generator;
     private @Nullable DeletionType deletion;
@@ -32,7 +36,7 @@ public class WorldImage implements Cloneable {
     private long seed;
 
     public @Nullable World build() {
-        var creator = new WorldCreator(name, new NamespacedKey("worlds", name.toLowerCase().replace(" ", "_")))
+        var creator = new WorldCreator(name, key)
                 .generator(resolveChunkGenerator())
                 .biomeProvider(resolveBiomeProvider())
                 .generateStructures(generateStructures())
@@ -72,6 +76,7 @@ public class WorldImage implements Cloneable {
     public static WorldImage of(World world) {
         return new WorldImage(
                 world.getName(),
+                world.getKey(),
                 null, null, null,
                 world.getEnvironment(),
                 Objects.requireNonNullElse(world.getWorldType(), WorldType.NORMAL),
