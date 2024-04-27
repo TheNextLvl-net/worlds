@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.command.world;
+package net.thenextlvl.worlds.command;
 
 import core.io.IO;
 import lombok.RequiredArgsConstructor;

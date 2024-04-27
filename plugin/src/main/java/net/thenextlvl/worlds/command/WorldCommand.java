@@ -1,9 +1,8 @@
-package net.thenextlvl.worlds.command.world;
+package net.thenextlvl.worlds.command;
 
 import com.google.gson.JsonParseException;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
-import net.thenextlvl.worlds.command.CustomSyntaxFormatter;
 import org.bukkit.command.CommandSender;
 import org.incendo.cloud.SenderMapper;
 import org.incendo.cloud.bukkit.parser.PlayerParser;

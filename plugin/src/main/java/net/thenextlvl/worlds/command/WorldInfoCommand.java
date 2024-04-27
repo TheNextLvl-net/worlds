@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.command.world;
+package net.thenextlvl.worlds.command;
 
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
