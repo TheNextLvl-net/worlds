@@ -1,5 +1,6 @@
 package net.thenextlvl.worlds.command.world;
 
+import com.google.gson.JsonParseException;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
 import net.thenextlvl.worlds.command.CustomSyntaxFormatter;
@@ -43,6 +44,8 @@ public class WorldCommand extends PaperCommandManager<CommandSender> {
                 .handler(WorldParser.WorldParseException.class, (formatter, context) ->
                         plugin.bundle().component(context.context().sender(), "world.unknown",
                                 Placeholder.parsed("world", context.exception().input())))
+                .handler(JsonParseException.class, (formatter, context) ->
+                        plugin.bundle().component(context.context().sender(), "world.preset.invalid"))
                 .defaultCommandExecutionHandler()
                 .registerTo(this);
         commandSyntaxFormatter(new CustomSyntaxFormatter<>(this));
@@ -58,6 +61,9 @@ public class WorldCommand extends PaperCommandManager<CommandSender> {
         command(new WorldExportCommand(plugin, world).create());
         command(new WorldImportCommand(plugin, world).create());
         command(new WorldInfoCommand(plugin, world).create());
+        command(new WorldLinkCommand.Create(plugin, world).create());
+        command(new WorldLinkCommand.Delete(plugin, world).create());
+        command(new WorldLinkCommand.List(plugin, world).create());
         command(new WorldListCommand(plugin, world).create());
         command(new WorldSetSpawnCommand(plugin, world).create());
         command(new WorldTeleportCommand(plugin, world).create());
