@@ -9,7 +9,7 @@ public record Structure(String provider, String structure) {
     }
 
     public static Structure bukkit(org.bukkit.generator.structure.Structure structure) {
-        return new Structure(structure.getKey().getNamespace(), structure.getKey().getKey());
+        return new Structure(structure.key().namespace(), structure.key().value());
     }
 
     public static Structure literal(String string) {

@@ -6,14 +6,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 import core.file.format.GsonFile;
 import core.io.IO;
+import core.paper.adapters.inventory.MaterialAdapter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.thenextlvl.worlds.preset.adapter.BiomeTypeAdapter;
-import net.thenextlvl.worlds.preset.adapter.MaterialTypeAdapter;
 import net.thenextlvl.worlds.preset.adapter.StructureTypeAdapter;
 import org.bukkit.Material;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ import java.util.List;
 @Getter
 @Setter
 @Accessors(chain = true, fluent = true)
-public class Preset implements Cloneable {
+public class Preset {
     private Biome biome = Biome.minecraft("plains");
     private boolean lakes;
     private boolean features;
@@ -69,7 +68,7 @@ public class Preset implements Cloneable {
 
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Structure.class, new StructureTypeAdapter())
-            .registerTypeAdapter(Material.class, new MaterialTypeAdapter())
+            .registerTypeAdapter(Material.class, MaterialAdapter.NotNull.INSTANCE)
             .registerTypeAdapter(Biome.class, new BiomeTypeAdapter())
             .setPrettyPrinting()
             .create();
@@ -88,18 +87,9 @@ public class Preset implements Cloneable {
      * Deserialize a json object into a preset
      *
      * @param object the object to deserialize
-     * @return the deserialized preset or null if the object is not a preset
+     * @return the deserialized preset
      */
-    public static @Nullable Preset deserialize(JsonObject object) {
+    public static Preset deserialize(JsonObject object) {
         return gson.fromJson(object, Preset.class);
-    }
-
-    @Override
-    public Preset clone() {
-        try {
-            return (Preset) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
     }
 }

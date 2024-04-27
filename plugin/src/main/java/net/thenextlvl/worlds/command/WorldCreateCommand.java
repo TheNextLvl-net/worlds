@@ -1,5 +1,6 @@
 package net.thenextlvl.worlds.command;
 
+import com.google.gson.JsonObject;
 import core.io.IO;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
@@ -7,8 +8,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
 import net.thenextlvl.worlds.image.DeletionType;
 import net.thenextlvl.worlds.image.Generator;
-import net.thenextlvl.worlds.image.Image;
-import net.thenextlvl.worlds.image.WorldImage;
 import net.thenextlvl.worlds.preset.Preset;
 import net.thenextlvl.worlds.preset.PresetFile;
 import net.thenextlvl.worlds.preset.Presets;
@@ -54,7 +53,7 @@ class WorldCreateCommand {
                 .permission("worlds.command.world.create")
                 .required("name", StringParser.stringParser(),
                         SuggestionProvider.blocking((context, input) ->
-                                Image.findWorlds().stream()
+                                plugin.imageProvider().findWorldFiles().stream()
                                         .map(File::getName)
                                         .filter(s -> Bukkit.getWorld(s) == null)
                                         .map(Suggestion::simple)
@@ -168,6 +167,7 @@ class WorldCreateCommand {
                 .orElse(base.map(World::isAutoSave).orElse(true));
         var hardcore = context.flags().contains("hardcore") || base.map(World::isHardcore).orElse(false);
         var preset = context.flags().<String>getValue("preset", null);
+        JsonObject settings = null;
 
         if (preset != null && generator != null) {
             plugin.bundle().sendMessage(context.sender(), "command.flag.combination",
@@ -180,9 +180,9 @@ class WorldCreateCommand {
         } else if (preset != null) {
             final var fileName = preset + ".json";
             var match = PresetFile.of(IO.of(plugin.presetsFolder(), fileName));
-            if (match != null) preset = match.settings().toString();
+            if (match != null) settings = match.settings();
         } else if (type.equals(WorldType.FLAT)) {
-            preset = Preset.serialize(Presets.CLASSIC_FLAT).toString();
+            settings = Preset.serialize(Presets.CLASSIC_FLAT);
         }
 
         base.ifPresent(world -> {
@@ -191,8 +191,12 @@ class WorldCreateCommand {
                 plugin.bundle().sendMessage(context.sender(), "world.clone.success", placeholder);
             else plugin.bundle().sendMessage(context.sender(), "world.clone.failed", placeholder);
         });
-        var image = Image.load(new WorldImage(name, key, preset, generator, deletion,
-                environment, type, autoSave, structures, hardcore, !loadManual, seed));
+
+        var image = plugin.imageProvider().load(plugin.imageProvider().createWorldImage()
+                .name(name).key(key).settings(settings).generator(generator).deletionType(deletion)
+                .environment(environment).worldType(type).autoSave(autoSave).generateStructures(structures)
+                .hardcore(hardcore).loadOnStart(!loadManual).seed(seed));
+
         var message = image != null ? "world.create.success" : "world.create.failed";
         plugin.bundle().sendMessage(context.sender(), message, Placeholder.parsed("world", name));
         if (image == null || !(context.sender() instanceof Entity entity)) return;

@@ -1,111 +1,202 @@
 package net.thenextlvl.worlds.image;
 
-import com.google.gson.GsonBuilder;
-import core.file.FileIO;
-import core.file.format.GsonFile;
-import core.io.IO;
-import core.paper.adapters.key.KeyAdapter;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import org.bukkit.*;
-import org.bukkit.generator.BiomeProvider;
-import org.bukkit.generator.ChunkGenerator;
+import com.google.gson.JsonObject;
+import org.bukkit.NamespacedKey;
+import org.bukkit.World;
+import org.bukkit.WorldType;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.util.Objects;
+public interface WorldImage {
+    /**
+     * Retrieves the name of the WorldImage.
+     *
+     * @return The name of the WorldImage.
+     */
+    String name();
 
-@Setter
-@Getter
-@AllArgsConstructor
-@Accessors(fluent = true)
-public class WorldImage implements Cloneable {
-    private String name;
-    private NamespacedKey key;
-    private @Nullable String settings;
-    private @Nullable Generator generator;
-    private @Nullable DeletionType deletion;
-    private World.Environment environment;
-    private WorldType type;
-    private boolean autoSave;
-    private boolean generateStructures;
-    private boolean hardcore;
-    private boolean loadOnStart;
-    private long seed;
+    /**
+     * Sets the name of the WorldImage.
+     *
+     * @param name The new name for the WorldImage.
+     * @return The updated WorldImage instance.
+     */
+    WorldImage name(String name);
 
-    public @Nullable World build() {
-        var creator = new WorldCreator(name, key)
-                .generator(resolveChunkGenerator())
-                .biomeProvider(resolveBiomeProvider())
-                .generateStructures(generateStructures())
-                .generatorSettings(settings() != null ? settings() : "")
-                .environment(environment())
-                .hardcore(hardcore())
-                .type(type())
-                .seed(seed());
-        var world = creator.createWorld();
-        if (world != null) world.setAutoSave(autoSave());
-        return revalidate(world);
-    }
+    /**
+     * Retrieves the NamespacedKey associated with the WorldImage.
+     *
+     * @return The NamespacedKey associated with the WorldImage.
+     */
+    NamespacedKey key();
 
-    public @Nullable World revalidate(@Nullable World world) {
-        if (world == null) return null;
-        this.generateStructures = world.canGenerateStructures();
-        this.hardcore = world.isHardcore();
-        this.seed = world.getSeed();
-        return world;
-    }
+    /**
+     * Sets the NamespacedKey associated with the WorldImage.
+     *
+     * @param key The NamespacedKey to set.
+     * @return The updated WorldImage instance.
+     */
+    WorldImage key(NamespacedKey key);
 
-    private @Nullable ChunkGenerator resolveChunkGenerator() {
-        if (generator() == null) return null;
-        var plugin = Bukkit.getPluginManager().getPlugin(generator().plugin());
-        if (plugin == null || !plugin.isEnabled()) throw new IllegalArgumentException();
-        return plugin.getDefaultWorldGenerator(name(), generator().id());
-    }
+    /**
+     * Retrieves the settings associated with the WorldImage.
+     *
+     * @return The settings associated with the WorldImage, or null if no settings are specified.
+     */
+    @Nullable
+    JsonObject settings();
 
-    private @Nullable BiomeProvider resolveBiomeProvider() {
-        if (generator() == null) return null;
-        var plugin = Bukkit.getPluginManager().getPlugin(generator().plugin());
-        if (plugin == null || !plugin.isEnabled()) throw new IllegalArgumentException();
-        return plugin.getDefaultBiomeProvider(name(), generator().id());
-    }
+    /**
+     * Set the settings associated with the WorldImage.
+     *
+     * @param object The JsonObject representing the settings to set.
+     * @return The updated WorldImage instance.
+     */
+    WorldImage settings(@Nullable JsonObject object);
 
-    @SuppressWarnings("deprecation")
-    public static WorldImage of(World world) {
-        return new WorldImage(
-                world.getName(),
-                world.getKey(),
-                null, null, null,
-                world.getEnvironment(),
-                Objects.requireNonNullElse(world.getWorldType(), WorldType.NORMAL),
-                world.isAutoSave(),
-                world.canGenerateStructures(),
-                world.isHardcore(),
-                true,
-                world.getSeed()
-        );
-    }
+    /**
+     * Retrieves the Generator associated with the WorldImage.
+     *
+     * @return The Generator associated with the WorldImage, or null if no Generator is specified.
+     */
+    @Nullable
+    Generator generator();
 
-    public static @Nullable WorldImage of(File file) {
-        return file.isFile() ? loadFile(IO.of(file), null).getRoot() : null;
-    }
+    /**
+     * Sets the world generator for the WorldImage.
+     *
+     * @param generator The Generator to set as the world generator.
+     * @return The updated WorldImage instance.
+     */
+    WorldImage generator(@Nullable Generator generator);
 
-    public static FileIO<WorldImage> loadFile(IO file, @Nullable WorldImage root) {
-        var gson = new GsonBuilder()
-                .registerTypeHierarchyAdapter(NamespacedKey.class, KeyAdapter.Bukkit.INSTANCE)
-                .setPrettyPrinting()
-                .create();
-        return root != null ? new GsonFile<>(file, root, gson) : new GsonFile<>(file, WorldImage.class, gson);
-    }
+    /**
+     * Retrieves the DeletionType associated with the WorldImage.
+     *
+     * @return The DeletionType associated with the WorldImage, or null if no DeletionType is specified.
+     */
+    @Nullable
+    DeletionType deletionType();
 
-    @Override
-    public WorldImage clone() {
-        try {
-            return (WorldImage) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
-    }
+    /**
+     * Retrieves the DeletionType associated with the WorldImage.
+     *
+     * @param deletionType The DeletionType to associate with the WorldImage.
+     * @return The updated WorldImage instance.
+     */
+    WorldImage deletionType(@Nullable DeletionType deletionType);
+
+
+    /**
+     * Retrieves the environment of the WorldImage.
+     *
+     * @return The environment of the WorldImage.
+     */
+    World.Environment environment();
+
+    /**
+     * Retrieves the environment of the WorldImage.
+     *
+     * @param environment The environment to set for the WorldImage.
+     * @return The updated WorldImage instance.
+     */
+    WorldImage environment(World.Environment environment);
+
+    /**
+     * Retrieves the world type of the WorldImage.
+     *
+     * @return The world type of the WorldImage.
+     */
+    WorldType worldType();
+
+    /**
+     * Sets the world type of the WorldImage.
+     *
+     * @param worldType The world type to set for the WorldImage.
+     * @return The updated WorldImage instance.
+     */
+    WorldImage worldType(WorldType worldType);
+
+    /**
+     * Returns whether the WorldImage has auto save enabled or not.
+     *
+     * @return true if auto save is enabled, false otherwise.
+     */
+    boolean autoSave();
+
+    /**
+     * Enables or disables the auto save feature for the WorldImage.
+     *
+     * @param autoSave true to enable auto save, false to disable auto save.
+     * @return The updated WorldImage instance.
+     */
+    WorldImage autoSave(boolean autoSave);
+
+    /**
+     * Checks if structures are generated in the world.
+     *
+     * @return true if structures are generated, false otherwise.
+     */
+    boolean generateStructures();
+
+    /**
+     * Generates structures in the world based on the given flag.
+     *
+     * @param generateStructures Specifies whether structures should be generated in the world.
+     *                           Set to true to generate structures, false otherwise.
+     * @return The updated WorldImage instance.
+     */
+    WorldImage generateStructures(boolean generateStructures);
+
+    /**
+     * Checks if the WorldImage is set to hardcore mode.
+     *
+     * @return true if the WorldImage is set to hardcore mode, false otherwise.
+     */
+    boolean hardcore();
+
+    /**
+     * Sets the hardcore mode for the WorldImage.
+     *
+     * @param hardcore true to enable hardcore mode, false to disable hardcore mode.
+     * @return The updated WorldImage instance.
+     */
+    WorldImage hardcore(boolean hardcore);
+
+    /**
+     * Returns whether the WorldImage is set to load on start.
+     *
+     * @return true if the WorldImage is set to load on start, false otherwise.
+     */
+    boolean loadOnStart();
+
+    /**
+     * Sets whether the WorldImage should be loaded on start.
+     *
+     * @param loadOnStart true if the WorldImage should be loaded on start, false otherwise.
+     * @return The updated WorldImage instance.
+     */
+    WorldImage loadOnStart(boolean loadOnStart);
+
+    /**
+     * Retrieves the seed of the WorldImage.
+     *
+     * @return The seed of the WorldImage.
+     */
+    long seed();
+
+    /**
+     * Sets the seed of the WorldImage.
+     *
+     * @param seed The seed to set for the WorldImage.
+     * @return The updated WorldImage instance.
+     */
+    WorldImage seed(long seed);
+
+    /**
+     * Builds and returns a World object based on the configuration of the WorldImage.
+     *
+     * @return The built World object, or null if the build fails.
+     */
+    @Nullable
+    World build();
 }

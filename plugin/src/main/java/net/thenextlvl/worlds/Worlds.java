@@ -9,7 +9,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.thenextlvl.worlds.command.WorldCommand;
-import net.thenextlvl.worlds.image.Image;
+import net.thenextlvl.worlds.image.CraftImageProvider;
 import net.thenextlvl.worlds.image.WorldImage;
 import net.thenextlvl.worlds.link.CraftLinkRegistry;
 import net.thenextlvl.worlds.link.LinkRegistry;
@@ -31,6 +31,7 @@ import java.util.Objects;
 @FieldsAreNotNullByDefault
 @ParametersAreNotNullByDefault
 public class Worlds extends JavaPlugin {
+    private final CraftImageProvider imageProvider = new CraftImageProvider(this);
     private final CraftLinkRegistry linkRegistry = new CraftLinkRegistry(this);
 
     private final File presetsFolder = new File(getDataFolder(), "presets");
@@ -58,10 +59,10 @@ public class Worlds extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        Image.findImages().stream()
+        imageProvider().findImages().stream()
                 .filter(WorldImage::loadOnStart)
-                .forEach(Image::load);
-        linkRegistry.loadLinks();
+                .forEach(imageProvider()::load);
+        linkRegistry().loadLinks();
         registerListeners();
         registerCommands();
     }
@@ -69,20 +70,20 @@ public class Worlds extends JavaPlugin {
     @Override
     public void onDisable() {
         Bukkit.getWorlds().stream()
-                .map(Image::get)
+                .map(imageProvider()::get)
                 .filter(Objects::nonNull)
                 .forEach(image -> {
-                    var worldImage = image.getWorldImage();
-                    if (worldImage.deletion() != null) {
+                    var deletionType = image.getWorldImage().deletionType();
+                    if (deletionType != null) {
                         image.getWorld().getPlayers().forEach(player -> player.kick(Bukkit.shutdownMessage()));
-                        image.deleteImmediately(worldImage.deletion().keepImage(), false);
-                    } else if (!worldImage.autoSave()) {
+                        image.deleteNow(deletionType.keepImage(), false);
+                    } else if (!image.getWorldImage().autoSave()) {
                         image.getWorld().getPlayers().forEach(player -> player.kick(Bukkit.shutdownMessage()));
                         image.unload();
                     }
                 });
-        linkRegistry.saveLinks();
-        metrics.shutdown();
+        linkRegistry().saveLinks();
+        metrics().shutdown();
     }
 
     private void registerListeners() {

@@ -3,7 +3,6 @@ package net.thenextlvl.worlds.command;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
-import net.thenextlvl.worlds.image.Image;
 import net.thenextlvl.worlds.image.WorldImage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -24,7 +23,7 @@ class WorldImportCommand {
         return builder.literal("import")
                 .permission("worlds.command.world.import")
                 .required("image", StringParser.greedyStringParser(),
-                        SuggestionProvider.blocking((context, input) -> Image.findImages().stream()
+                        SuggestionProvider.blocking((context, input) -> plugin.imageProvider().findImages().stream()
                                 .map(WorldImage::name)
                                 .filter(name -> Bukkit.getWorld(name) == null)
                                 .map(Suggestion::simple)
@@ -34,13 +33,13 @@ class WorldImportCommand {
 
     private void execute(CommandContext<CommandSender> context) {
         var imageName = context.<String>get("image");
-        var image = Image.findImageFiles().stream()
+        var image = plugin.imageProvider().findImageFiles().stream()
                 .filter(file -> {
-                    var worldImage = WorldImage.of(file);
+                    var worldImage = plugin.imageProvider().of(file);
                     return worldImage != null && worldImage.name().equals(imageName);
                 })
                 .findFirst()
-                .map(WorldImage::of)
+                .map(plugin.imageProvider()::of)
                 .orElse(null);
 
         if (image == null) {
@@ -55,7 +54,7 @@ class WorldImportCommand {
             return;
         }
 
-        var result = Image.load(image);
+        var result = plugin.imageProvider().load(image);
         var message = result != null ? "world.import.success" : "world.import.failed";
         plugin.bundle().sendMessage(context.sender(), message, placeholder);
         if (result == null || !(context.sender() instanceof Player player)) return;

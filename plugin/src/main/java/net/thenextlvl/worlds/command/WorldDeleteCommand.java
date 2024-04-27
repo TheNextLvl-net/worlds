@@ -3,7 +3,6 @@ package net.thenextlvl.worlds.command;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
-import net.thenextlvl.worlds.image.Image;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.incendo.cloud.Command;
@@ -38,7 +37,7 @@ class WorldDeleteCommand {
         var keepImage = context.flags().contains("keep-image");
         var keepWorld = context.flags().contains("keep-world");
         var schedule = context.flags().contains("schedule");
-        var image = Image.getOrDefault(world);
+        var image = plugin.imageProvider().getOrDefault(world);
         var result = image.delete(keepImage, keepWorld, schedule);
         plugin.bundle().sendMessage(context.sender(), result.getMessage(),
                 Placeholder.parsed("world", world.getName()),

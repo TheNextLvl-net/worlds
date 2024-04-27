@@ -3,7 +3,6 @@ package net.thenextlvl.worlds.command;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
-import net.thenextlvl.worlds.image.Image;
 import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
@@ -32,7 +31,7 @@ class WorldInfoCommand {
     private void execute(CommandContext<CommandSender> context) {
         var world = context.<World>optional("world").orElse(context.sender() instanceof Player self ? self.getWorld() : null);
         if (world == null) throw new InvalidSyntaxException("world info [world]", context.sender(), List.of());
-        var volume = Image.getOrDefault(world);
+        var volume = plugin.imageProvider().getOrDefault(world);
         plugin.bundle().sendMessage(context.sender(), "world.info.name",
                 Placeholder.parsed("world", world.getName()));
         plugin.bundle().sendMessage(context.sender(), "world.info.players",

@@ -8,18 +8,13 @@ import org.jetbrains.annotations.Nullable;
 public record Generator(String plugin, @Nullable String id) {
 
     @Nullable
-    public static Generator of(World world) {
-        var plugin = getGeneratorPlugin(world);
-        return plugin != null ? new Generator(plugin.getName(), null) : null;
-    }
-
-    @Nullable
     @SuppressWarnings("UnstableApiUsage")
-    public static Plugin getGeneratorPlugin(World world) {
+    public static Generator of(World world) {
         if (world.getGenerator() == null) return null;
         var loader = world.getGenerator().getClass().getClassLoader();
         if (!(loader instanceof PluginClassLoader pluginLoader)) return null;
-        return pluginLoader.getPlugin();
+        if (pluginLoader.getPlugin() == null) return null;
+        return new Generator(pluginLoader.getPlugin().getName(), null);
     }
 
     public static boolean hasChunkGenerator(Class<? extends Plugin> clazz) {

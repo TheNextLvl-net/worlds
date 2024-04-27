@@ -9,7 +9,7 @@ public record Biome(String provider, String biome) {
     }
 
     public static Biome bukkit(org.bukkit.block.Biome biome) {
-        return new Biome(biome.getKey().getNamespace(), biome.getKey().getKey());
+        return new Biome(biome.key().namespace(), biome.key().value());
     }
 
     public static Biome literal(String string) {
