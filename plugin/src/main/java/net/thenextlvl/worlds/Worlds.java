@@ -3,7 +3,6 @@ package net.thenextlvl.worlds;
 import core.annotation.FieldsAreNotNullByDefault;
 import core.annotation.ParametersAreNotNullByDefault;
 import core.i18n.file.ComponentBundle;
-import core.io.IO;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -12,13 +11,15 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.thenextlvl.worlds.command.world.WorldCommand;
 import net.thenextlvl.worlds.image.Image;
 import net.thenextlvl.worlds.image.WorldImage;
-import net.thenextlvl.worlds.link.LinkFile;
+import net.thenextlvl.worlds.link.CraftLinkRegistry;
+import net.thenextlvl.worlds.link.LinkRegistry;
+import net.thenextlvl.worlds.listener.PortalListener;
 import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.preset.Presets;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -30,23 +31,29 @@ import java.util.Objects;
 @FieldsAreNotNullByDefault
 @ParametersAreNotNullByDefault
 public class Worlds extends JavaPlugin {
-    private final LinkFile linkFile = new LinkFile(IO.of(Bukkit.getWorldContainer(), ".links"));
+    private final CraftLinkRegistry linkRegistry = new CraftLinkRegistry(this);
+
     private final File presetsFolder = new File(getDataFolder(), "presets");
-    private final Metrics metrics = new Metrics(this, 19652);
     private final File translations = new File(getDataFolder(), "translations");
+
     private final ComponentBundle bundle = new ComponentBundle(translations, audience ->
             audience instanceof Player player ? player.locale() : Locale.US)
             .register("worlds", Locale.US)
             .register("worlds_german", Locale.GERMANY)
             .fallback(Locale.US);
 
+    private final Metrics metrics = new Metrics(this, 19652);
+
     @Override
     public void onLoad() {
-        saveDefaultPresets();
         bundle().miniMessage(MiniMessage.builder().tags(TagResolver.resolver(
                 TagResolver.standard(),
                 Placeholder.component("prefix", bundle().component(Locale.US, "prefix"))
         )).build());
+
+        Bukkit.getServicesManager().register(LinkRegistry.class, linkRegistry(), this, ServicePriority.Highest);
+
+        saveDefaultPresets();
     }
 
     @Override
@@ -54,6 +61,7 @@ public class Worlds extends JavaPlugin {
         Image.findImages().stream()
                 .filter(WorldImage::loadOnStart)
                 .forEach(Image::load);
+        linkRegistry.loadLinks();
         registerListeners();
         registerCommands();
     }
@@ -66,24 +74,19 @@ public class Worlds extends JavaPlugin {
                 .forEach(image -> {
                     var worldImage = image.getWorldImage();
                     if (worldImage.deletion() != null) {
-                        image.getWorld().getPlayers().forEach(player -> player.kick(
-                                Bukkit.shutdownMessage(),
-                                PlayerKickEvent.Cause.RESTART_COMMAND
-                        ));
+                        image.getWorld().getPlayers().forEach(player -> player.kick(Bukkit.shutdownMessage()));
                         image.deleteImmediately(worldImage.deletion().keepImage(), false);
                     } else if (!worldImage.autoSave()) {
-                        image.getWorld().getPlayers().forEach(player -> player.kick(
-                                Bukkit.shutdownMessage(),
-                                PlayerKickEvent.Cause.RESTART_COMMAND
-                        ));
+                        image.getWorld().getPlayers().forEach(player -> player.kick(Bukkit.shutdownMessage()));
                         image.unload();
                     }
                 });
+        linkRegistry.saveLinks();
         metrics.shutdown();
-        linkFile().save();
     }
 
     private void registerListeners() {
+        Bukkit.getPluginManager().registerEvents(new PortalListener(this), this);
         Bukkit.getPluginManager().registerEvents(new WorldListener(this), this);
     }
 
