@@ -84,7 +84,15 @@ public class WorldImage implements Cloneable {
     }
 
     public static @Nullable WorldImage of(File file) {
-        return file.isFile() ? new GsonFile<WorldImage>(IO.of(file), WorldImage.class).getRoot() : null;
+        return file.isFile() ? loadFile(IO.of(file), null).getRoot() : null;
+    }
+
+    public static FileIO<WorldImage> loadFile(IO file, @Nullable WorldImage root) {
+        var gson = new GsonBuilder()
+                .registerTypeHierarchyAdapter(NamespacedKey.class, KeyAdapter.Bukkit.INSTANCE)
+                .setPrettyPrinting()
+                .create();
+        return root != null ? new GsonFile<>(file, root, gson) : new GsonFile<>(file, WorldImage.class, gson);
     }
 
     @Override
