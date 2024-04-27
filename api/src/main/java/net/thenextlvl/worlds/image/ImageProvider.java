@@ -16,8 +16,6 @@ public interface ImageProvider {
 
     void register(Image image);
 
-    Image getOrCreate(World world);
-
     Image getOrDefault(World world);
 
     List<File> findImageFiles();
