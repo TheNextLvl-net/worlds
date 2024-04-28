@@ -30,13 +30,13 @@ bStat Metrics can be found [here](https://bstats.org/plugin/bukkit/TheNextLvl%20
 
 The perm-pack to grant all permissions: `worlds.commands.world`
 
-### /link
+### /world link
 
-| Argument | Description                       | Usage                                             | Permission                 |
-|----------|-----------------------------------|---------------------------------------------------|----------------------------|
-| create   | create a new world link           | /link create [source] [destination] [portal-type] | worlds.command.link.create |
-| delete   | delete an existing world link     | /link delete [link]                               | worlds.command.link.delete |
-| list     | receive a list of all world links | /link list                                        | worlds.command.link.list   |
+| Argument | Description                       | Usage                                                   | Permission                 |
+|----------|-----------------------------------|---------------------------------------------------------|----------------------------|
+| create   | create a new world link           | /world link create [source] [destination] (portal-type) | worlds.command.link.create |
+| delete   | delete an existing world link     | /world link delete [link]                               | worlds.command.link.delete |
+| list     | receive a list of all world links | /world link list                                        | worlds.command.link.list   |
 
 The perm-pack to grant all permissions: `worlds.commands.link`
 
