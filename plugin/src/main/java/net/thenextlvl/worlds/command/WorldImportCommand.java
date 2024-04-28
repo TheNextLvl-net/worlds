@@ -26,7 +26,7 @@ class WorldImportCommand {
                         SuggestionProvider.blocking((context, input) -> plugin.imageProvider().findImages().stream()
                                 .map(WorldImage::name)
                                 .filter(name -> Bukkit.getWorld(name) == null)
-                                .map(Suggestion::simple)
+                                .map(Suggestion::suggestion)
                                 .toList()))
                 .handler(this::execute);
     }

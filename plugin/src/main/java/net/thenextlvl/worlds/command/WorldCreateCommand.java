@@ -2,8 +2,6 @@ package net.thenextlvl.worlds.command;
 
 import com.google.gson.JsonObject;
 import core.io.IO;
-import core.nbt.file.NBTFile;
-import core.nbt.tag.CompoundTag;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -13,6 +11,7 @@ import net.thenextlvl.worlds.image.Generator;
 import net.thenextlvl.worlds.preset.Preset;
 import net.thenextlvl.worlds.preset.PresetFile;
 import net.thenextlvl.worlds.preset.Presets;
+import net.thenextlvl.worlds.util.WorldReader;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -56,7 +55,7 @@ class WorldCreateCommand {
                                 plugin.imageProvider().findWorldFiles().stream()
                                         .map(File::getName)
                                         .filter(s -> Bukkit.getWorld(s) == null)
-                                        .map(Suggestion::simple)
+                                        .map(Suggestion::suggestion)
                                         .toList()))
                 .flag(CommandFlag.builder("type").withAliases("t")
                         .withDescription(RichDescription.of(Component.text("The world type")))
@@ -75,7 +74,7 @@ class WorldCreateCommand {
                                                 .filter(plugin -> Generator.hasChunkGenerator(plugin.getClass())
                                                                   || Generator.hasBiomeProvider(plugin.getClass()))
                                                 .map(Plugin::getName)
-                                                .map(Suggestion::simple)
+                                                .map(Suggestion::suggestion)
                                                 .toList()))))
                 .flag(CommandFlag.builder("base").withAliases("b")
                         .withDescription(RichDescription.of(Component.text("The world to clone")))
@@ -89,7 +88,7 @@ class WorldCreateCommand {
                                         PresetFile.findPresets(plugin.presetsFolder()).stream()
                                                 .map(file -> file.getName().substring(0, file.getName().length() - 5))
                                                 .map(name -> name.contains(" ") ? "\"" + name + "\"" : name)
-                                                .map(Suggestion::simple)
+                                                .map(Suggestion::suggestion)
                                                 .toList()))))
                 .flag(CommandFlag.builder("deletion").withAliases("d")
                         .withDescription(RichDescription.of(Component.text("What to do with the world on shutdown")))
@@ -130,20 +129,7 @@ class WorldCreateCommand {
             return;
         }
 
-        var recoveredSeed = OptionalLong.empty();
-        var recoveredStructures = Optional.<Boolean>empty();
-        var recoveredHardcore = Optional.<Boolean>empty();
-
-        var worldFolder = new File(Bukkit.getWorldContainer(), name);
-        var dataFile = IO.of(worldFolder, "level.dat");
-        if (dataFile.exists()) {
-            var file = new NBTFile<>(dataFile, new CompoundTag());
-            var data = file.getRoot().getAsCompound("Data");
-            var worldGenSettings = data.getAsCompound("WorldGenSettings");
-            recoveredSeed = OptionalLong.of(worldGenSettings.get("seed").getAsLong());
-            recoveredStructures = Optional.of(worldGenSettings.get("generate_features").getAsBoolean());
-            recoveredHardcore = Optional.of(data.get("hardcore").getAsBoolean());
-        }
+        var worldReader = new WorldReader(name);
 
         var base = context.flags().<World>getValue("base");
         var key = context.flags().<NamespacedKey>getValue("key").orElse(new NamespacedKey("worlds", name));
@@ -159,16 +145,16 @@ class WorldCreateCommand {
                     } catch (NumberFormatException e) {
                         return s.hashCode();
                     }
-                }).orElse(recoveredSeed.orElse(base.map(WorldInfo::getSeed)
+                }).orElse(worldReader.seed().orElse(base.map(WorldInfo::getSeed)
                         .orElse(ThreadLocalRandom.current().nextLong())))
                 .longValue();
         var deletion = context.flags().<DeletionType>getValue("deletion", null);
         var loadManual = context.flags().contains("load-manual");
         var structures = context.flags().<Boolean>getValue("structures")
-                .orElse(recoveredStructures.orElse(base.map(World::canGenerateStructures).orElse(true)));
+                .orElse(worldReader.generateStructures().orElse(base.map(World::canGenerateStructures).orElse(true)));
         var autoSave = context.flags().<Boolean>getValue("auto-save")
                 .orElse(base.map(World::isAutoSave).orElse(true));
-        var hardcore = context.flags().contains("hardcore") || recoveredHardcore
+        var hardcore = context.flags().contains("hardcore") || worldReader.hardcore()
                 .orElse(base.map(World::isHardcore).orElse(false));
         var preset = context.flags().<String>getValue("preset", null);
         JsonObject settings = null;

@@ -105,7 +105,7 @@ abstract class WorldLinkCommand {
                     .required("link", StringParser.greedyStringParser(),
                             SuggestionProvider.blocking((context, input) -> plugin.linkRegistry().getLinks()
                                     .map(Link::toString)
-                                    .map(Suggestion::simple)
+                                    .map(Suggestion::suggestion)
                                     .toList()))
                     .handler(this::execute);
         }
