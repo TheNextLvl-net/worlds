@@ -4,6 +4,15 @@ Simple, modern, efficient and blazingly fast world management system
 with support for linking worlds to properly use portals with multiple worlds<br/>
 bStat Metrics can be found [here](https://bstats.org/plugin/bukkit/TheNextLvl%20Worlds/19652)
 
+## Versions
+
+> [!WARNING]
+> Worlds only support the latest version of minecraft (1.20.5)<br>
+> The latest version of Worlds requires Java 21
+
+[Latest version supporting 1.19/1.20.4 (Java 19)](https://github.com/TheNextLvl-net/worlds/releases/tag/v1.1.6)<br>
+[Latest version supporting 1.19/1.20.4 (Java 17)](https://github.com/TheNextLvl-net/worlds/releases/tag/v1.1.3)<br>
+
 ## Commands
 
 ### /world
