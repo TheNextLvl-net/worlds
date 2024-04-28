@@ -50,7 +50,7 @@ _the aliases can be used by adding a single dash (-) in front of the alias (exam
 | Flag        | Alias | Values                                        | Description                                                                                                            |
 |-------------|-------|-----------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
 | auto-save   |       | `true`, `false`                               | whether the world will automatically save                                                                              |
-| base        | b     | world                                         | creates a world based on another world                                                                                 |
+| base        | b     | world                                         | creates a copy of the given world                                                                                      |
 | deletion    |       | `world`, `world-and-image`                    | automatically deletes the world (_and its image_) on shutdown                                                          |
 | environment | e     | `nether`, `normal`, `the-end`                 | changes the [environment](https://minecraft.fandom.com/wiki/Dimension) of the world                                    |
 | generator   | g     | world generator plugin                        | uses a custom generator and biome provider for the world creation                                                      |
