@@ -94,6 +94,7 @@ A world image file has the extension `.image` and contains a json object with th
 ```json
 {
   "name": "example",
+  "key": "worlds:example",
   "settings": "{\"biome\":\"minecraft:the_void\",\"layers\":[]}",
   "deletion": "WORLD",
   "environment": "NORMAL",
