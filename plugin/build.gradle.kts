@@ -30,9 +30,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.5-R0.1-SNAPSHOT")
 
     implementation("org.bstats:bstats-bukkit:3.0.2")
-    implementation("org.incendo:cloud-paper:2.0.0-beta.4")
-    implementation("org.incendo:cloud-processors-confirmation:1.0.0-beta.1")
-    implementation("org.incendo:cloud-minecraft-extras:2.0.0-beta.4")
+    implementation("org.incendo:cloud-paper:2.0.0-beta.5")
     implementation("org.incendo:cloud-minecraft-extras:2.0.0-beta.5")
 
     implementation(project(":api"))
