@@ -82,49 +82,42 @@ _The general spawn position will be overridden and only the world will be used_
 
 A world image file has the extension `.image` and contains a json object with the following entries
 
-| Key                | Values                                        | Description                                                                   | Optional |
-|--------------------|-----------------------------------------------|-------------------------------------------------------------------------------|----------|
-| name               | String                                        | the name of the world                                                         | No       |
-| settings           | World Preset                                  | the world settings<br/>_(only for flat maps)_                                 | Yes      |
-| generator          | World Generator                               | defines the world generator<br/>_(not combinable with settings)_              | Yes      |
-| deletion           | `WORLD`, `WORLD_AND_IMAGE`                    | what to delete on shutdown                                                    | Yes      |
-| environment        | `NORMAL`, `NETHER`, `THE_END`                 | the environment of the world                                                  | No       |
-| type               | `NORMAL`, `FLAT`, `LARGE_BIOMES`, `AMPLIFIED` | the type of the world                                                         | No       |
-| generateStructures | boolean                                       | whether to generate structures                                                | Yes      |
-| hardcore           | boolean                                       | whether the world should be in hardcore mode<br/>_(not properly working yet)_ | Yes      |
-| loadOnStart        | boolean                                       | whether the world should be loaded on startup                                 | Yes      |
-| seed               | double                                        | the seed of the world                                                         | No       |
+| Key         | Values                                        | Description                                                      | Optional |
+|-------------|-----------------------------------------------|------------------------------------------------------------------|----------|
+| name        | String                                        | the name of the world                                            | No       |
+| key         | NamespacedKey                                 | the namespaced key of the world                                  | No       |
+| settings    | World Preset                                  | the world settings<br/>_(only applies to world type flat)_       | Yes      |
+| generator   | World Generator                               | defines the world generator<br/>_(not combinable with settings)_ | Yes      |
+| deletion    | `WORLD`, `WORLD_AND_IMAGE`                    | what to delete on shutdown                                       | Yes      |
+| environment | `NORMAL`, `NETHER`, `THE_END`                 | the environment of the world                                     | No       |
+| type        | `NORMAL`, `FLAT`, `LARGE_BIOMES`, `AMPLIFIED` | the type of the world                                            | No       |
+| loadOnStart | boolean                                       | whether the world should be loaded on startup                    | Yes      |
+
+## World Generator
+
+A world generator consists out of two parts: The **plugin** and the **identifier**<br/>
+The plugin is the name of the plugin that provides a generator.<br/>
+In most cases the identifier will not be required, but in case a plugin provides multiple world generators,<br/>
+you have to define which one you have to use.
 
 ### Example
 
 ```json
 {
   "name": "example",
+  "generator": {
+    "plugin": "example-plugin",
+    "identifier": "example-generator"
+  },
   "key": "worlds:example",
-  "settings": "{\"biome\":\"minecraft:the_void\",\"layers\":[]}",
+  "settings": {
+    "biome": "minecraft:the_void",
+    "layers": []
+  },
   "deletion": "WORLD",
   "environment": "NORMAL",
   "type": "FLAT",
-  "generateStructures": true,
-  "hardcore": false,
-  "loadOnStart": true,
-  "seed": -7920583562141293424
-}
-```
-
-## World Generator
-
-A world generator consists out of two parts: The **plugin** and the **identifier**<br/>
-The plugin is just the name of the plugin itself.<br/>
-In most cases the identifier can be null, but in case a plugin provides multiple world generators,<br/>
-you have to define which one should be used.
-
-### Example
-
-```json
-{
-  "plugin": "example-plugin",
-  "identifier": "example-generator"
+  "loadOnStart": true
 }
 ```
 
