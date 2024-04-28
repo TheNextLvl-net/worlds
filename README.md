@@ -66,6 +66,8 @@ _the aliases can be used by adding a single dash (-) in front of the alias (exam
 
 | Flag       | Description                                    |
 |------------|------------------------------------------------|
+| confirm    | confirms you action                            |
+| schedule   | schedules the world deletion to shutdown       |
 | keep-image | deletes the world but not its image            |
 | keep-world | unloads the world _(no files will be deleted)_ |
 
