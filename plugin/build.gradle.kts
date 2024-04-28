@@ -33,6 +33,7 @@ dependencies {
     implementation("org.incendo:cloud-paper:2.0.0-beta.4")
     implementation("org.incendo:cloud-processors-confirmation:1.0.0-beta.1")
     implementation("org.incendo:cloud-minecraft-extras:2.0.0-beta.4")
+    implementation("org.incendo:cloud-minecraft-extras:2.0.0-beta.5")
 
     implementation(project(":api"))
     implementation("net.thenextlvl.core:nbt:1.3.10")
