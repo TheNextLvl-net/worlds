@@ -19,7 +19,6 @@ bStat Metrics can be found [here](https://bstats.org/plugin/bukkit/TheNextLvl%20
 
 | Argument | Description                                     | Usage                              | Permission                    |
 |----------|-------------------------------------------------|------------------------------------|-------------------------------|
-| confirm  | confirm a pending action                        | /world confirm                     |                               |
 | create   | build an image and create a world based on that | /world create [name] (flags)       | worlds.command.world.create   |
 | delete   | permanently delete a certain world              | /world delete [world] (flags)      | worlds.command.world.delete   |
 | export   | save a certain world to the disk                | /world export (world)              | worlds.command.world.export   |
