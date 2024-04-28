@@ -6,23 +6,24 @@ plugins {
 java {
     withSourcesJar()
     withJavadocJar()
-    sourceCompatibility = JavaVersion.VERSION_19
-    targetCompatibility = JavaVersion.VERSION_19
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
-group = rootProject.group
-version = rootProject.version
+group = "net.thenextlvl.worlds"
+version = "1.2.0"
 
 repositories {
     mavenCentral()
     maven("https://repo.thenextlvl.net/releases")
     maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {
     compileOnly("org.projectlombok:lombok:1.18.32")
     compileOnly("net.thenextlvl.core:annotations:2.0.1")
-    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.5-R0.1-SNAPSHOT")
 
     implementation("net.thenextlvl.core:nbt:1.3.10")
     implementation("net.thenextlvl.core:files:1.0.4")

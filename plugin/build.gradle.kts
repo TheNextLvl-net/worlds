@@ -4,30 +4,30 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 plugins {
     id("java")
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
     id("net.minecrell.plugin-yml.paper") version "0.6.0"
+    id("io.github.goooler.shadow") version "8.1.7"
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_19
-    targetCompatibility = JavaVersion.VERSION_19
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
-group = rootProject.group
-version = "1.1.6"
+group = project(":api").group
+version = project(":api").version
 
 repositories {
     mavenCentral()
-    maven("https://libraries.minecraft.net")
     maven("https://repo.thenextlvl.net/releases")
     maven("https://repo.thenextlvl.net/snapshots")
     maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {
     compileOnly("org.projectlombok:lombok:1.18.32")
     compileOnly("net.thenextlvl.core:annotations:2.0.1")
-    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.5-R0.1-SNAPSHOT")
 
     implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation("org.incendo:cloud-paper:2.0.0-beta.4")
@@ -54,7 +54,7 @@ tasks.shadowJar {
 paper {
     name = "Worlds"
     main = "net.thenextlvl.worlds.Worlds"
-    apiVersion = "1.19"
+    apiVersion = "1.20"
     load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
     website = "https://thenextlvl.net"
     authors = listOf("NonSwag")
