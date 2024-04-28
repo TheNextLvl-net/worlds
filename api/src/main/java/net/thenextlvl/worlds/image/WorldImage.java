@@ -6,6 +6,7 @@ import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public interface WorldImage {
     /**
      * Retrieves the name of the WorldImage.
@@ -136,6 +137,7 @@ public interface WorldImage {
      *
      * @return true if structures are generated, false otherwise.
      */
+    @Deprecated
     boolean generateStructures();
 
     /**
@@ -145,6 +147,7 @@ public interface WorldImage {
      *                           Set to true to generate structures, false otherwise.
      * @return The updated WorldImage instance.
      */
+    @Deprecated
     WorldImage generateStructures(boolean generateStructures);
 
     /**
@@ -152,6 +155,7 @@ public interface WorldImage {
      *
      * @return true if the WorldImage is set to hardcore mode, false otherwise.
      */
+    @Deprecated
     boolean hardcore();
 
     /**
@@ -160,6 +164,7 @@ public interface WorldImage {
      * @param hardcore true to enable hardcore mode, false to disable hardcore mode.
      * @return The updated WorldImage instance.
      */
+    @Deprecated
     WorldImage hardcore(boolean hardcore);
 
     /**
@@ -182,6 +187,7 @@ public interface WorldImage {
      *
      * @return The seed of the WorldImage.
      */
+    @Deprecated
     long seed();
 
     /**
@@ -190,6 +196,7 @@ public interface WorldImage {
      * @param seed The seed to set for the WorldImage.
      * @return The updated WorldImage instance.
      */
+    @Deprecated
     WorldImage seed(long seed);
 
     /**

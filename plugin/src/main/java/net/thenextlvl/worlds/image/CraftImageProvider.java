@@ -70,7 +70,7 @@ public class CraftImageProvider implements ImageProvider {
 
     @Override
     public WorldImage createWorldImage() {
-        return new CraftWorldImage();
+        return new CraftWorldImage(true);
     }
 
     @Override
@@ -86,7 +86,8 @@ public class CraftImageProvider implements ImageProvider {
                 world.canGenerateStructures(),
                 world.isHardcore(),
                 true,
-                world.getSeed()
+                world.getSeed(),
+                true
         );
     }
 

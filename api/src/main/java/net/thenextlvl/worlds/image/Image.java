@@ -10,6 +10,7 @@ public interface Image {
 
     World getWorld();
 
+    @Deprecated
     WorldImage getWorldImage();
 
     boolean unload();

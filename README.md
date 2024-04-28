@@ -74,6 +74,11 @@ _The general spawn position will be overridden and only the world will be used_
 
 ## World Images
 
+> [!WARNING]
+> In the near future World Images will be replaced or even removed
+> In their current state they are not very safe or consistent in their behaviour
+> The goal is to use as much information provided in the `level.dat` file
+
 A world image file has the extension `.image` and contains a json object with the following entries
 
 | Key                | Values                                        | Description                                                                   | Optional |

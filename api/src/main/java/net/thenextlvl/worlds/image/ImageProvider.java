@@ -9,6 +9,7 @@ import java.util.List;
 public interface ImageProvider {
 
     @Nullable
+    @Deprecated
     Image load(@Nullable WorldImage image);
 
     @Nullable
@@ -22,12 +23,16 @@ public interface ImageProvider {
 
     List<File> findWorldFiles();
 
+    @Deprecated
     List<WorldImage> findImages();
 
+    @Deprecated
     WorldImage createWorldImage();
 
+    @Deprecated
     WorldImage of(World world);
 
     @Nullable
+    @Deprecated
     WorldImage of(File file);
 }

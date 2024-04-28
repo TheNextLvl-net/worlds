@@ -2,13 +2,11 @@ package net.thenextlvl.worlds.image;
 
 import com.google.gson.JsonObject;
 import core.io.IO;
-import core.nbt.file.NBTFile;
-import core.nbt.tag.CompoundTag;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.thenextlvl.worlds.util.WorldReader;
 import org.bukkit.*;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
@@ -18,7 +16,6 @@ import java.io.File;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @Accessors(fluent = true, chain = true)
 public class CraftWorldImage implements WorldImage {
@@ -30,10 +27,17 @@ public class CraftWorldImage implements WorldImage {
     private World.Environment environment;
     private WorldType worldType;
     private boolean autoSave;
-    private boolean generateStructures;
-    private boolean hardcore;
     private boolean loadOnStart;
-    private long seed;
+
+    private volatile boolean generateStructures;
+    private volatile boolean hardcore;
+    private volatile long seed;
+
+    private volatile boolean skipValidation;
+
+    public CraftWorldImage(boolean skipValidation) {
+        this.skipValidation = skipValidation;
+    }
 
     @Override
     public @Nullable World build() {
@@ -60,13 +64,18 @@ public class CraftWorldImage implements WorldImage {
         var worldFolder = new File(Bukkit.getWorldContainer(), name());
         var dataFile = IO.of(worldFolder, "level.dat");
         if (!dataFile.exists()) return;
-        var file = new NBTFile<>(dataFile, new CompoundTag());
-        var data = file.getRoot().getAsCompound("Data");
+        var reader = new WorldReader(dataFile);
+        if (!skipValidation) {
+            reader.generateStructures().ifPresent(this::generateStructures);
+            reader.hardcore().ifPresent(this::hardcore);
+            reader.seed().ifPresent(this::seed);
+        }
+        var data = reader.file().getRoot().getAsCompound("Data");
         var worldGenSettings = data.getAsCompound("WorldGenSettings");
         worldGenSettings.add("seed", seed());
         worldGenSettings.add("generate_features", generateStructures());
         data.add("hardcore", hardcore());
-        file.save();
+        reader.file().save();
     }
 
     private @Nullable ChunkGenerator resolveChunkGenerator() {
