@@ -10,6 +10,8 @@ jobs:
   build:
     env:
       HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
+      REPOSITORY_USER: ${{ secrets.REPOSITORY_USER }}
+      REPOSITORY_PASSWORD: ${{ secrets.REPOSITORY_PASSWORD }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,7 +20,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-      - name: Publish with Gradle to Hangar
+      - name: Publish with Gradle to Hangar and Repository
         uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: publishAllPublicationsToHangar
+          arguments: publish publishAllPublicationsToHangar

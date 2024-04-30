@@ -89,9 +89,7 @@ hangarPublish { // docs - https://docs.papermc.io/misc/hangar-publishing
         id.set("Worlds")
         version.set(project.version as String)
         channel.set(if (isRelease) "Release" else "Snapshot")
-        if (extra.has("HANGAR_API_TOKEN"))
-            apiKey.set(extra["HANGAR_API_TOKEN"] as String)
-        else apiKey.set(System.getenv("HANGAR_API_TOKEN"))
+        apiKey.set(System.getenv("HANGAR_API_TOKEN"))
         platforms {
             register(Platforms.PAPER) {
                 jar.set(tasks.shadowJar.flatMap { it.archiveFile })
