@@ -11,11 +11,12 @@ java {
 }
 
 group = "net.thenextlvl.worlds"
-version = "1.2.0"
+version = "1.2.0-pre1"
 
 repositories {
     mavenCentral()
     maven("https://repo.thenextlvl.net/releases")
+    maven("https://repo.thenextlvl.net/snapshots")
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
@@ -23,10 +24,10 @@ repositories {
 dependencies {
     compileOnly("org.projectlombok:lombok:1.18.32")
     compileOnly("net.thenextlvl.core:annotations:2.0.1")
-    compileOnly("io.papermc.paper:paper-api:1.20.5-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
 
-    implementation("net.thenextlvl.core:nbt:1.3.10")
-    implementation("net.thenextlvl.core:files:1.0.4")
+    implementation("net.thenextlvl.core:nbt:1.4.0")
+    implementation("net.thenextlvl.core:files:1.0.5-pre2")
     implementation("net.thenextlvl.core:adapters:1.0.9")
 
     annotationProcessor("org.projectlombok:lombok:1.18.32")
