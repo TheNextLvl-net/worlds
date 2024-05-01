@@ -133,9 +133,14 @@ class WorldCreateCommand {
 
         var worldReader = new WorldReader(name);
 
+        var environment = context.flags().<Environment>getValue("environment").orElse(Environment.NORMAL);
+        if (environment.equals(Environment.CUSTOM)) {
+            plugin.bundle().sendMessage(context.sender(), "environment.custom");
+            return;
+        }
+
         var base = context.flags().<World>getValue("base");
         var key = context.flags().<NamespacedKey>getValue("key").orElse(new NamespacedKey("worlds", name));
-        var environment = context.flags().<Environment>getValue("environment").orElse(Environment.NORMAL);
         var type = context.flags().<WorldType>getValue("type")
                 .orElse(context.flags().contains("preset") ? WorldType.FLAT : WorldType.NORMAL);
         var identifier = context.flags().<String>getValue("identifier", null);
