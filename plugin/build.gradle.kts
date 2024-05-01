@@ -54,6 +54,7 @@ paper {
     name = "Worlds"
     main = "net.thenextlvl.worlds.Worlds"
     apiVersion = "1.20"
+    description = "Create, delete and manage your worlds"
     load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
     website = "https://thenextlvl.net"
     authors = listOf("NonSwag")
