@@ -7,7 +7,7 @@ bStat Metrics can be found [here](https://bstats.org/plugin/bukkit/TheNextLvl%20
 ## Versions
 
 > [!IMPORTANT]
-> Worlds only support the latest version of minecraft (1.20.6)<br>
+> Worlds only supports the latest version of Paper (1.20.6)<br>
 > The latest version of Worlds requires Java 21
 
 [Latest version supporting 1.19/1.20.4 (Java 19)](https://github.com/TheNextLvl-net/worlds/releases/tag/v1.1.6)<br>
