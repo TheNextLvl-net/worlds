@@ -1,0 +1,25 @@
+name: Maven Publish
+
+on:
+  release:
+    types:
+      - prereleased
+      - released
+
+jobs:
+  build:
+    env:
+      REPOSITORY_USER: ${{ secrets.REPOSITORY_USER }}
+      REPOSITORY_TOKEN: ${{ secrets.REPOSITORY_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Publish with Gradle to Repository
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          arguments: publish
