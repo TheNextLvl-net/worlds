@@ -11,7 +11,7 @@ java {
 }
 
 group = "net.thenextlvl.worlds"
-version = "1.2.0-pre1"
+version = "1.2.0"
 
 repositories {
     mavenCentral()
