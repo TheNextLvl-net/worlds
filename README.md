@@ -6,7 +6,7 @@ bStat Metrics can be found [here](https://bstats.org/plugin/bukkit/TheNextLvl%20
 
 ## Versions
 
-> [!WARNING]
+> [!IMPORTANT]
 > Worlds only support the latest version of minecraft (1.20.6)<br>
 > The latest version of Worlds requires Java 21
 
