@@ -140,7 +140,7 @@ class WorldCreateCommand {
         }
 
         var base = context.flags().<World>getValue("base");
-        var key = context.flags().<NamespacedKey>getValue("key").orElse(new NamespacedKey("worlds", name));
+        var key = context.flags().<NamespacedKey>getValue("key").orElse(new NamespacedKey("worlds", name.toLowerCase()));
         var type = context.flags().<WorldType>getValue("type")
                 .orElse(context.flags().contains("preset") ? WorldType.FLAT : WorldType.NORMAL);
         var identifier = context.flags().<String>getValue("identifier", null);
