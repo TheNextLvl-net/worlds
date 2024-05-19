@@ -29,8 +29,8 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
 
     implementation("org.bstats:bstats-bukkit:3.0.2")
-    implementation("org.incendo:cloud-paper:2.0.0-SNAPSHOT")
-    implementation("org.incendo:cloud-minecraft-extras:2.0.0-beta.5")
+    implementation("org.incendo:cloud-paper:2.0.0-beta.7")
+    implementation("org.incendo:cloud-minecraft-extras:2.0.0-beta.7")
 
     implementation(project(":api"))
     implementation("net.thenextlvl.core:nbt:1.4.0")
