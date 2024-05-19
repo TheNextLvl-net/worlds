@@ -92,7 +92,6 @@ public class Worlds extends JavaPlugin {
     }
 
     private void registerCommands() {
-        // LinkCommand.register(this);
         new WorldCommand(this).register();
     }
 
