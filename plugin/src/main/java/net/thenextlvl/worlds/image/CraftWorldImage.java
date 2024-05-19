@@ -2,6 +2,7 @@ package net.thenextlvl.worlds.image;
 
 import com.google.gson.JsonObject;
 import core.io.IO;
+import core.nbt.tag.CompoundTag;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -70,8 +71,8 @@ public class CraftWorldImage implements WorldImage {
             reader.hardcore().ifPresent(this::hardcore);
             reader.seed().ifPresent(this::seed);
         }
-        var data = reader.file().getRoot().getAsCompound("Data");
-        var worldGenSettings = data.getAsCompound("WorldGenSettings");
+        var data = reader.file().getRoot().getOrAdd("Data", new CompoundTag());
+        var worldGenSettings = data.getOrAdd("WorldGenSettings", new CompoundTag());
         worldGenSettings.add("seed", seed());
         worldGenSettings.add("generate_features", generateStructures());
         data.add("hardcore", hardcore());
