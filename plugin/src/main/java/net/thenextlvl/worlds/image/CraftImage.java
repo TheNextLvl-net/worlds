@@ -62,7 +62,7 @@ class CraftImage implements Image {
     public DeleteResult deleteNow(boolean keepImage, boolean keepWorld) {
         if (canDelete()) return DeleteResult.WORLD_DELETE_ILLEGAL;
 
-        var fallback = Bukkit.getWorlds().get(0).getSpawnLocation();
+        var fallback = Bukkit.getWorlds().getFirst().getSpawnLocation();
         getWorld().getPlayers().forEach(player -> player.teleport(fallback));
 
         try {
