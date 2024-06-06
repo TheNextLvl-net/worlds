@@ -1,5 +1,6 @@
 package net.thenextlvl.worlds.command;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
@@ -8,24 +9,24 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.generator.WorldInfo;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.context.CommandContext;
 
 @RequiredArgsConstructor
+@SuppressWarnings("UnstableApiUsage")
 class WorldListCommand {
     private final Worlds plugin;
-    private final Command.Builder<CommandSender> builder;
+    private final Command.Builder<CommandSourceStack> builder;
 
-    Command.Builder<CommandSender> create() {
+    Command.Builder<CommandSourceStack> create() {
         return builder.literal("list")
                 .permission("worlds.command.world.list")
                 .handler(this::execute);
     }
 
-    private void execute(CommandContext<CommandSender> context) {
-        var sender = context.sender();
+    private void execute(CommandContext<CommandSourceStack> context) {
+        var sender = context.sender().getSender();
         var worlds = Bukkit.getWorlds().stream().map(WorldInfo::getName).toList();
         var joined = Component.join(JoinConfiguration.commas(true), worlds.stream()
                 .map(world -> Component.text(world)

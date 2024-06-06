@@ -1,21 +1,22 @@
 package net.thenextlvl.worlds.command;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
 import org.bukkit.World;
-import org.bukkit.command.CommandSender;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.bukkit.parser.WorldParser;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.parser.flag.CommandFlag;
 
 @RequiredArgsConstructor
+@SuppressWarnings("UnstableApiUsage")
 class WorldDeleteCommand {
     private final Worlds plugin;
-    private final Command.Builder<CommandSender> builder;
+    private final Command.Builder<CommandSourceStack> builder;
 
-    Command.Builder<CommandSender> create() {
+    Command.Builder<CommandSourceStack> create() {
         return builder.literal("delete")
                 .permission("worlds.command.world.delete")
                 .required("world", WorldParser.worldParser())
@@ -26,9 +27,10 @@ class WorldDeleteCommand {
                 .handler(this::execute);
     }
 
-    private void execute(CommandContext<CommandSender> context) {
+    @SuppressWarnings("deprecation")
+    private void execute(CommandContext<CommandSourceStack> context) {
         if (!context.flags().contains("confirm")) {
-            plugin.bundle().sendMessage(context.sender(), "command.confirmation",
+            plugin.bundle().sendMessage(context.sender().getSender(), "command.confirmation",
                     Placeholder.parsed("action", "/" + context.rawInput().input()),
                     Placeholder.parsed("confirmation", "/" + context.rawInput().input() + " --confirm"));
             return;
@@ -39,7 +41,7 @@ class WorldDeleteCommand {
         var schedule = context.flags().contains("schedule");
         var image = plugin.imageProvider().getOrDefault(world);
         var result = image.delete(keepImage, keepWorld, schedule);
-        plugin.bundle().sendMessage(context.sender(), result.getMessage(),
+        plugin.bundle().sendMessage(context.sender().getSender(), result.getMessage(),
                 Placeholder.parsed("world", world.getName()),
                 Placeholder.parsed("image", image.getWorldImage().name()));
     }

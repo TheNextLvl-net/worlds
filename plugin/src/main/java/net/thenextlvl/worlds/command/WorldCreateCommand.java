@@ -2,6 +2,7 @@ package net.thenextlvl.worlds.command;
 
 import com.google.gson.JsonObject;
 import core.io.IO;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -17,7 +18,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldType;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.generator.WorldInfo;
@@ -45,11 +45,12 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 @RequiredArgsConstructor
+@SuppressWarnings("UnstableApiUsage")
 class WorldCreateCommand {
     private final Worlds plugin;
-    private final Command.Builder<CommandSender> builder;
+    private final Command.Builder<CommandSourceStack> builder;
 
-    Command.Builder<CommandSender> create() {
+    Command.Builder<CommandSourceStack> create() {
         return builder.literal("create")
                 .permission("worlds.command.world.create")
                 .required("name", StringParser.stringParser(),
@@ -59,17 +60,17 @@ class WorldCreateCommand {
                                         .filter(s -> Bukkit.getWorld(s) == null)
                                         .map(Suggestion::suggestion)
                                         .toList()))
-                .flag(CommandFlag.<CommandSender>builder("type").withAliases("t")
+                .flag(CommandFlag.<CommandSourceStack>builder("type").withAliases("t")
                         .withDescription(RichDescription.of(Component.text("The world type")))
-                        .withComponent(TypedCommandComponent.<CommandSender, WorldType>ofType(WorldType.class, "type")
+                        .withComponent(TypedCommandComponent.<CommandSourceStack, WorldType>ofType(WorldType.class, "type")
                                 .parser(EnumParser.enumParser(WorldType.class))))
-                .flag(CommandFlag.<CommandSender>builder("environment").withAliases("e")
+                .flag(CommandFlag.<CommandSourceStack>builder("environment").withAliases("e")
                         .withDescription(RichDescription.of(Component.text("The environment")))
-                        .withComponent(TypedCommandComponent.<CommandSender, Environment>ofType(Environment.class, "environment")
+                        .withComponent(TypedCommandComponent.<CommandSourceStack, Environment>ofType(Environment.class, "environment")
                                 .parser(EnumParser.enumParser(Environment.class))))
-                .flag(CommandFlag.<CommandSender>builder("generator").withAliases("g")
+                .flag(CommandFlag.<CommandSourceStack>builder("generator").withAliases("g")
                         .withDescription(RichDescription.of(Component.text("The generator plugin")))
-                        .withComponent(TypedCommandComponent.<CommandSender, String>ofType(String.class, "generator")
+                        .withComponent(TypedCommandComponent.<CommandSourceStack, String>ofType(String.class, "generator")
                                 .parser(StringParser.greedyFlagYieldingStringParser())
                                 .suggestionProvider(SuggestionProvider.blocking((context, input) ->
                                         Arrays.stream(Bukkit.getPluginManager().getPlugins())
@@ -78,13 +79,13 @@ class WorldCreateCommand {
                                                 .map(Plugin::getName)
                                                 .map(Suggestion::suggestion)
                                                 .toList()))))
-                .flag(CommandFlag.<CommandSender>builder("base").withAliases("b")
+                .flag(CommandFlag.<CommandSourceStack>builder("base").withAliases("b")
                         .withDescription(RichDescription.of(Component.text("The world to clone")))
-                        .withComponent(TypedCommandComponent.<CommandSender, World>ofType(World.class, "world")
+                        .withComponent(TypedCommandComponent.<CommandSourceStack, World>ofType(World.class, "world")
                                 .parser(WorldParser.worldParser())))
-                .flag(CommandFlag.<CommandSender>builder("preset")
+                .flag(CommandFlag.<CommandSourceStack>builder("preset")
                         .withDescription(RichDescription.of(Component.text("The preset to use")))
-                        .withComponent(TypedCommandComponent.<CommandSender, String>ofType(String.class, "preset")
+                        .withComponent(TypedCommandComponent.<CommandSourceStack, String>ofType(String.class, "preset")
                                 .parser(StringParser.greedyFlagYieldingStringParser())
                                 .suggestionProvider(SuggestionProvider.blocking((context, input) ->
                                         PresetFile.findPresets(plugin.presetsFolder()).stream()
@@ -92,42 +93,45 @@ class WorldCreateCommand {
                                                 .map(name -> name.contains(" ") ? "\"" + name + "\"" : name)
                                                 .map(Suggestion::suggestion)
                                                 .toList()))))
-                .flag(CommandFlag.<CommandSender>builder("deletion").withAliases("d")
+                .flag(CommandFlag.<CommandSourceStack>builder("deletion").withAliases("d")
                         .withDescription(RichDescription.of(Component.text("What to do with the world on shutdown")))
-                        .withComponent(TypedCommandComponent.<CommandSender, DeletionType>ofType(DeletionType.class, "deletion")
+                        .withComponent(TypedCommandComponent.<CommandSourceStack, DeletionType>ofType(DeletionType.class, "deletion")
                                 .parser(EnumParser.enumParser(DeletionType.class))))
-                .flag(CommandFlag.<CommandSender>builder("identifier").withAliases("i")
+                .flag(CommandFlag.<CommandSourceStack>builder("identifier").withAliases("i")
                         .withDescription(RichDescription.of(Component.text("The identifier of the world generator")))
-                        .withComponent(TypedCommandComponent.<CommandSender, String>ofType(String.class, "identifier")
+                        .withComponent(TypedCommandComponent.<CommandSourceStack, String>ofType(String.class, "identifier")
                                 .parser(StringParser.greedyFlagYieldingStringParser())))
-                .flag(CommandFlag.<CommandSender>builder("key")
+                .flag(CommandFlag.<CommandSourceStack>builder("key")
                         .withDescription(RichDescription.of(Component.text("The namespaced key")))
-                        .withComponent(TypedCommandComponent.<CommandSender, NamespacedKey>ofType(NamespacedKey.class, "key")
+                        .withComponent(TypedCommandComponent.<CommandSourceStack, NamespacedKey>ofType(NamespacedKey.class, "key")
                                 .parser(NamespacedKeyParser.namespacedKeyParser(true))))
-                .flag(CommandFlag.<CommandSender>builder("seed").withAliases("s")
+                .flag(CommandFlag.<CommandSourceStack>builder("seed").withAliases("s")
                         .withDescription(RichDescription.of(Component.text("The seed")))
-                        .withComponent(TypedCommandComponent.<CommandSender, String>ofType(String.class, "seed")
+                        .withComponent(TypedCommandComponent.<CommandSourceStack, String>ofType(String.class, "seed")
                                 .parser(StringParser.greedyFlagYieldingStringParser())))
-                .flag(CommandFlag.<CommandSender>builder("auto-save")
+                .flag(CommandFlag.<CommandSourceStack>builder("auto-save")
                         .withDescription(RichDescription.of(Component.text("Whether the world should auto-save")))
-                        .withComponent(TypedCommandComponent.<CommandSender, Boolean>ofType(boolean.class, "auto-save")
+                        .withComponent(TypedCommandComponent.<CommandSourceStack, Boolean>ofType(boolean.class, "auto-save")
                                 .parser(BooleanParser.booleanParser())))
-                .flag(CommandFlag.<CommandSender>builder("structures")
+                .flag(CommandFlag.<CommandSourceStack>builder("structures")
                         .withDescription(RichDescription.of(Component.text("Whether structures should generate")))
-                        .withComponent(TypedCommandComponent.<CommandSender, Boolean>ofType(boolean.class, "structures")
+                        .withComponent(TypedCommandComponent.<CommandSourceStack, Boolean>ofType(boolean.class, "structures")
                                 .parser(BooleanParser.booleanParser())))
-                .flag(CommandFlag.<CommandSender>builder("hardcore")
+                .flag(CommandFlag.<CommandSourceStack>builder("hardcore")
                         .withDescription(RichDescription.of(Component.text("Whether hardcore is enabled"))))
-                .flag(CommandFlag.<CommandSender>builder("load-manual")
+                .flag(CommandFlag.<CommandSourceStack>builder("load-manual")
                         .withDescription(RichDescription.of(Component.text("Whether the world must be loaded manual on startup"))))
                 .handler(this::execute);
     }
 
-    private void execute(CommandContext<CommandSender> context) {
+    @SuppressWarnings("deprecation")
+    private void execute(CommandContext<CommandSourceStack> context) {
         var name = context.<String>get("name");
 
+        var sender = context.sender().getSender();
+
         if (Bukkit.getWorld(name) != null) {
-            plugin.bundle().sendMessage(context.sender(), "world.known", Placeholder.parsed("world", name));
+            plugin.bundle().sendMessage(sender, "world.known", Placeholder.parsed("world", name));
             return;
         }
 
@@ -135,7 +139,7 @@ class WorldCreateCommand {
 
         var environment = context.flags().<Environment>getValue("environment").orElse(Environment.NORMAL);
         if (environment.equals(Environment.CUSTOM)) {
-            plugin.bundle().sendMessage(context.sender(), "environment.custom");
+            plugin.bundle().sendMessage(sender, "environment.custom");
             return;
         }
 
@@ -167,12 +171,12 @@ class WorldCreateCommand {
         JsonObject settings = null;
 
         if (preset != null && generator != null) {
-            plugin.bundle().sendMessage(context.sender(), "command.flag.combination",
+            plugin.bundle().sendMessage(sender, "command.flag.combination",
                     Placeholder.parsed("flag-1", "generator"),
                     Placeholder.parsed("flag-2", "preset"));
             return;
         } else if (preset != null && !Objects.equals(type, WorldType.FLAT)) {
-            plugin.bundle().sendMessage(context.sender(), "world.preset.flat");
+            plugin.bundle().sendMessage(sender, "world.preset.flat");
             return;
         } else if (preset != null) {
             final var fileName = preset + ".json";
@@ -185,8 +189,8 @@ class WorldCreateCommand {
         base.ifPresent(world -> {
             var placeholder = Placeholder.parsed("world", world.getName());
             if (copy(world.getWorldFolder(), new File(Bukkit.getWorldContainer(), name)))
-                plugin.bundle().sendMessage(context.sender(), "world.clone.success", placeholder);
-            else plugin.bundle().sendMessage(context.sender(), "world.clone.failed", placeholder);
+                plugin.bundle().sendMessage(sender, "world.clone.success", placeholder);
+            else plugin.bundle().sendMessage(sender, "world.clone.failed", placeholder);
         });
 
         var image = plugin.imageProvider().load(plugin.imageProvider().createWorldImage()
@@ -195,8 +199,8 @@ class WorldCreateCommand {
                 .hardcore(hardcore).loadOnStart(!loadManual).seed(seed));
 
         var message = image != null ? "world.create.success" : "world.create.failed";
-        plugin.bundle().sendMessage(context.sender(), message, Placeholder.parsed("world", name));
-        if (image == null || !(context.sender() instanceof Entity entity)) return;
+        plugin.bundle().sendMessage(sender, message, Placeholder.parsed("world", name));
+        if (image == null || !(sender instanceof Entity entity)) return;
         entity.teleportAsync(image.getWorld().getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
     }
 

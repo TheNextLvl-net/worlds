@@ -1,11 +1,11 @@
 package net.thenextlvl.worlds.command;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
 import org.bukkit.World;
 import org.bukkit.WorldType;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.bukkit.parser.WorldParser;
@@ -16,11 +16,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 @RequiredArgsConstructor
+@SuppressWarnings("UnstableApiUsage")
 class WorldInfoCommand {
     private final Worlds plugin;
-    private final Command.Builder<CommandSender> builder;
+    private final Command.Builder<CommandSourceStack> builder;
 
-    Command.Builder<CommandSender> create() {
+    Command.Builder<CommandSourceStack> create() {
         return builder.literal("info")
                 .permission("worlds.command.world.info")
                 .optional("world", WorldParser.worldParser())
@@ -28,22 +29,23 @@ class WorldInfoCommand {
     }
 
     @SuppressWarnings("deprecation")
-    private void execute(CommandContext<CommandSender> context) {
-        var world = context.<World>optional("world").orElse(context.sender() instanceof Player self ? self.getWorld() : null);
-        if (world == null) throw new InvalidSyntaxException("world info [world]", context.sender(), List.of());
+    private void execute(CommandContext<CommandSourceStack> context) {
+        var sender = context.sender().getSender();
+        var world = context.<World>optional("world").orElse(sender instanceof Player self ? self.getWorld() : null);
+        if (world == null) throw new InvalidSyntaxException("world info [world]", sender, List.of());
         var volume = plugin.imageProvider().getOrDefault(world);
-        plugin.bundle().sendMessage(context.sender(), "world.info.name",
+        plugin.bundle().sendMessage(sender, "world.info.name",
                 Placeholder.parsed("world", world.getName()));
-        plugin.bundle().sendMessage(context.sender(), "world.info.players",
+        plugin.bundle().sendMessage(sender, "world.info.players",
                 Placeholder.parsed("players", String.valueOf(world.getPlayers().size())));
-        plugin.bundle().sendMessage(context.sender(), "world.info.type",
+        plugin.bundle().sendMessage(sender, "world.info.type",
                 Placeholder.parsed("type", getName(notnull(world.getWorldType(), WorldType.NORMAL))));
-        plugin.bundle().sendMessage(context.sender(), "world.info.environment",
+        plugin.bundle().sendMessage(sender, "world.info.environment",
                 Placeholder.parsed("environment", getName(world.getEnvironment())));
-        plugin.bundle().sendMessage(context.sender(), "world.info.generator",
+        plugin.bundle().sendMessage(sender, "world.info.generator",
                 Placeholder.parsed("generator", String.valueOf(notnull(
                         volume.getWorldImage().generator(), "Vanilla"))));
-        plugin.bundle().sendMessage(context.sender(), "world.info.seed",
+        plugin.bundle().sendMessage(sender, "world.info.seed",
                 Placeholder.parsed("seed", String.valueOf(world.getSeed())));
     }
 

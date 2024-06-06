@@ -1,12 +1,12 @@
 package net.thenextlvl.worlds.command;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
 import net.thenextlvl.worlds.link.Link;
 import org.bukkit.PortalType;
 import org.bukkit.World;
-import org.bukkit.command.CommandSender;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.bukkit.parser.WorldParser;
 import org.incendo.cloud.context.CommandContext;
@@ -18,24 +18,25 @@ import org.incendo.cloud.suggestion.Suggestion;
 import org.incendo.cloud.suggestion.SuggestionProvider;
 
 @RequiredArgsConstructor
+@SuppressWarnings("UnstableApiUsage")
 abstract class WorldLinkCommand {
     protected final Worlds plugin;
-    protected final Command.Builder<CommandSender> builder;
+    protected final Command.Builder<CommandSourceStack> builder;
 
-    protected final Command.Builder<CommandSender> linkCommand() {
+    protected final Command.Builder<CommandSourceStack> linkCommand() {
         return builder.literal("link")
                 .commandDescription(Description.description("link portals between dimensions"));
     }
 
-    abstract Command.Builder<CommandSender> create();
+    abstract Command.Builder<CommandSourceStack> create();
 
     static class Create extends WorldLinkCommand {
-        public Create(Worlds plugin, Command.Builder<CommandSender> builder) {
+        public Create(Worlds plugin, Command.Builder<CommandSourceStack> builder) {
             super(plugin, builder);
         }
 
         @Override
-        Command.Builder<CommandSender> create() {
+        Command.Builder<CommandSourceStack> create() {
             return linkCommand().literal("create")
                     .permission("worlds.command.link.create")
                     .required("source", WorldParser.worldParser())
@@ -44,28 +45,30 @@ abstract class WorldLinkCommand {
                     .handler(this::execute);
         }
 
-        private void execute(CommandContext<CommandSender> context) {
+        private void execute(CommandContext<CommandSourceStack> context) {
             handleCreate(context);
         }
 
-        private void handleCreate(CommandContext<CommandSender> context) {
+        private void handleCreate(CommandContext<CommandSourceStack> context) {
             var source = context.<World>get("source");
             var destination = context.<World>get("destination");
             var portalType = context.<PortalType>optional("portal-type")
                     .orElse(getPortalType(source.getEnvironment(), destination.getEnvironment()));
 
+            var sender = context.sender().getSender();
+
             if (portalType == null) throw new InvalidSyntaxException(
                     "world link create [source] [destination] [portal-type]",
-                    context.sender(), java.util.List.of()
+                    sender, java.util.List.of()
             );
 
             var link = new Link(portalType, source, destination);
             if (plugin.linkRegistry().register(link)) {
-                plugin.bundle().sendMessage(context.sender(), "link.created",
+                plugin.bundle().sendMessage(sender, "link.created",
                         Placeholder.parsed("type", link.portalType().name().toLowerCase()),
                         Placeholder.parsed("source", link.source().getName()),
                         Placeholder.parsed("destination", link.destination().getName()));
-            } else plugin.bundle().sendMessage(context.sender(), "link.exists",
+            } else plugin.bundle().sendMessage(sender, "link.exists",
                     Placeholder.parsed("type", link.portalType().name().toLowerCase()),
                     Placeholder.parsed("source", link.source().getName()),
                     Placeholder.parsed("destination", link.destination().getName()));
@@ -94,12 +97,12 @@ abstract class WorldLinkCommand {
     }
 
     static class Delete extends WorldLinkCommand {
-        public Delete(Worlds plugin, Command.Builder<CommandSender> builder) {
+        public Delete(Worlds plugin, Command.Builder<CommandSourceStack> builder) {
             super(plugin, builder);
         }
 
         @Override
-        Command.Builder<CommandSender> create() {
+        Command.Builder<CommandSourceStack> create() {
             return linkCommand().literal("delete")
                     .permission("worlds.command.link.delete")
                     .required("link", StringParser.greedyStringParser(),
@@ -110,38 +113,40 @@ abstract class WorldLinkCommand {
                     .handler(this::execute);
         }
 
-        private void execute(CommandContext<CommandSender> context) {
+        private void execute(CommandContext<CommandSourceStack> context) {
+            var sender = context.sender().getSender();
             var linkName = context.<String>get("link");
             var link = plugin.linkRegistry().getLinks()
                     .filter(link1 -> link1.toString().equals(linkName))
                     .findFirst()
                     .orElse(null);
             if (link != null && plugin.linkRegistry().unregister(link)) {
-                plugin.bundle().sendMessage(context.sender(), "link.deleted",
+                plugin.bundle().sendMessage(sender, "link.deleted",
                         Placeholder.parsed("type", link.portalType().name().toLowerCase()),
                         Placeholder.parsed("source", link.source().getName()),
                         Placeholder.parsed("destination", link.destination().getName()));
-            } else plugin.bundle().sendMessage(context.sender(), "link.exists.not",
+            } else plugin.bundle().sendMessage(sender, "link.exists.not",
                     Placeholder.parsed("link", linkName));
         }
     }
 
     static class List extends WorldLinkCommand {
-        public List(Worlds plugin, Command.Builder<CommandSender> builder) {
+        public List(Worlds plugin, Command.Builder<CommandSourceStack> builder) {
             super(plugin, builder);
         }
 
         @Override
-        Command.Builder<CommandSender> create() {
+        Command.Builder<CommandSourceStack> create() {
             return linkCommand().literal("list")
                     .permission("worlds.command.link.list")
                     .handler(this::execute);
         }
 
-        private void execute(CommandContext<CommandSender> context) {
+        private void execute(CommandContext<CommandSourceStack> context) {
+            var sender = context.sender().getSender();
             var links = plugin.linkRegistry().getLinks().map(Link::toString).toList();
-            if (links.isEmpty()) plugin.bundle().sendMessage(context.sender(), "link.list.empty");
-            else plugin.bundle().sendMessage(context.sender(), "link.list",
+            if (links.isEmpty()) plugin.bundle().sendMessage(sender, "link.list.empty");
+            else plugin.bundle().sendMessage(sender, "link.list",
                     Placeholder.parsed("links", String.join(", ", links)),
                     Placeholder.parsed("amount", String.valueOf(links.size())));
         }

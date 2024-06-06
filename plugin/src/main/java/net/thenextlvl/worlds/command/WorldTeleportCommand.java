@@ -1,10 +1,10 @@
 package net.thenextlvl.worlds.command;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.Worlds;
 import org.bukkit.World;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.incendo.cloud.Command;
@@ -16,11 +16,12 @@ import org.incendo.cloud.exception.InvalidSyntaxException;
 import java.util.List;
 
 @RequiredArgsConstructor
+@SuppressWarnings("UnstableApiUsage")
 class WorldTeleportCommand {
     private final Worlds plugin;
-    private final Command.Builder<CommandSender> builder;
+    private final Command.Builder<CommandSourceStack> builder;
 
-    Command.Builder<CommandSender> create() {
+    Command.Builder<CommandSourceStack> create() {
         return builder.literal("teleport", "tp")
                 .permission("worlds.command.world.teleport")
                 .required("world", WorldParser.worldParser())
@@ -28,8 +29,8 @@ class WorldTeleportCommand {
                 .handler(this::execute);
     }
 
-    private void execute(CommandContext<CommandSender> context) {
-        var sender = context.sender();
+    private void execute(CommandContext<CommandSourceStack> context) {
+        var sender = context.sender().getSender();
         var world = context.<World>get("world");
         var player = context.<Player>optional("player").orElse(sender instanceof Player self ? self : null);
         if (player == null) throw new InvalidSyntaxException("world teleport [world] [player]", sender, List.of());
