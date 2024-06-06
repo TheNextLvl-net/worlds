@@ -92,10 +92,7 @@ hangarPublish { // docs - https://docs.papermc.io/misc/hangar-publishing
         apiKey.set(System.getenv("HANGAR_API_TOKEN"))
         platforms.register(Platforms.PAPER) {
             jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-            val versions: List<String> = (property("paperVersion") as String)
-                .split(",")
-                .map { it.trim() }
-            platformVersions.set(versions)
+            platformVersions.set(listOf("1.20.6"))
         }
     }
 }
