@@ -96,7 +96,7 @@ class CraftImage implements Image {
             if (!keepImage) try {
                 getFile().delete();
             } catch (IOException e) {
-                e.printStackTrace();
+                plugin.getComponentLogger().error("Failed to delete world {}", getWorld().getName(), e);
             }
         }));
 
