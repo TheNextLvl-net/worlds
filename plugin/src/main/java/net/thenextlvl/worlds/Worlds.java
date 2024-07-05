@@ -41,17 +41,15 @@ public class Worlds extends JavaPlugin {
             audience instanceof Player player ? player.locale() : Locale.US)
             .register("worlds", Locale.US)
             .register("worlds_german", Locale.GERMANY)
-            .fallback(Locale.US);
+            .miniMessage(bundle -> MiniMessage.builder().tags(TagResolver.resolver(
+                    TagResolver.standard(),
+                    Placeholder.component("prefix", bundle.component(Locale.US, "prefix"))
+            )).build());;
 
     private final Metrics metrics = new Metrics(this, 19652);
 
     @Override
     public void onLoad() {
-        bundle().miniMessage(MiniMessage.builder().tags(TagResolver.resolver(
-                TagResolver.standard(),
-                Placeholder.component("prefix", bundle().component(Locale.US, "prefix"))
-        )).build());
-
         Bukkit.getServicesManager().register(LinkRegistry.class, linkRegistry(), this, ServicePriority.Highest);
 
         saveDefaultPresets();
