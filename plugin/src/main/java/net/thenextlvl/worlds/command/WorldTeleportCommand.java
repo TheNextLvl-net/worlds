@@ -36,7 +36,7 @@ class WorldTeleportCommand {
         if (player == null) throw new InvalidSyntaxException("world teleport [world] [player]", sender, List.of());
         player.teleportAsync(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
         var message = player.equals(sender) ? "world.teleport.player.self" : "world.teleport.player.other";
-        var placeholder = Placeholder.parsed("world", world.getName());
-        plugin.bundle().sendMessage(player, message, placeholder);
+        plugin.bundle().sendMessage(sender, message, Placeholder.parsed("world", world.getName()),
+                Placeholder.parsed("player", player.getName()));
     }
 }
