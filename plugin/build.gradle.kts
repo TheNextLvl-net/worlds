@@ -4,6 +4,7 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 plugins {
     id("java")
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
+    id("io.papermc.paperweight.userdev") version "1.7.1"
     id("net.minecrell.plugin-yml.paper") version "0.6.0"
     id("io.github.goooler.shadow") version "8.1.7"
     id("com.modrinth.minotaur") version "2.+"
@@ -25,9 +26,10 @@ repositories {
 }
 
 dependencies {
+    paperweight.paperDevBundle("1.21-R0.1-SNAPSHOT")
+
     compileOnly("org.projectlombok:lombok:1.18.32")
     compileOnly("net.thenextlvl.core:annotations:2.0.1")
-    compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
 
     implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation("org.incendo:cloud-paper:2.0.0-beta.9")
