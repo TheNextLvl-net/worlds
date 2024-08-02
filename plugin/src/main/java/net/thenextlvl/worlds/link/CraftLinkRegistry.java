@@ -7,7 +7,7 @@ import core.file.format.GsonFile;
 import core.io.IO;
 import core.paper.adapters.world.WorldAdapter;
 import lombok.RequiredArgsConstructor;
-import net.thenextlvl.worlds.Worlds;
+import net.thenextlvl.worlds.WorldsPlugin;
 import org.bukkit.World;
 
 import java.util.HashSet;
@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class CraftLinkRegistry implements LinkRegistry {
     private final Set<Link> links = new HashSet<>();
-    private final Worlds plugin;
+    private final WorldsPlugin plugin;
 
     @Override
     public Stream<Link> getLinks() {
