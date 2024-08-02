@@ -1,7 +1,9 @@
 package net.thenextlvl.worlds.preset;
 
 import org.bukkit.Material;
-import org.jetbrains.annotations.Range;
 
-public record Layer(Material block, @Range(from = 1, to = Long.MAX_VALUE) int height) {
+public record Layer(String block, int height) {
+    Layer(Material material, int height) {
+        this(material.key().asString(), height);
+    }
 }
