@@ -30,8 +30,7 @@ import java.util.Objects;
 @Accessors(fluent = true)
 @FieldsAreNotNullByDefault
 @ParametersAreNotNullByDefault
-public class Worlds extends JavaPlugin {
-    private final CraftImageProvider imageProvider = new CraftImageProvider(this);
+public class WorldsPlugin extends JavaPlugin {
     private final CraftLinkRegistry linkRegistry = new CraftLinkRegistry(this);
 
     private final File presetsFolder = new File(getDataFolder(), "presets");
