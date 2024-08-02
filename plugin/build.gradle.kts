@@ -35,8 +35,6 @@ dependencies {
     compileOnly("net.thenextlvl.core:annotations:2.0.1")
 
     implementation("org.bstats:bstats-bukkit:3.0.2")
-    implementation("org.incendo:cloud-paper:2.0.0-beta.9")
-    implementation("org.incendo:cloud-minecraft-extras:2.0.0-beta.9")
 
     implementation(project(":api"))
     implementation("net.thenextlvl.core:nbt:1.4.2")
