@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.command;
+package net.thenextlvl.worlds.command.old;
 
 import core.annotation.MethodsReturnNotNullByDefault;
 import core.annotation.ParametersAreNotNullByDefault;

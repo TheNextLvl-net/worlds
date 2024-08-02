@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.util;
+package net.thenextlvl.worlds.model;
 
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.entity.Entity;
