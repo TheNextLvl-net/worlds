@@ -8,7 +8,7 @@ import java.lang.reflect.Type;
 public class StructureTypeAdapter implements JsonSerializer<Structure>, JsonDeserializer<Structure> {
     @Override
     public Structure deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
-        return Structure.literal(element.getAsString());
+        return new Structure(element.getAsString());
     }
 
     @Override
