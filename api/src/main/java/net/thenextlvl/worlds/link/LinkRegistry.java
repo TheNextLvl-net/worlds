@@ -5,7 +5,6 @@ import org.bukkit.World;
 import java.util.stream.Stream;
 
 public interface LinkRegistry {
-
     Stream<Link> getLinks();
 
     boolean isRegistered(Link link);
