@@ -2,9 +2,9 @@ package net.thenextlvl.worlds.listener;
 
 import io.papermc.paper.event.entity.EntityPortalReadyEvent;
 import lombok.RequiredArgsConstructor;
-import net.thenextlvl.worlds.Worlds;
+import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.link.Link;
-import net.thenextlvl.worlds.util.PortalCooldown;
+import net.thenextlvl.worlds.model.PortalCooldown;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.PortalType;
@@ -23,7 +23,7 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.END_PORT
 @RequiredArgsConstructor
 public class PortalListener implements Listener {
     private final PortalCooldown cooldown = new PortalCooldown();
-    private final Worlds plugin;
+    private final WorldsPlugin plugin;
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityPortal(EntityPortalReadyEvent event) {
