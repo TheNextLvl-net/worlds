@@ -27,8 +27,8 @@ public class PortalListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityPortal(EntityPortalReadyEvent event) {
-        plugin.linkRegistry().getLinks()
-                .filter(link -> event.getPortalType().equals(link.portalType()))
+        plugin.linkRegistry().getLinks().stream()
+                // .filter(link -> event.getPortalType().equals(link.portalType()))
                 .filter(link -> event.getEntity().getWorld().equals(link.source()))
                 .findFirst()
                 .map(Link::destination)
