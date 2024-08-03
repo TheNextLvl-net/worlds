@@ -1,6 +1,7 @@
 package net.thenextlvl.worlds.view;
 
 import core.io.IO;
+import core.io.PathIO;
 import core.nbt.file.NBTFile;
 import core.nbt.tag.CompoundTag;
 import core.nbt.tag.StringTag;
@@ -12,7 +13,10 @@ import net.thenextlvl.worlds.preset.Biome;
 import net.thenextlvl.worlds.preset.Layer;
 import net.thenextlvl.worlds.preset.Preset;
 import net.thenextlvl.worlds.preset.Structure;
-import org.bukkit.*;
+import org.bukkit.NamespacedKey;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -30,7 +34,8 @@ public class LevelView {
         return Optional.ofNullable(plugin.getServer().getWorldContainer()
                         .listFiles(File::isDirectory)).stream()
                 .flatMap(files -> Arrays.stream(files).filter(level ->
-                        new File(level, "level.dat").isFile()));
+                        new File(level, "level.dat").isFile() ||
+                        new File(level, "level.dat_old").isFile()));
     }
 
     public Stream<File> listOverworldLevels() {
@@ -40,7 +45,9 @@ public class LevelView {
     }
 
     public boolean canLoad(File level) {
-        return Bukkit.getWorld(level.getName()) == null;
+        return plugin.getServer().getWorlds().stream()
+                .map(World::getWorldFolder)
+                .noneMatch(level::equals);
     }
 
     public Stream<File> listNetherLevels() {
@@ -64,9 +71,17 @@ public class LevelView {
     }
 
     private @Nullable World loadLevel(File level, World.Environment environment) {
-        var root = new NBTFile<>(IO.of(level, "level.dat"), new CompoundTag()).getRoot();
+        var root = new NBTFile<>(Optional.of(
+                IO.of(level, "level.dat")
+        ).filter(PathIO::exists).orElseGet(() ->
+                IO.of(level, "level.dat_old")
+        ), new CompoundTag()).getRoot();
 
         var data = root.getAsCompound("Data");
+        var extras = readExtras(data);
+
+        if (extras.filter(LevelExtras::enabled).isEmpty()) return null;
+
         var settings = data.getAsCompound("WorldGenSettings");
         var dimensions = settings.getAsCompound("dimensions");
 
@@ -100,10 +115,12 @@ public class LevelView {
                 .orElseThrow(() -> new NoSuchElementException("generate_features"))
                 .getAsBoolean();
 
-        var extras = readExtras(root);
+        var key = extras.map(LevelExtras::key).orElseGet(() -> {
+            var namespace = level.getName().toLowerCase().replace(" ", "_");
+            return new NamespacedKey("worlds", namespace);
+        });
 
-        var namespace = level.getName().toLowerCase().replace(" ", "_");
-        var creator = new WorldCreator(level.getName(), new NamespacedKey("worlds", namespace))
+        var creator = new WorldCreator(level.getName(), key)
                 .environment(environment)
                 .generateStructures(structures)
                 .hardcore(hardcore)
@@ -114,11 +131,31 @@ public class LevelView {
                 Preset.serialize(generatorSettings).toString()
         );
 
-        return creator.createWorld();
+
+        var world = creator.createWorld();
+        if (world == null) return null;
+
+        extras.map(LevelExtras::autoSave).ifPresent(world::setAutoSave);
+
+        return world;
     }
 
-    private LevelExtras readExtras(CompoundTag root) {
-        return null;
+    private Optional<LevelExtras> readExtras(CompoundTag data) {
+        return data.optional("BukkitValues")
+                .map(Tag::getAsCompound)
+                .map(values -> {
+                    var key = values.optional("worlds:world_key")
+                            .map(Tag::getAsString)
+                            .map(NamespacedKey::fromString)
+                            .orElse(null);
+                    var autoSave = values.optional("worlds:auto_save")
+                            .map(Tag::getAsBoolean)
+                            .orElse(true);
+                    var enabled = values.optional("worlds:enabled")
+                            .map(Tag::getAsBoolean)
+                            .orElse(true);
+                    return new LevelExtras(key, autoSave, enabled);
+                });
     }
 
     private Preset readSettings(CompoundTag generator) {
