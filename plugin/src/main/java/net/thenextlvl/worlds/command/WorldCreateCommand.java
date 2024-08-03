@@ -1,10 +1,10 @@
 package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
 
@@ -16,7 +16,7 @@ class WorldCreateCommand {
     ArgumentBuilder<CommandSourceStack, ?> create() {
         return Commands.literal("create")
                 .requires(source -> source.getSender().hasPermission("worlds.command.create"))
-                .then(Commands.argument("name", StringArgumentType.string())
+                .then(Commands.argument("key", ArgumentTypes.key())
                         .executes(context -> {
                             return Command.SINGLE_SUCCESS;
                         }));
