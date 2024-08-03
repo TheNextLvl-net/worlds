@@ -2,10 +2,10 @@ package net.thenextlvl.worlds.link;
 
 import org.bukkit.World;
 
-import java.util.stream.Stream;
+import java.util.Set;
 
 public interface LinkRegistry {
-    Stream<Link> getLinks();
+    Set<Link> getLinks();
 
     boolean isRegistered(Link link);
 
