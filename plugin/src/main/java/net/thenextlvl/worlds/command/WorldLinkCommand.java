@@ -8,6 +8,7 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
@@ -18,6 +19,7 @@ class WorldLinkCommand {
         return Commands.literal("link")
                 .requires(source -> source.getSender().hasPermission("worlds.command.link"))
                 .then(Commands.argument("source", ArgumentTypes.world())
+                        .suggests(new WorldSuggestionProvider<>(plugin))
                         .then(Commands.argument("destination", ArgumentTypes.world())
                                 .executes(context -> {
                                     return Command.SINGLE_SUCCESS;
