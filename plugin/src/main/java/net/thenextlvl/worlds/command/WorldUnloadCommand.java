@@ -7,6 +7,7 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
@@ -17,6 +18,7 @@ class WorldUnloadCommand {
         return Commands.literal("unload")
                 .requires(source -> source.getSender().hasPermission("worlds.command.unload"))
                 .then(Commands.argument("world", ArgumentTypes.world())
+                        .suggests(new WorldSuggestionProvider<>(plugin))
                         .executes(context -> {
                             return Command.SINGLE_SUCCESS;
                         }));
