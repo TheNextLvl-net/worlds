@@ -9,28 +9,29 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.thenextlvl.worlds.command.WorldCommand;
-import net.thenextlvl.worlds.link.CraftLinkRegistry;
-import net.thenextlvl.worlds.link.LinkRegistry;
 import net.thenextlvl.worlds.listener.PortalListener;
+import net.thenextlvl.worlds.listener.ServerListener;
 import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.preset.Presets;
+import net.thenextlvl.worlds.version.PluginVersionChecker;
 import net.thenextlvl.worlds.view.LevelView;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.Locale;
+
+import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
+import static org.bukkit.persistence.PersistentDataType.STRING;
 
 @Getter
 @Accessors(fluent = true)
 @FieldsAreNotNullByDefault
 @ParametersAreNotNullByDefault
 public class WorldsPlugin extends JavaPlugin {
-    private final CraftLinkRegistry linkRegistry = new CraftLinkRegistry(this);
-
     private final LevelView levelView = new LevelView(this);
 
     private final File presetsFolder = new File(getDataFolder(), "presets");
@@ -45,11 +46,13 @@ public class WorldsPlugin extends JavaPlugin {
                     Placeholder.component("prefix", bundle.component(Locale.US, "prefix"))
             )).build());
 
+    private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
     private final Metrics metrics = new Metrics(this, 19652);
 
     @Override
     public void onLoad() {
-        Bukkit.getServicesManager().register(LinkRegistry.class, linkRegistry(), this, ServicePriority.Highest);
+        registerServices();
+
         if (presetsFolder().list() == null) saveDefaultPresets();
 
         versionChecker().checkVersion();
@@ -57,43 +60,43 @@ public class WorldsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        levelView().listOverworldLevels()
-                .filter(levelView()::canLoad)
-                .forEach(levelView()::loadOverworldLevel);
-        levelView().listNetherLevels()
-                .filter(levelView()::canLoad)
-                .forEach(levelView()::loadNetherLevel);
-        levelView().listEndLevels()
-                .filter(levelView()::canLoad)
-                .forEach(levelView()::loadEndLevel);
-
-        linkRegistry().loadLinks();
         registerListeners();
         registerCommands();
     }
 
     @Override
     public void onDisable() {
-        Bukkit.getWorlds().stream()
-                .map(imageProvider()::get)
-                .filter(Objects::nonNull)
-                .forEach(image -> {
-                    var deletionType = image.getWorldImage().deletionType();
-                    if (deletionType != null) {
-                        image.getWorld().getPlayers().forEach(player -> player.kick(Bukkit.shutdownMessage()));
-                        image.deleteNow(deletionType.keepImage(), false);
-                    } else if (!image.getWorldImage().autoSave()) {
-                        image.getWorld().getPlayers().forEach(player -> player.kick(Bukkit.shutdownMessage()));
-                        image.unload();
-                    }
-                });
-        linkRegistry().saveLinks();
         metrics().shutdown();
+        persistWorlds();
+        unloadWorlds();
+    }
+
+    private void unloadWorlds() {
+        getServer().getWorlds().stream().filter(world -> !world.isAutoSave()).forEach(world -> {
+            world.getPlayers().forEach(player -> player.kick(getServer().shutdownMessage()));
+            getServer().unloadWorld(world, false);
+        });
+    }
+
+    private void persistWorlds() {
+        getServer().getWorlds().forEach(this::persistWorld);
+    }
+
+    public void persistWorld(World world) {
+        var container = world.getPersistentDataContainer();
+        container.set(new NamespacedKey("worlds", "world_key"), STRING, world.getKey().asString());
+        container.set(new NamespacedKey("worlds", "auto_save"), BOOLEAN, world.isAutoSave());
+        container.set(new NamespacedKey("worlds", "enabled"), BOOLEAN, true);
+    }
+
+    private void registerServices() {
+        // getServer().getServicesManager().register(LinkRegistry.class, linkRegistry(), this, ServicePriority.Highest);
     }
 
     private void registerListeners() {
-        Bukkit.getPluginManager().registerEvents(new PortalListener(this), this);
-        Bukkit.getPluginManager().registerEvents(new WorldListener(this), this);
+        getServer().getPluginManager().registerEvents(new PortalListener(this), this);
+        getServer().getPluginManager().registerEvents(new ServerListener(this), this);
+        getServer().getPluginManager().registerEvents(new WorldListener(this), this);
     }
 
     private void registerCommands() {
