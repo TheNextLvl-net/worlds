@@ -5,14 +5,14 @@ import net.thenextlvl.worlds.WorldsPlugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.event.world.WorldSaveEvent;
 
 @RequiredArgsConstructor
 public class WorldListener implements Listener {
     private final WorldsPlugin plugin;
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onWorldUnload(WorldUnloadEvent event) {
-        plugin.linkRegistry().unregisterAll(event.getWorld());
+    public void onWorldSave(WorldSaveEvent event) {
+        plugin.persistWorld(event.getWorld());
     }
 }
