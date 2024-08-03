@@ -51,6 +51,8 @@ public class WorldsPlugin extends JavaPlugin {
     public void onLoad() {
         Bukkit.getServicesManager().register(LinkRegistry.class, linkRegistry(), this, ServicePriority.Highest);
         if (presetsFolder().list() == null) saveDefaultPresets();
+
+        versionChecker().checkVersion();
     }
 
     @Override
