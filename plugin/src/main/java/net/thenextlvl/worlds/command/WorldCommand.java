@@ -15,7 +15,6 @@ public class WorldCommand {
                 .then(new WorldCloneCommand(plugin).create())
                 .then(new WorldCreateCommand(plugin).create())
                 .then(new WorldDeleteCommand(plugin).create())
-                .then(new WorldExportCommand(plugin).create())
                 .then(new WorldImportCommand(plugin).create())
                 .then(new WorldInfoCommand(plugin).create())
                 .then(new WorldLinkCommand(plugin).create())
