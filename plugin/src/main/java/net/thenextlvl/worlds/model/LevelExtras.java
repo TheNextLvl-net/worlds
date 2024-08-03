@@ -1,6 +1,10 @@
 package net.thenextlvl.worlds.model;
 
-public record LevelExtras(
+import org.bukkit.NamespacedKey;
+import org.jetbrains.annotations.Nullable;
 
+public record LevelExtras(
+        @Nullable NamespacedKey key,
+        boolean autoSave
 ) {
 }
