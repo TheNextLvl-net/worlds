@@ -72,7 +72,7 @@ public class WorldsPlugin extends JavaPlugin {
     }
 
     private void unloadWorlds() {
-        getServer().getWorlds().stream().filter(world -> !world.isAutoSave()).forEach(world -> {
+        getServer().getWorlds().stream().dropWhile(World::isAutoSave).forEach(world -> {
             world.getPlayers().forEach(player -> player.kick(getServer().shutdownMessage()));
             getServer().unloadWorld(world, false);
         });
