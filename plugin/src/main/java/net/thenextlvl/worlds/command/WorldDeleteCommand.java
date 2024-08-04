@@ -11,7 +11,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.argument.CommandFlagsArgument;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
-import net.thenextlvl.worlds.image.DeleteResult;
+import net.thenextlvl.worlds.model.WorldActionResult;
 import org.bukkit.World;
 
 import java.io.File;
@@ -51,41 +51,31 @@ class WorldDeleteCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private DeleteResult delete(World world, boolean schedule) {
+    private WorldActionResult delete(World world, boolean schedule) {
         return schedule ? scheduleDeletion(world) : deleteNow(world);
     }
 
-    private boolean canUnload(World world) {
-        return /*!Bukkit.isTickingWorlds() && */world.getPlayers().isEmpty();
-    }
-
-    private boolean isDeletable(World world) {
-        return !world.getKey().toString().equals("minecraft:overworld");
-    }
-
-    private boolean unload(World world) {
-        return canUnload(world) && plugin.getServer().unloadWorld(world, false);
-    }
-
-    private DeleteResult deleteNow(World world) {
-        if (!isDeletable(world)) return DeleteResult.EXEMPTED;
+    private WorldActionResult deleteNow(World world) {
+        if (world.getKey().toString().equals("minecraft:overworld"))
+            return WorldActionResult.DELETE_EXEMPTED;
 
         var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
         world.getPlayers().forEach(player -> player.teleport(fallback));
 
-        if (!unload(world)) return DeleteResult.UNLOAD_FAILED;
+        if (!plugin.getServer().unloadWorld(world, false))
+            return WorldActionResult.UNLOAD_FAILED;
 
         return delete(world.getWorldFolder())
-                ? DeleteResult.SUCCESS
-                : DeleteResult.FAILED;
+                ? WorldActionResult.DELETE_SUCCESS
+                : WorldActionResult.DELETE_FAILED;
     }
 
-    private DeleteResult scheduleDeletion(World world) {
+    private WorldActionResult scheduleDeletion(World world) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (delete(world.getWorldFolder())) return;
             plugin.getComponentLogger().error("Failed to delete world {}", world.getName());
         }));
-        return DeleteResult.SCHEDULED;
+        return WorldActionResult.DELETE_SCHEDULED;
     }
 
     private boolean delete(File file) {
