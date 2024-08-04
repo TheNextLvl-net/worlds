@@ -66,22 +66,21 @@ public class Preset {
         return true;
     }
 
+    /**
+     * Serialize this preset into a json object.
+     *
+     * @return the serialized preset as a JsonObject
+     */
+    public JsonObject serialize() {
+        return gson.toJsonTree(this).getAsJsonObject();
+    }
+
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Structure.class, new StructureTypeAdapter())
             .registerTypeAdapter(Material.class, MaterialAdapter.NotNull.INSTANCE)
             .registerTypeAdapter(Biome.class, new BiomeTypeAdapter())
             .setPrettyPrinting()
             .create();
-
-    /**
-     * Serialize a preset into a json object
-     *
-     * @param preset the preset to serialize
-     * @return the serialized preset
-     */
-    public static JsonObject serialize(Preset preset) {
-        return gson.toJsonTree(preset).getAsJsonObject();
-    }
 
     /**
      * Deserialize a json object into a preset
