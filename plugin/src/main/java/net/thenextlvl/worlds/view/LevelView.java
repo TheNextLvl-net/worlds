@@ -36,10 +36,12 @@ public class LevelView {
                         new File(level, "level.dat_old").isFile()));
     }
 
-    public Stream<File> listOverworldLevels() {
-        return listLevels()
-                .filter(level -> !new File(level, "DIM1").exists())
-                .filter(level -> !new File(level, "DIM-1").exists());
+    public boolean hasNetherDimension(File level) {
+        return new File(level, "DIM-1").isDirectory();
+    }
+
+    public boolean hasEndDimension(File level) {
+        return new File(level, "DIM1").isDirectory();
     }
 
     public boolean canLoad(File level) {
@@ -48,31 +50,25 @@ public class LevelView {
                 .noneMatch(level::equals);
     }
 
-    public Stream<File> listNetherLevels() {
-        return listLevels().filter(level -> new File(level, "DIM-1").exists());
+    public World.Environment getEnvironment(File level) {
+        if (hasEndDimension(level)) return World.Environment.THE_END;
+        if (hasNetherDimension(level)) return World.Environment.NETHER;
+        return World.Environment.NORMAL;
     }
 
-    public Stream<File> listEndLevels() {
-        return listLevels().filter(level -> new File(level, "DIM1").exists());
+    public @Nullable World loadLevel(File level) {
+        return loadLevel(level, false);
     }
 
-    public @Nullable World loadOverworldLevel(File level) {
-        return loadLevel(level, World.Environment.NORMAL);
+    public @Nullable World loadLevel(File level, boolean force) {
+        return loadLevel(level, getEnvironment(level), force);
     }
 
-    public @Nullable World loadNetherLevel(File level) {
-        return loadLevel(level, World.Environment.NETHER);
-    }
-
-    public @Nullable World loadEndLevel(File level) {
-        return loadLevel(level, World.Environment.THE_END);
-    }
-
-    private @Nullable World loadLevel(File level, World.Environment environment) {
+    public @Nullable World loadLevel(File level, World.Environment environment, boolean force) {
         var data = getLevelDataFile(level).getRoot().<CompoundTag>optional("Data");
         var extras = data.flatMap(this::getExtras);
 
-        if (extras.filter(LevelExtras::enabled).isEmpty()) return null;
+        if (!force && extras.filter(LevelExtras::enabled).isEmpty()) return null;
 
         var settings = data.flatMap(tag -> tag.<CompoundTag>optional("WorldGenSettings"));
         var dimensions = settings.flatMap(tag -> tag.<CompoundTag>optional("dimensions"));
@@ -185,7 +181,7 @@ public class LevelView {
             case NORMAL -> "minecraft:overworld";
             case NETHER -> "minecraft:the_nether";
             case THE_END -> "minecraft:the_end";
-            case CUSTOM -> dimensions.keySet().stream().filter(s -> !s.startsWith("minecraft")).findAny()
+            case CUSTOM -> dimensions.keySet().stream().dropWhile(s -> s.startsWith("minecraft")).findAny()
                     .orElseThrow(() -> new UnsupportedOperationException("Could not find custom dimension"));
         };
     }
