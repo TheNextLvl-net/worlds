@@ -14,14 +14,8 @@ public class ServerListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onServerLoad(ServerLoadEvent event) {
         if (!event.getType().equals(ServerLoadEvent.LoadType.STARTUP)) return;
-        plugin.levelView().listOverworldLevels()
+        plugin.levelView().listLevels()
                 .filter(plugin.levelView()::canLoad)
-                .forEach(plugin.levelView()::loadOverworldLevel);
-        plugin.levelView().listNetherLevels()
-                .filter(plugin.levelView()::canLoad)
-                .forEach(plugin.levelView()::loadNetherLevel);
-        plugin.levelView().listEndLevels()
-                .filter(plugin.levelView()::canLoad)
-                .forEach(plugin.levelView()::loadEndLevel);
+                .forEach(plugin.levelView()::loadLevel);
     }
 }
