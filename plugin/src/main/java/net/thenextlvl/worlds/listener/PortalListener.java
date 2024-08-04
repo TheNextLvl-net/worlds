@@ -3,7 +3,6 @@ package net.thenextlvl.worlds.listener;
 import io.papermc.paper.event.entity.EntityPortalReadyEvent;
 import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.link.Link;
 import net.thenextlvl.worlds.model.PortalCooldown;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,12 +26,14 @@ public class PortalListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityPortal(EntityPortalReadyEvent event) {
+        /*
         plugin.linkRegistry().getLinks().stream()
-                // .filter(link -> event.getPortalType().equals(link.portalType()))
+                .filter(link -> event.getPortalType().equals(link.portalType()))
                 .filter(link -> event.getEntity().getWorld().equals(link.source()))
                 .findFirst()
                 .map(Link::destination)
                 .ifPresent(event::setTargetWorld);
+         */
     }
 
     @SuppressWarnings("UnstableApiUsage")
