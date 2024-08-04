@@ -3,9 +3,7 @@ package net.thenextlvl.worlds.view;
 import core.io.IO;
 import core.io.PathIO;
 import core.nbt.file.NBTFile;
-import core.nbt.tag.CompoundTag;
-import core.nbt.tag.StringTag;
-import core.nbt.tag.Tag;
+import core.nbt.tag.*;
 import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.model.LevelExtras;
@@ -71,47 +69,28 @@ public class LevelView {
     }
 
     private @Nullable World loadLevel(File level, World.Environment environment) {
-        var root = new NBTFile<>(Optional.of(
-                IO.of(level, "level.dat")
-        ).filter(PathIO::exists).orElseGet(() ->
-                IO.of(level, "level.dat_old")
-        ), new CompoundTag()).getRoot();
-
-        var data = root.getAsCompound("Data");
-        var extras = readExtras(data);
+        var data = getLevelDataFile(level).getRoot().<CompoundTag>optional("Data");
+        var extras = data.flatMap(this::getExtras);
 
         if (extras.filter(LevelExtras::enabled).isEmpty()) return null;
 
-        var settings = data.getAsCompound("WorldGenSettings");
-        var dimensions = settings.getAsCompound("dimensions");
+        var settings = data.flatMap(tag -> tag.<CompoundTag>optional("WorldGenSettings"));
+        var dimensions = settings.flatMap(tag -> tag.<CompoundTag>optional("dimensions"));
+        var dimension = dimensions.flatMap(tag -> tag.<CompoundTag>optional(getDimension(tag, environment)));
+        var generator = dimension.flatMap(tag -> tag.<CompoundTag>optional("generator"));
 
-        var dimension = dimensions.optional(switch (environment) {
-            case NORMAL -> "minecraft:overworld";
-            case NETHER -> "minecraft:the_nether";
-            case THE_END -> "minecraft:the_end";
-            case CUSTOM -> throw new UnsupportedOperationException("Custom dimensions are not yet supported");
-        }).orElseThrow().getAsCompound();
+        var type = generator.flatMap(this::getWorldType);
 
-        var generator = dimension.getAsCompound("generator");
+        var generatorSettings = type.filter(worldType -> worldType.equals(WorldType.FLAT))
+                .flatMap(worldType -> generator.flatMap(this::getSettings));
 
-        var type = generator.optional("type")
-                .map(Tag::getAsString)
-                .map(string -> switch (string) {
-                    case "minecraft:noise" -> WorldType.NORMAL;
-                    case "minecraft:flat" -> WorldType.FLAT;
-                    case "minecraft:debug" -> throw new IllegalArgumentException("Debug worlds are not yet supported");
-                    default -> throw new IllegalArgumentException("Unexpected generator type: " + string);
-                }).orElseThrow(() -> new NoSuchElementException("type"));
-
-        var generatorSettings = type.equals(WorldType.FLAT) ? readSettings(generator) : null;
-
-        var hardcore = data.optional("hardcore")
+        var hardcore = data.flatMap(tag -> tag.<ByteTag>optional("hardcore"))
                 .orElseThrow(() -> new NoSuchElementException("hardcore"))
                 .getAsBoolean();
-        var seed = settings.optional("seed")
+        var seed = settings.flatMap(tag -> tag.<IntTag>optional("seed"))
                 .orElseThrow(() -> new NoSuchElementException("seed"))
                 .getAsInt();
-        var structures = settings.optional("generate_features")
+        var structures = settings.flatMap(tag -> tag.<ByteTag>optional("generate_features"))
                 .orElseThrow(() -> new NoSuchElementException("generate_features"))
                 .getAsBoolean();
 
@@ -125,11 +104,9 @@ public class LevelView {
                 .generateStructures(structures)
                 .hardcore(hardcore)
                 .seed(seed)
-                .type(type);
+                .type(type.orElse(WorldType.NORMAL));
 
-        if (generatorSettings != null) creator.generatorSettings(
-                Preset.serialize(generatorSettings).toString()
-        );
+        generatorSettings.ifPresent(preset -> creator.generator(preset.serialize().toString()));
 
 
         var world = creator.createWorld();
@@ -140,7 +117,7 @@ public class LevelView {
         return world;
     }
 
-    private Optional<LevelExtras> readExtras(CompoundTag data) {
+    public Optional<LevelExtras> getExtras(CompoundTag data) {
         return data.optional("BukkitValues")
                 .map(Tag::getAsCompound)
                 .map(values -> {
@@ -158,39 +135,71 @@ public class LevelView {
                 });
     }
 
-    private Preset readSettings(CompoundTag generator) {
-        var settings = generator.getAsCompound("settings");
+    public Optional<Preset> getSettings(CompoundTag generator) {
+        var settings = generator.<CompoundTag>optional("settings");
 
-        var biome = settings.optional("biome")
-                .orElseThrow(() -> new NoSuchElementException("biome"))
-                .getAsString();
-        var features = settings.optional("features")
-                .orElseThrow(() -> new NoSuchElementException("features"))
-                .getAsBoolean();
-        var lakes = settings.optional("lakes")
-                .orElseThrow(() -> new NoSuchElementException("lakes"))
-                .getAsBoolean();
+        if (settings.isEmpty()) return Optional.empty();
 
-        var layers = settings.optional("layers")
-                .orElseThrow(() -> new NoSuchElementException("layers"))
-                .<CompoundTag>getAsList().stream()
-                .map(layer -> {
+        var preset = new Preset();
+
+        settings.flatMap(tag -> tag.<Tag>optional("biome"))
+                .map(Tag::getAsString)
+                .map(Biome::literal)
+                .ifPresent(preset::biome);
+
+        settings.flatMap(tag -> tag.<Tag>optional("features"))
+                .map(Tag::getAsBoolean)
+                .ifPresent(preset::features);
+
+        settings.flatMap(tag -> tag.<Tag>optional("lakes"))
+                .map(Tag::getAsBoolean)
+                .ifPresent(preset::lakes);
+
+        settings.flatMap(tag -> tag.<CompoundTag>optional("layers"))
+                .map(tag -> tag.<CompoundTag>getAsList().stream().map(layer -> {
                     var block = layer.optional("block").orElseThrow().getAsString();
                     var height = layer.optional("height").orElseThrow().getAsInt();
                     return new Layer(block, height);
-                }).collect(Collectors.toSet());
+                }).collect(Collectors.toSet()))
+                .ifPresent(preset::layers);
 
-        var structures = settings.optional("structure_overrides")
-                .orElseThrow(() -> new NoSuchElementException("structure_overrides"))
-                .<StringTag>getAsList().stream()
-                .map(structure -> new Structure(structure.getAsString()))
-                .collect(Collectors.toSet());
+        settings.flatMap(tag -> tag.<CompoundTag>optional("structure_overrides"))
+                .map(tag -> tag.<StringTag>getAsList().stream()
+                        .map(structure -> new Structure(structure.getAsString()))
+                        .collect(Collectors.toSet()))
+                .ifPresent(preset::structures);
 
-        return new Preset()
-                .biome(Biome.literal(biome))
-                .features(features)
-                .lakes(lakes)
-                .layers(layers)
-                .structures(structures);
+        return Optional.of(preset);
+    }
+
+    public NBTFile<CompoundTag> getLevelDataFile(File level) {
+        return new NBTFile<>(Optional.of(
+                IO.of(level, "level.dat")
+        ).filter(PathIO::exists).orElseGet(() ->
+                IO.of(level, "level.dat_old")
+        ), new CompoundTag());
+    }
+
+    public String getDimension(CompoundTag dimensions, World.Environment environment) {
+        return switch (environment) {
+            case NORMAL -> "minecraft:overworld";
+            case NETHER -> "minecraft:the_nether";
+            case THE_END -> "minecraft:the_end";
+            case CUSTOM -> dimensions.keySet().stream().filter(s -> !s.startsWith("minecraft")).findAny()
+                    .orElseThrow(() -> new UnsupportedOperationException("Could not find custom dimension"));
+        };
+    }
+
+    public Optional<WorldType> getWorldType(CompoundTag generator) {
+        return getGeneratorType(generator).map(string -> switch (string) {
+            case "minecraft:noise" -> WorldType.NORMAL;
+            case "minecraft:flat" -> WorldType.FLAT;
+            case "minecraft:debug" -> throw new IllegalArgumentException("Debug worlds are not yet supported");
+            default -> throw new IllegalArgumentException("Unexpected generator type: " + string);
+        });
+    }
+
+    public Optional<String> getGeneratorType(CompoundTag generator) {
+        return generator.optional("type").map(Tag::getAsString);
     }
 }
