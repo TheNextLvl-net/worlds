@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -59,18 +60,22 @@ public class LevelView {
     }
 
     public @Nullable World loadLevel(File level) {
-        return loadLevel(level, false);
+        return loadLevel(level, getEnvironment(level));
     }
 
-    public @Nullable World loadLevel(File level, boolean force) {
-        return loadLevel(level, getEnvironment(level), force);
+    public @Nullable World loadLevel(File level, World.Environment environment) {
+        return loadLevel(level, environment, extras -> extras.map(LevelExtras::enabled).isPresent());
     }
 
-    public @Nullable World loadLevel(File level, World.Environment environment, boolean force) {
+    public @Nullable World loadLevel(File level, Predicate<Optional<LevelExtras>> predicate) {
+        return loadLevel(level, getEnvironment(level), predicate);
+    }
+
+    public @Nullable World loadLevel(File level, World.Environment environment, Predicate<Optional<LevelExtras>> predicate) {
         var data = getLevelDataFile(level).getRoot().<CompoundTag>optional("Data");
         var extras = data.flatMap(this::getExtras);
 
-        if (!force && extras.filter(LevelExtras::enabled).isEmpty()) return null;
+        if (!predicate.test(extras)) return null;
 
         var settings = data.flatMap(tag -> tag.<CompoundTag>optional("WorldGenSettings"));
         var dimensions = settings.flatMap(tag -> tag.<CompoundTag>optional("dimensions"));
