@@ -101,7 +101,9 @@ public class LevelView {
                 .getAsBoolean();
 
         var key = extras.map(LevelExtras::key).orElseGet(() -> {
-            var namespace = level.getName().toLowerCase().replace(" ", "_");
+            var namespace = level.getName().toLowerCase()
+                    .replace("(", "").replace(")", "")
+                    .replace(" ", "_");
             return new NamespacedKey("worlds", namespace);
         });
 
