@@ -13,6 +13,7 @@ public class WorldListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWorldSave(WorldSaveEvent event) {
+        if (event.getWorld().key().asString().equals("minecraft:overworld")) return;
         plugin.persistWorld(event.getWorld());
     }
 }
