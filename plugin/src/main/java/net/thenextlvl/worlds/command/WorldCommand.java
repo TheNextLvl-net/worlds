@@ -20,6 +20,7 @@ public class WorldCommand {
                 .then(new WorldLinkCommand(plugin).create())
                 .then(new WorldListCommand(plugin).create())
                 .then(new WorldLoadCommand(plugin).create())
+                .then(new WorldRegenerateCommand(plugin).create())
                 .then(new WorldSaveAllCommand(plugin).create())
                 .then(new WorldSaveCommand(plugin).create())
                 .then(new WorldSaveOffCommand(plugin).create())
