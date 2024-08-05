@@ -6,14 +6,13 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.command.suggestion.DimensionSuggestionProvider;
+import net.thenextlvl.worlds.command.argument.DimensionArgument;
 import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -29,16 +28,10 @@ class WorldImportCommand {
                 .requires(source -> source.getSender().hasPermission("worlds.command.import"))
                 .then(Commands.argument("world", StringArgumentType.string())
                         .suggests(new LevelSuggestionProvider<>(plugin))
-                        .then(Commands.argument("dimension", ArgumentTypes.key())
-                                .suggests(new DimensionSuggestionProvider<>())
+                        .then(Commands.argument("dimension", new DimensionArgument())
                                 .executes(context -> {
-                                    var dimension = context.getArgument("dimension", Key.class);
-                                    return execute(context, switch (dimension.asString()) {
-                                        case "minecraft:overworld" -> World.Environment.NORMAL;
-                                        case "minecraft:the_end" -> World.Environment.THE_END;
-                                        case "minecraft:the_nether" -> World.Environment.NETHER;
-                                        default -> World.Environment.CUSTOM;
-                                    });
+                                    var environment = context.getArgument("dimension", World.Environment.class);
+                                    return execute(context, environment);
                                 }))
                         .executes(context -> execute(context, null)));
     }
@@ -52,6 +45,8 @@ class WorldImportCommand {
         var message = world != null ? "world.import.success" : "world.import.failed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
                 Placeholder.parsed("world", world != null ? world.key().asString() : name));
+        if (world != null && context.getSource().getSender() instanceof Entity entity)
+            entity.teleportAsync(world.getSpawnLocation());
         return world != null ? Command.SINGLE_SUCCESS : 0;
     }
 }
