@@ -31,9 +31,11 @@ public class LevelView {
     public Stream<File> listLevels() {
         return Optional.ofNullable(plugin.getServer().getWorldContainer()
                         .listFiles(File::isDirectory)).stream()
-                .flatMap(files -> Arrays.stream(files).filter(level ->
-                        new File(level, "level.dat").isFile() ||
-                        new File(level, "level.dat_old").isFile()));
+                .flatMap(files -> Arrays.stream(files).filter(this::isLevel));
+    }
+
+    public boolean isLevel(File file) {
+        return file.isDirectory() && (new File(file, "level.dat").isFile() || new File(file, "level.dat_old").isFile());
     }
 
     public boolean hasNetherDimension(File level) {
