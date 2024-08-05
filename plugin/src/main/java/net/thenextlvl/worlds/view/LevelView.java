@@ -188,9 +188,8 @@ public class LevelView {
 
     public Optional<WorldType> getWorldType(CompoundTag generator) {
         return getGeneratorType(generator).map(string -> switch (string) {
-            case "minecraft:noise" -> WorldType.NORMAL;
+            case "minecraft:noise", "minecraft:debug" -> WorldType.NORMAL;
             case "minecraft:flat" -> WorldType.FLAT;
-            case "minecraft:debug" -> throw new IllegalArgumentException("Debug worlds are not yet supported");
             default -> throw new IllegalArgumentException("Unexpected generator type: " + string);
         });
     }
