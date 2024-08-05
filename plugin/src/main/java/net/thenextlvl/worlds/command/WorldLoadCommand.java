@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
+import org.bukkit.entity.Entity;
 
 import java.io.File;
 
@@ -34,6 +35,8 @@ class WorldLoadCommand {
         var message = world != null ? "world.load.success" : "world.load.failed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
                 Placeholder.parsed("world", world != null ? world.key().asString() : name));
+        if (world != null && context.getSource().getSender() instanceof Entity entity)
+            entity.teleportAsync(world.getSpawnLocation());
         return world != null ? Command.SINGLE_SUCCESS : 0;
     }
 }
