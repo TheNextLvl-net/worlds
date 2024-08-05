@@ -93,7 +93,7 @@ public class LevelView {
         var hardcore = data.flatMap(tag -> tag.<ByteTag>optional("hardcore"))
                 .orElseThrow(() -> new NoSuchElementException("hardcore"))
                 .getAsBoolean();
-        var seed = settings.flatMap(tag -> tag.<IntTag>optional("seed"))
+        var seed = settings.flatMap(tag -> tag.<LongTag>optional("seed"))
                 .orElseThrow(() -> new NoSuchElementException("seed"))
                 .getAsInt();
         var structures = settings.flatMap(tag -> tag.<ByteTag>optional("generate_features"))
