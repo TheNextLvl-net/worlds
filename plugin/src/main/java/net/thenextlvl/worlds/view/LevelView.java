@@ -54,8 +54,11 @@ public class LevelView {
     }
 
     public World.Environment getEnvironment(File level) {
-        if (hasEndDimension(level)) return World.Environment.THE_END;
-        if (hasNetherDimension(level)) return World.Environment.NETHER;
+        var end = hasEndDimension(level);
+        var nether = hasNetherDimension(level);
+        if (end && nether) return World.Environment.NORMAL;
+        if (end) return World.Environment.THE_END;
+        if (nether) return World.Environment.NETHER;
         return World.Environment.NORMAL;
     }
 
