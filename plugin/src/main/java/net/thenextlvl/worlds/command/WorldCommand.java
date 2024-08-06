@@ -12,6 +12,7 @@ public class WorldCommand {
 
     public void register() {
         var command = Commands.literal("world")
+                .requires(source -> source.getSender().hasPermission("worlds.command"))
                 .then(new WorldCloneCommand(plugin).create())
                 .then(new WorldCreateCommand(plugin).create())
                 .then(new WorldDeleteCommand(plugin).create())
