@@ -63,16 +63,24 @@ paper {
     authors = listOf("NonSwag")
 
     permissions {
-        register("worlds.commands.world") {
+        register("worlds.commands.admin") {
             this.children = listOf(
-                "worlds.command.world.create",
-                "worlds.command.world.delete",
-                "worlds.command.world.export",
-                "worlds.command.world.import",
-                "worlds.command.world.info",
-                "worlds.command.world.list",
-                "worlds.command.world.setspawn",
-                "worlds.command.world.teleport"
+                "worlds.command.clone",
+                "worlds.command.create",
+                "worlds.command.delete",
+                "worlds.command.import",
+                "worlds.command.info",
+                "worlds.command.link",
+                "worlds.command.list",
+                "worlds.command.load",
+                "worlds.command.save",
+                "worlds.command.save-all",
+                "worlds.command.save-off",
+                "worlds.command.save-on",
+                "worlds.command.setspawn",
+                "worlds.command.spawn",
+                "worlds.command.teleport",
+                "worlds.command.unload",
             )
         }
         register("worlds.commands.link") {
@@ -81,6 +89,64 @@ paper {
                 "worlds.command.link.delete",
                 "worlds.command.link.list"
             )
+        }
+        register("worlds.command.link.create") {
+            this.children = listOf("worlds.command.link")
+        }
+        register("worlds.command.link.delete") {
+            this.children = listOf("worlds.command.link")
+        }
+        register("worlds.command.link.list") {
+            this.children = listOf("worlds.command.link")
+        }
+
+        register("worlds.command.link") {
+            this.children = listOf("worlds.command")
+        }
+        register("worlds.command.clone") {
+            this.children = listOf("worlds.command")
+        }
+        register("worlds.command.create") {
+            this.children = listOf("worlds.command")
+        }
+        register("worlds.command.delete") {
+            this.children = listOf("worlds.command")
+        }
+        register("worlds.command.import") {
+            this.children = listOf("worlds.command")
+        }
+        register("worlds.command.info") {
+            this.children = listOf("worlds.command")
+        }
+        register("worlds.command.list") {
+            this.children = listOf("worlds.command")
+        }
+        register("worlds.command.load") {
+            this.children = listOf("worlds.command")
+        }
+        register("worlds.command.save") {
+            this.children = listOf("worlds.command")
+        }
+        register("worlds.command.save-all") {
+            this.children = listOf("worlds.command")
+        }
+        register("worlds.command.save-off") {
+            this.children = listOf("worlds.command")
+        }
+        register("worlds.command.save-on") {
+            this.children = listOf("worlds.command")
+        }
+        register("worlds.command.setspawn") {
+            this.children = listOf("worlds.command")
+        }
+        register("worlds.command.spawn") {
+            this.children = listOf("worlds.command")
+        }
+        register("worlds.command.teleport") {
+            this.children = listOf("worlds.command")
+        }
+        register("worlds.command.unload") {
+            this.children = listOf("worlds.command")
         }
     }
 }
