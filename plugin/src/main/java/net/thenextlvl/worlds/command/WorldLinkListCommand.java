@@ -1,4 +1,3 @@
-
 package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -9,14 +8,11 @@ import net.thenextlvl.worlds.WorldsPlugin;
 
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
-class WorldLinkCommand {
+public class WorldLinkListCommand {
     private final WorldsPlugin plugin;
 
     ArgumentBuilder<CommandSourceStack, ?> create() {
         return Commands.literal("link")
-                .requires(source -> source.getSender().hasPermission("worlds.command.link"))
-                .then(new WorldLinkCreateCommand(plugin).create())
-                .then(new WorldLinkListCommand(plugin).create())
-                .then(new WorldLinkRemoveCommand(plugin).create());
+                .requires(source -> source.getSender().hasPermission("worlds.command.link.list"));
     }
 }
