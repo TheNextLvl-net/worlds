@@ -47,7 +47,6 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.32")
 }
 
-
 tasks.shadowJar {
     relocate("org.bstats", "net.thenextlvl.worlds.bstats")
     archiveBaseName.set("worlds")
