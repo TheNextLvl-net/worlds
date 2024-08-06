@@ -50,7 +50,6 @@ dependencies {
 tasks.shadowJar {
     relocate("org.bstats", "net.thenextlvl.worlds.bstats")
     archiveBaseName.set("worlds")
-    // minimize() // breaks cloud
 }
 
 paper {
