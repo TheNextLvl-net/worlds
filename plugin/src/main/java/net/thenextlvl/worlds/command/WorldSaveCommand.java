@@ -2,6 +2,7 @@ package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
@@ -10,7 +11,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.World;
-import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.CraftWorld;
 
 @RequiredArgsConstructor
@@ -24,24 +24,14 @@ class WorldSaveCommand {
                 .then(Commands.argument("world", ArgumentTypes.world())
                         .suggests(new WorldSuggestionProvider<>(plugin))
                         .then(Commands.literal("flush")
-                                .executes(context -> {
-                                    var world = context.getArgument("world", World.class);
-                                    return save(context.getSource().getSender(), world, true);
-                                }))
-                        .executes(context -> {
-                            var world = context.getArgument("world", World.class);
-                            return save(context.getSource().getSender(), world, false);
-                        }))
-                .then(Commands.literal("flush")
-                        .executes(context -> save(context.getSource().getSender(),
-                                context.getSource().getLocation().getWorld(), true)))
-                .executes(context -> save(context.getSource().getSender(),
-                        context.getSource().getLocation().getWorld(), false));
+                                .executes(context -> save(context, true)))
+                        .executes(context -> save(context, false)));
     }
 
-    private int save(CommandSender sender, World world, boolean flush) {
+    private int save(CommandContext<CommandSourceStack> context, boolean flush) {
+        var world = context.getArgument("world", World.class);
         var placeholder = Placeholder.parsed("world", world.key().asString());
-        plugin.bundle().sendMessage(sender, "world.save", placeholder);
+        plugin.bundle().sendMessage(context.getSource().getSender(), "world.save", placeholder);
 
         var level = ((CraftWorld) world).getHandle();
         var oldSave = level.noSave;
@@ -49,7 +39,7 @@ class WorldSaveCommand {
         level.save(null, flush, false);
         level.noSave = oldSave;
 
-        plugin.bundle().sendMessage(sender, "world.save.success", placeholder);
+        plugin.bundle().sendMessage(context.getSource().getSender(), "world.save.success", placeholder);
         return Command.SINGLE_SUCCESS;
     }
 }
