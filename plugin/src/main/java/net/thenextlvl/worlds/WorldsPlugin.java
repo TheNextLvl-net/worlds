@@ -51,10 +51,7 @@ public class WorldsPlugin extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        registerServices();
-
         if (presetsFolder().list() == null) saveDefaultPresets();
-
         versionChecker().checkVersion();
     }
 
@@ -83,14 +80,10 @@ public class WorldsPlugin extends JavaPlugin {
     }
 
     public void persistWorld(World world) {
+        if (world.key().asString().equals("minecraft:overworld")) return;
         var container = world.getPersistentDataContainer();
         container.set(new NamespacedKey("worlds", "world_key"), STRING, world.getKey().asString());
-        container.set(new NamespacedKey("worlds", "auto_save"), BOOLEAN, world.isAutoSave());
         container.set(new NamespacedKey("worlds", "enabled"), BOOLEAN, true);
-    }
-
-    private void registerServices() {
-        // getServer().getServicesManager().register(LinkRegistry.class, linkRegistry(), this, ServicePriority.Highest);
     }
 
     private void registerListeners() {
