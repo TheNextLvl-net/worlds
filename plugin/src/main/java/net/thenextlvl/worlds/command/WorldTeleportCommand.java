@@ -13,8 +13,13 @@ import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
+import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+
+import java.util.List;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
@@ -30,29 +35,25 @@ class WorldTeleportCommand {
                         .suggests(new WorldSuggestionProvider<>(plugin))
                         .then(Commands.argument("entities", ArgumentTypes.entities())
                                 .then(Commands.argument("position", ArgumentTypes.finePosition(true))
-                                        .executes(this::teleportEntityPosition))
-                                .executes(this::teleportEntity))
+                                        .executes(this::teleportEntitiesPosition))
+                                .executes(this::teleportEntities))
                         .executes(this::teleport));
     }
 
-    private int teleportEntityPosition(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    private int teleportEntitiesPosition(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var entities = context.getArgument("entities", EntitySelectorArgumentResolver.class);
         var position = context.getArgument("position", FinePositionResolver.class);
         var world = context.getArgument("world", World.class);
         var location = position.resolve(context.getSource()).toLocation(world);
         var resolved = entities.resolve(context.getSource());
-        // todo: add messages
-        resolved.forEach(entity -> entity.teleportAsync(location, COMMAND));
-        return Command.SINGLE_SUCCESS;
+        return teleport(context.getSource().getSender(), resolved, location);
     }
 
-    private int teleportEntity(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    private int teleportEntities(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var entities = context.getArgument("entities", EntitySelectorArgumentResolver.class);
         var world = context.getArgument("world", World.class);
         var resolved = entities.resolve(context.getSource());
-        // todo: add messages
-        resolved.forEach(entity -> entity.teleportAsync(world.getSpawnLocation(), COMMAND));
-        return Command.SINGLE_SUCCESS;
+        return teleport(context.getSource().getSender(), resolved, world.getSpawnLocation());
     }
 
     private int teleport(CommandContext<CommandSourceStack> context) {
@@ -61,9 +62,22 @@ class WorldTeleportCommand {
             return 0;
         }
         var world = context.getArgument("world", World.class);
-        player.teleportAsync(world.getSpawnLocation(), COMMAND);
-        plugin.bundle().sendMessage(player, "world.teleport.player.self",
-                Placeholder.parsed("world", world.key().asString()));
-        return Command.SINGLE_SUCCESS;
+        return teleport(player, List.of(player), world.getSpawnLocation());
+    }
+
+    private int teleport(CommandSender sender, List<Entity> entities, Location location) {
+        var message = entities.size() == 1 ? "world.teleport.other"
+                : entities.isEmpty() ? "world.teleport.none" : "world.teleport.others";
+        entities.forEach(entity -> {
+            entity.teleportAsync(location, COMMAND);
+            plugin.bundle().sendMessage(entity, "world.teleport.self",
+                    Placeholder.parsed("world", location.getWorld().key().asString()));
+        });
+        if (entities.size() == 1 && entities.getFirst().equals(sender)) return Command.SINGLE_SUCCESS;
+        plugin.bundle().sendMessage(sender, message,
+                Placeholder.parsed("entities", String.valueOf(entities.size())),
+                Placeholder.parsed("entity", entities.getFirst().getName()),
+                Placeholder.parsed("world", location.getWorld().key().asString()));
+        return entities.isEmpty() ? 0 : Command.SINGLE_SUCCESS;
     }
 }
