@@ -5,7 +5,6 @@ import org.jetbrains.annotations.Nullable;
 
 public record LevelExtras(
         @Nullable NamespacedKey key,
-        boolean autoSave,
         boolean enabled
 ) {
 }

@@ -116,13 +116,7 @@ public class LevelView {
 
         generatorSettings.ifPresent(preset -> creator.generator(preset.serialize().toString()));
 
-
-        var world = creator.createWorld();
-        if (world == null) return null;
-
-        extras.map(LevelExtras::autoSave).ifPresent(world::setAutoSave);
-
-        return world;
+        return creator.createWorld();
     }
 
     public Optional<LevelExtras> getExtras(CompoundTag data) {
@@ -133,13 +127,10 @@ public class LevelView {
                             .map(Tag::getAsString)
                             .map(NamespacedKey::fromString)
                             .orElse(null);
-                    var autoSave = values.optional("worlds:auto_save")
-                            .map(Tag::getAsBoolean)
-                            .orElse(true);
                     var enabled = values.optional("worlds:enabled")
                             .map(Tag::getAsBoolean)
                             .orElse(true);
-                    return new LevelExtras(key, autoSave, enabled);
+                    return new LevelExtras(key, enabled);
                 });
     }
 
