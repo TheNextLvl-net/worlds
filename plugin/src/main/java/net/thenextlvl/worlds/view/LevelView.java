@@ -184,7 +184,7 @@ public class LevelView {
             case NORMAL -> "minecraft:overworld";
             case NETHER -> "minecraft:the_nether";
             case THE_END -> "minecraft:the_end";
-            case CUSTOM -> dimensions.keySet().stream().dropWhile(s -> s.startsWith("minecraft")).findAny()
+            case CUSTOM -> dimensions.keySet().stream().filter(s -> !s.startsWith("minecraft")).findAny()
                     .orElseThrow(() -> new UnsupportedOperationException("Could not find custom dimension"));
         };
     }

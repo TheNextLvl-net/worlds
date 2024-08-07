@@ -19,7 +19,7 @@ public class CommandFlagsArgument extends WrappedArgumentType<String, CommandFla
             var index = builder.getRemaining().lastIndexOf(' ') + 1;
             var substring = builder.getRemaining().substring(index);
             flags.stream()
-                    .dropWhile(builder.getRemaining()::contains)
+                    .filter(flag -> !builder.getRemaining().contains(flag))
                     .filter(flag -> flag.startsWith(substring))
                     .forEach(s -> builder.suggest(builder.getRemaining() + s.substring(substring.length())));
             return builder.buildFuture();
