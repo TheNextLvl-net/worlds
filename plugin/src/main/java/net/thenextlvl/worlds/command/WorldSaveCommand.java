@@ -26,13 +26,11 @@ class WorldSaveCommand {
                         .then(Commands.literal("flush")
                                 .executes(context -> {
                                     var world = context.getArgument("world", World.class);
-                                    save(context.getSource().getSender(), world, true);
-                                    return Command.SINGLE_SUCCESS;
+                                    return save(context.getSource().getSender(), world, true);
                                 }))
                         .executes(context -> {
                             var world = context.getArgument("world", World.class);
-                            save(context.getSource().getSender(), world, false);
-                            return Command.SINGLE_SUCCESS;
+                            return save(context.getSource().getSender(), world, false);
                         }))
                 .then(Commands.literal("flush")
                         .executes(context -> save(context.getSource().getSender(),
