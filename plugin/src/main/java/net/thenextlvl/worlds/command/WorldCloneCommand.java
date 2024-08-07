@@ -7,12 +7,14 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,14 +39,25 @@ class WorldCloneCommand {
 
     private int clone(CommandContext<CommandSourceStack> context, boolean full) {
         var world = context.getArgument("world", World.class);
-        var name = context.getArgument("key", NamespacedKey.class);
-        if (plugin.getServer().getWorld(name) != null) return 0;
-        var creator = new WorldCreator(name).copy(world);
-        if (full) copy(world, new File(plugin.getServer().getWorldContainer(), creator.name()));
-        var copy = creator.createWorld();
-        if (copy != null && context.getSource().getSender() instanceof Player player)
-            player.teleportAsync(copy.getSpawnLocation());
-        return copy != null ? Command.SINGLE_SUCCESS : 0;
+        var key = context.getArgument("key", NamespacedKey.class);
+        var clone = clone(world, key, full);
+
+        var placeholder = Placeholder.parsed("world", world.key().asString());
+        var message = clone != null ? "world.clone.success" : "world.clone.failed";
+
+        if (clone != null && context.getSource().getSender() instanceof Player player)
+            player.teleportAsync(clone.getSpawnLocation());
+
+        plugin.bundle().sendMessage(context.getSource().getSender(), message, placeholder);
+        return clone != null ? Command.SINGLE_SUCCESS : 0;
+    }
+
+    private @Nullable World clone(World world, NamespacedKey key, boolean full) {
+        if (plugin.getServer().getWorld(key) != null) return null;
+        if (plugin.getServer().getWorld(key.getKey()) != null) return null;
+        if (new File(plugin.getServer().getWorldContainer(), key.getKey()).isDirectory()) return null;
+        if (full) copy(world, new File(plugin.getServer().getWorldContainer(), key.getKey()));
+        return new WorldCreator(key.getKey(), key).copy(world).createWorld();
     }
 
     private void copy(World world, File destination) {
