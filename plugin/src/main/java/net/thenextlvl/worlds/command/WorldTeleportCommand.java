@@ -10,6 +10,7 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.FinePositionResolver;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.EntitySelectorArgumentResolver;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
@@ -75,9 +76,9 @@ class WorldTeleportCommand {
         });
         if (entities.size() == 1 && entities.getFirst().equals(sender)) return Command.SINGLE_SUCCESS;
         plugin.bundle().sendMessage(sender, message,
-                Placeholder.parsed("entities", String.valueOf(entities.size())),
-                Placeholder.parsed("entity", entities.getFirst().getName()),
-                Placeholder.parsed("world", location.getWorld().key().asString()));
+                Placeholder.component("entity", entities.isEmpty() ? Component.empty() : entities.getFirst().name()),
+                Placeholder.parsed("world", location.getWorld().key().asString()),
+                Placeholder.parsed("entities", String.valueOf(entities.size())));
         return entities.isEmpty() ? 0 : Command.SINGLE_SUCCESS;
     }
 }
