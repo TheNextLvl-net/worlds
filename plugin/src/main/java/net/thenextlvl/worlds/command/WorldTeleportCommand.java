@@ -2,9 +2,12 @@ package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.command.brigadier.argument.resolvers.FinePositionResolver;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.EntitySelectorArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -26,26 +29,41 @@ class WorldTeleportCommand {
                 .then(Commands.argument("world", ArgumentTypes.world())
                         .suggests(new WorldSuggestionProvider<>(plugin))
                         .then(Commands.argument("entities", ArgumentTypes.entities())
-                                .executes(context -> {
-                                    var entities = context.getArgument("entities", EntitySelectorArgumentResolver.class);
-                                    var world = context.getArgument("world", World.class);
-                                    var resolved = entities.resolve(context.getSource());
-                                    // todo: add messages
-                                    resolved.forEach(entity -> {
-                                        entity.teleportAsync(world.getSpawnLocation(), COMMAND);
-                                    });
-                                    return Command.SINGLE_SUCCESS;
-                                }))
-                        .executes(context -> {
-                            if (!(context.getSource().getSender() instanceof Player player)) {
-                                plugin.bundle().sendMessage(context.getSource().getSender(), "command.sender");
-                                return 0;
-                            }
-                            var world = context.getArgument("world", World.class);
-                            player.teleportAsync(world.getSpawnLocation(), COMMAND);
-                            plugin.bundle().sendMessage(player, "world.teleport.player.self",
-                                    Placeholder.parsed("world", world.key().asString()));
-                            return Command.SINGLE_SUCCESS;
-                        }));
+                                .then(Commands.argument("position", ArgumentTypes.finePosition(true))
+                                        .executes(this::teleportEntityPosition))
+                                .executes(this::teleportEntity))
+                        .executes(this::teleport));
+    }
+
+    private int teleportEntityPosition(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var entities = context.getArgument("entities", EntitySelectorArgumentResolver.class);
+        var position = context.getArgument("position", FinePositionResolver.class);
+        var world = context.getArgument("world", World.class);
+        var location = position.resolve(context.getSource()).toLocation(world);
+        var resolved = entities.resolve(context.getSource());
+        // todo: add messages
+        resolved.forEach(entity -> entity.teleportAsync(location, COMMAND));
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int teleportEntity(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var entities = context.getArgument("entities", EntitySelectorArgumentResolver.class);
+        var world = context.getArgument("world", World.class);
+        var resolved = entities.resolve(context.getSource());
+        // todo: add messages
+        resolved.forEach(entity -> entity.teleportAsync(world.getSpawnLocation(), COMMAND));
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int teleport(CommandContext<CommandSourceStack> context) {
+        if (!(context.getSource().getSender() instanceof Player player)) {
+            plugin.bundle().sendMessage(context.getSource().getSender(), "command.sender");
+            return 0;
+        }
+        var world = context.getArgument("world", World.class);
+        player.teleportAsync(world.getSpawnLocation(), COMMAND);
+        plugin.bundle().sendMessage(player, "world.teleport.player.self",
+                Placeholder.parsed("world", world.key().asString()));
+        return Command.SINGLE_SUCCESS;
     }
 }
