@@ -91,4 +91,12 @@ public class Preset {
     public static Preset deserialize(JsonObject object) {
         return gson.fromJson(object, Preset.class);
     }
+
+    @Override
+    public String toString() {
+        var layers = layers().stream()
+                .map(Layer::toString)
+                .collect(Collectors.joining(","));
+        return layers + ";" + biome();
+    }
 }
