@@ -15,8 +15,8 @@ import net.thenextlvl.worlds.preset.adapter.StructureTypeAdapter;
 import org.bukkit.Material;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -27,9 +27,9 @@ public class Preset {
     private boolean features;
     private boolean decoration;
 
-    private Set<Layer> layers = new HashSet<>();
+    private LinkedHashSet<Layer> layers = new LinkedHashSet<>();
     @SerializedName("structure_overrides")
-    private Set<Structure> structures = new HashSet<>();
+    private LinkedHashSet<Structure> structures = new LinkedHashSet<>();
 
     /**
      * Add a layer to the preset
