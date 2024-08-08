@@ -8,10 +8,13 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
+import net.thenextlvl.worlds.model.WorldPreset;
 import org.bukkit.World;
+import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -39,6 +42,7 @@ class WorldInfoCommand {
                 });
     }
 
+    @SuppressWarnings("deprecation")
     private int list(CommandSender sender, World world) {
         var root = plugin.levelView().getLevelDataFile(world.getWorldFolder()).getRoot();
         var data = root.<CompoundTag>optional("Data");
@@ -49,14 +53,18 @@ class WorldInfoCommand {
         var generator = dimension.flatMap(tag -> tag.<CompoundTag>optional("generator"));
 
         var environment = dimensions.map(tag -> plugin.levelView().getDimension(tag, world.getEnvironment()));
-        var type = generator.flatMap(plugin.levelView()::getGeneratorType);
+        var worldPreset = generator.flatMap(tag -> plugin.levelView().getWorldPreset(tag));
 
         plugin.bundle().sendMessage(sender, "world.info.name",
-                Placeholder.parsed("world", world.key().asString()));
+                Placeholder.parsed("world", world.key().asString()),
+                Placeholder.parsed("name", world.getName()));
         plugin.bundle().sendMessage(sender, "world.info.players",
                 Placeholder.parsed("players", String.valueOf(world.getPlayers().size())));
         plugin.bundle().sendMessage(sender, "world.info.type",
-                Placeholder.parsed("type", type.orElse("unknown")));
+                Placeholder.parsed("type", worldPreset.map(WorldPreset::key)
+                        .map(Key::asString).orElse("unknown")),
+                Placeholder.parsed("old", Optional.ofNullable(world.getWorldType())
+                        .orElse(WorldType.NORMAL).getName().toLowerCase()));
         plugin.bundle().sendMessage(sender, "world.info.dimension",
                 Placeholder.parsed("dimension", environment.orElse("unknown")));
         getGenerator(world).ifPresent(gen -> plugin.bundle().sendMessage(sender,
