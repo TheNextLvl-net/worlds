@@ -16,6 +16,12 @@ public class ServerListener implements Listener {
         if (!event.getType().equals(ServerLoadEvent.LoadType.STARTUP)) return;
         plugin.levelView().listLevels()
                 .filter(plugin.levelView()::canLoad)
-                .forEach(plugin.levelView()::loadLevel);
+                .forEach(level -> {
+                    try {
+                        var world = plugin.levelView().loadLevel(level);
+                    } catch (Exception e) {
+                        plugin.getComponentLogger().error("Could not load level {}", level.getPath(), e);
+                    }
+                });
     }
 }
