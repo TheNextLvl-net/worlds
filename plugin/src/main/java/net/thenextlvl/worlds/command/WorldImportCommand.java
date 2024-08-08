@@ -18,6 +18,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.Optional;
 
+import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
+
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
 class WorldImportCommand {
@@ -46,7 +48,7 @@ class WorldImportCommand {
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
                 Placeholder.parsed("world", world != null ? world.key().asString() : name));
         if (world != null && context.getSource().getSender() instanceof Entity entity)
-            entity.teleportAsync(world.getSpawnLocation());
+            entity.teleportAsync(world.getSpawnLocation(), COMMAND);
         return world != null ? Command.SINGLE_SUCCESS : 0;
     }
 }

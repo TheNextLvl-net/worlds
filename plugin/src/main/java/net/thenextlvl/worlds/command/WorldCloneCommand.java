@@ -21,6 +21,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
+
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
 class WorldCloneCommand {
@@ -46,7 +48,7 @@ class WorldCloneCommand {
         var message = clone != null ? "world.clone.success" : "world.clone.failed";
 
         if (clone != null && context.getSource().getSender() instanceof Player player)
-            player.teleportAsync(clone.getSpawnLocation());
+            player.teleportAsync(clone.getSpawnLocation(), COMMAND);
 
         plugin.bundle().sendMessage(context.getSource().getSender(), message, placeholder);
         return clone != null ? Command.SINGLE_SUCCESS : 0;

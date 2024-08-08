@@ -16,6 +16,8 @@ import org.bukkit.World;
 import java.io.File;
 import java.util.Set;
 
+import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
+
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
 class WorldRegenerateCommand {
@@ -63,7 +65,7 @@ class WorldRegenerateCommand {
         var players = world.getPlayers();
 
         var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
-        players.forEach(player -> player.teleport(fallback));
+        players.forEach(player -> player.teleport(fallback, COMMAND));
 
         if (!plugin.getServer().unloadWorld(world, false))
             return "world.unload.failed";
@@ -72,7 +74,7 @@ class WorldRegenerateCommand {
 
         var regenerated = plugin.levelView().loadLevel(worldFolder, environment);
         if (regenerated != null) players.forEach(player ->
-                player.teleportAsync(regenerated.getSpawnLocation()));
+                player.teleportAsync(regenerated.getSpawnLocation(), COMMAND));
         return regenerated != null ? "world.regenerate.success" : "world.regenerate.failed";
     }
 
