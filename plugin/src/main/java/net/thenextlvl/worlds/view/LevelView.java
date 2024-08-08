@@ -7,6 +7,7 @@ import core.nbt.tag.*;
 import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.model.LevelExtras;
+import net.thenextlvl.worlds.model.WorldPreset;
 import net.thenextlvl.worlds.preset.Biome;
 import net.thenextlvl.worlds.preset.Layer;
 import net.thenextlvl.worlds.preset.Preset;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -85,10 +87,10 @@ public class LevelView {
         var dimension = dimensions.flatMap(tag -> tag.<CompoundTag>optional(getDimension(tag, environment)));
         var generator = dimension.flatMap(tag -> tag.<CompoundTag>optional("generator"));
 
-        var type = generator.flatMap(this::getWorldType);
+        var worldPreset = generator.flatMap(this::getWorldPreset);
 
-        var generatorSettings = type.filter(worldType -> worldType.equals(WorldType.FLAT))
-                .flatMap(worldType -> generator.flatMap(this::getSettings));
+        var generatorSettings = worldPreset.filter(preset -> preset.equals(WorldPreset.FLAT))
+                .flatMap(worldType -> generator.flatMap(this::getFlatPreset));
 
         var hardcore = data.flatMap(tag -> tag.<ByteTag>optional("hardcore"))
                 .orElseThrow(() -> new NoSuchElementException("hardcore"))
@@ -112,11 +114,18 @@ public class LevelView {
                 .generateStructures(structures)
                 .hardcore(hardcore)
                 .seed(seed)
-                .type(type.orElse(WorldType.NORMAL));
+                .type(typeOf(worldPreset.orElse(WorldPreset.NORMAL)));
 
-        generatorSettings.ifPresent(preset -> creator.generator(preset.serialize().toString()));
+        generatorSettings.ifPresent(preset -> creator.generatorSettings(preset.serialize().toString()));
 
         return creator.createWorld();
+    }
+
+    private WorldType typeOf(WorldPreset worldPreset) {
+        if (worldPreset.equals(WorldPreset.AMPLIFIED)) return WorldType.AMPLIFIED;
+        if (worldPreset.equals(WorldPreset.FLAT)) return WorldType.FLAT;
+        if (worldPreset.equals(WorldPreset.LARGE_BIOMES)) return WorldType.LARGE_BIOMES;
+        return WorldType.NORMAL;
     }
 
     public Optional<LevelExtras> getExtras(CompoundTag data) {
@@ -134,7 +143,7 @@ public class LevelView {
                 });
     }
 
-    public Optional<Preset> getSettings(CompoundTag generator) {
+    public Optional<Preset> getFlatPreset(CompoundTag generator) {
         var settings = generator.<CompoundTag>optional("settings");
 
         if (settings.isEmpty()) return Optional.empty();
@@ -154,18 +163,18 @@ public class LevelView {
                 .map(Tag::getAsBoolean)
                 .ifPresent(preset::lakes);
 
-        settings.flatMap(tag -> tag.<CompoundTag>optional("layers"))
-                .map(tag -> tag.<CompoundTag>getAsList().stream().map(layer -> {
+        settings.flatMap(tag -> tag.<ListTag<CompoundTag>>optional("layers"))
+                .map(tag -> tag.stream().map(layer -> {
                     var block = layer.optional("block").orElseThrow().getAsString();
                     var height = layer.optional("height").orElseThrow().getAsInt();
                     return new Layer(block, height);
-                }).collect(Collectors.toSet()))
+                }).collect(Collectors.toCollection(LinkedHashSet::new)))
                 .ifPresent(preset::layers);
 
-        settings.flatMap(tag -> tag.<CompoundTag>optional("structure_overrides"))
-                .map(tag -> tag.<StringTag>getAsList().stream()
+        settings.flatMap(tag -> tag.<ListTag<StringTag>>optional("structure_overrides"))
+                .map(tag -> tag.getAsList().stream()
                         .map(structure -> new Structure(structure.getAsString()))
-                        .collect(Collectors.toSet()))
+                        .collect(Collectors.toCollection(LinkedHashSet::new)))
                 .ifPresent(preset::structures);
 
         return Optional.of(preset);
@@ -189,12 +198,36 @@ public class LevelView {
         };
     }
 
-    public Optional<WorldType> getWorldType(CompoundTag generator) {
-        return getGeneratorType(generator).map(string -> switch (string) {
-            case "minecraft:noise", "minecraft:debug" -> WorldType.NORMAL;
-            case "minecraft:flat" -> WorldType.FLAT;
-            default -> throw new IllegalArgumentException("Unexpected generator type: " + string);
-        });
+    public Optional<WorldPreset> getWorldPreset(CompoundTag generator) {
+
+        var settings = getGeneratorSettings(generator);
+        if (settings.filter(s -> s.equals(WorldPreset.LARGE_BIOMES.key().asString())).isPresent())
+            return Optional.of(WorldPreset.LARGE_BIOMES);
+        if (settings.filter(s -> s.equals(WorldPreset.AMPLIFIED.key().asString())).isPresent())
+            return Optional.of(WorldPreset.AMPLIFIED);
+
+        var type = generator.<CompoundTag>optional("biome_source")
+                .flatMap(tag -> tag.<StringTag>optional("type"))
+                .map(Tag::getAsString);
+
+        if (type.filter(s -> s.equals(WorldPreset.SINGLE_BIOME.key().asString())).isPresent())
+            return Optional.of(WorldPreset.SINGLE_BIOME);
+        if (type.filter(s -> s.equals(WorldPreset.CHECKERBOARD.key().asString())).isPresent())
+            return Optional.of(WorldPreset.CHECKERBOARD);
+
+        var generatorType = getGeneratorType(generator);
+        if (generatorType.filter(s -> s.equals(WorldPreset.DEBUG.key().asString())).isPresent())
+            return Optional.of(WorldPreset.DEBUG);
+        if (generatorType.filter(s -> s.equals(WorldPreset.FLAT.key().asString())).isPresent())
+            return Optional.of(WorldPreset.FLAT);
+        if (generatorType.filter(s -> s.equals(WorldPreset.NORMAL.key().asString())).isPresent())
+            return Optional.of(WorldPreset.NORMAL);
+
+        return Optional.empty();
+    }
+
+    public Optional<String> getGeneratorSettings(CompoundTag generator) {
+        return generator.optional("settings").filter(Tag::isString).map(Tag::getAsString);
     }
 
     public Optional<String> getGeneratorType(CompoundTag generator) {
