@@ -46,7 +46,8 @@ class WorldImportCommand {
                 : plugin.levelView().loadLevel(level, Optional::isEmpty) : null;
         var message = world != null ? "world.import.success" : "world.import.failed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
-                Placeholder.parsed("world", world != null ? world.key().asString() : name));
+                Placeholder.parsed("world", world != null ? world.key().asString()
+                        : key != null ? key.asString() : name));
         if (world != null && context.getSource().getSender() instanceof Entity entity)
             entity.teleportAsync(world.getSpawnLocation(), COMMAND);
         return world != null ? Command.SINGLE_SUCCESS : 0;
