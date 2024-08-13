@@ -3,10 +3,11 @@ package net.thenextlvl.worlds.model;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.WeakHashMap;
 
-public class PortalCooldown extends WeakHashMap<Entity, ScheduledTask> {
+public class PortalCooldown extends WeakHashMap<Entity, @Nullable ScheduledTask> {
     public boolean isActive(Entity entity) {
         return containsKey(entity);
     }
