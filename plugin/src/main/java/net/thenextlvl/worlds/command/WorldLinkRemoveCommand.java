@@ -15,7 +15,7 @@ public class WorldLinkRemoveCommand {
     private final WorldsPlugin plugin;
 
     ArgumentBuilder<CommandSourceStack, ?> create() {
-        return Commands.literal("link")
+        return Commands.literal("remove")
                 .requires(source -> source.getSender().hasPermission("worlds.command.link.remove"))
                 .then(Commands.argument("source", ArgumentTypes.world())
                         .suggests(new WorldSuggestionProvider<>(plugin))

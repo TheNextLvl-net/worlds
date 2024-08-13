@@ -6,11 +6,13 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.argument.DimensionArgument;
 import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
@@ -30,17 +32,24 @@ class WorldImportCommand {
                 .requires(source -> source.getSender().hasPermission("worlds.command.import"))
                 .then(Commands.argument("world", StringArgumentType.string())
                         .suggests(new LevelSuggestionProvider<>(plugin))
-                        .then(Commands.argument("dimension", new DimensionArgument())
+                        .then(Commands.argument("dimension", new DimensionArgument(plugin))
+                                .then(Commands.argument("key", ArgumentTypes.namespacedKey())
+                                        .executes(context -> {
+                                            var environment = context.getArgument("dimension", World.Environment.class);
+                                            var key = context.getArgument("key", NamespacedKey.class);
+                                            return execute(context, environment, key);
+                                        }))
                                 .executes(context -> {
                                     var environment = context.getArgument("dimension", World.Environment.class);
-                                    return execute(context, environment);
+                                    return execute(context, environment, null);
                                 }))
-                        .executes(context -> execute(context, null)));
+                        .executes(context -> execute(context, null, null)));
     }
 
-    private int execute(CommandContext<CommandSourceStack> context, @Nullable World.Environment environment) {
+    private int execute(CommandContext<CommandSourceStack> context, @Nullable World.Environment environment, @Nullable NamespacedKey key) {
         var name = context.getArgument("world", String.class);
         var level = new File(plugin.getServer().getWorldContainer(), name);
+        // todo: define key
         var world = plugin.levelView().isLevel(level) ? environment != null
                 ? plugin.levelView().loadLevel(level, environment, Optional::isEmpty)
                 : plugin.levelView().loadLevel(level, Optional::isEmpty) : null;

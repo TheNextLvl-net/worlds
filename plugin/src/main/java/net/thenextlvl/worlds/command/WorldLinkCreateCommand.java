@@ -15,7 +15,7 @@ public class WorldLinkCreateCommand {
     private final WorldsPlugin plugin;
 
     ArgumentBuilder<CommandSourceStack, ?> create() {
-        return Commands.literal("link")
+        return Commands.literal("create")
                 .requires(source -> source.getSender().hasPermission("worlds.command.link.create"))
                 .then(Commands.argument("source", ArgumentTypes.world())
                         .suggests(new WorldSuggestionProvider<>(plugin))
