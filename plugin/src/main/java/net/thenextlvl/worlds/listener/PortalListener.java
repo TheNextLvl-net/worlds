@@ -4,10 +4,7 @@ import io.papermc.paper.event.entity.EntityPortalReadyEvent;
 import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.model.PortalCooldown;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.PortalType;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,14 +23,9 @@ public class PortalListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityPortal(EntityPortalReadyEvent event) {
-        /*
-        plugin.linkRegistry().getLinks().stream()
-                .filter(link -> event.getPortalType().equals(link.portalType()))
-                .filter(link -> event.getEntity().getWorld().equals(link.source()))
-                .findFirst()
-                .map(Link::destination)
-                .ifPresent(event::setTargetWorld);
-         */
+        if (event.getPortalType().equals(PortalType.CUSTOM)) return;
+        plugin.linkController().getTarget(event.getEntity().getWorld(), event.getPortalType())
+                .map(Bukkit::getWorld).ifPresent(event::setTargetWorld);
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -45,7 +37,7 @@ public class PortalListener implements Listener {
         if (!readyEvent.callEvent() || readyEvent.getTargetWorld() == null) return;
         if (readyEvent.getTargetWorld().getEnvironment().equals(World.Environment.THE_END)) {
             generateEndPlatform(readyEvent.getTargetWorld());
-            var spawn = new Location(readyEvent.getTargetWorld(), 100.5, 50, 0.5, 90, 0);
+            var spawn = new Location(readyEvent.getTargetWorld(), 100.5, 49, 0.5, 90, 0);
             event.getEntity().teleportAsync(spawn, END_PORTAL);
         } else if (readyEvent.getTargetWorld().getEnvironment().equals(World.Environment.NETHER)) {
             var spawn = event.getLocation().clone();
