@@ -16,6 +16,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
+import org.bukkit.craftbukkit.CraftWorld;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -232,5 +233,25 @@ public class LevelView {
 
     public Optional<String> getGeneratorType(CompoundTag generator) {
         return generator.optional("type").map(Tag::getAsString);
+    }
+
+    public void saveLevel(World world, boolean flush) {
+        var level = ((CraftWorld) world).getHandle();
+        var oldSave = level.noSave;
+        level.noSave = false;
+        level.save(null, flush, false);
+        level.noSave = oldSave;
+    }
+
+    public void saveLevelData(World world, boolean async) {
+        var level = ((CraftWorld) world).getHandle();
+        if (level.getDragonFight() != null) {
+            level.serverLevelData.setEndDragonFightData(level.getDragonFight().saveData());
+        }
+        level.getChunkSource().getDataStorage().save(async);
+
+        level.serverLevelData.setWorldBorder(level.getWorldBorder().createSettings());
+        level.serverLevelData.setCustomBossEvents(level.getServer().getCustomBossEvents().save(level.registryAccess()));
+        level.convertable.saveDataTag(level.getServer().registryAccess(), level.serverLevelData, level.getServer().getPlayerList().getSingleplayerData());
     }
 }
