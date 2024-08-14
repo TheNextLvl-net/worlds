@@ -6,8 +6,12 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.command.argument.RelativeArgument;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
+import net.thenextlvl.worlds.link.Relative;
+import org.bukkit.World;
 
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
@@ -17,11 +21,18 @@ public class WorldLinkRemoveCommand {
     ArgumentBuilder<CommandSourceStack, ?> create() {
         return Commands.literal("remove")
                 .requires(source -> source.getSender().hasPermission("worlds.command.link.remove"))
-                .then(Commands.argument("source", ArgumentTypes.world())
+                .then(Commands.argument("world", ArgumentTypes.world())
                         .suggests(new WorldSuggestionProvider<>(plugin))
-                        .then(Commands.argument("destination", ArgumentTypes.world())
+                        .then(Commands.argument("relative", new RelativeArgument())
                                 .executes(context -> {
-                                    return Command.SINGLE_SUCCESS;
+                                    var world = context.getArgument("world", World.class);
+                                    var relative = context.getArgument("relative", Relative.class);
+                                    var unlink = plugin.linkController().unlink(world, relative);
+                                    var message = unlink ? "world.unlink.success" : "world.unlink.failed";
+                                    plugin.bundle().sendMessage(context.getSource().getSender(), message,
+                                            Placeholder.parsed("relative", relative.key().asString()),
+                                            Placeholder.parsed("world", world.key().asString()));
+                                    return unlink ? Command.SINGLE_SUCCESS : 0;
                                 })));
     }
 }
