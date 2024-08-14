@@ -11,7 +11,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.CraftWorld;
 
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
@@ -32,13 +31,7 @@ class WorldSaveCommand {
         var world = context.getArgument("world", World.class);
         var placeholder = Placeholder.parsed("world", world.key().asString());
         plugin.bundle().sendMessage(context.getSource().getSender(), "world.save", placeholder);
-
-        var level = ((CraftWorld) world).getHandle();
-        var oldSave = level.noSave;
-        level.noSave = false;
-        level.save(null, flush, false);
-        level.noSave = oldSave;
-
+        plugin.levelView().saveLevel(world, flush);
         plugin.bundle().sendMessage(context.getSource().getSender(), "world.save.success", placeholder);
         return Command.SINGLE_SUCCESS;
     }
