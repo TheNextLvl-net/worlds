@@ -53,6 +53,10 @@ class WorldRegenerateCommand {
     }
 
     private String regenerate(World world, boolean schedule) {
+
+        var dragonBattle = world.getEnderDragonBattle();
+        if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
+
         return schedule ? scheduleRegeneration(world) : regenerateNow(world);
     }
 

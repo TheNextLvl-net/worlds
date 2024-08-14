@@ -51,6 +51,10 @@ class WorldDeleteCommand {
     }
 
     private String delete(World world, boolean schedule) {
+
+        var dragonBattle = world.getEnderDragonBattle();
+        if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
+
         return schedule ? scheduleDeletion(world) : deleteNow(world);
     }
 
