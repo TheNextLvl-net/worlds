@@ -50,6 +50,10 @@ class WorldUnloadCommand {
                 : plugin.getServer().getWorlds().getFirst().getSpawnLocation();
         world.getPlayers().forEach(player -> player.teleport(fallbackSpawn));
 
+        plugin.persistWorld(world, false);
+
+        if (!world.isAutoSave()) plugin.levelView().saveLevelData(world, false);
+
         return plugin.getServer().unloadWorld(world, world.isAutoSave())
                 ? "world.unload.success"
                 : "world.unload.failed";

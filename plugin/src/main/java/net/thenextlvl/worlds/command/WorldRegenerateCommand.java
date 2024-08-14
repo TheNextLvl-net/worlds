@@ -71,6 +71,9 @@ class WorldRegenerateCommand {
         var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
         players.forEach(player -> player.teleport(fallback, COMMAND));
 
+        plugin.persistWorld(world, true);
+        plugin.levelView().saveLevelData(world, false);
+
         if (!plugin.getServer().unloadWorld(world, false))
             return "world.unload.failed";
 
