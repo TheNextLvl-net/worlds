@@ -6,8 +6,10 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
+import org.bukkit.World;
 
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
@@ -21,7 +23,14 @@ public class WorldLinkCreateCommand {
                         .suggests(new WorldSuggestionProvider<>(plugin))
                         .then(Commands.argument("destination", ArgumentTypes.world())
                                 .executes(context -> {
-                                    return Command.SINGLE_SUCCESS;
+                                    var source = context.getArgument("source", World.class);
+                                    var destination = context.getArgument("destination", World.class);
+                                    var link = plugin.linkController().link(source, destination);
+                                    var message = link ? "world.link.success" : "world.link.failed";
+                                    plugin.bundle().sendMessage(context.getSource().getSender(), message,
+                                            Placeholder.parsed("source", source.key().asString()),
+                                            Placeholder.parsed("destination", destination.key().asString()));
+                                    return link ? Command.SINGLE_SUCCESS : 0;
                                 })));
     }
 }
