@@ -6,7 +6,7 @@ import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.model.PortalCooldown;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -47,7 +47,8 @@ public class PortalListener implements Listener {
             generateEndPlatform(readyEvent.getTargetWorld());
             var spawn = new Location(readyEvent.getTargetWorld(), 100.5, 49, 0.5, 90, 0);
             event.getEntity().teleportAsync(spawn, END_PORTAL);
-        } else if (event.getEntity() instanceof Player player) {
+        } else if (event.getEntity() instanceof CraftPlayer player) {
+            if (!player.getHandle().seenCredits) player.getHandle().showEndCredits();
             if (player.getRespawnLocation() != null) player.teleportAsync(player.getRespawnLocation(), END_PORTAL);
             else player.teleportAsync(readyEvent.getTargetWorld().getSpawnLocation(), END_PORTAL);
         } else event.getEntity().teleport(readyEvent.getTargetWorld().getSpawnLocation(), END_PORTAL);
