@@ -81,7 +81,7 @@ class WorldRegenerateCommand {
     private String scheduleRegeneration(World world) {
         Runtime.getRuntime().addShutdownHook(new Thread(() ->
                 regenerate(world.getWorldFolder())));
-        return "world.delete.scheduled";
+        return "world.regenerate.scheduled";
     }
 
     private void regenerate(File level) {
