@@ -22,8 +22,10 @@ public class WorldLinkRemoveCommand {
         return Commands.literal("remove")
                 .requires(source -> source.getSender().hasPermission("worlds.command.link.remove"))
                 .then(Commands.argument("world", ArgumentTypes.world())
-                        .suggests(new WorldSuggestionProvider<>(plugin))
-                        .then(Commands.argument("relative", new RelativeArgument())
+                        .suggests(new WorldSuggestionProvider<>(plugin, world ->
+                                world.getEnvironment().equals(World.Environment.NORMAL)))
+                        .then(Commands.argument("relative", new RelativeArgument(relative ->
+                                        !relative.equals(Relative.OVERWORLD)))
                                 .executes(context -> {
                                     var world = context.getArgument("world", World.class);
                                     var relative = context.getArgument("relative", Relative.class);
