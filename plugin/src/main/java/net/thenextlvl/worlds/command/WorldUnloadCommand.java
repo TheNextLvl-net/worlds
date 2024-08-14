@@ -52,6 +52,9 @@ class WorldUnloadCommand {
 
         plugin.persistWorld(world, false);
 
+        var dragonBattle = world.getEnderDragonBattle();
+        if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
+
         if (!world.isAutoSave()) plugin.levelView().saveLevelData(world, false);
 
         return plugin.getServer().unloadWorld(world, world.isAutoSave())
