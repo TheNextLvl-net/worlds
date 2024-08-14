@@ -98,8 +98,15 @@ class WorldCreateCommand {
         var message = world != null ? "world.create.success" : "world.create.failed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
                 Placeholder.parsed("world", world != null ? world.key().asString() : key.asString()));
+
         if (world != null && context.getSource().getSender() instanceof Entity entity)
             entity.teleportAsync(world.getSpawnLocation(), COMMAND);
+
+        if (world != null) {
+            plugin.persistWorld(world, true);
+            plugin.levelView().saveLevelData(world, true);
+        }
+
         return world != null ? Command.SINGLE_SUCCESS : 0;
     }
 
