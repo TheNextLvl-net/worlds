@@ -13,7 +13,6 @@ import net.thenextlvl.worlds.controller.WorldLinkController;
 import net.thenextlvl.worlds.link.LinkController;
 import net.thenextlvl.worlds.listener.PortalListener;
 import net.thenextlvl.worlds.listener.ServerListener;
-import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.preset.Presets;
 import net.thenextlvl.worlds.version.PluginVersionChecker;
 import net.thenextlvl.worlds.view.LevelView;
@@ -67,7 +66,6 @@ public class WorldsPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         metrics().shutdown();
-        persistWorlds();
         unloadWorlds();
     }
 
@@ -78,21 +76,16 @@ public class WorldsPlugin extends JavaPlugin {
         });
     }
 
-    private void persistWorlds() {
-        getServer().getWorlds().forEach(this::persistWorld);
-    }
-
-    public void persistWorld(World world) {
+    public void persistWorld(World world, boolean enabled) {
         if (world.key().asString().equals("minecraft:overworld")) return;
         var container = world.getPersistentDataContainer();
         container.set(new NamespacedKey("worlds", "world_key"), STRING, world.getKey().asString());
-        container.set(new NamespacedKey("worlds", "enabled"), BOOLEAN, true);
+        container.set(new NamespacedKey("worlds", "enabled"), BOOLEAN, enabled);
     }
 
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(new PortalListener(this), this);
         getServer().getPluginManager().registerEvents(new ServerListener(this), this);
-        getServer().getPluginManager().registerEvents(new WorldListener(this), this);
     }
 
     private void registerCommands() {
