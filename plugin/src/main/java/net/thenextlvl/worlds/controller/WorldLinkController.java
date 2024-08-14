@@ -52,9 +52,9 @@ public class WorldLinkController implements LinkController {
 
     @Override
     public boolean canLink(World source, World destination) {
-        return !source.getEnvironment().equals(destination.getEnvironment())
-               && getTarget(source, destination.getEnvironment()).isEmpty()
-               && getTarget(destination, source.getEnvironment()).isEmpty();
+        return source.getEnvironment().equals(World.Environment.NORMAL)
+               && !destination.getEnvironment().equals(World.Environment.NORMAL)
+               && getTarget(source, destination.getEnvironment()).isEmpty();
     }
 
     @Override
@@ -65,9 +65,8 @@ public class WorldLinkController implements LinkController {
             case THE_END -> Relative.THE_END.key();
             default -> null;
         };
-        var parent = Relative.valueOf(source.getEnvironment()).map(Relative::key);
-        if (child == null || parent.isEmpty()) return false;
-        destination.getPersistentDataContainer().set(parent.get(), STRING, source.key().asString());
+        if (child == null) return false;
+        destination.getPersistentDataContainer().set(Relative.OVERWORLD.key(), STRING, source.key().asString());
         source.getPersistentDataContainer().set(child, STRING, destination.key().asString());
         return true;
     }
