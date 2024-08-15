@@ -3,8 +3,8 @@ package net.thenextlvl.worlds.command.argument;
 import core.paper.command.WrappedArgumentType;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.key.Key;
-import net.thenextlvl.worlds.command.suggestion.RelativeSuggestionProvider;
 import net.thenextlvl.worlds.api.link.Relative;
+import net.thenextlvl.worlds.command.suggestion.RelativeSuggestionProvider;
 
 import java.util.function.Predicate;
 
