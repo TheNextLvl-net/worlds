@@ -21,10 +21,7 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -173,11 +170,16 @@ public class PaperLevelView implements LevelView {
                 }).collect(Collectors.toCollection(LinkedHashSet::new)))
                 .ifPresent(preset::layers);
 
-        settings.flatMap(tag -> tag.<ListTag<StringTag>>optional("structure_overrides"))
-                .map(tag -> tag.getAsList().stream()
+        settings.flatMap(tag -> tag.optional("structure_overrides")
+                        .filter(Tag::isList).map(Tag::getAsList))
+                .map(list -> list.stream()
                         .map(structure -> new Structure(structure.getAsString()))
                         .collect(Collectors.toCollection(LinkedHashSet::new)))
                 .ifPresent(preset::structures);
+        settings.flatMap(tag -> tag.optional("structure_overrides")
+                        .filter(Tag::isString).map(Tag::getAsString))
+                .map(Structure::new)
+                .ifPresent(preset::addStructure);
 
         return Optional.of(preset);
     }
