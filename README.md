@@ -86,54 +86,6 @@ _the aliases can be used by adding a single dash (-) in front of the alias (exam
 
 _The general spawn position will be overridden and only the world will be used_
 
-## World Images
-
-> [!WARNING]
-> In the near future World Images will be replaced or even removed
-> In their current state they are not very safe or consistent in their behaviour
-> The goal is to use as much information provided in the `level.dat` file
-
-A world image file has the extension `.image` and contains a json object with the following entries
-
-| Key         | Values                                        | Description                                                      | Optional |
-|-------------|-----------------------------------------------|------------------------------------------------------------------|----------|
-| name        | String                                        | the name of the world                                            | No       |
-| key         | NamespacedKey                                 | the namespaced key of the world                                  | No       |
-| settings    | World Preset                                  | the world settings<br/>_(only applies to world type flat)_       | Yes      |
-| generator   | World Generator                               | defines the world generator<br/>_(not combinable with settings)_ | Yes      |
-| deletion    | `WORLD`, `WORLD_AND_IMAGE`                    | what to delete on shutdown                                       | Yes      |
-| environment | `NORMAL`, `NETHER`, `THE_END`                 | the environment of the world                                     | No       |
-| type        | `NORMAL`, `FLAT`, `LARGE_BIOMES`, `AMPLIFIED` | the type of the world                                            | No       |
-| loadOnStart | boolean                                       | whether the world should be loaded on startup                    | Yes      |
-
-## World Generator
-
-A world generator consists out of two parts: The **plugin** and the **identifier**<br/>
-The plugin is the name of the plugin that provides a generator.<br/>
-In most cases the identifier will not be required, but in case a plugin provides multiple world generators,<br/>
-you have to define which one you have to use.
-
-### Example
-
-```json
-{
-  "name": "example",
-  "generator": {
-    "plugin": "example-plugin",
-    "identifier": "example-generator"
-  },
-  "key": "worlds:example",
-  "settings": {
-    "biome": "minecraft:the_void",
-    "layers": []
-  },
-  "deletion": "WORLD",
-  "environment": "NORMAL",
-  "type": "FLAT",
-  "loadOnStart": true
-}
-```
-
 ## World Presets
 
 ## API
