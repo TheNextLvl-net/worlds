@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
-public class LevelView {
+public class PaperLevelView implements LevelView {
     private final WorldsPlugin plugin;
 
     public Stream<File> listLevels() {
