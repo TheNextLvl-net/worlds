@@ -4,7 +4,7 @@ import core.paper.command.WrappedArgumentType;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.worlds.command.suggestion.RelativeSuggestionProvider;
-import net.thenextlvl.worlds.link.Relative;
+import net.thenextlvl.worlds.api.link.Relative;
 
 import java.util.function.Predicate;
 

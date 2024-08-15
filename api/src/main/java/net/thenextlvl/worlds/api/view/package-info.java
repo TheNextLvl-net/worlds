@@ -2,7 +2,7 @@
 @FieldsAreNotNullByDefault
 @ParametersAreNotNullByDefault
 @MethodsReturnNotNullByDefault
-package net.thenextlvl.worlds.preset;
+package net.thenextlvl.worlds.api.view;
 
 import core.annotation.FieldsAreNotNullByDefault;
 import core.annotation.MethodsReturnNotNullByDefault;

@@ -10,7 +10,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.argument.RelativeArgument;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
-import net.thenextlvl.worlds.link.Relative;
+import net.thenextlvl.worlds.api.link.Relative;
 import org.bukkit.World;
 
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.preset;
+package net.thenextlvl.worlds.api.preset;
 
 public record Structure(String structure) {
     Structure(org.bukkit.generator.structure.Structure structure) {

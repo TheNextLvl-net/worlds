@@ -1,7 +1,7 @@
-package net.thenextlvl.worlds.preset.adapter;
+package net.thenextlvl.worlds.api.preset.adapter;
 
 import com.google.gson.*;
-import net.thenextlvl.worlds.preset.Structure;
+import net.thenextlvl.worlds.api.preset.Structure;
 
 import java.lang.reflect.Type;
 

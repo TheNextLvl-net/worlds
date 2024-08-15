@@ -8,7 +8,7 @@ import io.papermc.paper.command.brigadier.Commands;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.link.Relative;
+import net.thenextlvl.worlds.api.link.Relative;
 import org.bukkit.World;
 
 import java.util.Arrays;

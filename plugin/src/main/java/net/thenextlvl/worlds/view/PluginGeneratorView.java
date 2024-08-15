@@ -1,5 +1,6 @@
 package net.thenextlvl.worlds.view;
 
+import net.thenextlvl.worlds.api.view.GeneratorView;
 import org.bukkit.plugin.Plugin;
 
 public class PluginGeneratorView implements GeneratorView {

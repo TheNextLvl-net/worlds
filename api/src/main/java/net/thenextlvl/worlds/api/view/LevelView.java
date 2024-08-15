@@ -1,10 +1,10 @@
-package net.thenextlvl.worlds.view;
+package net.thenextlvl.worlds.api.view;
 
 import core.nbt.file.NBTFile;
 import core.nbt.tag.CompoundTag;
-import net.thenextlvl.worlds.model.LevelExtras;
-import net.thenextlvl.worlds.model.WorldPreset;
-import net.thenextlvl.worlds.preset.Preset;
+import net.thenextlvl.worlds.api.model.LevelExtras;
+import net.thenextlvl.worlds.api.model.WorldPreset;
+import net.thenextlvl.worlds.api.preset.Preset;
 import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 

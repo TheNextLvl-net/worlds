@@ -2,8 +2,8 @@ package net.thenextlvl.worlds.controller;
 
 import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.link.LinkController;
-import net.thenextlvl.worlds.link.Relative;
+import net.thenextlvl.worlds.api.link.LinkController;
+import net.thenextlvl.worlds.api.link.Relative;
 import org.bukkit.NamespacedKey;
 import org.bukkit.PortalType;
 import org.bukkit.World;

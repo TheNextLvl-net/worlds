@@ -1,7 +1,7 @@
-package net.thenextlvl.worlds.preset.adapter;
+package net.thenextlvl.worlds.api.preset.adapter;
 
 import com.google.gson.*;
-import net.thenextlvl.worlds.preset.Biome;
+import net.thenextlvl.worlds.api.preset.Biome;
 
 import java.lang.reflect.Type;
 

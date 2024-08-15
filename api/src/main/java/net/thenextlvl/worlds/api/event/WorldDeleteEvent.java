@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.event;
+package net.thenextlvl.worlds.api.event;
 
 import lombok.Getter;
 import org.bukkit.World;

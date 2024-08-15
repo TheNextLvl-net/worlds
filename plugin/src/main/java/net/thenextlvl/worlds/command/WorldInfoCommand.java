@@ -12,7 +12,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
-import net.thenextlvl.worlds.model.WorldPreset;
+import net.thenextlvl.worlds.api.model.WorldPreset;
 import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.command.CommandSender;

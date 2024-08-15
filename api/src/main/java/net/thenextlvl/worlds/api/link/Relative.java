@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.link;
+package net.thenextlvl.worlds.api.link;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

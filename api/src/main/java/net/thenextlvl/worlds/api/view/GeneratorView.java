@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.view;
+package net.thenextlvl.worlds.api.view;
 
 import org.bukkit.plugin.Plugin;
 

@@ -5,7 +5,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import core.paper.command.SuggestionProvider;
 import lombok.RequiredArgsConstructor;
-import net.thenextlvl.worlds.link.Relative;
+import net.thenextlvl.worlds.api.link.Relative;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;

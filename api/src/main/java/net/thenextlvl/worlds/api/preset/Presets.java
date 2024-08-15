@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.preset;
+package net.thenextlvl.worlds.api.preset;
 
 import org.bukkit.Material;
 

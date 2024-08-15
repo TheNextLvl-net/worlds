@@ -7,7 +7,7 @@ import core.io.IO;
 import core.paper.command.WrappedArgumentType;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.suggestion.WorldPresetSuggestionProvider;
-import net.thenextlvl.worlds.preset.Preset;
+import net.thenextlvl.worlds.api.preset.Preset;
 
 import java.io.File;
 

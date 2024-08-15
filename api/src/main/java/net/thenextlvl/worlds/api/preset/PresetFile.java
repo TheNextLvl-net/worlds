@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.preset;
+package net.thenextlvl.worlds.api.preset;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

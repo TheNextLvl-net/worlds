@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.model;
+package net.thenextlvl.worlds.api.model;
 
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.Nullable;

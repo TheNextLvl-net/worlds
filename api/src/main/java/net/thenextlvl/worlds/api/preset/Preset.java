@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.preset;
+package net.thenextlvl.worlds.api.preset;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -10,8 +10,8 @@ import core.paper.adapters.inventory.MaterialAdapter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.thenextlvl.worlds.preset.adapter.BiomeTypeAdapter;
-import net.thenextlvl.worlds.preset.adapter.StructureTypeAdapter;
+import net.thenextlvl.worlds.api.preset.adapter.BiomeTypeAdapter;
+import net.thenextlvl.worlds.api.preset.adapter.StructureTypeAdapter;
 import org.bukkit.Material;
 
 import java.io.File;

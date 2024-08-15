@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.argument.*;
-import net.thenextlvl.worlds.preset.Preset;
+import net.thenextlvl.worlds.api.preset.Preset;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;

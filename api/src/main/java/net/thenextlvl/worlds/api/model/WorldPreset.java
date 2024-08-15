@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.model;
+package net.thenextlvl.worlds.api.model;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
