@@ -164,16 +164,14 @@ public class PaperLevelView implements LevelView {
                 .map(values -> {
                     var key = values.optional("worlds:world_key")
                             .map(Tag::getAsString)
-                            .map(NamespacedKey::fromString)
-                            .orElse(null);
+                            .map(NamespacedKey::fromString);
                     var generator = values.optional("worlds:generator")
                             .map(Tag::getAsString)
-                            .map(serialized -> Generator.deserialize(plugin, serialized))
-                            .orElse(null);
+                            .map(serialized -> Generator.deserialize(plugin, serialized));
                     var enabled = values.optional("worlds:enabled")
-                            .map(Tag::getAsBoolean)
-                            .orElse(false);
-                    return new LevelExtras(key, generator, enabled);
+                            .map(Tag::getAsBoolean);
+                    if (key.isEmpty() && generator.isEmpty() && enabled.isEmpty()) return null;
+                    return new LevelExtras(key.orElse(null), generator.orElse(null), enabled.orElse(false));
                 });
     }
 
