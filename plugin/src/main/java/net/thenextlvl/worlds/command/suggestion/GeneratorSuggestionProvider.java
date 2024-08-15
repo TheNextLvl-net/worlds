@@ -19,32 +19,10 @@ public class GeneratorSuggestionProvider implements SuggestionProvider {
     public CompletableFuture<Suggestions> suggest(CommandContext<?> context, SuggestionsBuilder builder) {
         Arrays.stream(plugin.getServer().getPluginManager().getPlugins())
                 .filter(Plugin::isEnabled)
-                .filter(this::hasGenerator)
+                .filter(plugin.generatorView()::hasGenerator)
                 .map(Plugin::getName)
                 .filter(s -> s.contains(builder.getRemaining()))
                 .forEach(builder::suggest);
         return builder.buildFuture();
-    }
-
-    private boolean hasGenerator(Plugin plugin) {
-        return hasChunkGenerator(plugin.getClass()) || hasBiomeProvider(plugin.getClass());
-    }
-
-    private boolean hasChunkGenerator(Class<? extends Plugin> clazz) {
-        try {
-            return clazz.getMethod("getDefaultWorldGenerator", String.class, String.class).getDeclaringClass().equals(clazz);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace(); // todo remove
-            return false;
-        }
-    }
-
-    private boolean hasBiomeProvider(Class<? extends Plugin> clazz) {
-        try {
-            return clazz.getMethod("getDefaultBiomeProvider", String.class, String.class).getDeclaringClass().equals(clazz);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace(); // todo remove
-            return false;
-        }
     }
 }
