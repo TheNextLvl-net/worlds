@@ -33,6 +33,8 @@ public interface LevelView {
 
     Optional<Preset> getFlatPreset(CompoundTag generator);
 
+    Optional<String> getGenerator(World world);
+
     Optional<String> getGeneratorSettings(CompoundTag generator);
 
     Optional<String> getGeneratorType(CompoundTag generator);
