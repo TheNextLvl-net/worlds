@@ -1,4 +1,3 @@
-
 package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
