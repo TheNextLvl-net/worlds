@@ -5,6 +5,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import org.bukkit.entity.Player;
 
@@ -22,7 +23,8 @@ class WorldSpawnCommand {
                 .executes(context -> {
                     var player = (Player) context.getSource().getSender();
                     player.teleportAsync(player.getWorld().getSpawnLocation(), COMMAND);
-                    plugin.bundle().sendMessage(player, "worlds.spawn");
+                    plugin.bundle().sendMessage(player, "world.teleport.self",
+                            Placeholder.parsed("world", player.getWorld().key().asString()));
                     return Command.SINGLE_SUCCESS;
                 });
     }
