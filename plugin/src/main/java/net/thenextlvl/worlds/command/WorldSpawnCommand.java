@@ -22,7 +22,7 @@ class WorldSpawnCommand {
                 .executes(context -> {
                     var player = (Player) context.getSource().getSender();
                     player.teleportAsync(player.getWorld().getSpawnLocation(), COMMAND);
-                    // todo: add message
+                    plugin.bundle().sendMessage(player, "worlds.spawn");
                     return Command.SINGLE_SUCCESS;
                 });
     }

@@ -28,7 +28,7 @@ class WorldSaveOffCommand {
     }
 
     private int saveOff(CommandSender sender, World world) {
-        var message = world.isAutoSave() ? "command.world.save.off" : "command.world.save.already-off";
+        var message = world.isAutoSave() ? "world.save.off" : "world.save.already-off";
         world.setAutoSave(false);
         plugin.bundle().sendMessage(sender, message);
         return Command.SINGLE_SUCCESS;

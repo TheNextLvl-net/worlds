@@ -28,7 +28,7 @@ class WorldSaveOnCommand {
     }
 
     private int saveOn(CommandSender sender, World world) {
-        var message = world.isAutoSave() ? "command.world.save.already-on" : "command.world.save.on";
+        var message = world.isAutoSave() ? "world.save.already-on" : "world.save.on";
         world.setAutoSave(true);
         plugin.bundle().sendMessage(sender, message);
         return Command.SINGLE_SUCCESS;
