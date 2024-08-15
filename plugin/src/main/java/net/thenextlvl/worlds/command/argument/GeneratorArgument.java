@@ -15,6 +15,7 @@ public class GeneratorArgument extends WrappedArgumentType<String, GeneratorArgu
             var generator = plugin.getServer().getPluginManager().getPlugin(split[0]);
             Preconditions.checkNotNull(generator, "Unknown plugin");
             Preconditions.checkState(generator.isEnabled(), "Plugin is not enabled");
+            Preconditions.checkState(plugin.generatorView().hasGenerator(generator), "Plugin has no generator");
             return new Generator(generator, split.length > 1 ? split[1] : null);
         }, new GeneratorSuggestionProvider(plugin));
     }
