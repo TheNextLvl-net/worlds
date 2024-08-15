@@ -4,8 +4,10 @@ import core.io.IO;
 import core.io.PathIO;
 import core.nbt.file.NBTFile;
 import core.nbt.tag.*;
+import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.api.model.Generator;
 import net.thenextlvl.worlds.api.model.LevelExtras;
 import net.thenextlvl.worlds.api.model.WorldPreset;
 import net.thenextlvl.worlds.api.preset.Biome;
@@ -141,6 +143,10 @@ public class PaperLevelView implements LevelView {
 
         generatorSettings.ifPresent(preset -> creator.generatorSettings(preset.serialize().toString()));
 
+        var generatorExtras = extras.map(LevelExtras::generator);
+        generatorExtras.map(gen -> gen.biomeProvider(creator.name())).ifPresent(creator::biomeProvider);
+        generatorExtras.map(gen -> gen.generator(creator.name())).ifPresent(creator::generator);
+
         return creator.createWorld();
     }
 
@@ -160,10 +166,14 @@ public class PaperLevelView implements LevelView {
                             .map(Tag::getAsString)
                             .map(NamespacedKey::fromString)
                             .orElse(null);
+                    var generator = values.optional("worlds:generator")
+                            .map(Tag::getAsString)
+                            .map(serialized -> Generator.deserialize(plugin, serialized))
+                            .orElse(null);
                     var enabled = values.optional("worlds:enabled")
                             .map(Tag::getAsBoolean)
-                            .orElse(true);
-                    return new LevelExtras(key, enabled);
+                            .orElse(false);
+                    return new LevelExtras(key, generator, enabled);
                 });
     }
 
@@ -208,6 +218,16 @@ public class PaperLevelView implements LevelView {
                 .ifPresent(preset::addStructure);
 
         return Optional.of(preset);
+    }
+
+    @Override
+    @SuppressWarnings("UnstableApiUsage")
+    public Optional<String> getGenerator(World world) {
+        if (world.getGenerator() == null) return Optional.empty();
+        var loader = world.getGenerator().getClass().getClassLoader();
+        if (!(loader instanceof ConfiguredPluginClassLoader pluginLoader)) return Optional.empty();
+        if (pluginLoader.getPlugin() == null) return Optional.empty();
+        return Optional.of(pluginLoader.getPlugin().getName());
     }
 
     @Override
