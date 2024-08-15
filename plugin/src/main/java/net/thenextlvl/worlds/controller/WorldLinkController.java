@@ -61,13 +61,18 @@ public class WorldLinkController implements LinkController {
     public boolean link(World source, World destination) {
         if (!canLink(source, destination)) return false;
         var child = switch (destination.getEnvironment()) {
-            case NETHER -> Relative.NETHER.key();
-            case THE_END -> Relative.THE_END.key();
+            case NETHER -> Relative.NETHER;
+            case THE_END -> Relative.THE_END;
             default -> null;
         };
         if (child == null) return false;
+        var opposite = child.equals(Relative.NETHER) ? Relative.THE_END : Relative.NETHER;
+        getTarget(source, opposite).map(plugin.getServer()::getWorld).ifPresent(sibling -> {
+            sibling.getPersistentDataContainer().set(child.key(), STRING, destination.key().asString());
+            destination.getPersistentDataContainer().set(opposite.key(), STRING, sibling.key().asString());
+        });
         destination.getPersistentDataContainer().set(Relative.OVERWORLD.key(), STRING, source.key().asString());
-        source.getPersistentDataContainer().set(child, STRING, destination.key().asString());
+        source.getPersistentDataContainer().set(child.key(), STRING, destination.key().asString());
         return true;
     }
 
