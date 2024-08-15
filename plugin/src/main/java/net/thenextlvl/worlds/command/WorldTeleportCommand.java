@@ -1,42 +1,84 @@
 package net.thenextlvl.worlds.command;
 
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.command.brigadier.argument.resolvers.FinePositionResolver;
+import io.papermc.paper.command.brigadier.argument.resolvers.selector.EntitySelectorArgumentResolver;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.thenextlvl.worlds.Worlds;
+import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
+import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
-import org.incendo.cloud.Command;
-import org.incendo.cloud.bukkit.parser.PlayerParser;
-import org.incendo.cloud.bukkit.parser.WorldParser;
-import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.exception.InvalidSyntaxException;
 
 import java.util.List;
+
+import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
 class WorldTeleportCommand {
-    private final Worlds plugin;
-    private final Command.Builder<CommandSourceStack> builder;
+    private final WorldsPlugin plugin;
 
-    Command.Builder<CommandSourceStack> create() {
-        return builder.literal("teleport", "tp")
-                .permission("worlds.command.world.teleport")
-                .required("world", WorldParser.worldParser())
-                .optional("player", PlayerParser.playerParser())
-                .handler(this::execute);
+    ArgumentBuilder<CommandSourceStack, ?> create() {
+        return Commands.literal("teleport")
+                .requires(source -> source.getSender().hasPermission("worlds.command.teleport"))
+                .then(Commands.argument("world", ArgumentTypes.world())
+                        .suggests(new WorldSuggestionProvider<>(plugin))
+                        .then(Commands.argument("entities", ArgumentTypes.entities())
+                                .then(Commands.argument("position", ArgumentTypes.finePosition(true))
+                                        .executes(this::teleportEntitiesPosition))
+                                .executes(this::teleportEntities))
+                        .executes(this::teleport));
     }
 
-    private void execute(CommandContext<CommandSourceStack> context) {
-        var sender = context.sender().getSender();
-        var world = context.<World>get("world");
-        var player = context.<Player>optional("player").orElse(sender instanceof Player self ? self : null);
-        if (player == null) throw new InvalidSyntaxException("world teleport [world] [player]", sender, List.of());
-        player.teleportAsync(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
-        var message = player.equals(sender) ? "world.teleport.player.self" : "world.teleport.player.other";
-        plugin.bundle().sendMessage(sender, message, Placeholder.parsed("world", world.getName()),
-                Placeholder.parsed("player", player.getName()));
+    private int teleportEntitiesPosition(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var entities = context.getArgument("entities", EntitySelectorArgumentResolver.class);
+        var position = context.getArgument("position", FinePositionResolver.class);
+        var world = context.getArgument("world", World.class);
+        var location = position.resolve(context.getSource()).toLocation(world);
+        var resolved = entities.resolve(context.getSource());
+        return teleport(context.getSource().getSender(), resolved, location);
+    }
+
+    private int teleportEntities(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var entities = context.getArgument("entities", EntitySelectorArgumentResolver.class);
+        var world = context.getArgument("world", World.class);
+        var resolved = entities.resolve(context.getSource());
+        return teleport(context.getSource().getSender(), resolved, world.getSpawnLocation());
+    }
+
+    private int teleport(CommandContext<CommandSourceStack> context) {
+        if (!(context.getSource().getSender() instanceof Player player)) {
+            plugin.bundle().sendMessage(context.getSource().getSender(), "command.sender");
+            return 0;
+        }
+        var world = context.getArgument("world", World.class);
+        return teleport(player, List.of(player), world.getSpawnLocation());
+    }
+
+    private int teleport(CommandSender sender, List<Entity> entities, Location location) {
+        var message = entities.size() == 1 ? "world.teleport.other"
+                : entities.isEmpty() ? "world.teleport.none" : "world.teleport.others";
+        entities.forEach(entity -> {
+            entity.teleportAsync(location, COMMAND);
+            plugin.bundle().sendMessage(entity, "world.teleport.self",
+                    Placeholder.parsed("world", location.getWorld().key().asString()));
+        });
+        if (entities.size() == 1 && entities.getFirst().equals(sender)) return Command.SINGLE_SUCCESS;
+        plugin.bundle().sendMessage(sender, message,
+                Placeholder.component("entity", entities.isEmpty() ? Component.empty() : entities.getFirst().name()),
+                Placeholder.parsed("world", location.getWorld().key().asString()),
+                Placeholder.parsed("entities", String.valueOf(entities.size())));
+        return entities.isEmpty() ? 0 : Command.SINGLE_SUCCESS;
     }
 }

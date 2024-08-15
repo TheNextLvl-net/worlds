@@ -1,67 +1,77 @@
 package net.thenextlvl.worlds.command;
 
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.thenextlvl.worlds.Worlds;
-import net.thenextlvl.worlds.image.WorldImage;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
-import org.incendo.cloud.Command;
-import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.parser.standard.StringParser;
-import org.incendo.cloud.suggestion.Suggestion;
-import org.incendo.cloud.suggestion.SuggestionProvider;
+import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.command.argument.DimensionArgument;
+import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
+import org.bukkit.NamespacedKey;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.util.Optional;
+
+import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
 class WorldImportCommand {
-    private final Worlds plugin;
-    private final Command.Builder<CommandSourceStack> builder;
+    private final WorldsPlugin plugin;
 
-    @SuppressWarnings("deprecation")
-    Command.Builder<CommandSourceStack> create() {
-        return builder.literal("import")
-                .permission("worlds.command.world.import")
-                .required("image", StringParser.greedyStringParser(),
-                        SuggestionProvider.blocking((context, input) -> plugin.imageProvider().findImages().stream()
-                                .map(WorldImage::name)
-                                .filter(name -> Bukkit.getWorld(name) == null)
-                                .map(Suggestion::suggestion)
-                                .toList()))
-                .handler(this::execute);
+    ArgumentBuilder<CommandSourceStack, ?> create() {
+        return Commands.literal("import")
+                .requires(source -> source.getSender().hasPermission("worlds.command.import"))
+                .then(Commands.argument("world", StringArgumentType.string())
+                        .suggests(new LevelSuggestionProvider<>(plugin))
+                        .then(Commands.argument("key", ArgumentTypes.namespacedKey())
+                                .executes(context -> {
+                                    var key = context.getArgument("key", NamespacedKey.class);
+                                    return execute(context, null, key);
+                                }))
+                        .then(Commands.argument("dimension", new DimensionArgument(plugin))
+                                .then(Commands.argument("key", ArgumentTypes.namespacedKey())
+                                        .executes(context -> {
+                                            var environment = context.getArgument("dimension", World.Environment.class);
+                                            var key = context.getArgument("key", NamespacedKey.class);
+                                            return execute(context, environment, key);
+                                        }))
+                                .executes(context -> {
+                                    var environment = context.getArgument("dimension", World.Environment.class);
+                                    return execute(context, environment, null);
+                                }))
+                        .executes(context -> execute(context, null, null)));
     }
 
-    private void execute(CommandContext<CommandSourceStack> context) {
-        var sender = context.sender().getSender();
+    private int execute(CommandContext<CommandSourceStack> context, @Nullable World.Environment environment, @Nullable NamespacedKey key) {
+        var name = context.getArgument("world", String.class);
+        var level = new File(plugin.getServer().getWorldContainer(), name);
 
-        var imageName = context.<String>get("image");
-        var image = plugin.imageProvider().findImageFiles().stream()
-                .filter(file -> {
-                    var worldImage = plugin.imageProvider().of(file);
-                    return worldImage != null && worldImage.name().equals(imageName);
-                })
-                .findFirst()
-                .map(plugin.imageProvider()::of)
-                .orElse(null);
+        var world = plugin.levelView().isLevel(level) ? environment != null
+                ? plugin.levelView().loadLevel(level, environment, key, Optional::isEmpty)
+                : plugin.levelView().loadLevel(level, key, Optional::isEmpty) : null;
 
-        if (image == null) {
-            plugin.bundle().sendMessage(sender, "image.exists.not", Placeholder.parsed("image", imageName));
-            return;
-        }
+        var message = world != null ? "world.import.success" : "world.import.failed";
+        plugin.bundle().sendMessage(context.getSource().getSender(), message,
+                Placeholder.parsed("world", world != null ? world.key().asString()
+                        : key != null ? key.asString() : name));
 
-        var world = Bukkit.getWorld(image.name());
-        var placeholder = Placeholder.parsed("world", world != null ? world.getName() : image.name());
+        if (world != null && context.getSource().getSender() instanceof Entity entity)
+            entity.teleportAsync(world.getSpawnLocation(), COMMAND);
+
         if (world != null) {
-            plugin.bundle().sendMessage(sender, "world.known", placeholder);
-            return;
+            plugin.persistWorld(world, true);
+            plugin.levelView().saveLevelData(world, true);
         }
 
-        var result = plugin.imageProvider().load(image);
-        var message = result != null ? "world.import.success" : "world.import.failed";
-        plugin.bundle().sendMessage(sender, message, placeholder);
-        if (result == null || !(sender instanceof Player player)) return;
-        player.teleportAsync(result.getWorld().getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
+        return world != null ? Command.SINGLE_SUCCESS : 0;
     }
 }

@@ -2,15 +2,11 @@ package net.thenextlvl.worlds.listener;
 
 import io.papermc.paper.event.entity.EntityPortalReadyEvent;
 import lombok.RequiredArgsConstructor;
-import net.thenextlvl.worlds.Worlds;
-import net.thenextlvl.worlds.link.Link;
-import net.thenextlvl.worlds.util.PortalCooldown;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.PortalType;
-import org.bukkit.World;
+import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.model.PortalCooldown;
+import org.bukkit.*;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -23,41 +19,39 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.END_PORT
 @RequiredArgsConstructor
 public class PortalListener implements Listener {
     private final PortalCooldown cooldown = new PortalCooldown();
-    private final Worlds plugin;
+    private final WorldsPlugin plugin;
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityPortal(EntityPortalReadyEvent event) {
-        plugin.linkRegistry().getLinks()
-                .filter(link -> event.getPortalType().equals(link.portalType()))
-                .filter(link -> event.getEntity().getWorld().equals(link.source()))
-                .findFirst()
-                .map(Link::destination)
-                .ifPresent(event::setTargetWorld);
+        if (event.getPortalType().equals(PortalType.CUSTOM)) return;
+        plugin.linkController().getTarget(event.getEntity().getWorld(), event.getPortalType())
+                .map(Bukkit::getWorld).ifPresentOrElse(event::setTargetWorld, () ->
+                        event.setTargetWorld(null));
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityPortalEnter(EntityPortalEnterEvent event) {
-        if (!event.getLocation().getBlock().getType().equals(Material.END_PORTAL)) return;
+        if (!event.getPortalType().equals(PortalType.ENDER)) return;
+
+        event.setCancelled(true);
+
         if (!cooldown.start(plugin, event.getEntity())) return;
+
         var readyEvent = new EntityPortalReadyEvent(event.getEntity(), null, PortalType.ENDER);
-        if (!readyEvent.callEvent() || readyEvent.getTargetWorld() == null) return;
+        onEntityPortal(readyEvent);
+
+        if (readyEvent.getTargetWorld() == null) return;
+
         if (readyEvent.getTargetWorld().getEnvironment().equals(World.Environment.THE_END)) {
             generateEndPlatform(readyEvent.getTargetWorld());
-            var spawn = new Location(readyEvent.getTargetWorld(), 100.5, 50, 0.5, 90, 0);
+            var spawn = new Location(readyEvent.getTargetWorld(), 100.5, 49, 0.5, 90, 0);
             event.getEntity().teleportAsync(spawn, END_PORTAL);
-        } else if (readyEvent.getTargetWorld().getEnvironment().equals(World.Environment.NETHER)) {
-            var spawn = event.getLocation().clone();
-            spawn.setWorld(readyEvent.getTargetWorld());
-            spawn.setX(spawn.getX() * readyEvent.getTargetWorld().getCoordinateScale());
-            spawn.setZ(spawn.getZ() * readyEvent.getTargetWorld().getCoordinateScale());
-            event.getEntity().teleportAsync(spawn, END_PORTAL);
-        } else if (event.getEntity() instanceof Player player) {
-            var location = player.getRespawnLocation();
-            if (location == null || !location.getWorld().equals(readyEvent.getTargetWorld()))
-                player.teleportAsync(readyEvent.getTargetWorld().getSpawnLocation(), END_PORTAL);
-            else player.teleportAsync(location, END_PORTAL);
-        } else event.getEntity().teleportAsync(readyEvent.getTargetWorld().getSpawnLocation(), END_PORTAL);
+        } else if (event.getEntity() instanceof CraftPlayer player) {
+            if (!player.getHandle().seenCredits) player.getHandle().showEndCredits();
+            if (player.getRespawnLocation() != null) player.teleportAsync(player.getRespawnLocation(), END_PORTAL);
+            else player.teleportAsync(readyEvent.getTargetWorld().getSpawnLocation(), END_PORTAL);
+        } else event.getEntity().teleport(readyEvent.getTargetWorld().getSpawnLocation(), END_PORTAL);
     }
 
     private void generateEndPlatform(World world) {

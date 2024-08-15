@@ -1,73 +1,84 @@
 package net.thenextlvl.worlds.command;
 
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import core.nbt.tag.CompoundTag;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.thenextlvl.worlds.Worlds;
+import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.api.model.WorldPreset;
+import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.World;
 import org.bukkit.WorldType;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.incendo.cloud.Command;
-import org.incendo.cloud.bukkit.parser.WorldParser;
-import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.exception.InvalidSyntaxException;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
 class WorldInfoCommand {
-    private final Worlds plugin;
-    private final Command.Builder<CommandSourceStack> builder;
+    private final WorldsPlugin plugin;
 
-    Command.Builder<CommandSourceStack> create() {
-        return builder.literal("info")
-                .permission("worlds.command.world.info")
-                .optional("world", WorldParser.worldParser())
-                .handler(this::execute);
+    ArgumentBuilder<CommandSourceStack, ?> create() {
+        return Commands.literal("info")
+                .requires(source -> source.getSender().hasPermission("worlds.command.info"))
+                .then(Commands.argument("world", ArgumentTypes.world())
+                        .suggests(new WorldSuggestionProvider<>(plugin))
+                        .executes(context -> {
+                            var world = context.getArgument("world", World.class);
+                            return list(context.getSource().getSender(), world);
+                        }))
+                .executes(context -> {
+                    if (!(context.getSource().getSender() instanceof Player player)) {
+                        plugin.bundle().sendMessage(context.getSource().getSender(), "command.sender");
+                        return 0;
+                    } else return list(context.getSource().getSender(), player.getWorld());
+                });
     }
 
     @SuppressWarnings("deprecation")
-    private void execute(CommandContext<CommandSourceStack> context) {
-        var sender = context.sender().getSender();
-        var world = context.<World>optional("world").orElse(sender instanceof Player self ? self.getWorld() : null);
-        if (world == null) throw new InvalidSyntaxException("world info [world]", sender, List.of());
-        var volume = plugin.imageProvider().getOrDefault(world);
+    private int list(CommandSender sender, World world) {
+        var root = plugin.levelView().getLevelDataFile(world.getWorldFolder()).getRoot();
+        var data = root.<CompoundTag>optional("Data");
+        var settings = data.flatMap(tag -> tag.<CompoundTag>optional("WorldGenSettings"));
+        var dimensions = settings.flatMap(tag -> tag.<CompoundTag>optional("dimensions"));
+        var dimension = dimensions.flatMap(tag -> tag.<CompoundTag>optional(
+                plugin.levelView().getDimension(tag, world.getEnvironment())));
+        var generator = dimension.flatMap(tag -> tag.<CompoundTag>optional("generator"));
+
+        var environment = dimensions.map(tag -> plugin.levelView().getDimension(tag, world.getEnvironment()));
+        var worldPreset = generator.flatMap(tag -> plugin.levelView().getWorldPreset(tag));
+
         plugin.bundle().sendMessage(sender, "world.info.name",
-                Placeholder.parsed("world", world.getName()));
+                Placeholder.parsed("world", world.key().asString()),
+                Placeholder.parsed("name", world.getName()));
         plugin.bundle().sendMessage(sender, "world.info.players",
                 Placeholder.parsed("players", String.valueOf(world.getPlayers().size())));
         plugin.bundle().sendMessage(sender, "world.info.type",
-                Placeholder.parsed("type", getName(notnull(world.getWorldType(), WorldType.NORMAL))));
-        plugin.bundle().sendMessage(sender, "world.info.environment",
-                Placeholder.parsed("environment", getName(world.getEnvironment())));
-        plugin.bundle().sendMessage(sender, "world.info.generator",
-                Placeholder.parsed("generator", String.valueOf(notnull(
-                        volume.getWorldImage().generator(), "Vanilla"))));
+                Placeholder.parsed("type", worldPreset.map(WorldPreset::key)
+                        .map(Key::asString).orElse("unknown")),
+                Placeholder.parsed("old", Optional.ofNullable(world.getWorldType())
+                        .orElse(WorldType.NORMAL).getName().toLowerCase()));
+        plugin.bundle().sendMessage(sender, "world.info.dimension",
+                Placeholder.parsed("dimension", environment.orElse("unknown")));
+        getGenerator(world).ifPresent(gen -> plugin.bundle().sendMessage(sender,
+                "world.info.generator", Placeholder.parsed("generator", gen)));
         plugin.bundle().sendMessage(sender, "world.info.seed",
                 Placeholder.parsed("seed", String.valueOf(world.getSeed())));
+        return Command.SINGLE_SUCCESS;
     }
 
-    private static String getName(World.Environment environment) {
-        return switch (environment) {
-            case THE_END -> "The End";
-            case NETHER -> "Nether";
-            case NORMAL -> "Normal";
-            case CUSTOM -> "Custom";
-        };
-    }
-
-    private String getName(WorldType type) {
-        return switch (type) {
-            case LARGE_BIOMES -> "Large Biomes";
-            case AMPLIFIED -> "Amplified";
-            case NORMAL -> "Normal";
-            case FLAT -> "Flat";
-        };
-    }
-
-    private <V> V notnull(@Nullable V value, V defaultValue) {
-        return value != null ? value : defaultValue;
+    private Optional<String> getGenerator(World world) {
+        if (world.getGenerator() == null) return Optional.empty();
+        var loader = world.getGenerator().getClass().getClassLoader();
+        if (!(loader instanceof ConfiguredPluginClassLoader pluginLoader)) return Optional.empty();
+        if (pluginLoader.getPlugin() == null) return Optional.empty();
+        return Optional.of(pluginLoader.getPlugin().getName());
     }
 }

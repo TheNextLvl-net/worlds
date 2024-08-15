@@ -1,62 +1,64 @@
 package net.thenextlvl.worlds.command;
 
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.thenextlvl.worlds.Worlds;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-import org.incendo.cloud.Command;
-import org.incendo.cloud.bukkit.parser.location.LocationParser;
-import org.incendo.cloud.component.DefaultValue;
-import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.exception.InvalidCommandSenderException;
-import org.incendo.cloud.parser.standard.FloatParser;
-
-import java.util.List;
-
-import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
+import net.thenextlvl.worlds.WorldsPlugin;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
 class WorldSetSpawnCommand {
-    private final Worlds plugin;
-    private final Command.Builder<CommandSourceStack> builder;
+    private final WorldsPlugin plugin;
 
-    Command.Builder<CommandSourceStack> create() {
-        return builder.literal("setspawn")
-                .permission("worlds.command.world.setspawn")
-                // .senderType(Player.class)
-                .optional("position", LocationParser.locationParser(),
-                        DefaultValue.dynamic(context -> context.sender().getLocation()))
-                .optional("angle", FloatParser.floatParser(-360, 360),
-                        DefaultValue.dynamic(context -> {
-                            var executor = context.sender().getExecutor();
-                            return executor != null ? executor.getYaw() : 0;
+    ArgumentBuilder<CommandSourceStack, ?> create() {
+        return Commands.literal("setspawn")
+                .requires(source -> source.getSender().hasPermission("worlds.command.setspawn"))
+                .then(Commands.argument("position", ArgumentTypes.blockPosition())
+                        .then(Commands.argument("angle", FloatArgumentType.floatArg(-180, 180))
+                                .executes(context -> {
+                                    var angle = context.getArgument("angle", float.class);
+                                    var resolver = context.getArgument("position", BlockPositionResolver.class);
+                                    var position = resolver.resolve(context.getSource());
+                                    return setSpawn(context.getSource().getSender(),
+                                            context.getSource().getLocation().getWorld(),
+                                            position.blockX(), position.blockY(), position.blockZ(), angle
+                                    );
+                                }))
+                        .executes(context -> {
+                            var resolver = context.getArgument("position", BlockPositionResolver.class);
+                            var position = resolver.resolve(context.getSource());
+                            return setSpawn(context.getSource().getSender(),
+                                    context.getSource().getLocation().getWorld(),
+                                    position.blockX(), position.blockY(), position.blockZ(), 0
+                            );
                         }))
-                .handler(this::execute);
+                .executes(context -> {
+                    var location = context.getSource().getLocation();
+                    return setSpawn(context.getSource().getSender(),
+                            location.getWorld(),
+                            location.blockX(),
+                            location.blockY(),
+                            location.blockZ(), 0
+                    );
+                });
     }
 
-    private void execute(CommandContext<CommandSourceStack> context) {
-        if (!(context.sender().getSender() instanceof Player player))
-            throw new InvalidCommandSenderException(context.sender(), Player.class, List.of(), context.command());
-
-        var location = context.<Location>get("position");
-        float angle = context.<Float>get("angle");
-
-        var success = player.getWorld().setSpawnLocation(
-                location.getBlockX(),
-                location.getBlockY(),
-                location.getBlockZ(),
-                angle
-        );
-        if (success) player.teleportAsync(player.getWorld().getSpawnLocation(), COMMAND);
-
+    private int setSpawn(CommandSender sender, World world, int x, int y, int z, float angle) {
+        var success = world.setSpawnLocation(x, y, z, angle);
         var message = success ? "world.spawn.set.success" : "world.spawn.set.failed";
-        plugin.bundle().sendMessage(player, message,
-                Placeholder.parsed("x", String.valueOf(location.getBlockX())),
-                Placeholder.parsed("y", String.valueOf(location.getBlockY())),
-                Placeholder.parsed("z", String.valueOf(location.getBlockZ())),
+        plugin.bundle().sendMessage(sender, message,
+                Placeholder.parsed("x", String.valueOf(x)),
+                Placeholder.parsed("y", String.valueOf(y)),
+                Placeholder.parsed("z", String.valueOf(z)),
                 Placeholder.parsed("angle", String.valueOf(angle)));
+        return success ? Command.SINGLE_SUCCESS : 0;
     }
 }
