@@ -10,6 +10,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.thenextlvl.worlds.api.WorldsProvider;
 import net.thenextlvl.worlds.api.link.LinkController;
+import net.thenextlvl.worlds.api.model.Generator;
 import net.thenextlvl.worlds.api.preset.Presets;
 import net.thenextlvl.worlds.api.view.GeneratorView;
 import net.thenextlvl.worlds.api.view.LevelView;
@@ -85,10 +86,20 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     }
 
     public void persistWorld(World world, boolean enabled) {
-        if (world.key().asString().equals("minecraft:overworld")) return;
-        var container = world.getPersistentDataContainer();
-        container.set(new NamespacedKey("worlds", "world_key"), STRING, world.getKey().asString());
-        container.set(new NamespacedKey("worlds", "enabled"), BOOLEAN, enabled);
+        var worldKey = new NamespacedKey("worlds", "world_key");
+        world.getPersistentDataContainer().set(worldKey, STRING, world.getKey().asString());
+        persistStatus(world, enabled, true);
+    }
+
+    public void persistStatus(World world, boolean enabled, boolean force) {
+        var enabledKey = new NamespacedKey("worlds", "enabled");
+        if (!force && !world.getPersistentDataContainer().has(enabledKey)) return;
+        world.getPersistentDataContainer().set(enabledKey, BOOLEAN, enabled);
+    }
+
+    public void persistGenerator(World world, Generator generator) {
+        var generatorKey = new NamespacedKey("worlds", "generator");
+        world.getPersistentDataContainer().set(generatorKey, STRING, generator.serialize());
     }
 
     private void registerServices() {
