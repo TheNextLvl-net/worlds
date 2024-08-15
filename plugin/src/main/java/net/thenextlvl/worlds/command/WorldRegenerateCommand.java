@@ -12,6 +12,7 @@ import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.argument.CommandFlagsArgument;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
 
 import java.io.File;
 import java.util.Set;
@@ -71,15 +72,17 @@ class WorldRegenerateCommand {
         var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
         players.forEach(player -> player.teleport(fallback, COMMAND));
 
-        plugin.persistWorld(world, true);
         plugin.levelView().saveLevelData(world, false);
+
+        var creator = new WorldCreator(world.getName(), world.getKey()).copy(world);
+        plugin.levelView().getGenerator(world).ifPresent(creator::generator);
 
         if (!plugin.getServer().unloadWorld(world, false))
             return "world.unload.failed";
 
         regenerate(worldFolder);
 
-        var regenerated = plugin.levelView().loadLevel(worldFolder, environment);
+        var regenerated = creator.createWorld();
         if (regenerated != null) players.forEach(player ->
                 player.teleportAsync(regenerated.getSpawnLocation(), COMMAND));
         return regenerated != null ? "world.regenerate.success" : "world.regenerate.failed";
