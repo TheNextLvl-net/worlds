@@ -21,7 +21,10 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -75,6 +78,11 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
+    public @Nullable World loadLevel(File level, @Nullable NamespacedKey key, Predicate<Optional<LevelExtras>> predicate) {
+        return loadLevel(level, getEnvironment(level), key, predicate);
+    }
+
+    @Override
     public @Nullable World loadLevel(File level, World.Environment environment) {
         return loadLevel(level, environment, extras -> extras.map(LevelExtras::enabled).isPresent());
     }
@@ -86,6 +94,11 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public @Nullable World loadLevel(File level, World.Environment environment, Predicate<Optional<LevelExtras>> predicate) {
+        return loadLevel(level, environment, null, predicate);
+    }
+
+    @Override
+    public @Nullable World loadLevel(File level, World.Environment environment, @Nullable NamespacedKey key, Predicate<Optional<LevelExtras>> predicate) {
         var data = getLevelDataFile(level).getRoot().<CompoundTag>optional("Data");
         var extras = data.flatMap(this::getExtras);
 
@@ -111,14 +124,15 @@ public class PaperLevelView implements LevelView {
                 .orElseThrow(() -> new NoSuchElementException("generate_features"))
                 .getAsBoolean();
 
-        var key = extras.map(LevelExtras::key).orElseGet(() -> {
-            var namespace = level.getName().toLowerCase()
-                    .replace("(", "").replace(")", "")
-                    .replace(" ", "_");
-            return new NamespacedKey("worlds", namespace);
-        });
+        var worldKey = Optional.ofNullable(key).orElseGet(() ->
+                extras.map(LevelExtras::key).orElseGet(() -> {
+                    var namespace = level.getName().toLowerCase()
+                            .replace("(", "").replace(")", "")
+                            .replace(" ", "_");
+                    return new NamespacedKey("worlds", namespace);
+                }));
 
-        var creator = new WorldCreator(level.getName(), key)
+        var creator = new WorldCreator(level.getName(), worldKey)
                 .environment(environment)
                 .generateStructures(structures)
                 .hardcore(hardcore)

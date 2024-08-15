@@ -5,6 +5,7 @@ import core.nbt.tag.CompoundTag;
 import net.thenextlvl.worlds.api.model.LevelExtras;
 import net.thenextlvl.worlds.api.model.WorldPreset;
 import net.thenextlvl.worlds.api.preset.Preset;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,9 +17,13 @@ import java.util.stream.Stream;
 public interface LevelView {
     @Nullable World loadLevel(File level);
 
+    @Nullable World loadLevel(File level, @Nullable NamespacedKey key, Predicate<Optional<LevelExtras>> predicate);
+
     @Nullable World loadLevel(File level, Predicate<Optional<LevelExtras>> predicate);
 
     @Nullable World loadLevel(File level, World.Environment environment);
+
+    @Nullable World loadLevel(File level, World.Environment environment, @Nullable NamespacedKey key, Predicate<Optional<LevelExtras>> predicate);
 
     @Nullable World loadLevel(File level, World.Environment environment, Predicate<Optional<LevelExtras>> predicate);
 
