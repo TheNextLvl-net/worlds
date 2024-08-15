@@ -23,7 +23,8 @@ class WorldUnloadCommand {
                 .then(Commands.argument("world", ArgumentTypes.world())
                         .suggests(new WorldSuggestionProvider<>(plugin))
                         .then(Commands.argument("fallback", ArgumentTypes.world())
-                                .suggests(new WorldSuggestionProvider<>(plugin))
+                                .suggests(new WorldSuggestionProvider<>(plugin)) //, (context, world) ->
+                                        //!world.equals(context.getArgument("world", World.class))))
                                 .executes(context -> {
                                     var world = context.getArgument("world", World.class);
                                     var fallback = context.getArgument("fallback", World.class);
@@ -50,7 +51,7 @@ class WorldUnloadCommand {
                 : plugin.getServer().getWorlds().getFirst().getSpawnLocation();
         world.getPlayers().forEach(player -> player.teleport(fallbackSpawn));
 
-        plugin.persistWorld(world, false);
+        plugin.persistStatus(world, false, false);
 
         var dragonBattle = world.getEnderDragonBattle();
         if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
