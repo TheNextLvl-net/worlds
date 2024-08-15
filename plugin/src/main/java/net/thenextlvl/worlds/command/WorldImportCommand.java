@@ -32,6 +32,11 @@ class WorldImportCommand {
                 .requires(source -> source.getSender().hasPermission("worlds.command.import"))
                 .then(Commands.argument("world", StringArgumentType.string())
                         .suggests(new LevelSuggestionProvider<>(plugin))
+                        .then(Commands.argument("key", ArgumentTypes.namespacedKey())
+                                .executes(context -> {
+                                    var key = context.getArgument("key", NamespacedKey.class);
+                                    return execute(context, null, key);
+                                }))
                         .then(Commands.argument("dimension", new DimensionArgument(plugin))
                                 .then(Commands.argument("key", ArgumentTypes.namespacedKey())
                                         .executes(context -> {
@@ -49,10 +54,10 @@ class WorldImportCommand {
     private int execute(CommandContext<CommandSourceStack> context, @Nullable World.Environment environment, @Nullable NamespacedKey key) {
         var name = context.getArgument("world", String.class);
         var level = new File(plugin.getServer().getWorldContainer(), name);
-        // todo: define key
+
         var world = plugin.levelView().isLevel(level) ? environment != null
-                ? plugin.levelView().loadLevel(level, environment, Optional::isEmpty)
-                : plugin.levelView().loadLevel(level, Optional::isEmpty) : null;
+                ? plugin.levelView().loadLevel(level, environment, key, Optional::isEmpty)
+                : plugin.levelView().loadLevel(level, key, Optional::isEmpty) : null;
 
         var message = world != null ? "world.import.success" : "world.import.failed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
