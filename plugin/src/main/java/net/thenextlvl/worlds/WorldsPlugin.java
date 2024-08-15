@@ -58,7 +58,7 @@ public class WorldsPlugin extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        if (presetsFolder().list() == null) saveDefaultPresets();
+        if (!presetsFolder().isDirectory()) saveDefaultPresets();
         versionChecker().checkVersion();
     }
 
