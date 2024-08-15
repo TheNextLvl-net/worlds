@@ -8,21 +8,23 @@ import lombok.experimental.Accessors;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.thenextlvl.worlds.api.WorldsProvider;
+import net.thenextlvl.worlds.api.link.LinkController;
+import net.thenextlvl.worlds.api.preset.Presets;
+import net.thenextlvl.worlds.api.view.GeneratorView;
+import net.thenextlvl.worlds.api.view.LevelView;
 import net.thenextlvl.worlds.command.WorldCommand;
 import net.thenextlvl.worlds.controller.WorldLinkController;
-import net.thenextlvl.worlds.api.view.GeneratorView;
-import net.thenextlvl.worlds.api.link.LinkController;
 import net.thenextlvl.worlds.listener.PortalListener;
 import net.thenextlvl.worlds.listener.ServerListener;
-import net.thenextlvl.worlds.api.preset.Presets;
 import net.thenextlvl.worlds.version.PluginVersionChecker;
-import net.thenextlvl.worlds.api.view.LevelView;
 import net.thenextlvl.worlds.view.PaperLevelView;
 import net.thenextlvl.worlds.view.PluginGeneratorView;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -35,7 +37,7 @@ import static org.bukkit.persistence.PersistentDataType.STRING;
 @Accessors(fluent = true)
 @FieldsAreNotNullByDefault
 @ParametersAreNotNullByDefault
-public class WorldsPlugin extends JavaPlugin {
+public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     private final GeneratorView generatorView = new PluginGeneratorView();
     private final LevelView levelView = new PaperLevelView(this);
 
@@ -60,6 +62,7 @@ public class WorldsPlugin extends JavaPlugin {
     public void onLoad() {
         if (!presetsFolder().isDirectory()) saveDefaultPresets();
         versionChecker().checkVersion();
+        registerServices();
     }
 
     @Override
@@ -86,6 +89,10 @@ public class WorldsPlugin extends JavaPlugin {
         var container = world.getPersistentDataContainer();
         container.set(new NamespacedKey("worlds", "world_key"), STRING, world.getKey().asString());
         container.set(new NamespacedKey("worlds", "enabled"), BOOLEAN, enabled);
+    }
+
+    private void registerServices() {
+        getServer().getServicesManager().register(WorldsProvider.class, this, this, ServicePriority.Highest);
     }
 
     private void registerListeners() {
