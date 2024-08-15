@@ -10,4 +10,4 @@ updates:
       - "api"
       - "plugin"
     schedule:
-      interval: "weekly"
+      interval: "daily"
