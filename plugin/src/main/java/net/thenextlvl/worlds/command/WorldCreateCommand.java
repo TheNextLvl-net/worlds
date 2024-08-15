@@ -11,6 +11,7 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.api.model.Generator;
 import net.thenextlvl.worlds.api.preset.Preset;
 import net.thenextlvl.worlds.command.argument.*;
 import org.bukkit.NamespacedKey;
@@ -75,7 +76,7 @@ class WorldCreateCommand {
     }
 
     private int create(CommandContext<CommandSourceStack> context, World.Environment environment, boolean structures,
-                       long seed, WorldType worldType, @Nullable Preset preset, @Nullable GeneratorArgument.Generator generator) {
+                       long seed, WorldType worldType, @Nullable Preset preset, @Nullable Generator generator) {
         var key = context.getArgument("key", NamespacedKey.class);
         var name = key.getKey();
         var creator = new WorldCreator(name, key)
@@ -104,6 +105,7 @@ class WorldCreateCommand {
 
         if (world != null) {
             plugin.persistWorld(world, true);
+            if (generator != null) plugin.persistGenerator(world, generator);
             plugin.levelView().saveLevelData(world, true);
         }
 
@@ -111,7 +113,7 @@ class WorldCreateCommand {
     }
 
     private int createGenerator(CommandContext<CommandSourceStack> context, World.Environment environment, boolean structures, long seed) {
-        var generator = context.getArgument("generator", GeneratorArgument.Generator.class);
+        var generator = context.getArgument("generator", Generator.class);
         return create(context, environment, structures, seed, WorldType.NORMAL, null, generator);
     }
 
