@@ -10,12 +10,15 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.thenextlvl.worlds.command.WorldCommand;
 import net.thenextlvl.worlds.controller.WorldLinkController;
+import net.thenextlvl.worlds.view.GeneratorView;
 import net.thenextlvl.worlds.link.LinkController;
 import net.thenextlvl.worlds.listener.PortalListener;
 import net.thenextlvl.worlds.listener.ServerListener;
 import net.thenextlvl.worlds.preset.Presets;
 import net.thenextlvl.worlds.version.PluginVersionChecker;
 import net.thenextlvl.worlds.view.LevelView;
+import net.thenextlvl.worlds.view.PaperLevelView;
+import net.thenextlvl.worlds.view.PluginGeneratorView;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -33,7 +36,9 @@ import static org.bukkit.persistence.PersistentDataType.STRING;
 @FieldsAreNotNullByDefault
 @ParametersAreNotNullByDefault
 public class WorldsPlugin extends JavaPlugin {
-    private final LevelView levelView = new LevelView(this);
+    private final GeneratorView generatorView = new PluginGeneratorView();
+    private final LevelView levelView = new PaperLevelView(this);
+
     private final LinkController linkController = new WorldLinkController(this);
 
     private final File presetsFolder = new File(getDataFolder(), "presets");
