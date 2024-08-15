@@ -84,7 +84,7 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public @Nullable World loadLevel(File level, World.Environment environment) {
-        return loadLevel(level, environment, extras -> extras.map(LevelExtras::enabled).isPresent());
+        return loadLevel(level, environment, extras -> extras.filter(LevelExtras::enabled).isPresent());
     }
 
     @Override
