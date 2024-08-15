@@ -4,8 +4,10 @@ import core.io.IO;
 import core.io.PathIO;
 import core.nbt.file.NBTFile;
 import core.nbt.tag.*;
+import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.api.model.Generator;
 import net.thenextlvl.worlds.api.model.LevelExtras;
 import net.thenextlvl.worlds.api.model.WorldPreset;
 import net.thenextlvl.worlds.api.preset.Biome;
@@ -84,7 +86,7 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public @Nullable World loadLevel(File level, World.Environment environment) {
-        return loadLevel(level, environment, extras -> extras.map(LevelExtras::enabled).isPresent());
+        return loadLevel(level, environment, extras -> extras.filter(LevelExtras::enabled).isPresent());
     }
 
     @Override
@@ -141,6 +143,10 @@ public class PaperLevelView implements LevelView {
 
         generatorSettings.ifPresent(preset -> creator.generatorSettings(preset.serialize().toString()));
 
+        var generatorExtras = extras.map(LevelExtras::generator);
+        generatorExtras.map(gen -> gen.biomeProvider(creator.name())).ifPresent(creator::biomeProvider);
+        generatorExtras.map(gen -> gen.generator(creator.name())).ifPresent(creator::generator);
+
         return creator.createWorld();
     }
 
@@ -158,12 +164,14 @@ public class PaperLevelView implements LevelView {
                 .map(values -> {
                     var key = values.optional("worlds:world_key")
                             .map(Tag::getAsString)
-                            .map(NamespacedKey::fromString)
-                            .orElse(null);
+                            .map(NamespacedKey::fromString);
+                    var generator = values.optional("worlds:generator")
+                            .map(Tag::getAsString)
+                            .map(serialized -> Generator.deserialize(plugin, serialized));
                     var enabled = values.optional("worlds:enabled")
-                            .map(Tag::getAsBoolean)
-                            .orElse(true);
-                    return new LevelExtras(key, enabled);
+                            .map(Tag::getAsBoolean);
+                    if (key.isEmpty() && generator.isEmpty() && enabled.isEmpty()) return null;
+                    return new LevelExtras(key.orElse(null), generator.orElse(null), enabled.orElse(false));
                 });
     }
 
@@ -208,6 +216,16 @@ public class PaperLevelView implements LevelView {
                 .ifPresent(preset::addStructure);
 
         return Optional.of(preset);
+    }
+
+    @Override
+    @SuppressWarnings("UnstableApiUsage")
+    public Optional<String> getGenerator(World world) {
+        if (world.getGenerator() == null) return Optional.empty();
+        var loader = world.getGenerator().getClass().getClassLoader();
+        if (!(loader instanceof ConfiguredPluginClassLoader pluginLoader)) return Optional.empty();
+        if (pluginLoader.getPlugin() == null) return Optional.empty();
+        return Optional.of(pluginLoader.getPlugin().getName());
     }
 
     @Override

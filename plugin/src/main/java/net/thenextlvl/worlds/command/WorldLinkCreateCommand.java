@@ -20,10 +20,10 @@ public class WorldLinkCreateCommand {
         return Commands.literal("create")
                 .requires(source -> source.getSender().hasPermission("worlds.command.link.create"))
                 .then(Commands.argument("source", ArgumentTypes.world())
-                        .suggests(new WorldSuggestionProvider<>(plugin, world ->
+                        .suggests(new WorldSuggestionProvider<>(plugin, (context, world) ->
                                 world.getEnvironment().equals(World.Environment.NORMAL)))
                         .then(Commands.argument("destination", ArgumentTypes.world())
-                                .suggests(new WorldSuggestionProvider<>(plugin, world ->
+                                .suggests(new WorldSuggestionProvider<>(plugin, (context, world) ->
                                         !world.getEnvironment().equals(World.Environment.NORMAL)))
                                 .executes(context -> {
                                     var source = context.getArgument("source", World.class);

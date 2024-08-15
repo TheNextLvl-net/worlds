@@ -12,18 +12,18 @@ import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Predicate;
+import java.util.function.BiPredicate;
 
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class WorldSuggestionProvider<S> implements SuggestionProvider<S> {
     private final Plugin plugin;
-    private Predicate<World> filter = world -> true;
+    private BiPredicate<CommandContext<S>, World> filter = (context, world) -> true;
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         plugin.getServer().getWorlds().stream()
-                .filter(filter)
+                .filter(world -> filter.test(context, world))
                 .map(Keyed::key)
                 .map(Key::asString)
                 .filter(s -> s.contains(builder.getRemaining()))

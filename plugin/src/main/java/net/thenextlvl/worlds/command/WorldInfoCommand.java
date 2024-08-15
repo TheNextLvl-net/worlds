@@ -6,7 +6,6 @@ import core.nbt.tag.CompoundTag;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
-import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -67,18 +66,10 @@ class WorldInfoCommand {
                         .orElse(WorldType.NORMAL).getName().toLowerCase()));
         plugin.bundle().sendMessage(sender, "world.info.dimension",
                 Placeholder.parsed("dimension", environment.orElse("unknown")));
-        getGenerator(world).ifPresent(gen -> plugin.bundle().sendMessage(sender,
+        plugin.levelView().getGenerator(world).ifPresent(gen -> plugin.bundle().sendMessage(sender,
                 "world.info.generator", Placeholder.parsed("generator", gen)));
         plugin.bundle().sendMessage(sender, "world.info.seed",
                 Placeholder.parsed("seed", String.valueOf(world.getSeed())));
         return Command.SINGLE_SUCCESS;
-    }
-
-    private Optional<String> getGenerator(World world) {
-        if (world.getGenerator() == null) return Optional.empty();
-        var loader = world.getGenerator().getClass().getClassLoader();
-        if (!(loader instanceof ConfiguredPluginClassLoader pluginLoader)) return Optional.empty();
-        if (pluginLoader.getPlugin() == null) return Optional.empty();
-        return Optional.of(pluginLoader.getPlugin().getName());
     }
 }
