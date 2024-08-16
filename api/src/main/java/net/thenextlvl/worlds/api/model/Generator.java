@@ -1,7 +1,7 @@
 package net.thenextlvl.worlds.api.model;
 
-import com.google.common.base.Preconditions;
 import net.thenextlvl.worlds.api.WorldsProvider;
+import net.thenextlvl.worlds.api.exception.GeneratorException;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
@@ -12,13 +12,22 @@ public record Generator(Plugin plugin, @Nullable String id) {
         return id != null ? plugin.getName() + ":" + id : plugin.getName();
     }
 
-    public static Generator deserialize(WorldsProvider provider, String serialized) {
+    public static Generator deserialize(WorldsProvider provider, String serialized) throws GeneratorException {
         var split = serialized.split(":", 2);
-        var generator = provider.getServer().getPluginManager().getPlugin(split[0]);
-        Preconditions.checkNotNull(generator, "Unknown plugin");
-        Preconditions.checkState(generator.isEnabled(), "Plugin is not enabled");
-        Preconditions.checkState(provider.generatorView().hasGenerator(generator), "Plugin has no generator");
-        return new Generator(generator, split.length > 1 ? split[1] : null);
+
+        var plugin = split[0];
+        var id = split.length > 1 ? split[1] : null;
+
+        var generator = provider.getServer().getPluginManager().getPlugin(plugin);
+
+        if (generator == null)
+            throw new GeneratorException(plugin, id, "Unknown plugin");
+        if (!provider.isEnabled())
+            throw new GeneratorException(plugin, id, "Plugin is not enabled");
+        if (!provider.generatorView().hasGenerator(generator))
+            throw new GeneratorException(plugin, id, "Plugin has no generator");
+
+        return new Generator(generator, id);
     }
 
     public @Nullable ChunkGenerator generator(String worldName) {
