@@ -28,63 +28,29 @@ bStat Metrics can be found [here](https://bstats.org/plugin/bukkit/TheNextLvl%20
 
 ## Commands
 
-### /world
-
-| Argument | Description                                     | Usage                              | Permission                    |
-|----------|-------------------------------------------------|------------------------------------|-------------------------------|
-| create   | build an image and create a world based on that | /world create [name] (flags)       | worlds.command.world.create   |
-| delete   | permanently delete a certain world              | /world delete [world] (flags)      | worlds.command.world.delete   |
-| export   | save a certain world to the disk                | /world export (world)              | worlds.command.world.export   |
-| import   | import a world from an existing image           | /world import [image]              | worlds.command.world.import   |
-| info     | receive all important information about a world | /world info (world)                | worlds.command.world.info     |
-| list     | receive a list of all existing worlds           | /world list                        | worlds.command.world.list     |
-| setspawn | change the spawn point of a world               | /world setspawn (position) (angle) | worlds.command.world.setspawn |
-| teleport | teleport you or someone else to a certain world | /world teleport [world] (player)   | worlds.command.world.teleport |
-
-The perm-pack to grant all permissions: `worlds.commands.world`
-
-### /world link
-
-| Argument | Description                       | Usage                                                   | Permission                 |
-|----------|-----------------------------------|---------------------------------------------------------|----------------------------|
-| create   | create a new world link           | /world link create [source] [destination] (portal-type) | worlds.command.link.create |
-| delete   | delete an existing world link     | /world link delete [link]                               | worlds.command.link.delete |
-| list     | receive a list of all world links | /world link list                                        | worlds.command.link.list   |
-
-The perm-pack to grant all permissions: `worlds.commands.link`
-
-## Flags
-
-_Command flags are used by adding a double dash (--) in front of the name (example: `--generator`)_<br/>
-_the aliases can be used by adding a single dash (-) in front of the alias (example: `-g`)_
-
-### /world create
-
-| Flag        | Alias | Values                                        | Description                                                                                                            |
-|-------------|-------|-----------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| auto-save   |       | `true`, `false`                               | whether the world will automatically save                                                                              |
-| base        | b     | world                                         | creates a copy of the given world                                                                                      |
-| deletion    |       | `world`, `world-and-image`                    | automatically deletes the world (_and its image_) on shutdown                                                          |
-| environment | e     | `nether`, `normal`, `the-end`                 | changes the [environment](https://minecraft.fandom.com/wiki/Dimension) of the world                                    |
-| generator   | g     | world generator plugin                        | uses a custom generator and biome provider for the world creation                                                      |
-| hardcore    |       |                                               | sets the world in [hardcore](https://minecraft.fandom.com/wiki/Hardcore) mode                                          |
-| identifier  | i     | world generator identifier                    | defines which generator/biome-provider was requested for the generator                                                 |
-| load-manual |       |                                               | prevents the world from getting automatically loaded on startup                                                        |
-| preset      |       | world preset                                  | uses a custom [world preset](https://minecraft.fandom.com/wiki/Custom_world_preset) for the world creation             |
-| seed        | s     | seed (Long/String)                            | defines the [seed](https://minecraft.fandom.com/wiki/Seed_(level_generation)) which will be used to generate the world |
-| structures  |       | `true`, `false`                               | whether [structures](https://minecraft.fandom.com/wiki/Structure) should generate in the world                         |
-| type        | t     | `amplified`, `flat`, `large-biomes`, `normal` | changes the [type](https://minecraft.fandom.com/wiki/Category:World_types) of the world                                |
-
-### /world delete
-
-| Flag       | Description                                    |
-|------------|------------------------------------------------|
-| confirm    | confirms you action                            |
-| schedule   | schedules the world deletion to shutdown       |
-| keep-image | deletes the world but not its image            |
-| keep-world | unloads the world _(no files will be deleted)_ |
-
-_The general spawn position will be overridden and only the world will be used_
+| Command                                                                         | Description                                                   | Permission                 |
+|---------------------------------------------------------------------------------|---------------------------------------------------------------|----------------------------|
+| /world clone <world> <key> [template]                                           | clone a world                                                 | worlds.command.clone       |
+| /world create <key> generator <generator> [<dimension>] [<structures>] [<seed>] | create a world using a custom world generator plugin          | worlds.command.create      |
+| /world create <key> preset <preset> [<dimension>] [<structures>] [<seed>]       | create a world using a preset                                 | worlds.command.create      |
+| /world create <key> type <type> [<dimension>] [<structures>] [<seed>]           | create a world with a specific type                           | worlds.command.create      |
+| /world delete <world> [<flags>]                                                 | immediately delete or schedule a world for deletion           | worlds.command.delete      |
+| /world import <world> [<key>] [<dimension>] [<generator>]                       | import a world from files                                     | worlds.command.import      |
+| /world info [<world>]                                                           | display info about a certain world                            | worlds.command.info        |
+| /world link create <source> <destination>                                       | link to worlds                                                | worlds.command.link.create |
+| /world link list                                                                | display all links                                             | worlds.command.link.list   |
+| /world link remove <world> <relative>                                           | unlink two worlds                                             | worlds.command.link.remove |
+| /world list                                                                     | list all loaded worlds                                        | worlds.command.list        |
+| /world load <world>                                                             | load a previously imported world                              | worlds.command.load        |
+| /world regenerate <world> [<flags>]                                             | immediately regenerate or schedule a world for regeneration   | worlds.command.regenerate  |
+| /world save <world> [flush]                                                     | save a world to disk                                          | worlds.command.save        |
+| /world save-all [flush]                                                         | save all worlds to disk                                       | worlds.command.save-all    |
+| /world save-off [<world>]                                                       | temporarily disable saving in a specific world                | worlds.command.save-off    |
+| /world save-on [<world>]                                                        | enable saving in a specific world if previously turned off    | worlds.command.save-on     |
+| /world setspawn [<position>] [<angle>]                                          | set the spawn of the world you are in                         | worlds.command.setspawn    |
+| /world spawn                                                                    | teleport yourself to the spawn of your current world          | worlds.command.spawn       |
+| /world teleport <world> [<entities>] [<position>]                               | teleport something to a different position in a certain world | worlds.command.teleport    |
+| /world unload <world> [<fallback>]                                              | unload a world                                                | worlds.command.unload      |
 
 ## World Presets
 
