@@ -3,7 +3,10 @@ package net.thenextlvl.worlds.view;
 import core.io.IO;
 import core.io.PathIO;
 import core.nbt.file.NBTFile;
-import core.nbt.tag.*;
+import core.nbt.tag.CompoundTag;
+import core.nbt.tag.ListTag;
+import core.nbt.tag.StringTag;
+import core.nbt.tag.Tag;
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
@@ -17,17 +20,12 @@ import net.thenextlvl.worlds.api.preset.Structure;
 import net.thenextlvl.worlds.api.view.LevelView;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
 import org.bukkit.craftbukkit.CraftWorld;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -72,89 +70,6 @@ public class PaperLevelView implements LevelView {
         if (end) return World.Environment.THE_END;
         if (nether) return World.Environment.NETHER;
         return World.Environment.NORMAL;
-    }
-
-    @Override
-    public @Nullable World loadLevel(File level) {
-        return loadLevel(level, getEnvironment(level));
-    }
-
-    @Override
-    public @Nullable World loadLevel(File level, @Nullable NamespacedKey key, Predicate<Optional<LevelExtras>> predicate) {
-        return loadLevel(level, getEnvironment(level), key, predicate);
-    }
-
-    @Override
-    public @Nullable World loadLevel(File level, World.Environment environment) {
-        return loadLevel(level, environment, extras -> extras.filter(LevelExtras::enabled).isPresent());
-    }
-
-    @Override
-    public @Nullable World loadLevel(File level, Predicate<Optional<LevelExtras>> predicate) {
-        return loadLevel(level, getEnvironment(level), predicate);
-    }
-
-    @Override
-    public @Nullable World loadLevel(File level, World.Environment environment, Predicate<Optional<LevelExtras>> predicate) {
-        return loadLevel(level, environment, null, predicate);
-    }
-
-    @Override
-    public @Nullable World loadLevel(File level, World.Environment environment, @Nullable NamespacedKey key, Predicate<Optional<LevelExtras>> predicate) {
-        var data = getLevelDataFile(level).getRoot().<CompoundTag>optional("Data");
-        var extras = data.flatMap(this::getExtras);
-
-        if (!predicate.test(extras)) return null;
-
-        var settings = data.flatMap(tag -> tag.<CompoundTag>optional("WorldGenSettings"));
-        var dimensions = settings.flatMap(tag -> tag.<CompoundTag>optional("dimensions"));
-        var dimension = dimensions.flatMap(tag -> tag.<CompoundTag>optional(getDimension(tag, environment)));
-        var generator = dimension.flatMap(tag -> tag.<CompoundTag>optional("generator"));
-
-        var worldPreset = generator.flatMap(this::getWorldPreset);
-
-        var generatorSettings = worldPreset.filter(preset -> preset.equals(WorldPreset.FLAT))
-                .flatMap(worldType -> generator.flatMap(this::getFlatPreset));
-
-        var hardcore = data.flatMap(tag -> tag.<ByteTag>optional("hardcore"))
-                .orElseThrow(() -> new NoSuchElementException("hardcore"))
-                .getAsBoolean();
-        var seed = settings.flatMap(tag -> tag.<LongTag>optional("seed"))
-                .orElseThrow(() -> new NoSuchElementException("seed"))
-                .getAsInt();
-        var structures = settings.flatMap(tag -> tag.<ByteTag>optional("generate_features"))
-                .orElseThrow(() -> new NoSuchElementException("generate_features"))
-                .getAsBoolean();
-
-        var worldKey = Optional.ofNullable(key).orElseGet(() ->
-                extras.map(LevelExtras::key).orElseGet(() -> {
-                    var namespace = level.getName().toLowerCase()
-                            .replace("(", "").replace(")", "")
-                            .replace(" ", "_");
-                    return new NamespacedKey("worlds", namespace);
-                }));
-
-        var creator = new WorldCreator(level.getName(), worldKey)
-                .environment(environment)
-                .generateStructures(structures)
-                .hardcore(hardcore)
-                .seed(seed)
-                .type(typeOf(worldPreset.orElse(WorldPreset.NORMAL)));
-
-        generatorSettings.ifPresent(preset -> creator.generatorSettings(preset.serialize().toString()));
-
-        var generatorExtras = extras.map(LevelExtras::generator);
-        generatorExtras.map(gen -> gen.biomeProvider(creator.name())).ifPresent(creator::biomeProvider);
-        generatorExtras.map(gen -> gen.generator(creator.name())).ifPresent(creator::generator);
-
-        return creator.createWorld();
-    }
-
-    private WorldType typeOf(WorldPreset worldPreset) {
-        if (worldPreset.equals(WorldPreset.AMPLIFIED)) return WorldType.AMPLIFIED;
-        if (worldPreset.equals(WorldPreset.FLAT)) return WorldType.FLAT;
-        if (worldPreset.equals(WorldPreset.LARGE_BIOMES)) return WorldType.LARGE_BIOMES;
-        return WorldType.NORMAL;
     }
 
     @Override
