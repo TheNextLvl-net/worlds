@@ -12,15 +12,15 @@ import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.model.Generator;
+import net.thenextlvl.worlds.api.model.WorldPreset;
 import net.thenextlvl.worlds.api.preset.Preset;
 import net.thenextlvl.worlds.command.argument.*;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
@@ -50,7 +50,7 @@ class WorldCreateCommand {
                                                 true, ThreadLocalRandom.current().nextLong()))
                                         .then(tree(this::createType))))
                         .executes(context -> create(context, World.Environment.NORMAL, true,
-                                ThreadLocalRandom.current().nextLong(), WorldType.NORMAL, null, null)));
+                                ThreadLocalRandom.current().nextLong(), WorldPreset.NORMAL, null, null)));
     }
 
     private RequiredArgumentBuilder<CommandSourceStack, World.Environment> tree(Creator<CommandSourceStack> creator) {
@@ -76,25 +76,25 @@ class WorldCreateCommand {
     }
 
     private int create(CommandContext<CommandSourceStack> context, World.Environment environment, boolean structures,
-                       long seed, WorldType worldType, @Nullable Preset preset, @Nullable Generator generator) {
+                       long seed, WorldPreset type, @Nullable Preset preset, @Nullable Generator generator) {
         var key = context.getArgument("key", NamespacedKey.class);
         var name = key.getKey();
-        var creator = new WorldCreator(name, key)
+
+        var levelFolder = new File(plugin.getServer().getWorldContainer(), name);
+
+        var level = plugin.levelBuilder(levelFolder)
                 .environment(environment)
-                .generateStructures(structures)
+                .generator(generator)
+                .preset(preset)
                 .seed(seed)
-                .type(worldType);
+                .name(name)
+                .structures(structures)
+                .type(type)
+                .build();
 
-        if (preset != null) creator.generatorSettings(preset.serialize().toString());
-
-        if (generator != null) {
-            creator.generator(generator.plugin().getDefaultWorldGenerator(name, generator.id()));
-            creator.biomeProvider(generator.plugin().getDefaultBiomeProvider(name, generator.id()));
-        }
-
-        var world = plugin.getServer().getWorld(creator.key()) == null
-                    && plugin.getServer().getWorld(name) == null
-                ? creator.createWorld() : null;
+        var world = plugin.getServer().getWorld(level.key()) == null
+                    && plugin.getServer().getWorld(level.name()) == null
+                ? level.create().orElse(null) : null;
 
         var message = world != null ? "world.create.success" : "world.create.failed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
@@ -114,16 +114,16 @@ class WorldCreateCommand {
 
     private int createGenerator(CommandContext<CommandSourceStack> context, World.Environment environment, boolean structures, long seed) {
         var generator = context.getArgument("generator", Generator.class);
-        return create(context, environment, structures, seed, WorldType.NORMAL, null, generator);
+        return create(context, environment, structures, seed, WorldPreset.NORMAL, null, generator);
     }
 
     private int createPreset(CommandContext<CommandSourceStack> context, World.Environment environment, boolean structures, long seed) {
         var preset = context.getArgument("preset", Preset.class);
-        return create(context, environment, structures, seed, WorldType.FLAT, preset, null);
+        return create(context, environment, structures, seed, WorldPreset.FLAT, preset, null);
     }
 
     private int createType(CommandContext<CommandSourceStack> context, World.Environment environment, boolean structures, long seed) {
-        var type = context.getArgument("type", WorldType.class);
+        var type = context.getArgument("type", WorldPreset.class);
         return create(context, environment, structures, seed, type, null, null);
     }
 

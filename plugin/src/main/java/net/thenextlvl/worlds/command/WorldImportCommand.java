@@ -10,7 +10,10 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.api.model.Generator;
+import net.thenextlvl.worlds.api.model.Level;
 import net.thenextlvl.worlds.command.argument.DimensionArgument;
+import net.thenextlvl.worlds.command.argument.GeneratorArgument;
 import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -33,31 +36,39 @@ class WorldImportCommand {
                 .then(Commands.argument("world", StringArgumentType.string())
                         .suggests(new LevelSuggestionProvider<>(plugin))
                         .then(Commands.argument("key", ArgumentTypes.namespacedKey())
-                                .executes(context -> {
-                                    var key = context.getArgument("key", NamespacedKey.class);
-                                    return execute(context, null, key);
-                                }))
-                        .then(Commands.argument("dimension", new DimensionArgument(plugin))
-                                .then(Commands.argument("key", ArgumentTypes.namespacedKey())
+                                .then(Commands.argument("dimension", new DimensionArgument(plugin))
+                                        .then(Commands.argument("generator", new GeneratorArgument(plugin))
+                                                .executes(context -> {
+                                                    var environment = context.getArgument("dimension", World.Environment.class);
+                                                    var generator = context.getArgument("generator", Generator.class);
+                                                    var key = context.getArgument("key", NamespacedKey.class);
+                                                    return execute(context, key, environment, generator);
+                                                }))
                                         .executes(context -> {
                                             var environment = context.getArgument("dimension", World.Environment.class);
                                             var key = context.getArgument("key", NamespacedKey.class);
-                                            return execute(context, environment, key);
+                                            return execute(context, key, environment, null);
                                         }))
                                 .executes(context -> {
-                                    var environment = context.getArgument("dimension", World.Environment.class);
-                                    return execute(context, environment, null);
+                                    var key = context.getArgument("key", NamespacedKey.class);
+                                    return execute(context, key, null, null);
                                 }))
-                        .executes(context -> execute(context, null, null)));
+                        .executes(context -> execute(context, null, null, null)));
     }
 
-    private int execute(CommandContext<CommandSourceStack> context, @Nullable World.Environment environment, @Nullable NamespacedKey key) {
+    private int execute(CommandContext<CommandSourceStack> context, @Nullable NamespacedKey key,
+                        @Nullable World.Environment environment, @Nullable Generator generator) {
         var name = context.getArgument("world", String.class);
-        var level = new File(plugin.getServer().getWorldContainer(), name);
+        var levelFolder = new File(plugin.getServer().getWorldContainer(), name);
 
-        var world = plugin.levelView().isLevel(level) ? environment != null
-                ? plugin.levelView().loadLevel(level, environment, key, Optional::isEmpty)
-                : plugin.levelView().loadLevel(level, key, Optional::isEmpty) : null;
+        var build = plugin.levelView().isLevel(levelFolder)
+                ? plugin.levelBuilder(levelFolder).environment(environment)
+                .generator(generator).key(key).build() : null;
+
+        var world = Optional.ofNullable(build)
+                .filter(level -> !level.importedBefore())
+                .flatMap(Level::create)
+                .orElse(null);
 
         var message = world != null ? "world.import.success" : "world.import.failed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
@@ -69,6 +80,7 @@ class WorldImportCommand {
 
         if (world != null) {
             plugin.persistWorld(world, true);
+            if (generator != null) plugin.persistGenerator(world, generator);
             plugin.levelView().saveLevelData(world, true);
         }
 

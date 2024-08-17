@@ -17,18 +17,22 @@ public class ServerListener implements Listener {
         if (!event.getWorld().key().asString().equals("minecraft:overworld")) return;
         plugin.levelView().listLevels()
                 .filter(plugin.levelView()::canLoad)
-                .forEach(level -> {
+                .forEach(levelDirectory -> {
                     try {
-                        var world = plugin.levelView().loadLevel(level);
-                        if (world != null) plugin.getComponentLogger().debug("Loaded dimension {} at {}",
-                                world.key().asString(), level.getPath());
+                        var level = plugin.levelBuilder(levelDirectory).build();
+                        if (!level.enabled()) return;
+                        level.create().ifPresent(world -> plugin.getComponentLogger().debug(
+                                "Loaded dimension {} ({}) from {}",
+                                world.key().asString(), level.type().key().asString(),
+                                world.getWorldFolder().getPath()
+                        ));
                     } catch (GeneratorException e) {
                         var generator = e.getId() != null ? e.getPlugin() + e.getId() : e.getPlugin();
-                        plugin.getComponentLogger().error("Skip loading dimension {}", level.getName());
+                        plugin.getComponentLogger().error("Skip loading dimension {}", levelDirectory.getName());
                         plugin.getComponentLogger().error("Cannot use generator {}: {}", generator, e.getMessage());
                     } catch (Exception e) {
                         plugin.getComponentLogger().error("An unexpected error occurred while loading the level {}",
-                                level.getPath(), e);
+                                levelDirectory.getName(), e);
                         plugin.getComponentLogger().error("Please report the error above on GitHub: {}",
                                 "https://github.com/TheNextLvl-net/worlds/issues/new/choose");
                     }
