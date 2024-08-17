@@ -9,10 +9,12 @@ import io.papermc.paper.command.brigadier.Commands;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.api.model.Level;
 import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.entity.Entity;
 
 import java.io.File;
+import java.util.Optional;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
@@ -33,8 +35,8 @@ class WorldLoadCommand {
         var name = context.getArgument("world", String.class);
         var level = new File(plugin.getServer().getWorldContainer(), name);
 
-        var world = plugin.levelView().isLevel(level) ? plugin.levelView().loadLevel(level,
-                optional -> optional.map(extras -> !extras.enabled()).isPresent()) : null;
+        var build = plugin.levelView().isLevel(level) ? plugin.levelBuilder(level).build(): null;
+        var world = Optional.ofNullable(build).filter(Level::importedBefore).flatMap(Level::create).orElse(null);
 
         var message = world != null ? "world.load.success" : "world.load.failed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
