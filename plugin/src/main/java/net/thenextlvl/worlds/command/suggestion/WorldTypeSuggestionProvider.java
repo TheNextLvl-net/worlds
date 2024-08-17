@@ -18,9 +18,12 @@ public class WorldTypeSuggestionProvider implements SuggestionProvider {
 
     private final Map<String, String> dimensions = Map.of(
             "minecraft:amplified", "world.type.amplified",
+            "minecraft:checkerboard", "world.type.checkerboard",
+            "minecraft:debug", "world.type.debug",
             "minecraft:flat", "world.type.flat",
             "minecraft:large_biomes", "world.type.large_biomes",
-            "minecraft:normal", "world.type.normal"
+            "minecraft:normal", "world.type.normal",
+            "minecraft:single_biome", "world.type.single_biome"
     );
 
     @Override
