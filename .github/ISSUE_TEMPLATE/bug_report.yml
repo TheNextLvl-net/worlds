@@ -48,7 +48,7 @@ body:
   - type: input
     attributes:
       label: Worlds Version
-      description: What version of World are you running? (`/version World`)
+      description: What version of Worlds are you running? (`/version Worlds`)
       placeholder: "For example: version 1.1.0"
     validations:
       required: true
