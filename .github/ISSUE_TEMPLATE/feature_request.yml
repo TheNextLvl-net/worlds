@@ -1,8 +1,9 @@
 name: Feature request
 description: Suggest an idea for this project
-labels: 'enhancement'
 assignees:
   - NonSwag
+labels:
+  - enhancement
 body:
   - type: markdown
     attributes:
