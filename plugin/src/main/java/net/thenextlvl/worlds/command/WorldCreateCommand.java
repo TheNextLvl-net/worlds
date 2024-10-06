@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.context.ParsedCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
@@ -77,7 +78,18 @@ class WorldCreateCommand {
 
     private int create(CommandContext<CommandSourceStack> context, World.Environment environment, boolean structures,
                        long seed, WorldPreset type, @Nullable Preset preset, @Nullable Generator generator) {
-        var key = context.getArgument("key", NamespacedKey.class);
+        var keyInput = context.getNodes().stream()
+                .filter(node -> node.getNode().getName().equals("key"))
+                .map(ParsedCommandNode::getRange)
+                .map(range -> range.get(context.getInput()))
+                .findAny();
+
+        var key = keyInput.map(string -> {
+            var split = string.split(":", 2);
+            if (split.length == 1) return new NamespacedKey("worlds", split[0]);
+            return new NamespacedKey(split[0], split[1]);
+        }).orElseGet(() -> context.getArgument("key", NamespacedKey.class));
+
         var name = key.getKey();
 
         var levelFolder = new File(plugin.getServer().getWorldContainer(), name);
@@ -85,9 +97,10 @@ class WorldCreateCommand {
         var level = plugin.levelBuilder(levelFolder)
                 .environment(environment)
                 .generator(generator)
+                .key(key)
+                .name(name)
                 .preset(preset)
                 .seed(seed)
-                .name(name)
                 .structures(structures)
                 .type(type)
                 .build();
