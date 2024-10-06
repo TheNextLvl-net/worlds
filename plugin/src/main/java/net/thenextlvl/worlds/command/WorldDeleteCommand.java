@@ -46,7 +46,7 @@ class WorldDeleteCommand {
         var world = context.getArgument("world", World.class);
         var result = delete(world, flags.contains("--schedule"));
         plugin.bundle().sendMessage(context.getSource().getSender(), result,
-                Placeholder.parsed("world", world.key().asString()));
+                Placeholder.parsed("world", world.getName()));
         return Command.SINGLE_SUCCESS;
     }
 

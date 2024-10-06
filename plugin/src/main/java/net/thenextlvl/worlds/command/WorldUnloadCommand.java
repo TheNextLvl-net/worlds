@@ -30,14 +30,14 @@ class WorldUnloadCommand {
                                     var fallback = context.getArgument("fallback", World.class);
                                     var message = unload(world, fallback);
                                     plugin.bundle().sendMessage(context.getSource().getSender(), message,
-                                            Placeholder.parsed("world", world.key().asString()));
+                                            Placeholder.parsed("world", world.getName()));
                                     return Command.SINGLE_SUCCESS;
                                 }))
                         .executes(context -> {
                             var world = context.getArgument("world", World.class);
                             var message = unload(world, null);
                             plugin.bundle().sendMessage(context.getSource().getSender(), message,
-                                    Placeholder.parsed("world", world.key().asString()));
+                                    Placeholder.parsed("world", world.getName()));
                             return Command.SINGLE_SUCCESS;
                         }));
     }
