@@ -65,7 +65,6 @@ class WorldRegenerateCommand {
         if (world.getKey().toString().equals("minecraft:overworld"))
             return "world.regenerate.disallowed";
 
-        var environment = world.getEnvironment();
         var worldFolder = world.getWorldFolder();
         var players = world.getPlayers();
 
