@@ -29,7 +29,7 @@ class WorldSaveCommand {
 
     private int save(CommandContext<CommandSourceStack> context, boolean flush) {
         var world = context.getArgument("world", World.class);
-        var placeholder = Placeholder.parsed("world", world.key().asString());
+        var placeholder = Placeholder.parsed("world", world.getName());
         plugin.bundle().sendMessage(context.getSource().getSender(), "world.save", placeholder);
         plugin.levelView().saveLevel(world, flush);
         plugin.bundle().sendMessage(context.getSource().getSender(), "world.save.success", placeholder);

@@ -72,13 +72,13 @@ class WorldTeleportCommand {
         entities.forEach(entity -> {
             entity.teleportAsync(location, COMMAND);
             plugin.bundle().sendMessage(entity, "world.teleport.self",
-                    Placeholder.parsed("world", location.getWorld().key().asString()));
+                    Placeholder.parsed("world", location.getWorld().getName()));
         });
         if (entities.size() == 1 && entities.getFirst().equals(sender)) return Command.SINGLE_SUCCESS;
         plugin.bundle().sendMessage(sender, message,
                 Placeholder.component("entity", entities.isEmpty() ? Component.empty() : entities.getFirst().name()),
-                Placeholder.parsed("world", location.getWorld().key().asString()),
-                Placeholder.parsed("entities", String.valueOf(entities.size())));
+                Placeholder.parsed("entities", String.valueOf(entities.size())),
+                Placeholder.parsed("world", location.getWorld().getName()));
         return entities.isEmpty() ? 0 : Command.SINGLE_SUCCESS;
     }
 }

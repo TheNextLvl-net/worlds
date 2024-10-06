@@ -44,7 +44,7 @@ class WorldCloneCommand {
         var key = context.getArgument("key", NamespacedKey.class);
         var clone = clone(world, key, full);
 
-        var placeholder = Placeholder.parsed("world", world.key().asString());
+        var placeholder = Placeholder.parsed("world", world.getName());
         var message = clone != null ? "world.clone.success" : "world.clone.failed";
 
         if (clone != null && context.getSource().getSender() instanceof Player player)

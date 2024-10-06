@@ -24,7 +24,7 @@ class WorldSpawnCommand {
                     var player = (Player) context.getSource().getSender();
                     player.teleportAsync(player.getWorld().getSpawnLocation(), COMMAND);
                     plugin.bundle().sendMessage(player, "world.teleport.self",
-                            Placeholder.parsed("world", player.getWorld().key().asString()));
+                            Placeholder.parsed("world", player.getWorld().getName()));
                     return Command.SINGLE_SUCCESS;
                 });
     }

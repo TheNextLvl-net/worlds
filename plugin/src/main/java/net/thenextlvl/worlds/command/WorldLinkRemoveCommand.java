@@ -33,7 +33,7 @@ public class WorldLinkRemoveCommand {
                                     var message = unlink ? "world.unlink.success" : "world.unlink.failed";
                                     plugin.bundle().sendMessage(context.getSource().getSender(), message,
                                             Placeholder.parsed("relative", relative.key().asString()),
-                                            Placeholder.parsed("world", world.key().asString()));
+                                            Placeholder.parsed("world", world.getName()));
                                     return unlink ? Command.SINGLE_SUCCESS : 0;
                                 })));
     }

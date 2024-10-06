@@ -98,7 +98,7 @@ class WorldCreateCommand {
 
         var message = world != null ? "world.create.success" : "world.create.failed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
-                Placeholder.parsed("world", world != null ? world.key().asString() : key.asString()));
+                Placeholder.parsed("world", world != null ? world.getName() : key.asString()));
 
         if (world != null && context.getSource().getSender() instanceof Entity entity)
             entity.teleportAsync(world.getSpawnLocation(), COMMAND);
