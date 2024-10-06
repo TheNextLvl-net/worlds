@@ -1,6 +1,7 @@
 package net.thenextlvl.worlds.listener;
 
 import lombok.RequiredArgsConstructor;
+import net.minecraft.util.DirectoryLock;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.exception.GeneratorException;
 import org.bukkit.event.EventHandler;
@@ -31,6 +32,11 @@ public class ServerListener implements Listener {
                         plugin.getComponentLogger().error("Skip loading dimension {}", levelDirectory.getName());
                         plugin.getComponentLogger().error("Cannot use generator {}: {}", generator, e.getMessage());
                     } catch (Exception e) {
+                        if (e.getCause() instanceof DirectoryLock.LockException lock) {
+                            plugin.getComponentLogger().error("Failed to start the minecraft server", lock);
+                            plugin.getServer().shutdown();
+                            return;
+                        }
                         plugin.getComponentLogger().error("An unexpected error occurred while loading the level {}",
                                 levelDirectory.getName(), e);
                         plugin.getComponentLogger().error("Please report the error above on GitHub: {}",
