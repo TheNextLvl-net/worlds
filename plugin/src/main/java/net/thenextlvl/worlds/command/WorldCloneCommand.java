@@ -44,6 +44,8 @@ class WorldCloneCommand {
         var key = context.getArgument("key", NamespacedKey.class);
         var clone = clone(world, key, full);
 
+        if (clone != null) plugin.persistWorld(clone, true);
+
         var placeholder = Placeholder.parsed("world", world.getName());
         var message = clone != null ? "world.clone.success" : "world.clone.failed";
 
