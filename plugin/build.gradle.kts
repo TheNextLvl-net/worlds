@@ -43,7 +43,7 @@ dependencies {
     implementation("net.thenextlvl.core:files:2.0.0")
     implementation("net.thenextlvl.core:i18n:1.0.19")
     implementation("net.thenextlvl.core:paper:1.5.2")
-    implementation("net.thenextlvl.core:adapters:1.0.9")
+    implementation("net.thenextlvl.core:adapters:2.0.0")
 
     annotationProcessor("org.projectlombok:lombok:1.18.34")
 }
