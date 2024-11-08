@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle("1.21-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.3-R0.1-SNAPSHOT")
 
     compileOnly("org.projectlombok:lombok:1.18.34")
 
