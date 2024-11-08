@@ -11,7 +11,7 @@ java {
 }
 
 group = "net.thenextlvl.worlds"
-version = "2.0.2"
+version = "2.0.3"
 
 repositories {
     mavenCentral()
@@ -27,7 +27,7 @@ dependencies {
 
     implementation("net.thenextlvl.core:nbt:2.2.14")
     implementation("net.thenextlvl.core:files:2.0.0")
-    implementation("net.thenextlvl.core:adapters:1.0.9")
+    implementation("net.thenextlvl.core:adapters:2.0.0")
 
     annotationProcessor("org.projectlombok:lombok:1.18.34")
 }

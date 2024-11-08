@@ -77,7 +77,7 @@ public class Preset {
 
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Structure.class, new StructureTypeAdapter())
-            .registerTypeAdapter(Material.class, MaterialAdapter.NotNull.INSTANCE)
+            .registerTypeAdapter(Material.class, MaterialAdapter.instance())
             .registerTypeAdapter(Biome.class, new BiomeTypeAdapter())
             .setPrettyPrinting()
             .create();
