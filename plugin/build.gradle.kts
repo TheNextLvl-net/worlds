@@ -32,7 +32,7 @@ repositories {
 dependencies {
     paperweight.paperDevBundle("1.21.3-R0.1-SNAPSHOT")
 
-    compileOnly("org.projectlombok:lombok:1.18.34")
+    compileOnly("org.projectlombok:lombok:1.18.36")
 
     compileOnly("net.thenextlvl.core:annotations:2.0.1")
 
@@ -45,7 +45,7 @@ dependencies {
     implementation("net.thenextlvl.core:paper:1.5.3")
     implementation("net.thenextlvl.core:adapters:2.0.0")
 
-    annotationProcessor("org.projectlombok:lombok:1.18.34")
+    annotationProcessor("org.projectlombok:lombok:1.18.36")
 }
 
 tasks.shadowJar {
