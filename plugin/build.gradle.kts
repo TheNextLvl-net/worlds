@@ -4,7 +4,7 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 plugins {
     id("java")
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
-    id("io.papermc.paperweight.userdev") version "1.7.7"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.8"
     id("net.minecrell.plugin-yml.paper") version "0.6.0"
     id("io.github.goooler.shadow") version "8.1.8"
     id("com.modrinth.minotaur") version "2.+"
@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle("1.21.3-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
 
     compileOnly("org.projectlombok:lombok:1.18.36")
 
@@ -56,7 +56,7 @@ tasks.shadowJar {
 paper {
     name = "Worlds"
     main = "net.thenextlvl.worlds.WorldsPlugin"
-    apiVersion = "1.20"
+    apiVersion = "1.21"
     description = "Create, delete and manage your worlds"
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
     website = "https://thenextlvl.net"
