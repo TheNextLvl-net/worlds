@@ -1,10 +1,9 @@
 package net.thenextlvl.worlds.api.preset;
 
-public record Structure(String structure) {
-    Structure(org.bukkit.generator.structure.Structure structure) {
-        this(structure.key().asString());
-    }
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
+public record Structure(String structure) {
     public static Structure minecraft(String structure) {
         return new Structure("minecraft:" + structure);
     }

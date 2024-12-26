@@ -1,10 +1,18 @@
 package net.thenextlvl.worlds.api.preset.adapter;
 
-import com.google.gson.*;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import net.thenextlvl.worlds.api.preset.Structure;
+import org.jspecify.annotations.NullMarked;
 
 import java.lang.reflect.Type;
 
+@NullMarked
 public class StructureTypeAdapter implements JsonSerializer<Structure>, JsonDeserializer<Structure> {
     @Override
     public Structure deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {

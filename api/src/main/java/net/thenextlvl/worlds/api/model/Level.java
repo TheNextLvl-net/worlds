@@ -6,12 +6,15 @@ import net.kyori.adventure.key.Keyed;
 import net.thenextlvl.worlds.api.preset.Preset;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 
+@NullMarked
 public interface Level extends Keyed {
-    @Nullable Generator generator();
+    @Nullable
+    Generator generator();
 
     @Nullable Preset preset();
 

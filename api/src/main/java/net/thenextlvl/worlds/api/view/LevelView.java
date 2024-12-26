@@ -6,11 +6,13 @@ import net.thenextlvl.worlds.api.model.LevelExtras;
 import net.thenextlvl.worlds.api.model.WorldPreset;
 import net.thenextlvl.worlds.api.preset.Preset;
 import org.bukkit.World;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+@NullMarked
 public interface LevelView {
     NBTFile<CompoundTag> getLevelDataFile(File level);
 

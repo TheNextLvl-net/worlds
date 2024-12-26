@@ -3,9 +3,11 @@ package net.thenextlvl.worlds.api.link;
 import org.bukkit.NamespacedKey;
 import org.bukkit.PortalType;
 import org.bukkit.World;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Optional;
 
+@NullMarked
 public interface LinkController {
     Optional<NamespacedKey> getTarget(World world, PortalType type);
 

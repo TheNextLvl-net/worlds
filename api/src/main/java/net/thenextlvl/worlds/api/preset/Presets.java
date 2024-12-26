@@ -1,7 +1,9 @@
 package net.thenextlvl.worlds.api.preset;
 
 import org.bukkit.Material;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class Presets {
 
     public static final Preset BOTTOMLESS_PIT = new Preset()
