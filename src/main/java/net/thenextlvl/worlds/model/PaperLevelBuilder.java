@@ -12,12 +12,14 @@ import net.thenextlvl.worlds.api.model.WorldPreset;
 import net.thenextlvl.worlds.api.preset.Preset;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 
 @Getter
 @Setter
+@NullMarked
 @RequiredArgsConstructor
 @Accessors(fluent = true)
 public class PaperLevelBuilder implements LevelBuilder {
@@ -31,7 +33,7 @@ public class PaperLevelBuilder implements LevelBuilder {
     private @Nullable NamespacedKey key;
     private @Nullable Preset preset;
     private @Nullable String name;
-    private @Nullable World.Environment environment;
+    private World.@Nullable Environment environment;
     private @Nullable WorldPreset type;
 
     @Override

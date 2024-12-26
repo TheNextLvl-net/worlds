@@ -7,11 +7,13 @@ import net.thenextlvl.worlds.api.link.Relative;
 import org.bukkit.NamespacedKey;
 import org.bukkit.PortalType;
 import org.bukkit.World;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Optional;
 
 import static org.bukkit.persistence.PersistentDataType.STRING;
 
+@NullMarked
 @RequiredArgsConstructor
 public class WorldLinkController implements LinkController {
     private final WorldsPlugin plugin;

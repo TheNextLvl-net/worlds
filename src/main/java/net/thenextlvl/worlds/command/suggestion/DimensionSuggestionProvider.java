@@ -7,12 +7,13 @@ import core.paper.command.SuggestionProvider;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+@NullMarked
 @RequiredArgsConstructor
-@SuppressWarnings("UnstableApiUsage")
 public class DimensionSuggestionProvider implements SuggestionProvider {
     private final WorldsPlugin plugin;
 

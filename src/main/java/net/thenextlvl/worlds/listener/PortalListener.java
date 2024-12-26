@@ -15,11 +15,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.stream.IntStream;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.END_PORTAL;
 
+@NullMarked
 @RequiredArgsConstructor
 public class PortalListener implements Listener {
     private final PortalCooldown cooldown = new PortalCooldown();
@@ -33,7 +35,6 @@ public class PortalListener implements Listener {
                         event.setTargetWorld(null));
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityPortalEnter(EntityPortalEnterEvent event) {
         if (!event.getPortalType().equals(PortalType.ENDER)) return;

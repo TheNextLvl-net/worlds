@@ -1,7 +1,5 @@
 package net.thenextlvl.worlds;
 
-import core.annotation.FieldsAreNotNullByDefault;
-import core.annotation.ParametersAreNotNullByDefault;
 import core.i18n.file.ComponentBundle;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -29,6 +27,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
 import java.util.Locale;
@@ -37,9 +36,8 @@ import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
 import static org.bukkit.persistence.PersistentDataType.STRING;
 
 @Getter
+@NullMarked
 @Accessors(fluent = true)
-@FieldsAreNotNullByDefault
-@ParametersAreNotNullByDefault
 public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     private final GeneratorView generatorView = new PluginGeneratorView();
     private final LevelView levelView = new PaperLevelView(this);

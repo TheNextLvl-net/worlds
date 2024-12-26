@@ -12,9 +12,10 @@ import net.thenextlvl.worlds.api.link.Relative;
 import net.thenextlvl.worlds.command.argument.RelativeArgument;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.World;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 @RequiredArgsConstructor
-@SuppressWarnings("UnstableApiUsage")
 public class WorldLinkRemoveCommand {
     private final WorldsPlugin plugin;
 

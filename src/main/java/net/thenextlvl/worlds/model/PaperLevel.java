@@ -18,12 +18,14 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
+@NullMarked
 @Accessors(fluent = true)
 public class PaperLevel implements Level {
     private final NBTFile<CompoundTag> levelData;

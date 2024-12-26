@@ -2,7 +2,9 @@ package net.thenextlvl.worlds.view;
 
 import net.thenextlvl.worlds.api.view.GeneratorView;
 import org.bukkit.plugin.Plugin;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class PluginGeneratorView implements GeneratorView {
     @Override
     public boolean hasGenerator(Plugin plugin) {

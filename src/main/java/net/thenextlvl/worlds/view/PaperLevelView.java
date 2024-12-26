@@ -21,6 +21,7 @@ import net.thenextlvl.worlds.api.view.LevelView;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@NullMarked
 @RequiredArgsConstructor
 public class PaperLevelView implements LevelView {
     private final WorldsPlugin plugin;
@@ -134,7 +136,6 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    @SuppressWarnings("UnstableApiUsage")
     public Optional<String> getGenerator(World world) {
         if (world.getGenerator() == null) return Optional.empty();
         var loader = world.getGenerator().getClass().getClassLoader();

@@ -12,9 +12,10 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 @RequiredArgsConstructor
-@SuppressWarnings("UnstableApiUsage")
 class WorldSetSpawnCommand {
     private final WorldsPlugin plugin;
 

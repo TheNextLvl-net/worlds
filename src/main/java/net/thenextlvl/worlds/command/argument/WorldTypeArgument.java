@@ -6,8 +6,9 @@ import net.kyori.adventure.key.Key;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.model.WorldPreset;
 import net.thenextlvl.worlds.command.suggestion.WorldTypeSuggestionProvider;
+import org.jspecify.annotations.NullMarked;
 
-@SuppressWarnings("UnstableApiUsage")
+@NullMarked
 public class WorldTypeArgument extends WrappedArgumentType<Key, WorldPreset> {
     public WorldTypeArgument(WorldsPlugin plugin) {
         super(ArgumentTypes.key(), (reader, type) -> switch (type.asMinimalString()) {

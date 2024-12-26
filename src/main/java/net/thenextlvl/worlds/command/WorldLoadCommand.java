@@ -12,14 +12,15 @@ import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.model.Level;
 import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.entity.Entity;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
 import java.util.Optional;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
+@NullMarked
 @RequiredArgsConstructor
-@SuppressWarnings("UnstableApiUsage")
 class WorldLoadCommand {
     private final WorldsPlugin plugin;
 

@@ -6,11 +6,13 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import core.paper.command.SuggestionProvider;
 import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.api.link.Relative;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
+@NullMarked
 @RequiredArgsConstructor
 public class RelativeSuggestionProvider implements SuggestionProvider {
     private final Predicate<Relative> filter;

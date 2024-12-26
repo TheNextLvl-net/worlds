@@ -10,10 +10,12 @@ import net.kyori.adventure.key.Key;
 import org.bukkit.Keyed;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiPredicate;
 
+@NullMarked
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class WorldSuggestionProvider<S> implements SuggestionProvider<S> {

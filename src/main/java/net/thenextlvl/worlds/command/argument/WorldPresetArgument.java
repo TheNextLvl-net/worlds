@@ -8,9 +8,11 @@ import core.paper.command.WrappedArgumentType;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.preset.Preset;
 import net.thenextlvl.worlds.command.suggestion.WorldPresetSuggestionProvider;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
 
+@NullMarked
 public class WorldPresetArgument extends WrappedArgumentType<String, Preset> {
     public WorldPresetArgument(WorldsPlugin plugin) {
         super(StringArgumentType.string(), (reader, type) -> {

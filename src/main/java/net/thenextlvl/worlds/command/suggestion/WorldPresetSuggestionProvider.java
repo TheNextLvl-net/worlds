@@ -7,11 +7,13 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import core.paper.command.SuggestionProvider;
 import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
+@NullMarked
 @RequiredArgsConstructor
 public class WorldPresetSuggestionProvider implements SuggestionProvider {
     private final WorldsPlugin plugin;

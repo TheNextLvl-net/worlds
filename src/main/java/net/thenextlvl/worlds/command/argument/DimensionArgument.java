@@ -6,8 +6,9 @@ import net.kyori.adventure.key.Key;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.suggestion.DimensionSuggestionProvider;
 import org.bukkit.World;
+import org.jspecify.annotations.NullMarked;
 
-@SuppressWarnings("UnstableApiUsage")
+@NullMarked
 public class DimensionArgument extends WrappedArgumentType<Key, World.Environment> {
     public DimensionArgument(WorldsPlugin plugin) {
         super(ArgumentTypes.key(), (reader, type) -> switch (type.asString()) {

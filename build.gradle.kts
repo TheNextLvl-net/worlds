@@ -34,8 +34,6 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok:1.18.36")
 
-    compileOnly("net.thenextlvl.core:annotations:2.0.1")
-
     implementation("org.bstats:bstats-bukkit:3.1.0")
 
     implementation(project(":api"))

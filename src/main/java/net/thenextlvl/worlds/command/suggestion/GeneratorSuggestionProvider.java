@@ -7,10 +7,12 @@ import core.paper.command.SuggestionProvider;
 import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
 import org.bukkit.plugin.Plugin;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
+@NullMarked
 @RequiredArgsConstructor
 public class GeneratorSuggestionProvider implements SuggestionProvider {
     private final WorldsPlugin plugin;

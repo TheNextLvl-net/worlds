@@ -12,12 +12,13 @@ import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.argument.CommandFlagsArgument;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.World;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
 import java.util.Set;
 
+@NullMarked
 @RequiredArgsConstructor
-@SuppressWarnings("UnstableApiUsage")
 class WorldDeleteCommand {
     private final WorldsPlugin plugin;
 

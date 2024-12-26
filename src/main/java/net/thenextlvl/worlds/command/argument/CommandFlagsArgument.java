@@ -2,12 +2,13 @@ package net.thenextlvl.worlds.command.argument;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import core.paper.command.WrappedArgumentType;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+@NullMarked
 public class CommandFlagsArgument extends WrappedArgumentType<String, CommandFlagsArgument.Flags> {
     public CommandFlagsArgument(Set<String> flags) {
         super(StringArgumentType.greedyString(), (reader, type) -> {
@@ -27,7 +28,7 @@ public class CommandFlagsArgument extends WrappedArgumentType<String, CommandFla
     }
 
     public static class Flags extends HashSet<String> {
-        private Flags(@NotNull String... flags) {
+        private Flags(String... flags) {
             super(Set.of(flags));
         }
     }

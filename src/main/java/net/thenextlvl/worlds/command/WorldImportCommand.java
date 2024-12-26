@@ -18,15 +18,16 @@ import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.util.Optional;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
+@NullMarked
 @RequiredArgsConstructor
-@SuppressWarnings("UnstableApiUsage")
 class WorldImportCommand {
     private final WorldsPlugin plugin;
 
@@ -57,7 +58,7 @@ class WorldImportCommand {
     }
 
     private int execute(CommandContext<CommandSourceStack> context, @Nullable NamespacedKey key,
-                        @Nullable World.Environment environment, @Nullable Generator generator) {
+                        World.@Nullable Environment environment, @Nullable Generator generator) {
         var name = context.getArgument("world", String.class);
         var levelFolder = new File(plugin.getServer().getWorldContainer(), name);
 

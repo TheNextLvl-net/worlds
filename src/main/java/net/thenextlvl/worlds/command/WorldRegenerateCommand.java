@@ -13,14 +13,15 @@ import net.thenextlvl.worlds.command.argument.CommandFlagsArgument;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
 import java.util.Set;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
+@NullMarked
 @RequiredArgsConstructor
-@SuppressWarnings("UnstableApiUsage")
 class WorldRegenerateCommand {
     private final WorldsPlugin plugin;
 
