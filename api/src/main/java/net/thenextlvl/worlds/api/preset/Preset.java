@@ -13,6 +13,7 @@ import lombok.experimental.Accessors;
 import net.thenextlvl.worlds.api.preset.adapter.BiomeTypeAdapter;
 import net.thenextlvl.worlds.api.preset.adapter.StructureTypeAdapter;
 import org.bukkit.Material;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
 import java.util.LinkedHashSet;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@NullMarked
 @Accessors(chain = true, fluent = true)
 public class Preset {
     private Biome biome = Biome.minecraft("plains");

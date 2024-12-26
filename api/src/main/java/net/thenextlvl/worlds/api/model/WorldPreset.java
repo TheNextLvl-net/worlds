@@ -2,7 +2,9 @@ package net.thenextlvl.worlds.api.model;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public record WorldPreset(Key key) implements Keyed {
     public static final WorldPreset AMPLIFIED = new WorldPreset(Key.key("minecraft", "amplified"));
     public static final WorldPreset CHECKERBOARD = new WorldPreset(Key.key("minecraft", "checkerboard"));

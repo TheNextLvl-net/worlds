@@ -1,7 +1,9 @@
 package net.thenextlvl.worlds.api.preset;
 
 import com.google.common.base.Preconditions;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public record Biome(String provider, String biome) {
     Biome(org.bukkit.block.Biome biome) {
         this(biome.key().namespace(), biome.key().value());

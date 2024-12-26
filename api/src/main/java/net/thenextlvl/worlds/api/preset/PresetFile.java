@@ -4,14 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import core.file.format.GsonFile;
 import core.io.IO;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
+@NullMarked
 public record PresetFile(JsonObject settings) {
-
     public static @Nullable PresetFile of(IO io) {
         if (!io.exists()) return null;
         var gson = new GsonFile<JsonObject>(io, JsonObject.class, new Gson());

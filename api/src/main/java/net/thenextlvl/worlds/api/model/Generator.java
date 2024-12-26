@@ -5,8 +5,10 @@ import net.thenextlvl.worlds.api.exception.GeneratorException;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public record Generator(Plugin plugin, @Nullable String id) {
     public String serialize() {
         return id != null ? plugin.getName() + ":" + id : plugin.getName();

@@ -3,32 +3,42 @@ package net.thenextlvl.worlds.api.model;
 import net.thenextlvl.worlds.api.preset.Preset;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 
+@NullMarked
 public interface LevelBuilder {
-    @Nullable Boolean hardcore();
+    @Nullable
+    Boolean hardcore();
 
-    @Nullable Boolean structures();
+    @Nullable
+    Boolean structures();
 
-    @Nullable Generator generator();
+    @Nullable
+    Generator generator();
 
-    @Nullable Long seed();
+    @Nullable
+    Long seed();
 
-    @Nullable NamespacedKey key();
+    @Nullable
+    NamespacedKey key();
 
-    @Nullable Preset preset();
+    @Nullable
+    Preset preset();
 
-    @Nullable String name();
+    @Nullable
+    String name();
 
-    @Nullable World.Environment environment();
+    World.@Nullable Environment environment();
 
-    @Nullable WorldPreset type();
+    @Nullable
+    WorldPreset type();
 
     File level();
 
-    LevelBuilder environment(@Nullable World.Environment environment);
+    LevelBuilder environment(World.@Nullable Environment environment);
 
     LevelBuilder generator(@Nullable Generator generator);
 

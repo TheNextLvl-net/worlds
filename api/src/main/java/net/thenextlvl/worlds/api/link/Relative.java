@@ -7,11 +7,13 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Arrays;
 import java.util.Optional;
 
 @Getter
+@NullMarked
 @RequiredArgsConstructor
 @Accessors(fluent = true)
 public enum Relative implements Keyed {
