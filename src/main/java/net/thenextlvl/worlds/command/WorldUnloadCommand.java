@@ -5,7 +5,6 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
-import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
@@ -14,9 +13,12 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-@RequiredArgsConstructor
 class WorldUnloadCommand {
     private final WorldsPlugin plugin;
+
+    WorldUnloadCommand(WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     ArgumentBuilder<CommandSourceStack, ?> create() {
         return Commands.literal("unload")

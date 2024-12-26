@@ -7,7 +7,6 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver;
-import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import org.bukkit.World;
@@ -15,9 +14,12 @@ import org.bukkit.command.CommandSender;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-@RequiredArgsConstructor
 class WorldSetSpawnCommand {
     private final WorldsPlugin plugin;
+
+    WorldSetSpawnCommand(WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     ArgumentBuilder<CommandSourceStack, ?> create() {
         return Commands.literal("setspawn")

@@ -1,6 +1,5 @@
 package net.thenextlvl.worlds.listener;
 
-import lombok.RequiredArgsConstructor;
 import net.minecraft.util.DirectoryLock;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.exception.GeneratorException;
@@ -11,9 +10,12 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-@RequiredArgsConstructor
 public class ServerListener implements Listener {
     private final WorldsPlugin plugin;
+
+    public ServerListener(WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onWorldLoad(WorldLoadEvent event) {

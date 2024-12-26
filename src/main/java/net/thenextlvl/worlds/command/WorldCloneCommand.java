@@ -6,7 +6,6 @@ import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
-import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
@@ -25,9 +24,12 @@ import java.io.IOException;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
-@RequiredArgsConstructor
 class WorldCloneCommand {
     private final WorldsPlugin plugin;
+
+    WorldCloneCommand(WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     ArgumentBuilder<CommandSourceStack, ?> create() {
         return Commands.literal("clone")

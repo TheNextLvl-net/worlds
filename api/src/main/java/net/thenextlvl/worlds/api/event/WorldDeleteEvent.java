@@ -1,6 +1,5 @@
 package net.thenextlvl.worlds.api.event;
 
-import lombok.Getter;
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.world.WorldEvent;
@@ -8,7 +7,7 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class WorldDeleteEvent extends WorldEvent {
-    private static final @Getter HandlerList handlerList = new HandlerList();
+    private static final HandlerList handlerList = new HandlerList();
 
     public WorldDeleteEvent(World world) {
         super(world, false);
@@ -16,6 +15,10 @@ public class WorldDeleteEvent extends WorldEvent {
 
     @Override
     public HandlerList getHandlers() {
-        return getHandlerList();
+        return handlerList;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlerList;
     }
 }

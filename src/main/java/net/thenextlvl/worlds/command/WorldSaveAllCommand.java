@@ -4,16 +4,18 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.craftbukkit.CraftServer;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-@RequiredArgsConstructor
 class WorldSaveAllCommand {
     private final WorldsPlugin plugin;
+
+    WorldSaveAllCommand(WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     ArgumentBuilder<CommandSourceStack, ?> create() {
         return Commands.literal("save-all")

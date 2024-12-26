@@ -1,6 +1,5 @@
 package net.thenextlvl.worlds.controller;
 
-import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.link.LinkController;
 import net.thenextlvl.worlds.api.link.Relative;
@@ -14,10 +13,12 @@ import java.util.Optional;
 import static org.bukkit.persistence.PersistentDataType.STRING;
 
 @NullMarked
-@RequiredArgsConstructor
 public class WorldLinkController implements LinkController {
     private final WorldsPlugin plugin;
 
+    public WorldLinkController(WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
     @Override
     public Optional<NamespacedKey> getTarget(World world, Relative relative) {
         return Optional.ofNullable(world.getPersistentDataContainer()

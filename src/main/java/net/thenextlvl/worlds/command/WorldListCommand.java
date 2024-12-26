@@ -5,7 +5,6 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -15,9 +14,12 @@ import net.thenextlvl.worlds.WorldsPlugin;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-@RequiredArgsConstructor
 class WorldListCommand {
     private final WorldsPlugin plugin;
+
+    WorldListCommand(WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     ArgumentBuilder<CommandSourceStack, ?> create() {
         return Commands.literal("list")

@@ -8,7 +8,6 @@ import core.nbt.tag.ListTag;
 import core.nbt.tag.StringTag;
 import core.nbt.tag.Tag;
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
-import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.model.Generator;
 import net.thenextlvl.worlds.api.model.LevelExtras;
@@ -31,9 +30,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @NullMarked
-@RequiredArgsConstructor
 public class PaperLevelView implements LevelView {
     private final WorldsPlugin plugin;
+
+    public PaperLevelView(WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public Stream<File> listLevels() {

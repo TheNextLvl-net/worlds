@@ -1,8 +1,6 @@
 package net.thenextlvl.worlds;
 
 import core.i18n.file.ComponentBundle;
-import lombok.Getter;
-import lombok.experimental.Accessors;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -35,9 +33,7 @@ import java.util.Locale;
 import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
 import static org.bukkit.persistence.PersistentDataType.STRING;
 
-@Getter
 @NullMarked
-@Accessors(fluent = true)
 public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     private final GeneratorView generatorView = new PluginGeneratorView();
     private final LevelView levelView = new PaperLevelView(this);
@@ -61,8 +57,8 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     @Override
     public void onLoad() {
-        if (!presetsFolder().isDirectory()) saveDefaultPresets();
-        versionChecker().checkVersion();
+        if (!presetsFolder.isDirectory()) saveDefaultPresets();
+        versionChecker.checkVersion();
         registerServices();
     }
 
@@ -74,13 +70,36 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     @Override
     public void onDisable() {
-        metrics().shutdown();
+        metrics.shutdown();
         unloadWorlds();
+    }
+
+    public File presetsFolder() {
+        return presetsFolder;
+    }
+
+    public ComponentBundle bundle() {
+        return bundle;
+    }
+
+    @Override
+    public GeneratorView generatorView() {
+        return generatorView;
     }
 
     @Override
     public LevelBuilder levelBuilder(File level) {
         return new PaperLevelBuilder(this, level);
+    }
+
+    @Override
+    public LevelView levelView() {
+        return levelView;
+    }
+
+    @Override
+    public LinkController linkController() {
+        return linkController;
     }
 
     private void unloadWorlds() {
@@ -121,14 +140,14 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     }
 
     private void saveDefaultPresets() {
-        Presets.BOTTOMLESS_PIT.saveToFile(new File(presetsFolder(), "bottomless-pit.json"), true);
-        Presets.CLASSIC_FLAT.saveToFile(new File(presetsFolder(), "classic-flat.json"), true);
-        Presets.DESERT.saveToFile(new File(presetsFolder(), "desert.json"), true);
-        Presets.OVERWORLD.saveToFile(new File(presetsFolder(), "overworld.json"), true);
-        Presets.REDSTONE_READY.saveToFile(new File(presetsFolder(), "redstone-ready.json"), true);
-        Presets.SNOWY_KINGDOM.saveToFile(new File(presetsFolder(), "snowy-kingdom.json"), true);
-        Presets.THE_VOID.saveToFile(new File(presetsFolder(), "the-void.json"), true);
-        Presets.TUNNELERS_DREAM.saveToFile(new File(presetsFolder(), "tunnelers-dream.json"), true);
-        Presets.WATER_WORLD.saveToFile(new File(presetsFolder(), "water-world.json"), true);
+        Presets.BOTTOMLESS_PIT.saveToFile(new File(presetsFolder, "bottomless-pit.json"), true);
+        Presets.CLASSIC_FLAT.saveToFile(new File(presetsFolder, "classic-flat.json"), true);
+        Presets.DESERT.saveToFile(new File(presetsFolder, "desert.json"), true);
+        Presets.OVERWORLD.saveToFile(new File(presetsFolder, "overworld.json"), true);
+        Presets.REDSTONE_READY.saveToFile(new File(presetsFolder, "redstone-ready.json"), true);
+        Presets.SNOWY_KINGDOM.saveToFile(new File(presetsFolder, "snowy-kingdom.json"), true);
+        Presets.THE_VOID.saveToFile(new File(presetsFolder, "the-void.json"), true);
+        Presets.TUNNELERS_DREAM.saveToFile(new File(presetsFolder, "tunnelers-dream.json"), true);
+        Presets.WATER_WORLD.saveToFile(new File(presetsFolder, "water-world.json"), true);
     }
 }

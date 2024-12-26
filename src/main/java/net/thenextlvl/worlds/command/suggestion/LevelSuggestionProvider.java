@@ -5,7 +5,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
 import org.jspecify.annotations.NullMarked;
 
@@ -13,9 +12,12 @@ import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
-@RequiredArgsConstructor
 public class LevelSuggestionProvider<S> implements SuggestionProvider<S> {
     private final WorldsPlugin plugin;
+
+    public LevelSuggestionProvider(WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {

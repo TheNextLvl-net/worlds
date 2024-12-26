@@ -6,7 +6,6 @@ import core.nbt.tag.CompoundTag;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
-import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
@@ -21,9 +20,12 @@ import org.jspecify.annotations.NullMarked;
 import java.util.Optional;
 
 @NullMarked
-@RequiredArgsConstructor
 class WorldInfoCommand {
     private final WorldsPlugin plugin;
+
+    WorldInfoCommand(WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     ArgumentBuilder<CommandSourceStack, ?> create() {
         return Commands.literal("info")

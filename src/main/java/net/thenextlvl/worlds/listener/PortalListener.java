@@ -1,7 +1,6 @@
 package net.thenextlvl.worlds.listener;
 
 import io.papermc.paper.event.entity.EntityPortalReadyEvent;
-import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.model.PortalCooldown;
 import org.bukkit.Bukkit;
@@ -22,10 +21,13 @@ import java.util.stream.IntStream;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.END_PORTAL;
 
 @NullMarked
-@RequiredArgsConstructor
 public class PortalListener implements Listener {
     private final PortalCooldown cooldown = new PortalCooldown();
     private final WorldsPlugin plugin;
+
+    public PortalListener(WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityPortal(EntityPortalReadyEvent event) {

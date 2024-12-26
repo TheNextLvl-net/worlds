@@ -4,7 +4,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import core.paper.command.SuggestionProvider;
-import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
 import org.bukkit.plugin.Plugin;
 import org.jspecify.annotations.NullMarked;
@@ -13,9 +12,12 @@ import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
-@RequiredArgsConstructor
 public class GeneratorSuggestionProvider implements SuggestionProvider {
     private final WorldsPlugin plugin;
+
+    public GeneratorSuggestionProvider(WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public CompletableFuture<Suggestions> suggest(CommandContext<?> context, SuggestionsBuilder builder) {

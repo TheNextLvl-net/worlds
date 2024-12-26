@@ -4,8 +4,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Keyed;
 import org.bukkit.World;
@@ -16,11 +14,18 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiPredicate;
 
 @NullMarked
-@AllArgsConstructor
-@RequiredArgsConstructor
 public class WorldSuggestionProvider<S> implements SuggestionProvider<S> {
     private final Plugin plugin;
-    private BiPredicate<CommandContext<S>, World> filter = (context, world) -> true;
+    private final BiPredicate<CommandContext<S>, World> filter;
+
+    public WorldSuggestionProvider(Plugin plugin) {
+        this(plugin, (context, world) -> true);
+    }
+
+    public WorldSuggestionProvider(Plugin plugin, BiPredicate<CommandContext<S>, World> filter) {
+        this.plugin = plugin;
+        this.filter = filter;
+    }
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {

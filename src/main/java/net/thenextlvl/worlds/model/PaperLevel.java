@@ -5,8 +5,6 @@ import core.nbt.file.NBTFile;
 import core.nbt.tag.ByteTag;
 import core.nbt.tag.CompoundTag;
 import core.nbt.tag.LongTag;
-import lombok.Getter;
-import lombok.experimental.Accessors;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.model.Generator;
 import net.thenextlvl.worlds.api.model.Level;
@@ -24,9 +22,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-@Getter
 @NullMarked
-@Accessors(fluent = true)
 public class PaperLevel implements Level {
     private final NBTFile<CompoundTag> levelData;
     private final WorldsPlugin plugin;
@@ -116,6 +112,26 @@ public class PaperLevel implements Level {
     }
 
     @Override
+    public @Nullable Generator generator() {
+        return generator;
+    }
+
+    @Override
+    public @Nullable Preset preset() {
+        return preset;
+    }
+
+    @Override
+    public NBTFile<CompoundTag> levelData() {
+        return levelData;
+    }
+
+    @Override
+    public NamespacedKey key() {
+        return key;
+    }
+
+    @Override
     public Optional<World> create() {
         var generatorSettings = Optional.ofNullable(preset())
                 .map(Preset::serialize)
@@ -130,9 +146,49 @@ public class PaperLevel implements Level {
                 .seed(seed())
                 .type(typeOf(type()));
 
-        if (generator() != null) creator.generator(generator().generator(creator.name()));
-        if (generator() != null) creator.biomeProvider(generator().biomeProvider(creator.name()));
+        if (generator != null) creator.generator(generator.generator(creator.name()));
+        if (generator != null) creator.biomeProvider(generator.biomeProvider(creator.name()));
 
         return Optional.ofNullable(creator.createWorld());
+    }
+
+    @Override
+    public String name() {
+        return name;
+    }
+
+    @Override
+    public World.Environment environment() {
+        return environment;
+    }
+
+    @Override
+    public WorldPreset type() {
+        return type;
+    }
+
+    @Override
+    public boolean enabled() {
+        return enabled;
+    }
+
+    @Override
+    public boolean hardcore() {
+        return hardcore;
+    }
+
+    @Override
+    public boolean importedBefore() {
+        return importedBefore;
+    }
+
+    @Override
+    public boolean structures() {
+        return structures;
+    }
+
+    @Override
+    public long seed() {
+        return seed;
     }
 }

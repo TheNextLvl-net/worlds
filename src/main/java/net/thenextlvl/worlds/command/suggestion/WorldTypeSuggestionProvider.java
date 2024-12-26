@@ -5,7 +5,6 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import core.paper.command.SuggestionProvider;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import lombok.RequiredArgsConstructor;
 import net.thenextlvl.worlds.WorldsPlugin;
 import org.jspecify.annotations.NullMarked;
 
@@ -13,9 +12,12 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
-@RequiredArgsConstructor
 public class WorldTypeSuggestionProvider implements SuggestionProvider {
     private final WorldsPlugin plugin;
+
+    public WorldTypeSuggestionProvider(WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     private final Map<String, String> dimensions = Map.of(
             "minecraft:amplified", "world.type.amplified",

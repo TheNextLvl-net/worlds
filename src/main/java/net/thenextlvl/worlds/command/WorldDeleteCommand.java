@@ -6,7 +6,6 @@ import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
-import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.argument.CommandFlagsArgument;
@@ -18,9 +17,12 @@ import java.io.File;
 import java.util.Set;
 
 @NullMarked
-@RequiredArgsConstructor
 class WorldDeleteCommand {
     private final WorldsPlugin plugin;
+
+    WorldDeleteCommand(WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     ArgumentBuilder<CommandSourceStack, ?> create() {
         return Commands.literal("delete")
