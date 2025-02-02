@@ -15,7 +15,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.Main;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldLoader;
-import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.dedicated.DedicatedServerProperties;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.GsonHelper;
@@ -56,7 +55,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Locale;
 
@@ -241,17 +239,5 @@ public class FoliaLevel extends PaperLevel {
 
         server.paperPluginManager.callEvent(new WorldLoadEvent(internal.getWorld()));
         return internal.getWorld();
-    }
-
-    private void loadLevel(DedicatedServer console) {
-        try {
-            var loadLevel = MinecraftServer.class.getDeclaredMethod("loadLevel", String.class);
-            var accessible = loadLevel.canAccess(console);
-            if (!accessible) loadLevel.trySetAccessible();
-            loadLevel.invoke(console, name);
-            if (!accessible) loadLevel.setAccessible(false);
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
