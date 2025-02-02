@@ -24,22 +24,22 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @NullMarked
 public class PaperLevel implements Level {
-    private final NBTFile<CompoundTag> levelData;
-    private final WorldsPlugin plugin;
+    protected final NBTFile<CompoundTag> levelData;
+    protected final WorldsPlugin plugin;
 
-    private final NamespacedKey key;
-    private final String name;
-    private final World.Environment environment;
-    private final WorldPreset type;
+    protected final NamespacedKey key;
+    protected final String name;
+    protected final World.Environment environment;
+    protected final WorldPreset type;
 
-    private final @Nullable Generator generator;
-    private final @Nullable Preset preset;
+    protected final @Nullable Generator generator;
+    protected final @Nullable Preset preset;
 
-    private final boolean enabled;
-    private final boolean hardcore;
-    private final boolean importedBefore;
-    private final boolean structures;
-    private final long seed;
+    protected final boolean enabled;
+    protected final boolean hardcore;
+    protected final boolean importedBefore;
+    protected final boolean structures;
+    protected final long seed;
 
     public PaperLevel(WorldsPlugin plugin, LevelBuilder builder) {
         this.levelData = plugin.levelView().getLevelDataFile(builder.level());
