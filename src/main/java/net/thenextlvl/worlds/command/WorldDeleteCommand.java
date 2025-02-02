@@ -62,6 +62,8 @@ class WorldDeleteCommand {
     }
 
     private String deleteNow(World world) {
+        if (plugin.isRunningFolia())
+            return "world.delete.disallowed.folia";
         if (world.getKey().toString().equals("minecraft:overworld"))
             return "world.delete.disallowed";
 

@@ -65,6 +65,8 @@ class WorldRegenerateCommand {
     }
 
     private String regenerateNow(World world) {
+        if (plugin.isRunningFolia())
+            return "world.regenerate.disallowed.folia";
         if (world.getKey().toString().equals("minecraft:overworld"))
             return "world.regenerate.disallowed";
 
