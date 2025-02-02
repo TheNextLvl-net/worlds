@@ -1,6 +1,8 @@
 package net.thenextlvl.worlds;
 
 import core.i18n.file.ComponentBundle;
+import io.papermc.paper.ServerBuildInfo;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -54,6 +56,8 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
     private final Metrics metrics = new Metrics(this, 19652);
+
+    private final boolean foliaCompatible = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
 
     @Override
     public void onLoad() {
@@ -117,6 +121,10 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     public void persistGenerator(World world, Generator generator) {
         var generatorKey = new NamespacedKey("worlds", "generator");
         world.getPersistentDataContainer().set(generatorKey, STRING, generator.serialize());
+    }
+
+    public boolean isFoliaCompatible() {
+        return foliaCompatible;
     }
 
     private void unloadWorlds() {
