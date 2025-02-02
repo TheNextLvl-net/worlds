@@ -48,9 +48,9 @@ class WorldUnloadCommand {
     private String unload(World world, @Nullable World fallback) {
         if (plugin.isRunningFolia())
             return "world.unload.disallowed.folia";
-        if (world.equals(fallback)) return "world.unload.fallback";
         if (world.getKey().toString().equals("minecraft:overworld"))
             return "world.unload.disallowed";
+        if (world.equals(fallback)) return "world.unload.fallback";
 
         var fallbackSpawn = fallback != null ? fallback.getSpawnLocation()
                 : plugin.getServer().getWorlds().getFirst().getSpawnLocation();
