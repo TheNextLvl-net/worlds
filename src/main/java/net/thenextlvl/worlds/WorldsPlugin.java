@@ -19,6 +19,7 @@ import net.thenextlvl.worlds.listener.PortalListener;
 import net.thenextlvl.worlds.listener.ServerListener;
 import net.thenextlvl.worlds.model.PaperLevelBuilder;
 import net.thenextlvl.worlds.version.PluginVersionChecker;
+import net.thenextlvl.worlds.view.FoliaLevelView;
 import net.thenextlvl.worlds.view.PaperLevelView;
 import net.thenextlvl.worlds.view.PluginGeneratorView;
 import org.bstats.bukkit.Metrics;
@@ -39,8 +40,10 @@ import static org.bukkit.persistence.PersistentDataType.STRING;
 public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     public static final String BUG_REPORTING = "https://github.com/TheNextLvl-net/worlds/issues/new?template=bug_report.yml";
 
+    private final boolean foliaCompatible = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
+
     private final GeneratorView generatorView = new PluginGeneratorView();
-    private final LevelView levelView = new PaperLevelView(this);
+    private final LevelView levelView = foliaCompatible ? new FoliaLevelView(this) : new PaperLevelView(this);
 
     private final LinkController linkController = new WorldLinkController(this);
 
@@ -59,12 +62,11 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
     private final Metrics metrics = new Metrics(this, 19652);
 
-    private final boolean foliaCompatible = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
 
     @Override
     public void onLoad() {
         if (!presetsFolder.isDirectory()) saveDefaultPresets();
-        if (isFoliaCompatible()) warnExperimental();
+        if (foliaCompatible) warnExperimental();
         versionChecker.checkVersion();
         registerServices();
     }
