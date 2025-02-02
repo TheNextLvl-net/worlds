@@ -58,7 +58,7 @@ public class PortalListener implements Listener {
             if (!player.getHandle().seenCredits) player.getHandle().showEndCredits();
             if (player.getRespawnLocation() != null) player.teleportAsync(player.getRespawnLocation(), END_PORTAL);
             else player.teleportAsync(readyEvent.getTargetWorld().getSpawnLocation(), END_PORTAL);
-        } else event.getEntity().teleport(readyEvent.getTargetWorld().getSpawnLocation(), END_PORTAL);
+        } else event.getEntity().teleportAsync(readyEvent.getTargetWorld().getSpawnLocation(), END_PORTAL);
     }
 
     private void generateEndPlatform(World world) {
