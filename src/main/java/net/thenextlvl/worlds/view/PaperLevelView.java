@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 
 @NullMarked
 public class PaperLevelView implements LevelView {
-    private final WorldsPlugin plugin;
+    protected final WorldsPlugin plugin;
 
     public PaperLevelView(WorldsPlugin plugin) {
         this.plugin = plugin;
