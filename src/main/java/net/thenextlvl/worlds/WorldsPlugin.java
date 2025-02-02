@@ -63,15 +63,15 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     }
 
     @Override
-    public void onEnable() {
-        registerListeners();
-        registerCommands();
-    }
-
-    @Override
     public void onDisable() {
         metrics.shutdown();
         unloadWorlds();
+    }
+
+    @Override
+    public void onEnable() {
+        registerListeners();
+        registerCommands();
     }
 
     public File presetsFolder() {
@@ -102,13 +102,6 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         return linkController;
     }
 
-    private void unloadWorlds() {
-        getServer().getWorlds().stream().filter(world -> !world.isAutoSave()).forEach(world -> {
-            world.getPlayers().forEach(player -> player.kick(getServer().shutdownMessage()));
-            getServer().unloadWorld(world, false);
-        });
-    }
-
     public void persistWorld(World world, boolean enabled) {
         var worldKey = new NamespacedKey("worlds", "world_key");
         world.getPersistentDataContainer().set(worldKey, STRING, world.getKey().asString());
@@ -124,6 +117,13 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     public void persistGenerator(World world, Generator generator) {
         var generatorKey = new NamespacedKey("worlds", "generator");
         world.getPersistentDataContainer().set(generatorKey, STRING, generator.serialize());
+    }
+
+    private void unloadWorlds() {
+        getServer().getWorlds().stream().filter(world -> !world.isAutoSave()).forEach(world -> {
+            world.getPlayers().forEach(player -> player.kick(getServer().shutdownMessage()));
+            getServer().unloadWorld(world, false);
+        });
     }
 
     private void registerServices() {

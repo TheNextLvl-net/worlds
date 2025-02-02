@@ -14,6 +14,14 @@ public record Generator(Plugin plugin, @Nullable String id) {
         return id != null ? plugin.getName() + ":" + id : plugin.getName();
     }
 
+    public @Nullable ChunkGenerator generator(String worldName) {
+        return plugin().getDefaultWorldGenerator(worldName, id());
+    }
+
+    public @Nullable BiomeProvider biomeProvider(String worldName) {
+        return plugin().getDefaultBiomeProvider(worldName, id());
+    }
+
     public static Generator deserialize(WorldsProvider provider, String serialized) throws GeneratorException {
         var split = serialized.split(":", 2);
 
@@ -30,13 +38,5 @@ public record Generator(Plugin plugin, @Nullable String id) {
             throw new GeneratorException(plugin, id, "Plugin has no generator");
 
         return new Generator(generator, id);
-    }
-
-    public @Nullable ChunkGenerator generator(String worldName) {
-        return plugin().getDefaultWorldGenerator(worldName, id());
-    }
-
-    public @Nullable BiomeProvider biomeProvider(String worldName) {
-        return plugin().getDefaultBiomeProvider(worldName, id());
     }
 }

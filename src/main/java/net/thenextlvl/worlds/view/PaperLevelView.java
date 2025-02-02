@@ -38,42 +38,12 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public Stream<File> listLevels() {
-        return Optional.ofNullable(plugin.getServer().getWorldContainer()
-                        .listFiles(File::isDirectory)).stream()
-                .flatMap(files -> Arrays.stream(files).filter(this::isLevel));
-    }
-
-    @Override
-    public boolean isLevel(File file) {
-        return file.isDirectory() && (new File(file, "level.dat").isFile() || new File(file, "level.dat_old").isFile());
-    }
-
-    @Override
-    public boolean hasNetherDimension(File level) {
-        return new File(level, "DIM-1").isDirectory();
-    }
-
-    @Override
-    public boolean hasEndDimension(File level) {
-        return new File(level, "DIM1").isDirectory();
-    }
-
-    @Override
-    public boolean canLoad(File level) {
-        return plugin.getServer().getWorlds().stream()
-                .map(World::getWorldFolder)
-                .noneMatch(level::equals);
-    }
-
-    @Override
-    public World.Environment getEnvironment(File level) {
-        var end = hasEndDimension(level);
-        var nether = hasNetherDimension(level);
-        if (end && nether) return World.Environment.NORMAL;
-        if (end) return World.Environment.THE_END;
-        if (nether) return World.Environment.NETHER;
-        return World.Environment.NORMAL;
+    public NBTFile<CompoundTag> getLevelDataFile(File level) {
+        return new NBTFile<>(Optional.of(
+                IO.of(level, "level.dat")
+        ).filter(PathIO::exists).orElseGet(() ->
+                IO.of(level, "level.dat_old")
+        ), new CompoundTag());
     }
 
     @Override
@@ -147,23 +117,13 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public NBTFile<CompoundTag> getLevelDataFile(File level) {
-        return new NBTFile<>(Optional.of(
-                IO.of(level, "level.dat")
-        ).filter(PathIO::exists).orElseGet(() ->
-                IO.of(level, "level.dat_old")
-        ), new CompoundTag());
+    public Optional<String> getGeneratorSettings(CompoundTag generator) {
+        return generator.optional("settings").filter(Tag::isString).map(Tag::getAsString);
     }
 
     @Override
-    public String getDimension(CompoundTag dimensions, World.Environment environment) {
-        return switch (environment) {
-            case NORMAL -> "minecraft:overworld";
-            case NETHER -> "minecraft:the_nether";
-            case THE_END -> "minecraft:the_end";
-            case CUSTOM -> dimensions.keySet().stream().filter(s -> !s.startsWith("minecraft")).findAny()
-                    .orElseThrow(() -> new UnsupportedOperationException("Could not find custom dimension"));
-        };
+    public Optional<String> getGeneratorType(CompoundTag generator) {
+        return generator.optional("type").map(Tag::getAsString);
     }
 
     @Override
@@ -196,13 +156,54 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public Optional<String> getGeneratorSettings(CompoundTag generator) {
-        return generator.optional("settings").filter(Tag::isString).map(Tag::getAsString);
+    public Stream<File> listLevels() {
+        return Optional.ofNullable(plugin.getServer().getWorldContainer()
+                        .listFiles(File::isDirectory)).stream()
+                .flatMap(files -> Arrays.stream(files).filter(this::isLevel));
     }
 
     @Override
-    public Optional<String> getGeneratorType(CompoundTag generator) {
-        return generator.optional("type").map(Tag::getAsString);
+    public String getDimension(CompoundTag dimensions, World.Environment environment) {
+        return switch (environment) {
+            case NORMAL -> "minecraft:overworld";
+            case NETHER -> "minecraft:the_nether";
+            case THE_END -> "minecraft:the_end";
+            case CUSTOM -> dimensions.keySet().stream().filter(s -> !s.startsWith("minecraft")).findAny()
+                    .orElseThrow(() -> new UnsupportedOperationException("Could not find custom dimension"));
+        };
+    }
+
+    @Override
+    public World.Environment getEnvironment(File level) {
+        var end = hasEndDimension(level);
+        var nether = hasNetherDimension(level);
+        if (end && nether) return World.Environment.NORMAL;
+        if (end) return World.Environment.THE_END;
+        if (nether) return World.Environment.NETHER;
+        return World.Environment.NORMAL;
+    }
+
+    @Override
+    public boolean canLoad(File level) {
+        return plugin.getServer().getWorlds().stream()
+                .map(World::getWorldFolder)
+                .noneMatch(level::equals);
+    }
+
+    @Override
+    public boolean hasEndDimension(File level) {
+        return new File(level, "DIM1").isDirectory();
+    }
+
+    @Override
+    public boolean hasNetherDimension(File level) {
+        return new File(level, "DIM-1").isDirectory();
+    }
+
+    @Override
+    public boolean isLevel(File file) {
+        return file.isDirectory() && (new File(file, "level.dat").isFile() || new File(file, "level.dat_old").isFile());
+    }
     }
 
     @Override

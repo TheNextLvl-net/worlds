@@ -19,12 +19,6 @@ public class WorldLinkController implements LinkController {
     public WorldLinkController(WorldsPlugin plugin) {
         this.plugin = plugin;
     }
-    @Override
-    public Optional<NamespacedKey> getTarget(World world, Relative relative) {
-        return Optional.ofNullable(world.getPersistentDataContainer()
-                .get(relative.key(), STRING)
-        ).map(NamespacedKey::fromString);
-    }
 
     @Override
     public Optional<NamespacedKey> getTarget(World world, PortalType type) {
@@ -41,6 +35,13 @@ public class WorldLinkController implements LinkController {
             };
             default -> Optional.empty();
         };
+    }
+
+    @Override
+    public Optional<NamespacedKey> getTarget(World world, Relative relative) {
+        return Optional.ofNullable(world.getPersistentDataContainer()
+                .get(relative.key(), STRING)
+        ).map(NamespacedKey::fromString);
     }
 
     @Override
