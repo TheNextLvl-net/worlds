@@ -14,11 +14,6 @@ import java.util.concurrent.CompletableFuture;
 @NullMarked
 public class WorldTypeSuggestionProvider implements SuggestionProvider {
     private final WorldsPlugin plugin;
-
-    public WorldTypeSuggestionProvider(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
     private final Map<String, String> dimensions = Map.of(
             "minecraft:amplified", "world.type.amplified",
             "minecraft:checkerboard", "world.type.checkerboard",
@@ -28,6 +23,10 @@ public class WorldTypeSuggestionProvider implements SuggestionProvider {
             "minecraft:normal", "world.type.normal",
             "minecraft:single_biome", "world.type.single_biome"
     );
+
+    public WorldTypeSuggestionProvider(WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public CompletableFuture<Suggestions> suggest(CommandContext<?> context, SuggestionsBuilder builder) {

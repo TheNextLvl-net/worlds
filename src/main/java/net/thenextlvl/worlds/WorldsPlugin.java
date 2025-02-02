@@ -1,6 +1,8 @@
 package net.thenextlvl.worlds;
 
 import core.i18n.file.ComponentBundle;
+import io.papermc.paper.ServerBuildInfo;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -17,6 +19,7 @@ import net.thenextlvl.worlds.listener.PortalListener;
 import net.thenextlvl.worlds.listener.ServerListener;
 import net.thenextlvl.worlds.model.PaperLevelBuilder;
 import net.thenextlvl.worlds.version.PluginVersionChecker;
+import net.thenextlvl.worlds.view.FoliaLevelView;
 import net.thenextlvl.worlds.view.PaperLevelView;
 import net.thenextlvl.worlds.view.PluginGeneratorView;
 import org.bstats.bukkit.Metrics;
@@ -35,8 +38,12 @@ import static org.bukkit.persistence.PersistentDataType.STRING;
 
 @NullMarked
 public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
+    public static final String BUG_REPORTING = "https://github.com/TheNextLvl-net/worlds/issues/new?template=bug_report.yml";
+
+    private final boolean runningFolia = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
+
     private final GeneratorView generatorView = new PluginGeneratorView();
-    private final LevelView levelView = new PaperLevelView(this);
+    private final LevelView levelView = runningFolia ? new FoliaLevelView(this) : new PaperLevelView(this);
 
     private final LinkController linkController = new WorldLinkController(this);
 
@@ -55,23 +62,25 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
     private final Metrics metrics = new Metrics(this, 19652);
 
+
     @Override
     public void onLoad() {
         if (!presetsFolder.isDirectory()) saveDefaultPresets();
+        if (runningFolia) warnExperimental();
         versionChecker.checkVersion();
         registerServices();
+    }
+
+    @Override
+    public void onDisable() {
+        metrics.shutdown();
+        unloadLevels();
     }
 
     @Override
     public void onEnable() {
         registerListeners();
         registerCommands();
-    }
-
-    @Override
-    public void onDisable() {
-        metrics.shutdown();
-        unloadWorlds();
     }
 
     public File presetsFolder() {
@@ -102,13 +111,6 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         return linkController;
     }
 
-    private void unloadWorlds() {
-        getServer().getWorlds().stream().filter(world -> !world.isAutoSave()).forEach(world -> {
-            world.getPlayers().forEach(player -> player.kick(getServer().shutdownMessage()));
-            getServer().unloadWorld(world, false);
-        });
-    }
-
     public void persistWorld(World world, boolean enabled) {
         var worldKey = new NamespacedKey("worlds", "world_key");
         world.getPersistentDataContainer().set(worldKey, STRING, world.getKey().asString());
@@ -124,6 +126,22 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     public void persistGenerator(World world, Generator generator) {
         var generatorKey = new NamespacedKey("worlds", "generator");
         world.getPersistentDataContainer().set(generatorKey, STRING, generator.serialize());
+    }
+
+    public boolean isRunningFolia() {
+        return runningFolia;
+    }
+
+    private void warnExperimental() {
+        getComponentLogger().warn("Folia builds of Worlds are extremely experimental");
+        getComponentLogger().warn("Please report any issues you encounter to {}", BUG_REPORTING);
+    }
+
+    private void unloadLevels() {
+        getServer().getWorlds().stream().filter(world -> !world.isAutoSave()).forEach(world -> {
+            world.getPlayers().forEach(player -> player.kick(getServer().shutdownMessage()));
+            levelView().unloadLevel(world, false);
+        });
     }
 
     private void registerServices() {

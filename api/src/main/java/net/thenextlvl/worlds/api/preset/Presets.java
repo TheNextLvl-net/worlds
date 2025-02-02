@@ -5,7 +5,6 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class Presets {
-
     public static final Preset BOTTOMLESS_PIT = new Preset()
             .addLayer(new Layer(Material.COBBLESTONE, 2))
             .addLayer(new Layer(Material.DIRT, 3))

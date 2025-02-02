@@ -46,13 +46,15 @@ class WorldUnloadCommand {
     }
 
     private String unload(World world, @Nullable World fallback) {
-        if (world.equals(fallback)) return "world.unload.fallback";
+        if (plugin.isRunningFolia())
+            return "world.unload.disallowed.folia";
         if (world.getKey().toString().equals("minecraft:overworld"))
             return "world.unload.disallowed";
+        if (world.equals(fallback)) return "world.unload.fallback";
 
         var fallbackSpawn = fallback != null ? fallback.getSpawnLocation()
                 : plugin.getServer().getWorlds().getFirst().getSpawnLocation();
-        world.getPlayers().forEach(player -> player.teleport(fallbackSpawn));
+        world.getPlayers().forEach(player -> player.teleportAsync(fallbackSpawn).join());
 
         plugin.persistStatus(world, false, false);
 
@@ -61,7 +63,7 @@ class WorldUnloadCommand {
 
         if (!world.isAutoSave()) plugin.levelView().saveLevelData(world, false);
 
-        return plugin.getServer().unloadWorld(world, world.isAutoSave())
+        return plugin.levelView().unloadLevel(world, world.isAutoSave())
                 ? "world.unload.success"
                 : "world.unload.failed";
     }

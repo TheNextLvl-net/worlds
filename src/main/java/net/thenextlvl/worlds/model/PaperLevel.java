@@ -24,22 +24,22 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @NullMarked
 public class PaperLevel implements Level {
-    private final NBTFile<CompoundTag> levelData;
-    private final WorldsPlugin plugin;
+    protected final NBTFile<CompoundTag> levelData;
+    protected final WorldsPlugin plugin;
 
-    private final NamespacedKey key;
-    private final String name;
-    private final World.Environment environment;
-    private final WorldPreset type;
+    protected final NamespacedKey key;
+    protected final String name;
+    protected final World.Environment environment;
+    protected final WorldPreset type;
 
-    private final @Nullable Generator generator;
-    private final @Nullable Preset preset;
+    protected final @Nullable Generator generator;
+    protected final @Nullable Preset preset;
 
-    private final boolean enabled;
-    private final boolean hardcore;
-    private final boolean importedBefore;
-    private final boolean structures;
-    private final long seed;
+    protected final boolean enabled;
+    protected final boolean hardcore;
+    protected final boolean importedBefore;
+    protected final boolean structures;
+    protected final long seed;
 
     public PaperLevel(WorldsPlugin plugin, LevelBuilder builder) {
         this.levelData = plugin.levelView().getLevelDataFile(builder.level());
@@ -48,7 +48,7 @@ public class PaperLevel implements Level {
         this.name = Optional.ofNullable(builder.name())
                 .orElseGet(() -> builder.level().getName());
 
-        var data = levelData().getRoot().<CompoundTag>optional("Data");
+        var data = levelData.getRoot().<CompoundTag>optional("Data");
         var extras = data.flatMap(plugin.levelView()::getExtras);
 
         this.importedBefore = extras.isPresent();
@@ -102,15 +102,6 @@ public class PaperLevel implements Level {
                 .orElse(null);
     }
 
-    private WorldType typeOf(WorldPreset worldPreset) {
-        if (worldPreset.equals(WorldPreset.AMPLIFIED)) return WorldType.AMPLIFIED;
-        if (worldPreset.equals(WorldPreset.FLAT)) return WorldType.FLAT;
-        if (worldPreset.equals(WorldPreset.LARGE_BIOMES)) return WorldType.LARGE_BIOMES;
-        if (worldPreset.equals(WorldPreset.NORMAL)) return WorldType.NORMAL;
-        plugin.getComponentLogger().warn("Custom world presets do not work yet, defaulting to normal");
-        return WorldType.NORMAL;
-    }
-
     @Override
     public @Nullable Generator generator() {
         return generator;
@@ -133,23 +124,27 @@ public class PaperLevel implements Level {
 
     @Override
     public Optional<World> create() {
-        var generatorSettings = Optional.ofNullable(preset())
+        var generatorSettings = Optional.ofNullable(preset)
                 .map(Preset::serialize)
                 .map(JsonObject::toString)
                 .orElse("");
 
-        var creator = new WorldCreator(name(), key())
-                .environment(environment())
-                .generateStructures(structures())
+        var creator = new WorldCreator(name, key)
+                .environment(environment)
+                .generateStructures(structures)
                 .generatorSettings(generatorSettings)
-                .hardcore(hardcore())
-                .seed(seed())
-                .type(typeOf(type()));
+                .hardcore(hardcore)
+                .seed(seed)
+                .type(typeOf(type));
 
         if (generator != null) creator.generator(generator.generator(creator.name()));
         if (generator != null) creator.biomeProvider(generator.biomeProvider(creator.name()));
 
-        return Optional.ofNullable(creator.createWorld());
+        return Optional.ofNullable(createWorld(creator));
+    }
+
+    protected @Nullable World createWorld(WorldCreator creator) {
+        return creator.createWorld();
     }
 
     @Override
@@ -190,5 +185,14 @@ public class PaperLevel implements Level {
     @Override
     public long seed() {
         return seed;
+    }
+
+    private WorldType typeOf(WorldPreset worldPreset) {
+        if (worldPreset.equals(WorldPreset.AMPLIFIED)) return WorldType.AMPLIFIED;
+        if (worldPreset.equals(WorldPreset.FLAT)) return WorldType.FLAT;
+        if (worldPreset.equals(WorldPreset.LARGE_BIOMES)) return WorldType.LARGE_BIOMES;
+        if (worldPreset.equals(WorldPreset.NORMAL)) return WorldType.NORMAL;
+        plugin.getComponentLogger().warn("Custom world presets do not work yet, defaulting to normal");
+        return WorldType.NORMAL;
     }
 }

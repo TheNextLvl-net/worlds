@@ -16,7 +16,8 @@ public interface Level extends Keyed {
     @Nullable
     Generator generator();
 
-    @Nullable Preset preset();
+    @Nullable
+    Preset preset();
 
     NBTFile<CompoundTag> levelData();
 

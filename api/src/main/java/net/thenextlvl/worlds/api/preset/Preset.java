@@ -18,6 +18,13 @@ import java.util.stream.Collectors;
 
 @NullMarked
 public class Preset {
+    private static final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(Structure.class, new StructureTypeAdapter())
+            .registerTypeAdapter(Material.class, MaterialAdapter.instance())
+            .registerTypeAdapter(Biome.class, new BiomeTypeAdapter())
+            .setPrettyPrinting()
+            .create();
+
     private Biome biome = Biome.minecraft("plains");
     private boolean lakes;
     private boolean features;
@@ -191,12 +198,13 @@ public class Preset {
         return gson.toJsonTree(this).getAsJsonObject();
     }
 
-    private static final Gson gson = new GsonBuilder()
-            .registerTypeAdapter(Structure.class, new StructureTypeAdapter())
-            .registerTypeAdapter(Material.class, MaterialAdapter.instance())
-            .registerTypeAdapter(Biome.class, new BiomeTypeAdapter())
-            .setPrettyPrinting()
-            .create();
+    @Override
+    public String toString() {
+        var layers = layers().stream()
+                .map(Layer::toString)
+                .collect(Collectors.joining(","));
+        return layers + ";" + biome();
+    }
 
     /**
      * Deserialize a JSON object into a preset
@@ -206,13 +214,5 @@ public class Preset {
      */
     public static Preset deserialize(JsonObject object) {
         return gson.fromJson(object, Preset.class);
-    }
-
-    @Override
-    public String toString() {
-        var layers = layers().stream()
-                .map(Layer::toString)
-                .collect(Collectors.joining(","));
-        return layers + ";" + biome();
     }
 }

@@ -65,6 +65,8 @@ class WorldRegenerateCommand {
     }
 
     private String regenerateNow(World world) {
+        if (plugin.isRunningFolia())
+            return "world.regenerate.disallowed.folia";
         if (world.getKey().toString().equals("minecraft:overworld"))
             return "world.regenerate.disallowed";
 
@@ -72,14 +74,14 @@ class WorldRegenerateCommand {
         var players = world.getPlayers();
 
         var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
-        players.forEach(player -> player.teleport(fallback, COMMAND));
+        players.forEach(player -> player.teleportAsync(fallback, COMMAND).join());
 
         plugin.levelView().saveLevelData(world, false);
 
         var creator = new WorldCreator(world.getName(), world.getKey()).copy(world);
         plugin.levelView().getGenerator(world).ifPresent(creator::generator);
 
-        if (!plugin.getServer().unloadWorld(world, false))
+        if (!plugin.levelView().unloadLevel(world, false))
             return "world.unload.failed";
 
         regenerate(worldFolder);

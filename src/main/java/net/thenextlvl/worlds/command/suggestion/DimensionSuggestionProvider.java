@@ -14,16 +14,15 @@ import java.util.concurrent.CompletableFuture;
 @NullMarked
 public class DimensionSuggestionProvider implements SuggestionProvider {
     private final WorldsPlugin plugin;
-
-    public DimensionSuggestionProvider(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
     private final Map<String, String> dimensions = Map.of(
             "minecraft:overworld", "environment.normal",
             "minecraft:the_end", "environment.end",
             "minecraft:the_nether", "environment.nether"
     );
+
+    public DimensionSuggestionProvider(WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public CompletableFuture<Suggestions> suggest(CommandContext<?> context, SuggestionsBuilder builder) {

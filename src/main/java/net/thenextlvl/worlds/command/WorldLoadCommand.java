@@ -38,7 +38,7 @@ class WorldLoadCommand {
         var name = context.getArgument("world", String.class);
         var level = new File(plugin.getServer().getWorldContainer(), name);
 
-        var build = plugin.levelView().isLevel(level) ? plugin.levelBuilder(level).build(): null;
+        var build = plugin.levelView().isLevel(level) ? plugin.levelBuilder(level).build() : null;
         var world = Optional.ofNullable(build).filter(Level::importedBefore).flatMap(Level::create).orElse(null);
 
         var message = world != null ? "world.load.success" : "world.load.failed";

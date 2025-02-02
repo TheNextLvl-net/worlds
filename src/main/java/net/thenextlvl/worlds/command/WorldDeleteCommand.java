@@ -62,13 +62,15 @@ class WorldDeleteCommand {
     }
 
     private String deleteNow(World world) {
+        if (plugin.isRunningFolia())
+            return "world.delete.disallowed.folia";
         if (world.getKey().toString().equals("minecraft:overworld"))
             return "world.delete.disallowed";
 
         var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
-        world.getPlayers().forEach(player -> player.teleport(fallback));
+        world.getPlayers().forEach(player -> player.teleportAsync(fallback).join());
 
-        if (!plugin.getServer().unloadWorld(world, false))
+        if (!plugin.levelView().unloadLevel(world, false))
             return "world.unload.failed";
 
         return delete(world.getWorldFolder()) ? "world.delete.success" : "world.delete.failed";
