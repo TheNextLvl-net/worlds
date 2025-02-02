@@ -48,20 +48,14 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public Optional<LevelExtras> getExtras(CompoundTag data) {
-        return data.optional("BukkitValues")
-                .map(Tag::getAsCompound)
-                .map(values -> {
-                    var key = values.optional("worlds:world_key")
-                            .map(Tag::getAsString)
-                            .map(NamespacedKey::fromString);
-                    var generator = values.optional("worlds:generator")
-                            .map(Tag::getAsString)
-                            .map(serialized -> Generator.deserialize(plugin, serialized));
-                    var enabled = values.optional("worlds:enabled")
-                            .map(Tag::getAsBoolean);
-                    if (key.isEmpty() && generator.isEmpty() && enabled.isEmpty()) return null;
-                    return new LevelExtras(key.orElse(null), generator.orElse(null), enabled.orElse(false));
-                });
+        return data.optional("BukkitValues").map(Tag::getAsCompound).map(values -> {
+            var key = values.optional("worlds:world_key").map(Tag::getAsString).map(NamespacedKey::fromString);
+            var generator = values.optional("worlds:generator").map(Tag::getAsString).map(serialized ->
+                    Generator.deserialize(plugin, serialized));
+            var enabled = values.optional("worlds:enabled").map(Tag::getAsBoolean);
+            if (key.isEmpty() && generator.isEmpty() && enabled.isEmpty()) return null;
+            return new LevelExtras(key.orElse(null), generator.orElse(null), enabled.orElse(false));
+        });
     }
 
     @Override
