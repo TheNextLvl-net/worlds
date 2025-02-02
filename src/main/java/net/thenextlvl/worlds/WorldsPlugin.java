@@ -40,10 +40,10 @@ import static org.bukkit.persistence.PersistentDataType.STRING;
 public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     public static final String BUG_REPORTING = "https://github.com/TheNextLvl-net/worlds/issues/new?template=bug_report.yml";
 
-    private final boolean foliaCompatible = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
+    private final boolean runningFolia = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
 
     private final GeneratorView generatorView = new PluginGeneratorView();
-    private final LevelView levelView = foliaCompatible ? new FoliaLevelView(this) : new PaperLevelView(this);
+    private final LevelView levelView = runningFolia ? new FoliaLevelView(this) : new PaperLevelView(this);
 
     private final LinkController linkController = new WorldLinkController(this);
 
@@ -66,7 +66,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     @Override
     public void onLoad() {
         if (!presetsFolder.isDirectory()) saveDefaultPresets();
-        if (foliaCompatible) warnExperimental();
+        if (runningFolia) warnExperimental();
         versionChecker.checkVersion();
         registerServices();
     }
@@ -128,8 +128,8 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         world.getPersistentDataContainer().set(generatorKey, STRING, generator.serialize());
     }
 
-    public boolean isFoliaCompatible() {
-        return foliaCompatible;
+    public boolean isRunningFolia() {
+        return runningFolia;
     }
 
     private void warnExperimental() {
