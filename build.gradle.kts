@@ -171,4 +171,5 @@ modrinth {
     uploadFile.set(tasks.shadowJar)
     gameVersions.set(versions)
     loaders.add("paper")
+    loaders.add("folia")
 }
