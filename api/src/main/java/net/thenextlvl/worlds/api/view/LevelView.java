@@ -42,6 +42,8 @@ public interface LevelView {
 
     boolean isLevel(File file);
 
+    boolean unloadLevel(World world, boolean save);
+
     void saveLevel(World world, boolean flush);
 
     void saveLevelData(World world, boolean async);

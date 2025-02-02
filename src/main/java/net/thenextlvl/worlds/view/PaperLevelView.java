@@ -204,6 +204,10 @@ public class PaperLevelView implements LevelView {
     public boolean isLevel(File file) {
         return file.isDirectory() && (new File(file, "level.dat").isFile() || new File(file, "level.dat_old").isFile());
     }
+
+    @Override
+    public boolean unloadLevel(World world, boolean save) {
+        return plugin.getServer().unloadWorld(world, save);
     }
 
     @Override
