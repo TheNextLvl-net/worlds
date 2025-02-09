@@ -76,7 +76,7 @@ public class PaperLevel implements Level {
         this.hardcore = Optional.ofNullable(builder.hardcore())
                 .or(() -> settings.flatMap(tag -> tag.<ByteTag>optional("hardcore"))
                         .map(ByteTag::getAsBoolean))
-                .orElse(true);
+                .orElse(plugin.getServer().isHardcore());
         this.seed = Optional.ofNullable(builder.seed())
                 .or(() -> settings.flatMap(tag -> tag.<LongTag>optional("seed"))
                         .map(LongTag::getAsLong))
@@ -84,7 +84,7 @@ public class PaperLevel implements Level {
         this.structures = Optional.ofNullable(builder.structures())
                 .or(() -> settings.flatMap(tag -> tag.<ByteTag>optional("generate_features"))
                         .map(ByteTag::getAsBoolean))
-                .orElse(true);
+                .orElse(plugin.getServer().getGenerateStructures());
 
 
         var worldPreset = generator.flatMap(plugin.levelView()::getWorldPreset);
