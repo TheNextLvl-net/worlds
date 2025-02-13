@@ -74,7 +74,7 @@ class WorldRegenerateCommand {
         var players = world.getPlayers();
 
         var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
-        players.forEach(player -> player.teleportAsync(fallback, COMMAND).join());
+        players.forEach(player -> player.teleport(fallback, COMMAND));
 
         plugin.levelView().saveLevelData(world, false);
 
