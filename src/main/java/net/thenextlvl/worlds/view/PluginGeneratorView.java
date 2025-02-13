@@ -15,7 +15,7 @@ public class PluginGeneratorView implements GeneratorView {
     public boolean hasChunkGenerator(Class<? extends Plugin> clazz) {
         try {
             return clazz.getMethod("getDefaultWorldGenerator", String.class, String.class).getDeclaringClass().equals(clazz);
-        } catch (NoSuchMethodException e) {
+        } catch (NoClassDefFoundError | NoSuchMethodException e) {
             return false;
         }
     }
@@ -24,7 +24,7 @@ public class PluginGeneratorView implements GeneratorView {
     public boolean hasBiomeProvider(Class<? extends Plugin> clazz) {
         try {
             return clazz.getMethod("getDefaultBiomeProvider", String.class, String.class).getDeclaringClass().equals(clazz);
-        } catch (NoSuchMethodException e) {
+        } catch (NoClassDefFoundError | NoSuchMethodException e) {
             return false;
         }
     }
