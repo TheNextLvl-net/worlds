@@ -25,7 +25,7 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 
-    implementation("net.thenextlvl.core:nbt:2.2.15")
+    implementation("net.thenextlvl.core:nbt:2.3.0")
     implementation("net.thenextlvl.core:files:2.0.1")
     implementation("net.thenextlvl.core:adapters:2.0.1")
 }
