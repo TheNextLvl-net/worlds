@@ -54,7 +54,7 @@ class WorldUnloadCommand {
 
         var fallbackSpawn = fallback != null ? fallback.getSpawnLocation()
                 : plugin.getServer().getWorlds().getFirst().getSpawnLocation();
-        world.getPlayers().forEach(player -> player.teleportAsync(fallbackSpawn).join());
+        world.getPlayers().forEach(player -> player.teleport(fallbackSpawn));
 
         plugin.persistStatus(world, false, false);
 
