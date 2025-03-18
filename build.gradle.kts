@@ -3,11 +3,11 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
     id("java")
+    id("com.gradleup.shadow") version "9.0.0-beta9"
+    id("com.modrinth.minotaur") version "2.+"
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.14"
     id("net.minecrell.plugin-yml.paper") version "0.6.0"
-    id("com.gradleup.shadow") version "9.0.0-beta9"
-    id("com.modrinth.minotaur") version "2.+"
 }
 
 java {
