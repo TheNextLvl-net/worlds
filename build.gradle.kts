@@ -30,14 +30,10 @@ repositories {
 dependencies {
     paperweight.foliaDevBundle("1.21.4-R0.1-SNAPSHOT")
 
-    implementation("org.bstats:bstats-bukkit:3.1.0")
-
     implementation(project(":api"))
-    implementation("net.thenextlvl.core:nbt:2.3.0")
-    implementation("net.thenextlvl.core:files:2.0.1")
+    implementation(project(":per-worlds"))
     implementation("net.thenextlvl.core:i18n:1.0.20")
     implementation("net.thenextlvl.core:paper:2.0.3")
-    implementation("net.thenextlvl.core:adapters:2.0.1")
 }
 
 tasks.shadowJar {
