@@ -51,6 +51,7 @@ paper {
     website = "https://thenextlvl.net"
     authors = listOf("NonSwag")
     foliaSupported = true
+    provides = listOf("PerWorlds")
 
     permissions {
         register("worlds.commands.admin") {
