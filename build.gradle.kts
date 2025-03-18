@@ -42,6 +42,7 @@ dependencies {
 
 tasks.shadowJar {
     archiveBaseName.set("worlds")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     relocate("org.bstats", "net.thenextlvl.worlds.bstats")
 }
 
