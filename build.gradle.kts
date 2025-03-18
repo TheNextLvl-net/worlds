@@ -41,8 +41,8 @@ dependencies {
 }
 
 tasks.shadowJar {
-    relocate("org.bstats", "net.thenextlvl.worlds.bstats")
     archiveBaseName.set("worlds")
+    relocate("org.bstats", "net.thenextlvl.worlds.bstats")
 }
 
 paper {
