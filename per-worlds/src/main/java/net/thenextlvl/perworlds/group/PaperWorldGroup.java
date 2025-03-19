@@ -63,6 +63,11 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
+    public boolean containsWorld(World world) {
+        return worlds.contains(world);
+    }
+
+    @Override
     public boolean removeWorld(World world) {
         return false; // todo: implement
     }
@@ -87,7 +92,7 @@ public class PaperWorldGroup implements WorldGroup {
         private Key key;
         private Set<World> worlds = new HashSet<>();
 
-        private Builder(Key key) {
+        Builder(Key key) {
             this.key = key;
         }
 
