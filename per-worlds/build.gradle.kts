@@ -36,6 +36,8 @@ dependencies {
     api("net.thenextlvl.core:paper:2.0.3")
 
     compileOnlyApi(project(":worlds-api"))
+
+    implementation(":per-worlds-api")
 }
 
 paper {
