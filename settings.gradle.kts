@@ -3,5 +3,5 @@ plugins {
 }
 
 rootProject.name = "worlds"
-include("api")
 include("per-worlds")
+include("worlds-api")
