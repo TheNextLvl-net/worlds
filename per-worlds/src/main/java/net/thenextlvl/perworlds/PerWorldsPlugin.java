@@ -28,7 +28,7 @@ public class PerWorldsPlugin extends JavaPlugin {
     }
 
     private void addCustomCharts() {
-        metrics.addCustomChart(new SimplePie("worlds", () -> {
+        metrics.addCustomChart(new SimplePie("using_worlds", () -> {
             var worlds = getServer().getPluginManager().getPlugin("Worlds") != null;
             return String.valueOf(worlds);
         }));
