@@ -32,6 +32,8 @@ public interface WorldGroup extends Keyed {
 
     boolean addWorld(World world);
 
+    boolean containsWorld(World world);
+
     boolean removeWorld(World world);
 
     void setEnderChestContents(OfflinePlayer player, ItemStack[] contents);
