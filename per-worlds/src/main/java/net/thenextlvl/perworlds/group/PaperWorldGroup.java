@@ -1,6 +1,7 @@
 package net.thenextlvl.perworlds.group;
 
 import net.kyori.adventure.key.Key;
+import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
@@ -16,17 +17,25 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 @NullMarked
 public class PaperWorldGroup implements WorldGroup {
     private final @Nullable GameMode gameMode;
+    private final GroupSettings settings;
     private final Key key;
     private final Set<World> worlds;
 
-    private PaperWorldGroup(Key key, Set<World> worlds, @Nullable GameMode gameMode) {
+    private PaperWorldGroup(Key key, GroupSettings settings, Set<World> worlds, @Nullable GameMode gameMode) {
         this.gameMode = gameMode;
+        this.settings = settings;
         this.key = key;
         this.worlds = worlds;
+    }
+
+    @Override
+    public GroupSettings getSettings() {
+        return settings;
     }
 
     @Override
@@ -91,6 +100,7 @@ public class PaperWorldGroup implements WorldGroup {
         private @Nullable GameMode gameMode;
         private Key key;
         private Set<World> worlds = new HashSet<>();
+        private final GroupSettings settings = new PaperGroupSettings();
 
         Builder(Key key) {
             this.key = key;
@@ -137,8 +147,14 @@ public class PaperWorldGroup implements WorldGroup {
         }
 
         @Override
+        public WorldGroup.Builder settings(Consumer<GroupSettings> settings) {
+            settings.accept(this.settings);
+            return this;
+        }
+
+        @Override
         public WorldGroup build() {
-            return new PaperWorldGroup(key, worlds, gameMode);
+            return new PaperWorldGroup(key, settings, worlds, gameMode);
         }
     }
 }

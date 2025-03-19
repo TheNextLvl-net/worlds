@@ -10,6 +10,8 @@ import java.util.Optional;
 
 @NullMarked
 public interface GroupProvider {
+    GroupSettings getSettings();
+
     @Unmodifiable
     List<WorldGroup> getGroups();
 

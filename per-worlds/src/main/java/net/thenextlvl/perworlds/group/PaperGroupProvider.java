@@ -3,6 +3,7 @@ package net.thenextlvl.perworlds.group;
 import com.google.common.base.Preconditions;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.GroupProvider;
+import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
 import org.bukkit.World;
 import org.jetbrains.annotations.Unmodifiable;
@@ -15,6 +16,11 @@ import java.util.Optional;
 @NullMarked
 public class PaperGroupProvider implements GroupProvider {
     private final List<WorldGroup> groups = new ArrayList<>();
+
+    @Override
+    public GroupSettings getSettings() {
+        return null; // todo: save and load settings
+    }
 
     @Override
     public @Unmodifiable List<WorldGroup> getGroups() {

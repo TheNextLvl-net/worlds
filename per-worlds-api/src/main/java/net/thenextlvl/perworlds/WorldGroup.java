@@ -15,9 +15,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 @NullMarked
 public interface WorldGroup extends Keyed {
+    GroupSettings getSettings();
+
     @Unmodifiable
     List<Player> getPlayers();
 
@@ -54,6 +57,8 @@ public interface WorldGroup extends Keyed {
         Builder setWorlds(Collection<World> worlds);
 
         Builder setWorlds(World... worlds);
+
+        Builder settings(Consumer<GroupSettings> settings);
 
         WorldGroup build();
     }
