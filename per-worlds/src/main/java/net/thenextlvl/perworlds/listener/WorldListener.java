@@ -15,5 +15,10 @@ public class WorldListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+        var from = groupProvider.getGroup(event.getFrom());
+        var to = groupProvider.getGroup(event.getPlayer().getWorld());
+        if (from.equals(to)) return;
+        from.ifPresent(group -> group.persist(event.getPlayer()));
+        to.ifPresent(group -> group.load(event.getPlayer()));
     }
 }

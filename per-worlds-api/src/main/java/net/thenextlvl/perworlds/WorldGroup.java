@@ -39,6 +39,10 @@ public interface WorldGroup extends Keyed {
 
     boolean removeWorld(World world);
 
+    void load(OfflinePlayer player);
+
+    void persist(OfflinePlayer player);
+
     void setEnderChestContents(OfflinePlayer player, ItemStack[] contents);
 
     void setInventoryContents(OfflinePlayer player, ItemStack[] contents);
