@@ -27,7 +27,7 @@ public class SharedWorlds {
     }
 
     private void registerListeners() {
-        plugin.getServer().getPluginManager().registerEvents(new WorldListener(), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new WorldListener(groupProvider), plugin);
     }
 
     private void registerServices() {
