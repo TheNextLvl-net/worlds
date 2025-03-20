@@ -82,6 +82,16 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
+    public void loadPlayerData(OfflinePlayer player) {
+        // todo: implement
+    }
+
+    @Override
+    public void persistPlayerData(OfflinePlayer player) {
+        // todo: implement
+    }
+
+    @Override
     public void setEnderChestContents(OfflinePlayer player, ItemStack[] contents) {
         // todo: implement
     }

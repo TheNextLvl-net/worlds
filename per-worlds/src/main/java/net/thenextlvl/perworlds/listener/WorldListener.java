@@ -18,7 +18,7 @@ public class WorldListener implements Listener {
         var from = groupProvider.getGroup(event.getFrom());
         var to = groupProvider.getGroup(event.getPlayer().getWorld());
         if (from.equals(to)) return;
-        from.ifPresent(group -> group.persist(event.getPlayer()));
-        to.ifPresent(group -> group.load(event.getPlayer()));
+        from.ifPresent(group -> group.persistPlayerData(event.getPlayer()));
+        to.ifPresent(group -> group.loadPlayerData(event.getPlayer()));
     }
 }
