@@ -1,15 +1,29 @@
 package net.thenextlvl.perworlds;
 
 public interface GroupSettings {
+    boolean attributes();
+
     boolean chat();
 
     boolean enabled();
+
+    boolean experience();
+
+    boolean foodLevel();
 
     boolean gameMode();
 
     boolean gameRules();
 
+    boolean health();
+
     boolean inventory();
+
+    boolean potionEffects();
+
+    boolean saturation();
+
+    boolean score();
 
     boolean tabList();
 
@@ -17,15 +31,29 @@ public interface GroupSettings {
 
     boolean weather();
 
+    void attributes(boolean attributes);
+
     void chat(boolean chat);
 
     void enabled(boolean enabled);
+
+    void experience(boolean experience);
+
+    void foodLevel(boolean foodLevel);
 
     void gameMode(boolean gameMode);
 
     void gameRules(boolean gameRules);
 
+    void health(boolean health);
+
     void inventory(boolean inventory);
+
+    void potionEffects(boolean potionEffects);
+
+    void saturation(boolean saturation);
+
+    void score(boolean score);
 
     void tabList(boolean tabList);
 
