@@ -1,20 +1,36 @@
 package net.thenextlvl.perworlds.group;
 
 import com.google.common.base.Preconditions;
+import core.nbt.serialization.NBT;
+import core.nbt.serialization.adapter.EnumAdapter;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
+import net.thenextlvl.perworlds.adapter.ItemStackAdapter;
+import net.thenextlvl.perworlds.adapter.KeyAdapter;
+import net.thenextlvl.perworlds.adapter.LocationAdapter;
+import net.thenextlvl.perworlds.adapter.PerWorldDataAdapter;
+import net.thenextlvl.perworlds.adapter.WorldAdapter;
+import net.thenextlvl.perworlds.model.PerWorldData;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @NullMarked
 public class PaperGroupProvider implements GroupProvider {
+    private final File dataFolder;
     private final List<WorldGroup> groups = new ArrayList<>();
     private final NBT nbt;
     private final Plugin plugin;
@@ -68,7 +84,7 @@ public class PaperGroupProvider implements GroupProvider {
 
     @Override
     public WorldGroup.Builder createGroup(Key key) {
-        return new PaperWorldGroup.Builder(key);
+        return new PaperWorldGroup.Builder(this, key);
     }
 
     @Override
