@@ -40,7 +40,7 @@ public record PerWorldData(
         if (settings.foodLevel()) player.setFoodLevel(foodLevel);
         if (settings.gameMode()) player.setGameMode(gameMode);
         if (settings.health()) player.setHealth(health);
-        if (settings.respawnLocation()) player.setRespawnLocation(respawnLocation);
+        if (settings.respawnLocation()) player.setRespawnLocation(respawnLocation, true);
         if (settings.saturation()) player.setSaturation(saturation);
         if (settings.score()) player.setDeathScreenScore(score);
 
