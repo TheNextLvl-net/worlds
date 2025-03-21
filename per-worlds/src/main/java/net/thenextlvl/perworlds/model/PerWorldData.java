@@ -10,6 +10,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.List;
 
 @NullMarked
 public record PerWorldData(
@@ -28,6 +29,11 @@ public record PerWorldData(
         int level,
         int score
 ) {
+    public static final PerWorldData DEFAULT = new PerWorldData(
+            new ItemStack[27], new ItemStack[40], null, List.of(),
+            GameMode.SURVIVAL, 0, 20, 0, 0, 10, 20, 0, 0
+    );
+
     public void apply(GroupSettings settings, Player player) {
         if (settings.absorption()) player.setAbsorptionAmount(absorption);
         if (settings.attributes()) player.setExhaustion(exhaustion);
