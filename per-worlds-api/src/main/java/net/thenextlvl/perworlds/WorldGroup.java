@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,8 @@ import java.util.function.Consumer;
 
 @NullMarked
 public interface WorldGroup extends Keyed {
+    File getDataFolder();
+
     GroupSettings getSettings();
 
     @Unmodifiable

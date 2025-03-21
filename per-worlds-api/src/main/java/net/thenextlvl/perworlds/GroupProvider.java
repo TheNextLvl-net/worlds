@@ -5,11 +5,14 @@ import org.bukkit.World;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
 @NullMarked
 public interface GroupProvider {
+    File getDataFolder();
+
     GroupSettings getSettings();
 
     @Unmodifiable
