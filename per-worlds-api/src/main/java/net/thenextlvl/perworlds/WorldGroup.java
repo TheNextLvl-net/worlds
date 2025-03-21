@@ -29,9 +29,9 @@ public interface WorldGroup extends Keyed {
 
     Optional<GameMode> getGameMode();
 
-    Optional<ItemStack[]> getEnderChestContents(OfflinePlayer player);
+    Optional<@Nullable ItemStack[]> getEnderChestContents(OfflinePlayer player);
 
-    Optional<ItemStack[]> getInventoryContents(OfflinePlayer player);
+    Optional<@Nullable ItemStack[]> getInventoryContents(OfflinePlayer player);
 
     @Unmodifiable
     Set<World> getWorlds();
@@ -42,13 +42,15 @@ public interface WorldGroup extends Keyed {
 
     boolean removeWorld(World world);
 
-    void loadPlayerData(OfflinePlayer player);
+    void loadPlayerData(Player player);
 
-    void persistPlayerData(OfflinePlayer player);
+    void persistPlayerData(Player player);
 
-    void setEnderChestContents(OfflinePlayer player, ItemStack[] contents);
+    void setEnderChestContents(OfflinePlayer player, @Nullable ItemStack[] contents);
 
-    void setInventoryContents(OfflinePlayer player, ItemStack[] contents);
+    void setGameMode(@Nullable GameMode gameMode);
+
+    void setInventoryContents(OfflinePlayer player, @Nullable ItemStack[] contents);
 
     interface Builder {
         Builder addWorld(World world);
@@ -67,6 +69,6 @@ public interface WorldGroup extends Keyed {
 
         Builder settings(Consumer<GroupSettings> settings);
 
-        WorldGroup build();
+        WorldGroup build() throws IllegalStateException;
     }
 }
