@@ -23,9 +23,8 @@ public class ItemStackArrayAdapter implements TagAdapter<ItemStack[]> {
 
     @Override
     public Tag serialize(@Nullable ItemStack[] itemStacks, TagSerializationContext context) throws ParserException {
-        var tag = new ListTag<>(StringTag.ID);
-        Arrays.stream(itemStacks).map(itemStack -> itemStack != null ? itemStack : ItemStack.of(Material.AIR))
-                .map(context::serialize).forEach(tag::add);
-        return tag;
+        return new ListTag<>(Arrays.stream(itemStacks).map(itemStack ->
+                itemStack != null ? itemStack : ItemStack.of(Material.AIR)
+        ).map(context::serialize).toList(), StringTag.ID);
     }
 }

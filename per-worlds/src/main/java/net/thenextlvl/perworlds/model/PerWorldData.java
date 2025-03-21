@@ -1,18 +1,25 @@
 package net.thenextlvl.perworlds.model;
 
+import net.thenextlvl.perworlds.GroupSettings;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
+import java.util.Collection;
 
 @NullMarked
 public record PerWorldData(
         @Nullable ItemStack[] enderChestContents,
         @Nullable ItemStack[] inventoryContents,
         @Nullable Location respawnLocation,
+        Collection<PotionEffect> potionEffects,
+        // todo: save attributes
         GameMode gameMode,
+        double absorption,
         double health,
         float exhaustion,
         float experience,
@@ -21,18 +28,28 @@ public record PerWorldData(
         int level,
         int score
 ) {
-    public void apply(Player player) {
-        player.getEnderChest().setContents(enderChestContents);
-        player.getInventory().setContents(inventoryContents);
-        player.setRespawnLocation(respawnLocation);
-        player.setGameMode(gameMode);
-        player.setHealth(health);
-        player.setExhaustion(exhaustion);
-        player.setExp(experience);
-        player.setSaturation(saturation);
-        player.setFoodLevel(foodLevel);
-        player.setLevel(level);
-        player.setDeathScreenScore(score);
+    public void apply(GroupSettings settings, Player player) {
+        if (settings.absorption()) player.setAbsorptionAmount(absorption);
+        if (settings.attributes()) player.setExhaustion(exhaustion);
+        if (settings.foodLevel()) player.setFoodLevel(foodLevel);
+        if (settings.gameMode()) player.setGameMode(gameMode);
+        if (settings.health()) player.setHealth(health);
+        if (settings.respawnLocation()) player.setRespawnLocation(respawnLocation);
+        if (settings.saturation()) player.setSaturation(saturation);
+        if (settings.score()) player.setDeathScreenScore(score);
+
+        if (settings.inventory()) {
+            player.getEnderChest().setContents(enderChestContents);
+            player.getInventory().setContents(inventoryContents);
+        }
+        if (settings.potionEffects()) {
+            player.clearActivePotionEffects();
+            player.addPotionEffects(potionEffects);
+        }
+        if (settings.experience()) {
+            player.setExp(experience);
+            player.setLevel(level);
+        }
     }
 
     public static PerWorldData of(Player player) {
@@ -40,7 +57,9 @@ public record PerWorldData(
                 player.getEnderChest().getContents(),
                 player.getInventory().getContents(),
                 player.getRespawnLocation(),
+                player.getActivePotionEffects(),
                 player.getGameMode(),
+                player.getAbsorptionAmount(),
                 player.getHealth(),
                 player.getExhaustion(),
                 player.getSaturation(),

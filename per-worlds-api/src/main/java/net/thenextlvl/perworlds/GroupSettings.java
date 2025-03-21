@@ -1,6 +1,8 @@
 package net.thenextlvl.perworlds;
 
 public interface GroupSettings {
+    boolean absorption();
+
     boolean attributes();
 
     boolean chat();
@@ -32,6 +34,8 @@ public interface GroupSettings {
     boolean time();
 
     boolean weather();
+
+    void absorption(boolean absorption);
 
     void attributes(boolean attributes);
 

@@ -3,6 +3,7 @@ package net.thenextlvl.perworlds.group;
 import net.thenextlvl.perworlds.GroupSettings;
 
 public class PaperGroupSettings implements GroupSettings {
+    private boolean absorption = true;
     private boolean attributes = false;
     private boolean chat = false;
     private boolean enabled = true;
@@ -19,6 +20,11 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean tabList = false;
     private boolean time = true;
     private boolean weather = true;
+
+    @Override
+    public boolean absorption() {
+        return absorption;
+    }
 
     @Override
     public boolean attributes() {
@@ -98,6 +104,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean weather() {
         return weather;
+    }
+
+    @Override
+    public void absorption(boolean absorption) {
+        this.absorption = absorption;
     }
 
     @Override

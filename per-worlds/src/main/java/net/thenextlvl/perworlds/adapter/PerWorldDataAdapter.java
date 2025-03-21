@@ -5,6 +5,7 @@ import core.nbt.serialization.TagAdapter;
 import core.nbt.serialization.TagDeserializationContext;
 import core.nbt.serialization.TagSerializationContext;
 import core.nbt.tag.CompoundTag;
+import core.nbt.tag.ListTag;
 import core.nbt.tag.Tag;
 import net.thenextlvl.perworlds.model.PerWorldData;
 import org.bukkit.GameMode;
@@ -28,9 +29,10 @@ public class PerWorldDataAdapter implements TagAdapter<PerWorldData> {
                         list.stream().map(effect -> context.deserialize(effect, PotionEffect.class)).toList()
                 ).orElseGet(List::of),
                 root.optional("gameMode").map(mode -> context.deserialize(mode, GameMode.class)).orElse(GameMode.SURVIVAL),
-                root.optional("health").map(Tag::getAsDouble).orElse(20.0),
-                root.optional("exhaustion").map(Tag::getAsFloat).orElse(0.0f),
-                root.optional("saturation").map(Tag::getAsFloat).orElse(5.0f),
+                root.optional("absorption").map(Tag::getAsDouble).orElse(0d),
+                root.optional("health").map(Tag::getAsDouble).orElse(20d),
+                root.optional("exhaustion").map(Tag::getAsFloat).orElse(0f),
+                root.optional("saturation").map(Tag::getAsFloat).orElse(5f),
                 root.optional("experience").map(Tag::getAsFloat).orElse(0f),
                 root.optional("foodLevel").map(Tag::getAsInt).orElse(20),
                 root.optional("level").map(Tag::getAsInt).orElse(0),
@@ -44,7 +46,9 @@ public class PerWorldDataAdapter implements TagAdapter<PerWorldData> {
         tag.add("enderChest", context.serialize(data.enderChestContents()));
         tag.add("inventory", context.serialize(data.inventoryContents()));
         if (data.respawnLocation() != null) tag.add("respawnLocation", context.serialize(data.respawnLocation()));
+        tag.add("potionEffects", new ListTag<>(data.potionEffects().stream().map(context::serialize).toList(), CompoundTag.ID));
         tag.add("gameMode", context.serialize(data.gameMode()));
+        tag.add("absorption", data.absorption());
         tag.add("health", data.health());
         tag.add("exhaustion", data.exhaustion());
         tag.add("experience", data.experience());
