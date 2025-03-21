@@ -16,10 +16,39 @@ import java.util.Optional;
 @NullMarked
 public class PaperGroupProvider implements GroupProvider {
     private final List<WorldGroup> groups = new ArrayList<>();
+    private final NBT nbt;
+    private final Plugin plugin;
+
+    public PaperGroupProvider(Plugin plugin) {
+        this.dataFolder = new File(plugin.getDataFolder(), "data");
+        this.nbt = new NBT.Builder()
+                .registerTypeHierarchyAdapter(GameMode.class, new EnumAdapter<>(GameMode.class))
+                .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackAdapter())
+                .registerTypeHierarchyAdapter(Key.class, new KeyAdapter())
+                .registerTypeHierarchyAdapter(Location.class, new LocationAdapter())
+                .registerTypeHierarchyAdapter(PerWorldData.class, new PerWorldDataAdapter())
+                .registerTypeHierarchyAdapter(PotionType.class, new EnumAdapter<>(PotionType.class))
+                .registerTypeHierarchyAdapter(World.class, new WorldAdapter(plugin.getServer()))
+                .build();
+        this.plugin = plugin;
+    }
+
+    public ComponentLogger getLogger() {
+        return plugin.getComponentLogger();
+    }
+
+    @Override
+    public File getDataFolder() {
+        return dataFolder;
+    }
 
     @Override
     public GroupSettings getSettings() {
         return null; // todo: save and load settings
+    }
+
+    public NBT nbt() {
+        return nbt;
     }
 
     @Override
