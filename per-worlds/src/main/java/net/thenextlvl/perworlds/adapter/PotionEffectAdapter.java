@@ -27,7 +27,7 @@ public class PotionEffectAdapter implements TagAdapter<PotionEffect> {
     @Override
     public Tag serialize(PotionEffect object, TagSerializationContext context) throws ParserException {
         var tag = new CompoundTag();
-        tag.add("type", context.serialize(object.getType(), PotionEffectType.class));
+        tag.add("type", context.serialize(object.getType()));
         tag.add("duration", object.getDuration());
         tag.add("amplifier", object.getAmplifier());
         tag.add("ambient", object.isAmbient());
