@@ -6,6 +6,7 @@ import core.nbt.serialization.TagDeserializationContext;
 import core.nbt.serialization.TagSerializationContext;
 import core.nbt.tag.StringTag;
 import core.nbt.tag.Tag;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jspecify.annotations.NullMarked;
 
@@ -15,11 +16,14 @@ import java.util.Base64;
 public class ItemStackAdapter implements TagAdapter<ItemStack> {
     @Override
     public ItemStack deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
-        return ItemStack.deserializeBytes(Base64.getDecoder().decode(tag.getAsString()));
+        var string = tag.getAsString();
+        if (string.isBlank()) return new ItemStack(Material.AIR);
+        return ItemStack.deserializeBytes(Base64.getDecoder().decode(string));
     }
 
     @Override
     public Tag serialize(ItemStack itemStack, TagSerializationContext context) throws ParserException {
+        if (itemStack.isEmpty()) return new StringTag("");
         return new StringTag(Base64.getEncoder().encodeToString(itemStack.serializeAsBytes()));
     }
 }
