@@ -2,14 +2,20 @@ package net.thenextlvl.perworlds;
 
 import net.thenextlvl.perworlds.group.PaperGroupProvider;
 import net.thenextlvl.perworlds.listener.WorldListener;
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class SharedWorlds {
-    private final JavaPlugin plugin;
-    private final GroupProvider groupProvider = new PaperGroupProvider();
+    public static final String ISSUES = "https://github.com/TheNextLvl-net/worlds/issues/new?template=bug_report.yml";
+    private final GroupProvider groupProvider;
+    private final Metrics metrics;
+    private final Plugin plugin;
 
-    public SharedWorlds(JavaPlugin plugin) {
+    public SharedWorlds(Plugin plugin) {
+        this.groupProvider = new PaperGroupProvider(plugin);
+        this.metrics = new Metrics(plugin, 19652); // todo: create project
         this.plugin = plugin;
     }
 
@@ -20,6 +26,15 @@ public class SharedWorlds {
     public void onEnable() {
         registerListeners();
         registerCommands();
+        addCustomCharts();
+    }
+
+    public void onDisable() {
+        metrics.shutdown();
+    }
+
+    public GroupProvider groupProvider() {
+        return groupProvider;
     }
 
     private void registerCommands() {
@@ -34,7 +49,10 @@ public class SharedWorlds {
         plugin.getServer().getServicesManager().register(GroupProvider.class, groupProvider, plugin, ServicePriority.Highest);
     }
 
-    public GroupProvider groupProvider() {
-        return groupProvider;
+    private void addCustomCharts() {
+        metrics.addCustomChart(new SimplePie("using_worlds", () -> {
+            var worlds = plugin.getServer().getPluginManager().getPlugin("Worlds") != null;
+            return String.valueOf(worlds);
+        }));
     }
 }
