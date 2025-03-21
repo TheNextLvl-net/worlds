@@ -10,36 +10,31 @@ import net.thenextlvl.perworlds.model.PerWorldData;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import org.jspecify.annotations.NullMarked;
+
+import java.util.List;
 
 @NullMarked
 public class PerWorldDataAdapter implements TagAdapter<PerWorldData> {
     @Override
     public PerWorldData deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
         var root = tag.getAsCompound();
-        var enderChestContents = root.optional("enderChest").map(items -> context.deserialize(items, ItemStack[].class));
-        var inventoryContents = root.optional("inventory").map(items -> context.deserialize(items, ItemStack[].class));
-        var respawnLocation = root.optional("respawnLocation").map(location -> context.deserialize(location, Location.class));
-        var gameMode = root.optional("gameMode").map(mode -> context.deserialize(mode, GameMode.class));
-        var health = root.optional("health").map(Tag::getAsDouble);
-        var exhaustion = root.optional("exhaustion").map(Tag::getAsFloat);
-        var saturation = root.optional("saturation").map(Tag::getAsFloat);
-        var experience = root.optional("experience").map(Tag::getAsFloat);
-        var foodLevel = root.optional("foodLevel").map(Tag::getAsInt);
-        var level = root.optional("level").map(Tag::getAsInt);
-        var score = root.optional("score").map(Tag::getAsInt);
         return new PerWorldData(
-                enderChestContents.orElse(new ItemStack[27]),
-                inventoryContents.orElse(new ItemStack[40]),
-                respawnLocation.orElse(null),
-                gameMode.orElse(GameMode.SURVIVAL),
-                health.orElse(20.0),
-                exhaustion.orElse(0.0f),
-                saturation.orElse(5.0f),
-                experience.orElse(0f),
-                foodLevel.orElse(20),
-                level.orElse(0),
-                score.orElse(0)
+                root.optional("enderChest").map(items -> context.deserialize(items, ItemStack[].class)).orElseGet(() -> new ItemStack[27]),
+                root.optional("inventory").map(items -> context.deserialize(items, ItemStack[].class)).orElseGet(() -> new ItemStack[40]),
+                root.optional("respawnLocation").map(location -> context.deserialize(location, Location.class)).orElse(null),
+                root.optional("potionEffects").map(Tag::getAsList).map(list ->
+                        list.stream().map(effect -> context.deserialize(effect, PotionEffect.class)).toList()
+                ).orElseGet(List::of),
+                root.optional("gameMode").map(mode -> context.deserialize(mode, GameMode.class)).orElse(GameMode.SURVIVAL),
+                root.optional("health").map(Tag::getAsDouble).orElse(20.0),
+                root.optional("exhaustion").map(Tag::getAsFloat).orElse(0.0f),
+                root.optional("saturation").map(Tag::getAsFloat).orElse(5.0f),
+                root.optional("experience").map(Tag::getAsFloat).orElse(0f),
+                root.optional("foodLevel").map(Tag::getAsInt).orElse(20),
+                root.optional("level").map(Tag::getAsInt).orElse(0),
+                root.optional("score").map(Tag::getAsInt).orElse(0)
         );
     }
 
