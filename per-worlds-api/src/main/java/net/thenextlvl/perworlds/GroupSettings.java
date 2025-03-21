@@ -21,6 +21,8 @@ public interface GroupSettings {
 
     boolean potionEffects();
 
+    boolean respawnLocation();
+
     boolean saturation();
 
     boolean score();
@@ -50,6 +52,8 @@ public interface GroupSettings {
     void inventory(boolean inventory);
 
     void potionEffects(boolean potionEffects);
+
+    void respawnLocation(boolean respawnLocation);
 
     void saturation(boolean saturation);
 
