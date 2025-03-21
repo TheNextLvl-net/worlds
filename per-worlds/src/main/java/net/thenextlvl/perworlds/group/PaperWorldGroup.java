@@ -110,7 +110,7 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public void loadPlayerData(Player player) {
-        readPlayerData(player);
+        readPlayerData(player).ifPresent(data -> data.apply(settings, player));
     }
 
     @Override
