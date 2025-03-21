@@ -9,6 +9,7 @@ import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.adapter.ItemStackAdapter;
+import net.thenextlvl.perworlds.adapter.ItemStackArrayAdapter;
 import net.thenextlvl.perworlds.adapter.KeyAdapter;
 import net.thenextlvl.perworlds.adapter.LocationAdapter;
 import net.thenextlvl.perworlds.adapter.PerWorldDataAdapter;
@@ -43,6 +44,7 @@ public class PaperGroupProvider implements GroupProvider {
         this.nbt = new NBT.Builder()
                 .registerTypeHierarchyAdapter(GameMode.class, new EnumAdapter<>(GameMode.class))
                 .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackAdapter())
+                .registerTypeHierarchyAdapter(ItemStack[].class, new ItemStackArrayAdapter())
                 .registerTypeHierarchyAdapter(Key.class, new KeyAdapter())
                 .registerTypeHierarchyAdapter(Location.class, new LocationAdapter())
                 .registerTypeHierarchyAdapter(PerWorldData.class, new PerWorldDataAdapter())
