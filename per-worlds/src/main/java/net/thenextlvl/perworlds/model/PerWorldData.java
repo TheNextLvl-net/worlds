@@ -62,7 +62,7 @@ public record PerWorldData(
         return new PerWorldData(
                 player.getEnderChest().getContents(),
                 player.getInventory().getContents(),
-                player.getRespawnLocation(),
+                player.getPotentialRespawnLocation(),
                 player.getActivePotionEffects(),
                 player.getGameMode(),
                 player.getAbsorptionAmount(),
