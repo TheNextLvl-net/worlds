@@ -32,11 +32,14 @@ public class PerWorldDataAdapter implements TagAdapter<PerWorldData> {
                 root.optional("absorption").map(Tag::getAsDouble).orElse(0d),
                 root.optional("health").map(Tag::getAsDouble).orElse(20d),
                 root.optional("exhaustion").map(Tag::getAsFloat).orElse(0f),
-                root.optional("saturation").map(Tag::getAsFloat).orElse(5f),
                 root.optional("experience").map(Tag::getAsFloat).orElse(0f),
+                root.optional("saturation").map(Tag::getAsFloat).orElse(5f),
+                root.optional("fireTicks").map(Tag::getAsInt).orElse(0),
                 root.optional("foodLevel").map(Tag::getAsInt).orElse(20),
+                root.optional("freezeTicks").map(Tag::getAsInt).orElse(0),
                 root.optional("heldItemSlot").map(Tag::getAsInt).orElse(0),
                 root.optional("level").map(Tag::getAsInt).orElse(0),
+                root.optional("remainingAir").map(Tag::getAsInt).orElse(300),
                 root.optional("score").map(Tag::getAsInt).orElse(0)
         );
     }
@@ -54,9 +57,12 @@ public class PerWorldDataAdapter implements TagAdapter<PerWorldData> {
         tag.add("exhaustion", data.exhaustion());
         tag.add("experience", data.experience());
         tag.add("saturation", data.saturation());
+        tag.add("fireTicks", data.fireTicks());
         tag.add("foodLevel", data.foodLevel());
+        tag.add("freezeTicks", data.freezeTicks());
         tag.add("heldItemSlot", data.heldItemSlot());
         tag.add("level", data.level());
+        tag.add("remainingAir", data.remainingAir());
         tag.add("score", data.score());
         return tag;
     }

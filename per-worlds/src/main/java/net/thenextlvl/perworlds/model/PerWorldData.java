@@ -25,14 +25,17 @@ public record PerWorldData(
         float exhaustion,
         float experience,
         float saturation,
+        int fireTicks,
         int foodLevel,
+        int freezeTicks,
         int heldItemSlot,
         int level,
+        int remainingAir,
         int score
 ) {
     public static final PerWorldData DEFAULT = new PerWorldData(
             new ItemStack[27], new ItemStack[40], null, List.of(),
-            GameMode.SURVIVAL, 0, 20, 0, 0, 10, 20, 0, 0, 0
+            GameMode.SURVIVAL, 0d, 20d, 0f, 0f, 10f, 0, 20, 0, 0, 0, 300, 0
     );
 
     public void apply(GroupSettings settings, Player player) {
@@ -58,6 +61,11 @@ public record PerWorldData(
             player.setExp(experience);
             player.setLevel(level);
         }
+
+        // todo: add setting
+        player.setFireTicks(fireTicks);
+        player.setFreezeTicks(freezeTicks);
+        player.setRemainingAir(remainingAir);
     }
 
     public static PerWorldData of(Player player) {
@@ -70,11 +78,14 @@ public record PerWorldData(
                 player.getAbsorptionAmount(),
                 player.getHealth(),
                 player.getExhaustion(),
-                player.getSaturation(),
                 player.getExp(),
+                player.getSaturation(),
+                player.getFireTicks(),
                 player.getFoodLevel(),
+                player.getFreezeTicks(),
                 player.getInventory().getHeldItemSlot(),
                 player.getLevel(),
+                player.getRemainingAir(),
                 player.getDeathScreenScore()
         );
     }
