@@ -26,12 +26,13 @@ public record PerWorldData(
         float experience,
         float saturation,
         int foodLevel,
+        int heldItemSlot,
         int level,
         int score
 ) {
     public static final PerWorldData DEFAULT = new PerWorldData(
             new ItemStack[27], new ItemStack[40], null, List.of(),
-            GameMode.SURVIVAL, 0, 20, 0, 0, 10, 20, 0, 0
+            GameMode.SURVIVAL, 0, 20, 0, 0, 10, 20, 0, 0, 0
     );
 
     public void apply(GroupSettings settings, Player player) {
@@ -47,6 +48,7 @@ public record PerWorldData(
         if (settings.inventory()) {
             player.getEnderChest().setContents(enderChestContents);
             player.getInventory().setContents(inventoryContents);
+            player.getInventory().setHeldItemSlot(heldItemSlot);
         }
         if (settings.potionEffects()) {
             player.clearActivePotionEffects();
@@ -71,6 +73,7 @@ public record PerWorldData(
                 player.getSaturation(),
                 player.getExp(),
                 player.getFoodLevel(),
+                player.getInventory().getHeldItemSlot(),
                 player.getLevel(),
                 player.getDeathScreenScore()
         );
