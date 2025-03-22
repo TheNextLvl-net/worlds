@@ -40,7 +40,7 @@ public class PaperGroupProvider implements GroupProvider {
     private final Plugin plugin;
 
     public PaperGroupProvider(Plugin plugin) {
-        this.dataFolder = new File(plugin.getDataFolder(), "data");
+        this.dataFolder = new File("plugins/PerWorlds", "saves");
         this.nbt = new NBT.Builder()
                 .registerTypeHierarchyAdapter(GameMode.class, new EnumAdapter<>(GameMode.class))
                 .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackAdapter())
