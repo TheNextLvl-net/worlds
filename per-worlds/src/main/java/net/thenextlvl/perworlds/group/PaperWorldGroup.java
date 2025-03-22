@@ -6,14 +6,14 @@ import core.nbt.NBTInputStream;
 import core.nbt.NBTOutputStream;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.GroupSettings;
+import net.thenextlvl.perworlds.PlayerData;
 import net.thenextlvl.perworlds.WorldGroup;
-import net.thenextlvl.perworlds.model.PerWorldData;
+import net.thenextlvl.perworlds.model.PaperPlayerData;
 import org.bukkit.GameMode;
 import org.bukkit.Keyed;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -79,16 +79,6 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
-    public Optional<@Nullable ItemStack[]> getEnderChestContents(OfflinePlayer player) {
-        return readPlayerData(player).map(PerWorldData::enderChestContents);
-    }
-
-    @Override
-    public Optional<@Nullable ItemStack[]> getInventoryContents(OfflinePlayer player) {
-        return readPlayerData(player).map(PerWorldData::inventoryContents);
-    }
-
-    @Override
     public @Unmodifiable Set<World> getWorlds() {
         return Set.copyOf(worlds);
     }
@@ -109,36 +99,7 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
-    public void loadPlayerData(Player player) {
-        readPlayerData(player).orElse(PerWorldData.DEFAULT).apply(settings, player);
-    }
-
-    @Override
-    public void persistPlayerData(Player player) {
-        writePlayerData(player, PerWorldData.of(player));
-    }
-
-    @Override
-    public void setEnderChestContents(OfflinePlayer player, @Nullable ItemStack[] contents) {
-        // todo: implement
-    }
-
-    @Override
-    public void setGameMode(@Nullable GameMode gameMode) {
-        this.gameMode = gameMode;
-    }
-
-    @Override
-    public void setInventoryContents(OfflinePlayer player, @Nullable ItemStack[] contents) {
-        // todo: implement
-    }
-
-    @Override
-    public Key key() {
-        return key;
-    }
-
-    private Optional<PerWorldData> readPlayerData(OfflinePlayer player) {
+    public Optional<PlayerData> readPlayerData(OfflinePlayer player) {
         var file = new File(getDataFolder(), player.getUniqueId() + ".dat");
         try {
             return readPlayerData(file);
@@ -152,24 +113,8 @@ public class PaperWorldGroup implements WorldGroup {
         }
     }
 
-    private Optional<PerWorldData> readPlayerData(File file) throws IOException {
-        if (!file.exists()) return Optional.empty();
-        try (var inputStream = stream(IO.of(file))) {
-            return Optional.of(inputStream.readTag()).map(tag ->
-                    groupProvider.nbt().fromTag(tag, PerWorldData.class));
-        } catch (Exception e) {
-            var io = IO.of(file.getPath() + "_old");
-            if (!io.exists()) throw e;
-            groupProvider.getLogger().warn("Failed to load player data from {}", file.getPath(), e);
-            groupProvider.getLogger().warn("Falling back to {}", io);
-            try (var inputStream = stream(io)) {
-                return Optional.of(inputStream.readTag()).map(tag ->
-                        groupProvider.nbt().fromTag(tag, PerWorldData.class));
-            }
-        }
-    }
-
-    private boolean writePlayerData(OfflinePlayer player, PerWorldData data) {
+    @Override
+    public boolean writePlayerData(OfflinePlayer player, PlayerData data) {
         var file = IO.of(new File(getDataFolder(), player.getUniqueId() + ".dat"));
         var backup = IO.of(new File(getDataFolder(), player.getUniqueId() + ".dat_old"));
         try {
@@ -179,7 +124,7 @@ public class PaperWorldGroup implements WorldGroup {
                     file.outputStream(WRITE, CREATE, TRUNCATE_EXISTING),
                     StandardCharsets.UTF_8
             )) {
-                outputStream.writeTag(null, groupProvider.nbt().toTag(data, PerWorldData.class));
+                outputStream.writeTag(null, groupProvider.nbt().toTag(data, PlayerData.class));
                 return true;
             }
         } catch (Throwable t) {
@@ -192,6 +137,43 @@ public class PaperWorldGroup implements WorldGroup {
             groupProvider.getLogger().error("Failed to save player data {}", player.getUniqueId(), t);
             groupProvider.getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
             return false;
+        }
+    }
+
+    @Override
+    public void loadPlayerData(Player player) {
+        readPlayerData(player).orElseGet(PaperPlayerData::new).apply(settings, player);
+    }
+
+    @Override
+    public void persistPlayerData(Player player) {
+        writePlayerData(player, PaperPlayerData.of(player));
+    }
+
+    @Override
+    public void setGameMode(@Nullable GameMode gameMode) {
+        this.gameMode = gameMode;
+    }
+
+    @Override
+    public Key key() {
+        return key;
+    }
+
+    private Optional<PlayerData> readPlayerData(File file) throws IOException {
+        if (!file.exists()) return Optional.empty();
+        try (var inputStream = stream(IO.of(file))) {
+            return Optional.of(inputStream.readTag()).map(tag ->
+                    groupProvider.nbt().fromTag(tag, PlayerData.class));
+        } catch (Exception e) {
+            var io = IO.of(file.getPath() + "_old");
+            if (!io.exists()) throw e;
+            groupProvider.getLogger().warn("Failed to load player data from {}", file.getPath(), e);
+            groupProvider.getLogger().warn("Falling back to {}", io);
+            try (var inputStream = stream(io)) {
+                return Optional.of(inputStream.readTag()).map(tag ->
+                        groupProvider.nbt().fromTag(tag, PlayerData.class));
+            }
         }
     }
 

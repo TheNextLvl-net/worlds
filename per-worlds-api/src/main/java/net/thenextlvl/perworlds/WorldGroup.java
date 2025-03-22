@@ -6,7 +6,6 @@ import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -29,9 +28,7 @@ public interface WorldGroup extends Keyed {
 
     Optional<GameMode> getGameMode();
 
-    Optional<@Nullable ItemStack[]> getEnderChestContents(OfflinePlayer player);
-
-    Optional<@Nullable ItemStack[]> getInventoryContents(OfflinePlayer player);
+    Optional<PlayerData> readPlayerData(OfflinePlayer player);
 
     @Unmodifiable
     Set<World> getWorlds();
@@ -42,15 +39,13 @@ public interface WorldGroup extends Keyed {
 
     boolean removeWorld(World world);
 
+    boolean writePlayerData(OfflinePlayer player, PlayerData data);
+
     void loadPlayerData(Player player);
 
     void persistPlayerData(Player player);
 
-    void setEnderChestContents(OfflinePlayer player, @Nullable ItemStack[] contents);
-
     void setGameMode(@Nullable GameMode gameMode);
-
-    void setInventoryContents(OfflinePlayer player, @Nullable ItemStack[] contents);
 
     interface Builder {
         Builder addWorld(World world);
