@@ -1,5 +1,6 @@
 package net.thenextlvl.worlds.api;
 
+import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.worlds.api.link.LinkController;
 import net.thenextlvl.worlds.api.model.LevelBuilder;
 import net.thenextlvl.worlds.api.view.GeneratorView;
@@ -18,4 +19,6 @@ public interface WorldsProvider extends Plugin {
     LevelView levelView();
 
     LinkController linkController();
+
+    GroupProvider groupProvider();
 }

@@ -6,6 +6,8 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.thenextlvl.perworlds.GroupProvider;
+import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.worlds.api.WorldsProvider;
 import net.thenextlvl.worlds.api.link.LinkController;
 import net.thenextlvl.worlds.api.model.Generator;
@@ -47,6 +49,8 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     private final LinkController linkController = new WorldLinkController(this);
 
+    private final SharedWorlds commons = new SharedWorlds(this);
+
     private final File presetsFolder = new File(getDataFolder(), "presets");
     private final File translations = new File(getDataFolder(), "translations");
 
@@ -69,6 +73,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         if (runningFolia) warnExperimental();
         versionChecker.checkVersion();
         registerServices();
+        commons.onLoad();
     }
 
     @Override
@@ -81,6 +86,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     public void onEnable() {
         registerListeners();
         registerCommands();
+        commons.onEnable();
     }
 
     public File presetsFolder() {
@@ -109,6 +115,11 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     @Override
     public LinkController linkController() {
         return linkController;
+    }
+
+    @Override
+    public GroupProvider groupProvider() {
+        return commons.groupProvider();
     }
 
     public void persistWorld(World world, boolean enabled) {
