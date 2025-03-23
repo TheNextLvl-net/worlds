@@ -20,6 +20,6 @@ public class KeyAdapter implements TagAdapter<Key> {
 
     @Override
     public Tag serialize(Key key, TagSerializationContext context) throws ParserException {
-        return new StringTag(key.toString());
+        return new StringTag(key.asString());
     }
 }
