@@ -40,10 +40,13 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public void apply(GroupSettings settings, Player player) {
         if (settings.absorption()) player.setAbsorptionAmount(absorption);
-        if (settings.attributes()) player.setExhaustion(exhaustion);
+        if (settings.exhaustion()) player.setExhaustion(exhaustion);
+        if (settings.fireTicks()) player.setFireTicks(fireTicks);
         if (settings.foodLevel()) player.setFoodLevel(foodLevel);
+        if (settings.freezeTicks()) player.setFreezeTicks(freezeTicks);
         if (settings.gameMode()) player.setGameMode(gameMode);
         if (settings.health()) player.setHealth(health);
+        if (settings.remainingAir()) player.setRemainingAir(remainingAir);
         if (settings.respawnLocation()) player.setRespawnLocation(respawnLocation, true);
         if (settings.saturation()) player.setSaturation(saturation);
         if (settings.score()) player.setDeathScreenScore(score);
@@ -66,11 +69,6 @@ public class PaperPlayerData implements PlayerData {
             player.setExp(experience);
             player.setLevel(level);
         }
-
-        // todo: add setting
-        player.setFireTicks(fireTicks);
-        player.setFreezeTicks(freezeTicks);
-        player.setRemainingAir(remainingAir);
     }
 
     @Override
