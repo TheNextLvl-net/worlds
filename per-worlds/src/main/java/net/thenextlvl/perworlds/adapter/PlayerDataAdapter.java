@@ -32,6 +32,7 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
                 list.stream().map(effect -> context.deserialize(effect, PotionEffect.class)).toList()
         ).ifPresent(data::potionEffects);
         root.optional("gameMode").map(mode -> context.deserialize(mode, GameMode.class)).ifPresent(data::gameMode);
+        root.optional("seenCredits").map(Tag::getAsBoolean).ifPresent(data::seenCredits);
         root.optional("absorption").map(Tag::getAsDouble).ifPresent(data::absorption);
         root.optional("health").map(Tag::getAsDouble).ifPresent(data::health);
         root.optional("exhaustion").map(Tag::getAsFloat).ifPresent(data::exhaustion);
@@ -58,6 +59,7 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         if (location != null) tag.add("respawnLocation", context.serialize(location));
         tag.add("potionEffects", new ListTag<>(data.potionEffects().stream().map(context::serialize).toList(), CompoundTag.ID));
         tag.add("gameMode", context.serialize(data.gameMode()));
+        tag.add("seenCredits", data.seenCredits());
         tag.add("absorption", data.absorption());
         tag.add("health", data.health());
         tag.add("exhaustion", data.exhaustion());

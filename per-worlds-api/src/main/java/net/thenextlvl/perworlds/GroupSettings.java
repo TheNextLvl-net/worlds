@@ -9,6 +9,8 @@ public interface GroupSettings {
 
     boolean enabled();
 
+    boolean endCredits();
+
     boolean exhaustion();
 
     boolean experience();
@@ -52,6 +54,8 @@ public interface GroupSettings {
     void chat(boolean enabled);
 
     void enabled(boolean enabled);
+
+    void endCredits(boolean enabled);
 
     void exhaustion(boolean enabled);
 

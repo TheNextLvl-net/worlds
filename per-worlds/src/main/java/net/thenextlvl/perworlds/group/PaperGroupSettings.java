@@ -7,6 +7,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean attributes = false;
     private boolean chat = false;
     private boolean enabled = true;
+    private boolean endCredits = true;
     private boolean exhaustion = true;
     private boolean experience = true;
     private boolean fallDistance = true;
@@ -49,6 +50,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean enabled() {
         return enabled;
+    }
+
+    @Override
+    public boolean endCredits() {
+        return endCredits;
     }
 
     @Override
@@ -159,6 +165,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void enabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    @Override
+    public void endCredits(boolean enabled) {
+        this.endCredits = enabled;
     }
 
     @Override

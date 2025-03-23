@@ -27,6 +27,7 @@ public class PaperPlayerData implements PlayerData {
     private GameMode gameMode = GameMode.SURVIVAL;
     private List<PotionEffect> potionEffects = List.of();
     private Set<AttributeData> attributes = Set.of();
+    private boolean seenCredits = false;
     private double absorption = 0;
     private double health = 20;
     private float exhaustion = 0;
@@ -53,6 +54,7 @@ public class PaperPlayerData implements PlayerData {
                 .respawnLocation(player.getPotentialRespawnLocation())
                 .potionEffects(player.getActivePotionEffects())
                 .gameMode(player.getGameMode())
+                .seenCredits(player.hasSeenWinScreen())
                 .absorption(player.getAbsorptionAmount())
                 .health(player.getHealth())
                 .exhaustion(player.getExhaustion())
@@ -70,6 +72,7 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public void apply(GroupSettings settings, Player player) {
         if (settings.absorption()) player.setAbsorptionAmount(absorption);
+        if (settings.endCredits()) player.setHasSeenWinScreen(seenCredits);
         if (settings.exhaustion()) player.setExhaustion(exhaustion);
         if (settings.fallDistance()) player.setFallDistance(fallDistance);
         if (settings.fireTicks()) player.setFireTicks(fireTicks);
@@ -206,6 +209,12 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public PaperPlayerData seenCredits(boolean seenCredits) {
+        this.seenCredits = seenCredits;
+        return this;
+    }
+
+    @Override
     public PaperPlayerData level(int level) {
         this.level = level;
         return this;
@@ -244,6 +253,11 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public @Unmodifiable Set<AttributeData> attributes() {
         return attributes;
+    }
+
+    @Override
+    public boolean seenCredits() {
+        return seenCredits;
     }
 
     @Override
