@@ -9,9 +9,15 @@ public interface GroupSettings {
 
     boolean enabled();
 
+    boolean exhaustion();
+
     boolean experience();
 
+    boolean fireTicks();
+
     boolean foodLevel();
+
+    boolean freezeTicks();
 
     boolean gameMode();
 
@@ -22,6 +28,8 @@ public interface GroupSettings {
     boolean inventory();
 
     boolean potionEffects();
+
+    boolean remainingAir();
 
     boolean respawnLocation();
 
@@ -35,37 +43,45 @@ public interface GroupSettings {
 
     boolean weather();
 
-    void absorption(boolean absorption);
+    void absorption(boolean enabled);
 
-    void attributes(boolean attributes);
+    void attributes(boolean enabled);
 
-    void chat(boolean chat);
+    void chat(boolean enabled);
 
     void enabled(boolean enabled);
 
-    void experience(boolean experience);
+    void exhaustion(boolean enabled);
 
-    void foodLevel(boolean foodLevel);
+    void experience(boolean enabled);
 
-    void gameMode(boolean gameMode);
+    void fireTicks(boolean enabled);
 
-    void gameRules(boolean gameRules);
+    void foodLevel(boolean enabled);
 
-    void health(boolean health);
+    void freezeTicks(boolean enabled);
 
-    void inventory(boolean inventory);
+    void gameMode(boolean enabled);
 
-    void potionEffects(boolean potionEffects);
+    void gameRules(boolean enabled);
 
-    void respawnLocation(boolean respawnLocation);
+    void health(boolean enabled);
 
-    void saturation(boolean saturation);
+    void inventory(boolean enabled);
 
-    void score(boolean score);
+    void potionEffects(boolean enabled);
 
-    void tabList(boolean tabList);
+    void remainingAir(boolean enabled);
 
-    void time(boolean time);
+    void respawnLocation(boolean enabled);
 
-    void weather(boolean weather);
+    void saturation(boolean enabled);
+
+    void score(boolean enabled);
+
+    void tabList(boolean enabled);
+
+    void time(boolean enabled);
+
+    void weather(boolean enabled);
 }

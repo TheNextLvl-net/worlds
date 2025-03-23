@@ -7,13 +7,17 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean attributes = false;
     private boolean chat = false;
     private boolean enabled = true;
+    private boolean exhaustion = true;
     private boolean experience = true;
+    private boolean fireTicks = true;
     private boolean foodLevel = true;
+    private boolean freezeTicks = true;
     private boolean gameMode = true;
     private boolean gameRules = true;
     private boolean health = true;
     private boolean inventory = true;
     private boolean potionEffects = true;
+    private boolean remainingAir = true;
     private boolean respawnLocation = true;
     private boolean saturation = true;
     private boolean score = true;
@@ -47,13 +51,28 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
+    public boolean exhaustion() {
+        return exhaustion;
+    }
+
+    @Override
     public boolean experience() {
         return experience;
     }
 
     @Override
+    public boolean fireTicks() {
+        return fireTicks;
+    }
+
+    @Override
     public boolean foodLevel() {
         return foodLevel;
+    }
+
+    @Override
+    public boolean freezeTicks() {
+        return freezeTicks;
     }
 
     @Override
@@ -82,6 +101,11 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
+    public boolean remainingAir() {
+        return remainingAir;
+    }
+
+    @Override
     public boolean respawnLocation() {
         return respawnLocation;
     }
@@ -107,23 +131,23 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
-    public void absorption(boolean absorption) {
-        this.absorption = absorption;
+    public void absorption(boolean enabled) {
+        this.absorption = enabled;
     }
 
     @Override
-    public void attributes(boolean attributes) {
-        this.attributes = attributes;
+    public void attributes(boolean enabled) {
+        this.attributes = enabled;
     }
 
     @Override
-    public void chat(boolean chat) {
-        this.chat = chat;
+    public void chat(boolean enabled) {
+        this.chat = enabled;
     }
 
     @Override
-    public void score(boolean score) {
-        this.score = score;
+    public void score(boolean enabled) {
+        this.score = enabled;
     }
 
     @Override
@@ -132,62 +156,82 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
-    public void experience(boolean experience) {
-        this.experience = experience;
+    public void exhaustion(boolean enabled) {
+        this.exhaustion = enabled;
     }
 
     @Override
-    public void foodLevel(boolean foodLevel) {
-        this.foodLevel = foodLevel;
+    public void experience(boolean enabled) {
+        this.experience = enabled;
     }
 
     @Override
-    public void gameMode(boolean gameMode) {
-        this.gameMode = gameMode;
+    public void fireTicks(boolean enabled) {
+        this.fireTicks = enabled;
     }
 
     @Override
-    public void gameRules(boolean gameRules) {
-        this.gameRules = gameRules;
+    public void foodLevel(boolean enabled) {
+        this.foodLevel = enabled;
     }
 
     @Override
-    public void health(boolean health) {
-        this.health = health;
+    public void freezeTicks(boolean enabled) {
+        this.freezeTicks = enabled;
     }
 
     @Override
-    public void inventory(boolean inventory) {
-        this.inventory = inventory;
+    public void gameMode(boolean enabled) {
+        this.gameMode = enabled;
     }
 
     @Override
-    public void potionEffects(boolean potionEffects) {
-        this.potionEffects = potionEffects;
+    public void gameRules(boolean enabled) {
+        this.gameRules = enabled;
     }
 
     @Override
-    public void respawnLocation(boolean respawnLocation) {
-        this.respawnLocation = respawnLocation;
+    public void health(boolean enabled) {
+        this.health = enabled;
     }
 
     @Override
-    public void saturation(boolean saturation) {
-        this.saturation = saturation;
+    public void inventory(boolean enabled) {
+        this.inventory = enabled;
     }
 
     @Override
-    public void tabList(boolean tabList) {
-        this.tabList = tabList;
+    public void potionEffects(boolean enabled) {
+        this.potionEffects = enabled;
     }
 
     @Override
-    public void time(boolean time) {
-        this.time = time;
+    public void remainingAir(boolean enabled) {
+        this.remainingAir = enabled;
     }
 
     @Override
-    public void weather(boolean weather) {
-        this.weather = weather;
+    public void respawnLocation(boolean enabled) {
+        this.respawnLocation = enabled;
+    }
+
+    @Override
+    public void saturation(boolean enabled) {
+        this.saturation = enabled;
+    }
+
+    @Override
+    public void tabList(boolean enabled) {
+        this.tabList = enabled;
+    }
+
+    @Override
+    public void time(boolean enabled) {
+        this.time = enabled;
+    }
+
+    @Override
+    public void weather(boolean enabled) {
+        this.weather = enabled;
     }
 }
