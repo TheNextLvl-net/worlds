@@ -5,6 +5,7 @@ import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Registry;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -14,7 +15,9 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @NullMarked
 public class PaperPlayerData implements PlayerData {
@@ -28,6 +31,7 @@ public class PaperPlayerData implements PlayerData {
     private double health = 20;
     private float exhaustion = 0;
     private float experience = 0;
+    private float fallDistance = 0;
     private float saturation = 10;
     private int fireTicks = 0;
     private int foodLevel = 20;
@@ -37,10 +41,37 @@ public class PaperPlayerData implements PlayerData {
     private int remainingAir = 300;
     private int score = 0;
 
+    public static PaperPlayerData of(Player player) {
+        return new PaperPlayerData()
+                .attributes(Registry.ATTRIBUTE.stream()
+                        .map(player::getAttribute)
+                        .filter(Objects::nonNull)
+                        .map(PaperAttributeData::new)
+                        .collect(Collectors.toSet()))
+                .enderChestContents(player.getEnderChest().getContents())
+                .inventoryContents(player.getInventory().getContents())
+                .respawnLocation(player.getPotentialRespawnLocation())
+                .potionEffects(player.getActivePotionEffects())
+                .gameMode(player.getGameMode())
+                .absorption(player.getAbsorptionAmount())
+                .health(player.getHealth())
+                .exhaustion(player.getExhaustion())
+                .experience(player.getExp())
+                .saturation(player.getSaturation())
+                .fireTicks(player.getFireTicks())
+                .foodLevel(player.getFoodLevel())
+                .freezeTicks(player.getFreezeTicks())
+                .heldItemSlot(player.getInventory().getHeldItemSlot())
+                .level(player.getLevel())
+                .remainingAir(player.getRemainingAir())
+                .score(player.getDeathScreenScore());
+    }
+
     @Override
     public void apply(GroupSettings settings, Player player) {
         if (settings.absorption()) player.setAbsorptionAmount(absorption);
         if (settings.exhaustion()) player.setExhaustion(exhaustion);
+        if (settings.fallDistance()) player.setFallDistance(fallDistance);
         if (settings.fireTicks()) player.setFireTicks(fireTicks);
         if (settings.foodLevel()) player.setFoodLevel(foodLevel);
         if (settings.freezeTicks()) player.setFreezeTicks(freezeTicks);
@@ -103,7 +134,7 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public PlayerData attributes(Collection<AttributeData> attributes) {
+    public PaperPlayerData attributes(Collection<AttributeData> attributes) {
         this.attributes = Set.copyOf(attributes);
         return this;
     }
@@ -123,6 +154,12 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public PaperPlayerData experience(float experience) {
         this.experience = experience;
+        return this;
+    }
+
+    @Override
+    public PaperPlayerData fallDistance(float fallDistance) {
+        this.fallDistance = fallDistance;
         return this;
     }
 
@@ -230,6 +267,11 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public float fallDistance() {
+        return fallDistance;
+    }
+
+    @Override
     public float saturation() {
         return saturation;
     }
@@ -267,26 +309,5 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public int score() {
         return score;
-    }
-
-    public static PaperPlayerData of(Player player) {
-        return new PaperPlayerData()
-                .enderChestContents(player.getEnderChest().getContents())
-                .inventoryContents(player.getInventory().getContents())
-                .respawnLocation(player.getPotentialRespawnLocation())
-                .potionEffects(player.getActivePotionEffects())
-                .gameMode(player.getGameMode())
-                .absorption(player.getAbsorptionAmount())
-                .health(player.getHealth())
-                .exhaustion(player.getExhaustion())
-                .experience(player.getExp())
-                .saturation(player.getSaturation())
-                .fireTicks(player.getFireTicks())
-                .foodLevel(player.getFoodLevel())
-                .freezeTicks(player.getFreezeTicks())
-                .heldItemSlot(player.getInventory().getHeldItemSlot())
-                .level(player.getLevel())
-                .remainingAir(player.getRemainingAir())
-                .score(player.getDeathScreenScore());
     }
 }

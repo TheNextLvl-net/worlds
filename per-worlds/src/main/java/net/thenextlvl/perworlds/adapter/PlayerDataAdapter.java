@@ -7,6 +7,7 @@ import core.nbt.serialization.TagSerializationContext;
 import core.nbt.tag.CompoundTag;
 import core.nbt.tag.ListTag;
 import core.nbt.tag.Tag;
+import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.model.PaperPlayerData;
 import org.bukkit.GameMode;
@@ -21,6 +22,9 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
     public PlayerData deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
         var data = new PaperPlayerData();
         var root = tag.getAsCompound();
+        root.optional("attributes").map(Tag::getAsList).map(list ->
+                list.stream().map(attribute -> context.deserialize(attribute, AttributeData.class)).toList()
+        ).ifPresent(data::attributes);
         root.optional("enderChest").map(items -> context.deserialize(items, ItemStack[].class)).ifPresent(data::enderChestContents);
         root.optional("inventory").map(items -> context.deserialize(items, ItemStack[].class)).ifPresent(data::inventoryContents);
         root.optional("respawnLocation").map(location -> context.deserialize(location, Location.class)).ifPresent(data::respawnLocation);
@@ -32,6 +36,7 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         root.optional("health").map(Tag::getAsDouble).ifPresent(data::health);
         root.optional("exhaustion").map(Tag::getAsFloat).ifPresent(data::exhaustion);
         root.optional("experience").map(Tag::getAsFloat).ifPresent(data::experience);
+        root.optional("fallDistance").map(Tag::getAsFloat).ifPresent(data::fallDistance);
         root.optional("saturation").map(Tag::getAsFloat).ifPresent(data::saturation);
         root.optional("fireTicks").map(Tag::getAsInt).ifPresent(data::fireTicks);
         root.optional("foodLevel").map(Tag::getAsInt).ifPresent(data::foodLevel);
@@ -46,6 +51,7 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
     @Override
     public CompoundTag serialize(PlayerData data, TagSerializationContext context) throws ParserException {
         var tag = new CompoundTag();
+        tag.add("attributes", new ListTag<>(data.attributes().stream().map(context::serialize).toList(), CompoundTag.ID));
         tag.add("enderChest", context.serialize(data.enderChestContents()));
         tag.add("inventory", context.serialize(data.inventoryContents()));
         var location = data.respawnLocation();
@@ -56,6 +62,7 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         tag.add("health", data.health());
         tag.add("exhaustion", data.exhaustion());
         tag.add("experience", data.experience());
+        tag.add("fallDistance", data.fallDistance());
         tag.add("saturation", data.saturation());
         tag.add("fireTicks", data.fireTicks());
         tag.add("foodLevel", data.foodLevel());

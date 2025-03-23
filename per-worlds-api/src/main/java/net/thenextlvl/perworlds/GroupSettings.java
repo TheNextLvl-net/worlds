@@ -13,6 +13,8 @@ public interface GroupSettings {
 
     boolean experience();
 
+    boolean fallDistance();
+
     boolean fireTicks();
 
     boolean foodLevel();
@@ -54,6 +56,8 @@ public interface GroupSettings {
     void exhaustion(boolean enabled);
 
     void experience(boolean enabled);
+
+    void fallDistance(boolean enabled);
 
     void fireTicks(boolean enabled);
 

@@ -40,6 +40,8 @@ public interface PlayerData {
 
     PlayerData experience(float experience);
 
+    PlayerData fallDistance(float fallDistance);
+
     PlayerData fireTicks(int fireTicks);
 
     PlayerData foodLevel(int foodLevel);
@@ -76,6 +78,8 @@ public interface PlayerData {
     float exhaustion();
 
     float experience();
+
+    float fallDistance();
 
     float saturation();
 

@@ -9,6 +9,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean enabled = true;
     private boolean exhaustion = true;
     private boolean experience = true;
+    private boolean fallDistance = true;
     private boolean fireTicks = true;
     private boolean foodLevel = true;
     private boolean freezeTicks = true;
@@ -58,6 +59,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean experience() {
         return experience;
+    }
+
+    @Override
+    public boolean fallDistance() {
+        return fallDistance;
     }
 
     @Override
@@ -163,6 +169,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void experience(boolean enabled) {
         this.experience = enabled;
+    }
+
+    @Override
+    public void fallDistance(boolean enabled) {
+        this.fallDistance = enabled;
     }
 
     @Override
