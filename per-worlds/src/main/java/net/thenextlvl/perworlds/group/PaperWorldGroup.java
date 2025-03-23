@@ -105,10 +105,10 @@ public class PaperWorldGroup implements WorldGroup {
         try {
             return readPlayerData(file);
         } catch (EOFException e) {
-            groupProvider.getLogger().error("The character file {} is irrecoverably broken", file.getPath());
+            groupProvider.getLogger().error("The player data file {} is irrecoverably broken", file.getPath());
             return Optional.empty();
         } catch (Exception e) {
-            groupProvider.getLogger().error("Failed to load character from {}", file.getPath(), e);
+            groupProvider.getLogger().error("Failed to load player data from {}", file.getPath(), e);
             groupProvider.getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
             return Optional.empty();
         }
