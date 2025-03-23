@@ -70,6 +70,7 @@ public class PaperWorldGroup implements WorldGroup {
         return getWorlds().stream()
                 .map(World::getPlayers)
                 .flatMap(List::stream)
+                .filter(player -> !player.hasMetadata("NPC"))
                 .toList();
     }
 
