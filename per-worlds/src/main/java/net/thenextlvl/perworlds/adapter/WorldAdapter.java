@@ -28,6 +28,6 @@ public class WorldAdapter implements TagAdapter<World> {
 
     @Override
     public Tag serialize(World world, TagSerializationContext context) throws ParserException {
-        return context.serialize(world.getKey());
+        return context.serialize(world.key());
     }
 }

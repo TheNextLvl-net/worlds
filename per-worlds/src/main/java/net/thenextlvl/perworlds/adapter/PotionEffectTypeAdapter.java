@@ -19,6 +19,6 @@ public class PotionEffectTypeAdapter implements TagAdapter<PotionEffectType> {
 
     @Override
     public Tag serialize(PotionEffectType effectType, TagSerializationContext context) throws ParserException {
-        return context.serialize(effectType.getKey());
+        return context.serialize(effectType.key());
     }
 }
