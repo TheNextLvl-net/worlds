@@ -3,6 +3,7 @@ package net.thenextlvl.perworlds.data;
 import net.thenextlvl.perworlds.GroupSettings;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface PlayerData {
-    // todo: discovered recipes, stats, achievements
+    // todo: stats, achievements
 
     @Nullable
     ItemStack[] enderChestContents();
@@ -33,6 +34,8 @@ public interface PlayerData {
     PlayerData absorption(double absorption);
 
     PlayerData attributes(Collection<AttributeData> attributes);
+
+    PlayerData discoveredRecipes(Collection<NamespacedKey> recipes);
 
     PlayerData enderChestContents(@Nullable ItemStack[] contents);
 
@@ -72,6 +75,9 @@ public interface PlayerData {
 
     @Unmodifiable
     Set<AttributeData> attributes();
+
+    @Unmodifiable
+    Set<NamespacedKey> discoveredRecipes();
 
     boolean seenCredits();
 

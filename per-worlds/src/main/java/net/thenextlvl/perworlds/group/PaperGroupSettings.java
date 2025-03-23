@@ -19,6 +19,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean health = true;
     private boolean inventory = true;
     private boolean potionEffects = true;
+    private boolean recipes = true;
     private boolean remainingAir = true;
     private boolean respawnLocation = true;
     private boolean saturation = true;
@@ -110,6 +111,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean potionEffects() {
         return potionEffects;
+    }
+
+    @Override
+    public boolean recipes() {
+        return recipes;
     }
 
     @Override
@@ -225,6 +231,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void potionEffects(boolean enabled) {
         this.potionEffects = enabled;
+    }
+
+    @Override
+    public void recipes(boolean enabled) {
+        this.recipes = enabled;
     }
 
     @Override

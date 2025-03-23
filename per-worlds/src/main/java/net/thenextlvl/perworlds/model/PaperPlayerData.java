@@ -5,6 +5,7 @@ import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -14,6 +15,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -27,6 +29,7 @@ public class PaperPlayerData implements PlayerData {
     private GameMode gameMode = GameMode.SURVIVAL;
     private List<PotionEffect> potionEffects = List.of();
     private Set<AttributeData> attributes = Set.of();
+    private Set<NamespacedKey> recipes = Set.of();
     private boolean seenCredits = false;
     private double absorption = 0;
     private double health = 20;
@@ -90,6 +93,16 @@ public class PaperPlayerData implements PlayerData {
             if (attribute != null) attribute.setBaseValue(data.baseValue());
         });
 
+        if (settings.recipes()) {
+            var toAdd = new HashSet<>(this.recipes);
+            recipes.removeAll(player.getDiscoveredRecipes());
+            player.discoverRecipes(toAdd);
+
+            var toRemove = new HashSet<>(player.getDiscoveredRecipes());
+            toRemove.removeAll(this.recipes);
+            player.undiscoverRecipes(toRemove);
+        }
+
         if (settings.inventory()) {
             player.getEnderChest().setContents(enderChestContents);
             player.getInventory().setContents(inventoryContents);
@@ -139,6 +152,12 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public PaperPlayerData attributes(Collection<AttributeData> attributes) {
         this.attributes = Set.copyOf(attributes);
+        return this;
+    }
+
+    @Override
+    public PaperPlayerData discoveredRecipes(Collection<NamespacedKey> recipes) {
+        this.recipes = Set.copyOf(recipes);
         return this;
     }
 
@@ -253,6 +272,11 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public @Unmodifiable Set<AttributeData> attributes() {
         return attributes;
+    }
+
+    @Override
+    public @Unmodifiable Set<NamespacedKey> discoveredRecipes() {
+        return recipes;
     }
 
     @Override

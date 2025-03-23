@@ -33,6 +33,8 @@ public interface GroupSettings {
 
     boolean potionEffects();
 
+    boolean recipes();
+
     boolean remainingAir();
 
     boolean respawnLocation();
@@ -78,6 +80,8 @@ public interface GroupSettings {
     void inventory(boolean enabled);
 
     void potionEffects(boolean enabled);
+
+    void recipes(boolean enabled);
 
     void remainingAir(boolean enabled);
 
