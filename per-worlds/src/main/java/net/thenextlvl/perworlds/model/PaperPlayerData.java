@@ -57,6 +57,7 @@ public class PaperPlayerData implements PlayerData {
                 .respawnLocation(player.getPotentialRespawnLocation())
                 .potionEffects(player.getActivePotionEffects())
                 .gameMode(player.getGameMode())
+                .discoveredRecipes(player.getDiscoveredRecipes())
                 .seenCredits(player.hasSeenWinScreen())
                 .absorption(player.getAbsorptionAmount())
                 .health(player.getHealth())
@@ -94,12 +95,12 @@ public class PaperPlayerData implements PlayerData {
         });
 
         if (settings.recipes()) {
-            var toAdd = new HashSet<>(this.recipes);
-            recipes.removeAll(player.getDiscoveredRecipes());
+            var toAdd = new HashSet<>(recipes);
+            toAdd.removeAll(player.getDiscoveredRecipes());
             player.discoverRecipes(toAdd);
 
             var toRemove = new HashSet<>(player.getDiscoveredRecipes());
-            toRemove.removeAll(this.recipes);
+            toRemove.removeAll(recipes);
             player.undiscoverRecipes(toRemove);
         }
 
