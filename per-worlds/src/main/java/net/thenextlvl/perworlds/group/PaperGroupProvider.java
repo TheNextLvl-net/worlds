@@ -8,6 +8,8 @@ import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
+import net.thenextlvl.perworlds.adapter.AttributeAdapter;
+import net.thenextlvl.perworlds.adapter.AttributeDataAdapter;
 import net.thenextlvl.perworlds.adapter.ItemStackAdapter;
 import net.thenextlvl.perworlds.adapter.ItemStackArrayAdapter;
 import net.thenextlvl.perworlds.adapter.KeyAdapter;
@@ -16,10 +18,12 @@ import net.thenextlvl.perworlds.adapter.PlayerDataAdapter;
 import net.thenextlvl.perworlds.adapter.PotionEffectAdapter;
 import net.thenextlvl.perworlds.adapter.PotionEffectTypeAdapter;
 import net.thenextlvl.perworlds.adapter.WorldAdapter;
+import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -42,6 +46,8 @@ public class PaperGroupProvider implements GroupProvider {
     public PaperGroupProvider(Plugin plugin) {
         this.dataFolder = new File("plugins/PerWorlds", "saves");
         this.nbt = new NBT.Builder()
+                .registerTypeHierarchyAdapter(Attribute.class, new AttributeAdapter())
+                .registerTypeHierarchyAdapter(AttributeData.class, new AttributeDataAdapter())
                 .registerTypeHierarchyAdapter(GameMode.class, new EnumAdapter<>(GameMode.class))
                 .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackAdapter())
                 .registerTypeHierarchyAdapter(ItemStack[].class, new ItemStackArrayAdapter())
