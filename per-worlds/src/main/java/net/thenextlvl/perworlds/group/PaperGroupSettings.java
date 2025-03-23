@@ -19,7 +19,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean health = true;
     private boolean inventory = true;
     private boolean potionEffects = true;
-    private boolean recipes = true;
+    private boolean recipes = false;
     private boolean remainingAir = true;
     private boolean respawnLocation = true;
     private boolean saturation = true;
