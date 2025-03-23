@@ -30,6 +30,7 @@ public class SharedWorlds {
     }
 
     public void onDisable() {
+        groupProvider.getGroups().forEach(group -> group.getPlayers().forEach(group::persistPlayerData));
         metrics.shutdown();
     }
 
