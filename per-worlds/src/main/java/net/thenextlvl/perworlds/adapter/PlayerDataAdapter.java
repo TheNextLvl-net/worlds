@@ -7,7 +7,7 @@ import core.nbt.serialization.TagSerializationContext;
 import core.nbt.tag.CompoundTag;
 import core.nbt.tag.ListTag;
 import core.nbt.tag.Tag;
-import net.thenextlvl.perworlds.PlayerData;
+import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.model.PaperPlayerData;
 import org.bukkit.GameMode;
 import org.bukkit.Location;

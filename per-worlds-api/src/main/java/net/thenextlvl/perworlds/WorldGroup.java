@@ -2,6 +2,7 @@ package net.thenextlvl.perworlds;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
+import net.thenextlvl.perworlds.data.PlayerData;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
