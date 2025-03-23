@@ -79,6 +79,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     @Override
     public void onDisable() {
+        commons.onDisable();
         metrics.shutdown();
         unloadLevels();
     }
