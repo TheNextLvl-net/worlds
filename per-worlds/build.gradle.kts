@@ -35,7 +35,6 @@ dependencies {
     api("net.thenextlvl.core:i18n:1.0.20")
     api("net.thenextlvl.core:paper:2.0.3")
 
-    compileOnlyApi(project(":worlds-api"))
     implementation(project(":per-worlds-api"))
 }
 
