@@ -19,6 +19,7 @@ import net.thenextlvl.worlds.command.WorldCommand;
 import net.thenextlvl.worlds.controller.WorldLinkController;
 import net.thenextlvl.worlds.listener.PortalListener;
 import net.thenextlvl.worlds.listener.ServerListener;
+import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.model.PaperLevelBuilder;
 import net.thenextlvl.worlds.version.PluginVersionChecker;
 import net.thenextlvl.worlds.view.FoliaLevelView;
@@ -162,6 +163,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(new PortalListener(this), this);
         getServer().getPluginManager().registerEvents(new ServerListener(this), this);
+        getServer().getPluginManager().registerEvents(new WorldListener(this), this);
     }
 
     private void registerCommands() {
