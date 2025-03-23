@@ -6,12 +6,14 @@ import core.nbt.serialization.TagDeserializationContext;
 import core.nbt.serialization.TagSerializationContext;
 import core.nbt.tag.CompoundTag;
 import core.nbt.tag.ListTag;
+import core.nbt.tag.StringTag;
 import core.nbt.tag.Tag;
 import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.model.PaperPlayerData;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.jspecify.annotations.NullMarked;
@@ -28,6 +30,9 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         root.optional("enderChest").map(items -> context.deserialize(items, ItemStack[].class)).ifPresent(data::enderChestContents);
         root.optional("inventory").map(items -> context.deserialize(items, ItemStack[].class)).ifPresent(data::inventoryContents);
         root.optional("respawnLocation").map(location -> context.deserialize(location, Location.class)).ifPresent(data::respawnLocation);
+        root.optional("recipes").map(Tag::getAsList).map(list ->
+                list.stream().map(recipe -> context.deserialize(recipe, NamespacedKey.class)).toList()
+        ).ifPresent(data::discoveredRecipes);
         root.optional("potionEffects").map(Tag::getAsList).map(list ->
                 list.stream().map(effect -> context.deserialize(effect, PotionEffect.class)).toList()
         ).ifPresent(data::potionEffects);
@@ -57,6 +62,7 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         tag.add("inventory", context.serialize(data.inventoryContents()));
         var location = data.respawnLocation();
         if (location != null) tag.add("respawnLocation", context.serialize(location));
+        tag.add("recipes", new ListTag<>(data.discoveredRecipes().stream().map(context::serialize).toList(), StringTag.ID));
         tag.add("potionEffects", new ListTag<>(data.potionEffects().stream().map(context::serialize).toList(), CompoundTag.ID));
         tag.add("gameMode", context.serialize(data.gameMode()));
         tag.add("seenCredits", data.seenCredits());
