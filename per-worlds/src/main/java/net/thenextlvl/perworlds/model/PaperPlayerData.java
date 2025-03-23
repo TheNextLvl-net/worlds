@@ -1,7 +1,8 @@
 package net.thenextlvl.perworlds.model;
 
 import net.thenextlvl.perworlds.GroupSettings;
-import net.thenextlvl.perworlds.PlayerData;
+import net.thenextlvl.perworlds.data.AttributeData;
+import net.thenextlvl.perworlds.data.PlayerData;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -13,15 +14,16 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @NullMarked
 public class PaperPlayerData implements PlayerData {
     private @Nullable ItemStack[] enderChestContents = new ItemStack[27];
     private @Nullable ItemStack[] inventoryContents = new ItemStack[40];
     private @Nullable Location respawnLocation = null;
-    private List<PotionEffect> potionEffects = List.of();
-    // todo: save attributes;
     private GameMode gameMode = GameMode.SURVIVAL;
+    private List<PotionEffect> potionEffects = List.of();
+    private Set<AttributeData> attributes = Set.of();
     private double absorption = 0;
     private double health = 20;
     private float exhaustion = 0;
@@ -45,6 +47,11 @@ public class PaperPlayerData implements PlayerData {
         if (settings.respawnLocation()) player.setRespawnLocation(respawnLocation, true);
         if (settings.saturation()) player.setSaturation(saturation);
         if (settings.score()) player.setDeathScreenScore(score);
+
+        if (settings.attributes()) attributes.forEach(data -> {
+            var attribute = player.getAttribute(data.attribute());
+            if (attribute != null) attribute.setBaseValue(data.baseValue());
+        });
 
         if (settings.inventory()) {
             player.getEnderChest().setContents(enderChestContents);
@@ -94,6 +101,12 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public PaperPlayerData absorption(double absorption) {
         this.absorption = absorption;
+        return this;
+    }
+
+    @Override
+    public PlayerData attributes(Collection<AttributeData> attributes) {
+        this.attributes = Set.copyOf(attributes);
         return this;
     }
 
@@ -191,6 +204,11 @@ public class PaperPlayerData implements PlayerData {
     public PaperPlayerData score(int score) {
         this.score = score;
         return this;
+    }
+
+    @Override
+    public @Unmodifiable Set<AttributeData> attributes() {
+        return attributes;
     }
 
     @Override
