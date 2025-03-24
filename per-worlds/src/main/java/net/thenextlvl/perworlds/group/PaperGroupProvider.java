@@ -38,14 +38,14 @@ import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @NullMarked
 public class PaperGroupProvider implements GroupProvider {
     private final File dataFolder;
-    private final FileIO<PerWorldsConfig> config;
+    private final FileIO<PerWorldsConfig> config; // todo: do something with that
     private final List<WorldGroup> groups = new ArrayList<>();
     private final NBT nbt;
     private final Plugin plugin;
@@ -53,7 +53,7 @@ public class PaperGroupProvider implements GroupProvider {
     public PaperGroupProvider(Plugin plugin) {
         var pluginDirectory = new File("plugins/PerWorlds");
         this.dataFolder = new File(pluginDirectory, "saves");
-        this.config = new GsonFile<>(IO.of(pluginDirectory, "config.json"), new PerWorldsConfig(Map.of()));
+        this.config = new GsonFile<>(IO.of(pluginDirectory, "config.json"), new PerWorldsConfig(new HashMap<>()));
         this.nbt = new NBT.Builder()
                 .registerTypeHierarchyAdapter(Attribute.class, new AttributeAdapter())
                 .registerTypeHierarchyAdapter(AttributeData.class, new AttributeDataAdapter())
