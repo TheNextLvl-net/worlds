@@ -32,10 +32,17 @@ dependencies {
 
     api("org.bstats:bstats-bukkit:3.1.0")
 
+    api("net.thenextlvl.core:adapters:2.0.1")
     api("net.thenextlvl.core:i18n:1.0.20")
     api("net.thenextlvl.core:paper:2.0.3")
 
-    compileOnlyApi(project(":api"))
+    implementation(project(":per-worlds-api"))
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("per-worlds")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    relocate("org.bstats", "net.thenextlvl.perworlds.bstats")
 }
 
 paper {
@@ -52,6 +59,9 @@ paper {
             load = PaperPluginDescription.RelativeLoadOrder.BEFORE
             required = false
         }
+    }
+    permissions {
+        register("perworlds.command.group") { children = listOf("perworlds.command") }
     }
 }
 
