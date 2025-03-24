@@ -6,8 +6,10 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 @NullMarked
 public interface GroupProvider {
@@ -20,9 +22,9 @@ public interface GroupProvider {
 
     Optional<WorldGroup> getGroup(World world);
 
-    WorldGroup.Builder createGroup(Key key);
+    WorldGroup createGroup(Key key, Consumer<GroupSettings> settings, Collection<World> worlds);
 
-    boolean addGroup(WorldGroup group);
+    WorldGroup createGroup(Key key, Consumer<GroupSettings> settings, World... worlds);
 
     boolean hasGroup(Key key);
 

@@ -1,6 +1,5 @@
 package net.thenextlvl.perworlds.group;
 
-import com.google.common.base.Preconditions;
 import core.io.IO;
 import core.nbt.NBTInputStream;
 import core.nbt.NBTOutputStream;
@@ -9,14 +8,11 @@ import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.model.PaperPlayerData;
-import org.bukkit.GameMode;
-import org.bukkit.Keyed;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import java.io.EOFException;
 import java.io.File;
@@ -24,12 +20,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.READ;
@@ -39,16 +32,14 @@ import static net.thenextlvl.perworlds.SharedWorlds.ISSUES;
 
 @NullMarked
 public class PaperWorldGroup implements WorldGroup {
-    private @Nullable GameMode gameMode;
     private final File dataFolder;
     private final GroupSettings settings;
     private final Key key;
     private final PaperGroupProvider groupProvider;
     private final Set<World> worlds;
 
-    private PaperWorldGroup(PaperGroupProvider groupProvider, Key key, GroupSettings settings, Set<World> worlds, @Nullable GameMode gameMode) {
+    public PaperWorldGroup(PaperGroupProvider groupProvider, Key key, GroupSettings settings, Set<World> worlds) {
         this.dataFolder = new File(groupProvider.getDataFolder(), key.asString());
-        this.gameMode = gameMode;
         this.groupProvider = groupProvider;
         this.key = key;
         this.settings = settings;
@@ -72,11 +63,6 @@ public class PaperWorldGroup implements WorldGroup {
                 .flatMap(List::stream)
                 .filter(player -> !player.hasMetadata("NPC"))
                 .toList();
-    }
-
-    @Override
-    public Optional<GameMode> getGameMode() {
-        return Optional.ofNullable(gameMode);
     }
 
     @Override
@@ -152,11 +138,6 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
-    public void setGameMode(@Nullable GameMode gameMode) {
-        this.gameMode = gameMode;
-    }
-
-    @Override
     public Key key() {
         return key;
     }
@@ -180,72 +161,5 @@ public class PaperWorldGroup implements WorldGroup {
 
     private NBTInputStream stream(IO file) throws IOException {
         return new NBTInputStream(file.inputStream(READ), StandardCharsets.UTF_8);
-    }
-
-    static class Builder implements WorldGroup.Builder {
-        private @Nullable GameMode gameMode;
-        private Key key;
-        private Set<World> worlds = new HashSet<>();
-        private final GroupSettings settings = new PaperGroupSettings();
-        private final PaperGroupProvider groupProvider;
-
-        Builder(PaperGroupProvider groupProvider, Key key) {
-            this.groupProvider = groupProvider;
-            this.key = key;
-        }
-
-        @Override
-        public WorldGroup.Builder addWorld(World world) {
-            worlds.add(world);
-            return this;
-        }
-
-        @Override
-        public WorldGroup.Builder addWorlds(Collection<World> worlds) {
-            this.worlds.addAll(worlds);
-            return this;
-        }
-
-        @Override
-        public WorldGroup.Builder addWorlds(World... worlds) {
-            return addWorlds(List.of(worlds));
-        }
-
-        @Override
-        public WorldGroup.Builder gameMode(@Nullable GameMode gameMode) {
-            this.gameMode = gameMode;
-            return this;
-        }
-
-        @Override
-        public WorldGroup.Builder key(Key key) {
-            this.key = key;
-            return this;
-        }
-
-        @Override
-        public WorldGroup.Builder setWorlds(Collection<World> worlds) {
-            this.worlds = new HashSet<>(worlds);
-            return this;
-        }
-
-        @Override
-        public WorldGroup.Builder setWorlds(World... worlds) {
-            return setWorlds(List.of(worlds));
-        }
-
-        @Override
-        public WorldGroup.Builder settings(Consumer<GroupSettings> settings) {
-            settings.accept(this.settings);
-            return this;
-        }
-
-        @Override
-        public WorldGroup build() throws IllegalStateException {
-            Preconditions.checkState(!groupProvider.hasGroup(key), "Cannot create multiple groups with the same key");
-            var invalid = worlds.stream().filter(groupProvider::hasGroup).map(Keyed::key).map(Key::asString).toList();
-            Preconditions.checkState(invalid.isEmpty(), "Worlds cannot be in multiple groups: {}", String.join(", ", invalid));
-            return new PaperWorldGroup(groupProvider, key, settings, worlds, gameMode);
-        }
     }
 }
