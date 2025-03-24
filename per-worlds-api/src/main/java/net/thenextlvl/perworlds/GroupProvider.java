@@ -13,8 +13,6 @@ import java.util.Optional;
 public interface GroupProvider {
     File getDataFolder();
 
-    GroupSettings getSettings();
-
     @Unmodifiable
     List<WorldGroup> getGroups();
 

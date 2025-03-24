@@ -1,12 +1,14 @@
 package net.thenextlvl.perworlds.group;
 
 import com.google.common.base.Preconditions;
+import core.file.FileIO;
+import core.file.format.GsonFile;
+import core.io.IO;
 import core.nbt.serialization.NBT;
 import core.nbt.serialization.adapter.EnumAdapter;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.thenextlvl.perworlds.GroupProvider;
-import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.adapter.AttributeAdapter;
 import net.thenextlvl.perworlds.adapter.AttributeDataAdapter;
@@ -21,6 +23,7 @@ import net.thenextlvl.perworlds.adapter.PotionEffectTypeAdapter;
 import net.thenextlvl.perworlds.adapter.WorldAdapter;
 import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
+import net.thenextlvl.perworlds.model.PerWorldsConfig;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -36,17 +39,21 @@ import org.jspecify.annotations.NullMarked;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @NullMarked
 public class PaperGroupProvider implements GroupProvider {
     private final File dataFolder;
+    private final FileIO<PerWorldsConfig> config;
     private final List<WorldGroup> groups = new ArrayList<>();
     private final NBT nbt;
     private final Plugin plugin;
 
     public PaperGroupProvider(Plugin plugin) {
-        this.dataFolder = new File("plugins/PerWorlds", "saves");
+        var pluginDirectory = new File("plugins/PerWorlds");
+        this.dataFolder = new File(pluginDirectory, "saves");
+        this.config = new GsonFile<>(IO.of(pluginDirectory, "config.json"), new PerWorldsConfig(Map.of()));
         this.nbt = new NBT.Builder()
                 .registerTypeHierarchyAdapter(Attribute.class, new AttributeAdapter())
                 .registerTypeHierarchyAdapter(AttributeData.class, new AttributeDataAdapter())
@@ -71,11 +78,6 @@ public class PaperGroupProvider implements GroupProvider {
     @Override
     public File getDataFolder() {
         return dataFolder;
-    }
-
-    @Override
-    public GroupSettings getSettings() {
-        return null; // todo: save and load settings
     }
 
     public NBT nbt() {
