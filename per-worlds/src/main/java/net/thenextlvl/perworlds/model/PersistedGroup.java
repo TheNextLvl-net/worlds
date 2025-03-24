@@ -3,9 +3,7 @@ package net.thenextlvl.perworlds.model;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.GroupSettings;
 
-import java.util.HashMap;
+import java.util.Set;
 
-public record PerWorldsConfig(
-        HashMap<Key, GroupSettings> settings
-) {
+public record PersistedGroup(Set<Key> worlds, GroupSettings settings) {
 }

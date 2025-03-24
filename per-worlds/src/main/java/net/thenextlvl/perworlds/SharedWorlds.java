@@ -9,7 +9,7 @@ import org.bukkit.plugin.ServicePriority;
 
 public class SharedWorlds {
     public static final String ISSUES = "https://github.com/TheNextLvl-net/worlds/issues/new?template=bug_report.yml";
-    private final GroupProvider groupProvider;
+    private final PaperGroupProvider groupProvider;
     private final Metrics metrics;
     private final Plugin plugin;
 
@@ -30,6 +30,7 @@ public class SharedWorlds {
 
     public void onDisable() {
         groupProvider.getGroups().forEach(group -> group.getPlayers().forEach(group::persistPlayerData));
+        groupProvider.save();
         metrics.shutdown();
     }
 
