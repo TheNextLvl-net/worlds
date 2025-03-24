@@ -59,6 +59,9 @@ paper {
             required = false
         }
     }
+    permissions {
+        register("perworlds.command.group") { children = listOf("perworlds.command") }
+    }
 }
 
 val versionString: String = project.version as String

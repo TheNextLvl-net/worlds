@@ -74,6 +74,10 @@ paper {
                 "worlds.command.unload",
             )
         }
+        register("perworlds.command") { children = listOf("worlds.command") }
+        register("perworlds.command.group") { children = listOf("perworlds.command") }
+        register("worlds.command.group") { children = listOf("perworlds.command.group") }
+
         register("worlds.commands.link") {
             this.children = listOf(
                 "worlds.command.link.create",
