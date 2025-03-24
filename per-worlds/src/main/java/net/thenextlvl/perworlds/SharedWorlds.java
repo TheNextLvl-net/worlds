@@ -25,7 +25,6 @@ public class SharedWorlds {
 
     public void onEnable() {
         registerListeners();
-        registerCommands();
         addCustomCharts();
     }
 
@@ -36,10 +35,6 @@ public class SharedWorlds {
 
     public GroupProvider groupProvider() {
         return groupProvider;
-    }
-
-    private void registerCommands() {
-
     }
 
     private void registerListeners() {
