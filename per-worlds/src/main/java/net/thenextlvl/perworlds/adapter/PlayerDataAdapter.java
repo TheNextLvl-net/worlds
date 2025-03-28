@@ -11,6 +11,7 @@ import core.nbt.tag.Tag;
 import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.model.PaperPlayerData;
+import net.thenextlvl.perworlds.statistics.Stats;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -36,6 +37,7 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         root.optional("potionEffects").map(Tag::getAsList).map(list ->
                 list.stream().map(effect -> context.deserialize(effect, PotionEffect.class)).toList()
         ).ifPresent(data::potionEffects);
+        root.optional("statistics").map(stats -> context.deserialize(stats, Stats.class)).ifPresent(data::stats);
         root.optional("gameMode").map(mode -> context.deserialize(mode, GameMode.class)).ifPresent(data::gameMode);
         root.optional("seenCredits").map(Tag::getAsBoolean).ifPresent(data::seenCredits);
         root.optional("absorption").map(Tag::getAsDouble).ifPresent(data::absorption);
@@ -66,6 +68,7 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         if (location != null) tag.add("respawnLocation", context.serialize(location));
         tag.add("recipes", new ListTag<>(data.discoveredRecipes().stream().map(context::serialize).toList(), StringTag.ID));
         tag.add("potionEffects", new ListTag<>(data.potionEffects().stream().map(context::serialize).toList(), CompoundTag.ID));
+        tag.add("statistics", context.serialize(data.stats()));
         tag.add("gameMode", context.serialize(data.gameMode()));
         tag.add("seenCredits", data.seenCredits());
         tag.add("absorption", data.absorption());

@@ -47,6 +47,8 @@ public interface GroupSettings {
 
     boolean score();
 
+    boolean statistics();
+
     boolean tabList();
 
     boolean time();
@@ -98,6 +100,8 @@ public interface GroupSettings {
     void saturation(boolean enabled);
 
     void score(boolean enabled);
+
+    void statistics(boolean enabled);
 
     void tabList(boolean enabled);
 

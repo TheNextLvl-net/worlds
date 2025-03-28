@@ -26,6 +26,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean respawnLocation = true;
     private boolean saturation = true;
     private boolean score = true;
+    private boolean statistics = true;
     private boolean tabList = false;
     private boolean time = true;
     private boolean weather = true;
@@ -58,6 +59,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean score() {
         return score;
+    }
+
+    @Override
+    public boolean statistics() {
+        return statistics;
     }
 
     @Override
@@ -188,6 +194,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void score(boolean enabled) {
         this.score = enabled;
+    }
+
+    @Override
+    public void statistics(boolean enabled) {
+        this.statistics = enabled;
     }
 
     @Override

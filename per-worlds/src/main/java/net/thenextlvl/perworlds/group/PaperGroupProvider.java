@@ -17,9 +17,11 @@ import net.thenextlvl.perworlds.adapter.NamespacedKeyAdapter;
 import net.thenextlvl.perworlds.adapter.PlayerDataAdapter;
 import net.thenextlvl.perworlds.adapter.PotionEffectAdapter;
 import net.thenextlvl.perworlds.adapter.PotionEffectTypeAdapter;
+import net.thenextlvl.perworlds.adapter.StatisticsAdapter;
 import net.thenextlvl.perworlds.adapter.WorldAdapter;
 import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
+import net.thenextlvl.perworlds.statistics.Stats;
 import org.bukkit.GameMode;
 import org.bukkit.Keyed;
 import org.bukkit.Location;
@@ -61,6 +63,7 @@ public class PaperGroupProvider implements GroupProvider {
                 .registerTypeHierarchyAdapter(PlayerData.class, new PlayerDataAdapter())
                 .registerTypeHierarchyAdapter(PotionEffect.class, new PotionEffectAdapter())
                 .registerTypeHierarchyAdapter(PotionEffectType.class, new PotionEffectTypeAdapter())
+                .registerTypeHierarchyAdapter(Stats.class, new StatisticsAdapter())
                 .registerTypeHierarchyAdapter(World.class, new WorldAdapter(plugin.getServer()))
                 .build();
         this.plugin = plugin;

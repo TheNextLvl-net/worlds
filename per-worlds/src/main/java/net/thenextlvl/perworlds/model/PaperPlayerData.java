@@ -3,6 +3,7 @@ package net.thenextlvl.perworlds.model;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
+import net.thenextlvl.perworlds.statistics.Stats;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -30,6 +31,7 @@ public class PaperPlayerData implements PlayerData {
     private List<PotionEffect> potionEffects = List.of();
     private Set<AttributeData> attributes = Set.of();
     private Set<NamespacedKey> recipes = Set.of();
+    private Stats stats = new PaperStats();
     private boolean seenCredits = false;
     private double absorption = 0;
     private double health = 20;
@@ -59,6 +61,7 @@ public class PaperPlayerData implements PlayerData {
                 .respawnLocation(player.getPotentialRespawnLocation())
                 .potionEffects(player.getActivePotionEffects())
                 .gameMode(player.getGameMode())
+                .stats(PaperStats.of(player))
                 .discoveredRecipes(player.getDiscoveredRecipes())
                 .seenCredits(player.hasSeenWinScreen())
                 .absorption(player.getAbsorptionAmount())
@@ -94,6 +97,7 @@ public class PaperPlayerData implements PlayerData {
         if (settings.respawnLocation()) player.setRespawnLocation(respawnLocation, true);
         if (settings.saturation()) player.setSaturation(saturation);
         if (settings.score()) player.setDeathScreenScore(score);
+        if (settings.statistics()) stats.apply(player);
 
         if (settings.attributes()) attributes.forEach(data -> {
             var attribute = player.getAttribute(data.attribute());
@@ -253,6 +257,12 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public PaperPlayerData stats(Stats stats) {
+        this.stats = stats;
+        return this;
+    }
+
+    @Override
     public PaperPlayerData level(int level) {
         this.level = level;
         return this;
@@ -296,6 +306,11 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public @Unmodifiable Set<NamespacedKey> discoveredRecipes() {
         return recipes;
+    }
+
+    @Override
+    public Stats stats() {
+        return stats;
     }
 
     @Override

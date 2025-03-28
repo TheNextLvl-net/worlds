@@ -1,6 +1,7 @@
 package net.thenextlvl.perworlds.data;
 
 import net.thenextlvl.perworlds.GroupSettings;
+import net.thenextlvl.perworlds.statistics.Stats;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface PlayerData {
-    // todo: stats, achievements
+    // todo: achievements
 
     @Nullable
     ItemStack[] enderChestContents();
@@ -77,11 +78,15 @@ public interface PlayerData {
 
     PlayerData seenCredits(boolean seenCredits);
 
+    PlayerData stats(Stats stats);
+
     @Unmodifiable
     Set<AttributeData> attributes();
 
     @Unmodifiable
     Set<NamespacedKey> discoveredRecipes();
+
+    Stats stats();
 
     boolean seenCredits();
 
