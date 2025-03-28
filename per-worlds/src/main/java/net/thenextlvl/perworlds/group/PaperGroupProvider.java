@@ -81,7 +81,6 @@ public class PaperGroupProvider implements GroupProvider {
                 .registerTypeHierarchyAdapter(Attribute.class, new AttributeAdapter())
                 .registerTypeHierarchyAdapter(AttributeData.class, new AttributeDataAdapter())
                 .registerTypeHierarchyAdapter(GameMode.class, new EnumAdapter<>(GameMode.class))
-                .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackAdapter())
                 .registerTypeHierarchyAdapter(ItemStack[].class, new ItemStackArrayAdapter())
                 .registerTypeHierarchyAdapter(Key.class, new KeyAdapter())
                 .registerTypeHierarchyAdapter(Location.class, new LocationAdapter())
