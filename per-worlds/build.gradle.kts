@@ -32,9 +32,9 @@ dependencies {
 
     api("org.bstats:bstats-bukkit:3.1.0")
 
-    api("net.thenextlvl.core:adapters:2.0.1")
-    api("net.thenextlvl.core:i18n:1.0.20")
-    api("net.thenextlvl.core:paper:2.0.3")
+    api("net.thenextlvl.core:adapters:2.0.2")
+    api("net.thenextlvl.core:i18n:1.0.21")
+    api("net.thenextlvl.core:paper:2.0.4")
 
     implementation(project(":per-worlds-api"))
 }

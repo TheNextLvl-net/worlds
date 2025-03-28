@@ -27,7 +27,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 
     compileOnlyApi(project(":per-worlds-api"))
-    api("net.thenextlvl.core:adapters:2.0.1")
+    api("net.thenextlvl.core:adapters:2.0.2")
 }
 
 

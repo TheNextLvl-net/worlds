@@ -32,8 +32,8 @@ dependencies {
 
     implementation(project(":worlds-api"))
     implementation(project(":per-worlds"))
-    implementation("net.thenextlvl.core:i18n:1.0.20")
-    implementation("net.thenextlvl.core:paper:2.0.3")
+    implementation("net.thenextlvl.core:i18n:1.0.21")
+    implementation("net.thenextlvl.core:paper:2.0.4")
 }
 
 tasks.shadowJar {
