@@ -59,8 +59,6 @@ public interface PlayerData {
 
     PlayerData inventoryContents(@Nullable ItemStack[] contents);
 
-    PlayerData seenCredits(boolean seenCredits);
-
     PlayerData level(int level);
 
     PlayerData potionEffects(Collection<PotionEffect> effects);
@@ -72,6 +70,8 @@ public interface PlayerData {
     PlayerData saturation(float saturation);
 
     PlayerData score(int score);
+
+    PlayerData seenCredits(boolean seenCredits);
 
     @Unmodifiable
     Set<AttributeData> attributes();
