@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @NullMarked
-public interface WorldGroup extends Keyed {
+public interface WorldGroup {
     File getDataFolder();
 
     GroupSettings getSettings();
@@ -26,6 +26,8 @@ public interface WorldGroup extends Keyed {
 
     @Unmodifiable
     Set<World> getWorlds();
+
+    String getName();
 
     boolean addWorld(World world);
 

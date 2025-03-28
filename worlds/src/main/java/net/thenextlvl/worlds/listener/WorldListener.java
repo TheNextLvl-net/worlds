@@ -21,11 +21,11 @@ public class WorldListener implements Listener {
             if (plugin.groupProvider().removeGroup(group) && group.getDataFolder().delete())
                 plugin.getComponentLogger().info(
                         "Cleaned up group data {} ({})",
-                        group.key(), group.getDataFolder()
+                        group.getName(), group.getDataFolder()
                 );
             else plugin.getComponentLogger().warn(
                     "Failed to delete group data {} ({})",
-                    group.key(), group.getDataFolder()
+                    group.getName(), group.getDataFolder()
             );
         });
     }

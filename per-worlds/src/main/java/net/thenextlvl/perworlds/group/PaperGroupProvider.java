@@ -123,8 +123,8 @@ public class PaperGroupProvider implements GroupProvider {
     }
 
     @Override
-    public Optional<WorldGroup> getGroup(Key key) {
-        return groups.stream().filter(group -> group.key().equals(key)).findAny();
+    public Optional<WorldGroup> getGroup(String name) {
+        return groups.stream().filter(group -> group.getName().equals(name)).findAny();
     }
 
     @Override
@@ -133,27 +133,27 @@ public class PaperGroupProvider implements GroupProvider {
     }
 
     @Override
-    public WorldGroup createGroup(Key key, Consumer<GroupSettings> settings, Collection<World> worlds) {
-        Preconditions.checkState(!hasGroup(key), "Cannot create multiple groups with the same key");
+    public WorldGroup createGroup(String name, Consumer<GroupSettings> settings, Collection<World> worlds) {
+        Preconditions.checkState(!hasGroup(name), "Cannot create multiple groups with the same key");
         var invalid = worlds.stream().filter(this::hasGroup).map(Keyed::key).map(Key::asString).toList();
         Preconditions.checkState(invalid.isEmpty(), "Worlds cannot be in multiple groups: {}", String.join(", ", invalid));
 
         var groupSettings = new PaperGroupSettings();
         settings.accept(groupSettings);
 
-        var group = new PaperWorldGroup(this, key, groupSettings, Set.copyOf(worlds));
+        var group = new PaperWorldGroup(this, name, groupSettings, Set.copyOf(worlds));
         groups.add(group);
         return group;
     }
 
     @Override
-    public WorldGroup createGroup(Key key, Consumer<GroupSettings> settings, World... worlds) {
-        return createGroup(key, settings, List.of(worlds));
+    public WorldGroup createGroup(String name, Consumer<GroupSettings> settings, World... worlds) {
+        return createGroup(name, settings, List.of(worlds));
     }
 
     @Override
-    public boolean hasGroup(Key key) {
-        return groups.stream().anyMatch(group -> group.key().equals(key));
+    public boolean hasGroup(String name) {
+        return groups.stream().anyMatch(group -> group.getName().equals(name));
     }
 
     @Override
@@ -167,8 +167,8 @@ public class PaperGroupProvider implements GroupProvider {
     }
 
     @Override
-    public boolean removeGroup(Key key) {
-        return groups.removeIf(group -> group.key().equals(key));
+    public boolean removeGroup(String name) {
+        return groups.removeIf(group -> group.getName().equals(name));
     }
 
     @Override

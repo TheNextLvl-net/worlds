@@ -37,11 +37,12 @@ public class PaperWorldGroup implements WorldGroup {
     private final Key key;
     private final PaperGroupProvider groupProvider;
     private final Set<World> worlds;
+    private final String name;
 
-    public PaperWorldGroup(PaperGroupProvider groupProvider, Key key, GroupSettings settings, Set<World> worlds) {
-        this.dataFolder = new File(groupProvider.getDataFolder(), key.asString());
+    public PaperWorldGroup(PaperGroupProvider groupProvider, String name, GroupSettings settings, Set<World> worlds) {
+        this.dataFolder = new File(groupProvider.getDataFolder(), name);
         this.groupProvider = groupProvider;
-        this.key = key;
+        this.name = name;
         this.settings = settings;
         this.worlds = worlds;
     }
@@ -68,6 +69,11 @@ public class PaperWorldGroup implements WorldGroup {
     @Override
     public @Unmodifiable Set<World> getWorlds() {
         return Set.copyOf(worlds);
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -135,11 +141,6 @@ public class PaperWorldGroup implements WorldGroup {
     @Override
     public void persistPlayerData(Player player) {
         writePlayerData(player, PaperPlayerData.of(player));
-    }
-
-    @Override
-    public Key key() {
-        return key;
     }
 
     private Optional<PlayerData> readPlayerData(File file) throws IOException {

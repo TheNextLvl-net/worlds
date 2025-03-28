@@ -1,6 +1,5 @@
 package net.thenextlvl.perworlds;
 
-import net.kyori.adventure.key.Key;
 import org.bukkit.World;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
@@ -18,21 +17,21 @@ public interface GroupProvider {
     @Unmodifiable
     List<WorldGroup> getGroups();
 
-    Optional<WorldGroup> getGroup(Key key);
+    Optional<WorldGroup> getGroup(String name);
 
     Optional<WorldGroup> getGroup(World world);
 
-    WorldGroup createGroup(Key key, Consumer<GroupSettings> settings, Collection<World> worlds);
+    WorldGroup createGroup(String name, Consumer<GroupSettings> settings, Collection<World> worlds);
 
-    WorldGroup createGroup(Key key, Consumer<GroupSettings> settings, World... worlds);
+    WorldGroup createGroup(String name, Consumer<GroupSettings> settings, World... worlds);
 
-    boolean hasGroup(Key key);
+    boolean hasGroup(String name);
 
     boolean hasGroup(World world);
 
     boolean hasGroup(WorldGroup group);
 
-    boolean removeGroup(Key key);
+    boolean removeGroup(String name);
 
     boolean removeGroup(WorldGroup group);
 }
