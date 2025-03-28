@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class Preset {
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Structure.class, new StructureTypeAdapter())
-            .registerTypeAdapter(Material.class, MaterialAdapter.instance())
+            .registerTypeAdapter(Material.class, new MaterialAdapter())
             .registerTypeAdapter(Biome.class, new BiomeTypeAdapter())
             .setPrettyPrinting()
             .create();
