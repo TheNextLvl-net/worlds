@@ -1,11 +1,6 @@
 package net.thenextlvl.perworlds.group;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import core.file.FileIO;
-import core.file.format.GsonFile;
-import core.io.IO;
 import core.nbt.serialization.NBT;
 import core.nbt.serialization.adapter.EnumAdapter;
 import net.kyori.adventure.key.Key;
@@ -15,7 +10,6 @@ import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.adapter.AttributeAdapter;
 import net.thenextlvl.perworlds.adapter.AttributeDataAdapter;
-import net.thenextlvl.perworlds.adapter.ItemStackAdapter;
 import net.thenextlvl.perworlds.adapter.ItemStackArrayAdapter;
 import net.thenextlvl.perworlds.adapter.KeyAdapter;
 import net.thenextlvl.perworlds.adapter.LocationAdapter;
@@ -24,10 +18,8 @@ import net.thenextlvl.perworlds.adapter.PlayerDataAdapter;
 import net.thenextlvl.perworlds.adapter.PotionEffectAdapter;
 import net.thenextlvl.perworlds.adapter.PotionEffectTypeAdapter;
 import net.thenextlvl.perworlds.adapter.WorldAdapter;
-import net.thenextlvl.perworlds.adapter.gson.GroupSettingsAdapter;
 import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
-import net.thenextlvl.perworlds.model.PersistedGroup;
 import org.bukkit.GameMode;
 import org.bukkit.Keyed;
 import org.bukkit.Location;
@@ -42,41 +34,22 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @NullMarked
 public class PaperGroupProvider implements GroupProvider {
     private final File dataFolder;
-    private final FileIO<Map<Key, PersistedGroup>> config;
-    private final List<WorldGroup> groups; // todo: move to config
+    private final List<WorldGroup> groups = new ArrayList<>(); // todo: move to config
     private final NBT nbt;
     private final Plugin plugin;
 
     public PaperGroupProvider(Plugin plugin) {
-        var pluginDirectory = new File("plugins/PerWorlds");
-        this.dataFolder = new File(pluginDirectory, "saves");
-        this.config = new GsonFile<>(IO.of(pluginDirectory, "config.json"),
-                new HashMap<>(), new TypeToken<>() {
-        }, new GsonBuilder()
-                .registerTypeAdapter(GroupSettings.class, new GroupSettingsAdapter())
-                .registerTypeAdapter(Key.class, core.paper.adapters.key.KeyAdapter.kyori())
-                .setPrettyPrinting()
-                .create());
-
-        this.groups = config.getRoot().entrySet().stream().map(entry -> {
-            var worlds = entry.getValue().worlds().stream().map(plugin.getServer()::getWorld)
-                    .filter(Objects::nonNull).collect(Collectors.toSet());
-            return new PaperWorldGroup(this, entry.getKey(), entry.getValue().settings(), worlds);
-        }).collect(Collectors.toList());
-
+        this.dataFolder = new File("plugins/PerWorlds");
         this.nbt = new NBT.Builder()
                 .registerTypeHierarchyAdapter(Attribute.class, new AttributeAdapter())
                 .registerTypeHierarchyAdapter(AttributeData.class, new AttributeDataAdapter())
@@ -91,16 +64,6 @@ public class PaperGroupProvider implements GroupProvider {
                 .registerTypeHierarchyAdapter(World.class, new WorldAdapter(plugin.getServer()))
                 .build();
         this.plugin = plugin;
-    }
-
-    public void save() {
-        var groups = new HashMap<Key, PersistedGroup>();
-        this.groups.forEach(group -> {
-            var worlds = group.getWorlds().stream().map(World::key).collect(Collectors.toSet());
-            groups.put(group.key(), new PersistedGroup(worlds, group.getSettings()));
-        });
-        config.setRoot(groups);
-        config.save();
     }
 
     public ComponentLogger getLogger() {

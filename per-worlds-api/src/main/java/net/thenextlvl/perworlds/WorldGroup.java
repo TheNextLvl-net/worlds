@@ -1,6 +1,5 @@
 package net.thenextlvl.perworlds;
 
-import net.kyori.adventure.key.Keyed;
 import net.thenextlvl.perworlds.data.PlayerData;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -16,6 +15,8 @@ import java.util.Set;
 @NullMarked
 public interface WorldGroup {
     File getDataFolder();
+
+    File getFile();
 
     GroupSettings getSettings();
 
@@ -33,11 +34,17 @@ public interface WorldGroup {
 
     boolean containsWorld(World world);
 
+    boolean delete();
+
+    boolean persist();
+
     boolean removeWorld(World world);
 
     boolean writePlayerData(OfflinePlayer player, PlayerData data);
 
     void loadPlayerData(Player player);
+
+    void persistPlayerData();
 
     void persistPlayerData(Player player);
 }

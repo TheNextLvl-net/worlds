@@ -3,7 +3,6 @@ package net.thenextlvl.perworlds.group;
 import core.io.IO;
 import core.nbt.NBTInputStream;
 import core.nbt.NBTOutputStream;
-import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.data.PlayerData;
@@ -17,12 +16,16 @@ import org.jspecify.annotations.NullMarked;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.READ;
@@ -33,23 +36,29 @@ import static net.thenextlvl.perworlds.SharedWorlds.ISSUES;
 @NullMarked
 public class PaperWorldGroup implements WorldGroup {
     private final File dataFolder;
+    private final File file;
     private final GroupSettings settings;
-    private final Key key;
     private final PaperGroupProvider groupProvider;
-    private final Set<World> worlds;
+    private final Set<WeakReference<World>> worlds;
     private final String name;
 
     public PaperWorldGroup(PaperGroupProvider groupProvider, String name, GroupSettings settings, Set<World> worlds) {
         this.dataFolder = new File(groupProvider.getDataFolder(), name);
+        this.file = new File(dataFolder, name + ".json");
         this.groupProvider = groupProvider;
         this.name = name;
         this.settings = settings;
-        this.worlds = worlds;
+        this.worlds = worlds.stream().map(WeakReference::new).collect(Collectors.toSet());
     }
 
     @Override
     public File getDataFolder() {
         return dataFolder;
+    }
+
+    @Override
+    public File getFile() {
+        return file;
     }
 
     @Override
@@ -68,7 +77,9 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public @Unmodifiable Set<World> getWorlds() {
-        return Set.copyOf(worlds);
+        return worlds.stream().map(Reference::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     @Override
@@ -78,17 +89,29 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public boolean addWorld(World world) {
-        return !groupProvider.hasGroup(world) && worlds.add(world);
+        return !groupProvider.hasGroup(world) && worlds.add(new WeakReference<>(world));
     }
 
     @Override
     public boolean containsWorld(World world) {
-        return worlds.contains(world);
+        return worlds.stream().anyMatch(reference -> reference.refersTo(world));
+    }
+
+    @Override
+    public boolean delete() {
+        var config = file.delete();
+        var data = dataFolder.delete();
+        return config || data;
+    }
+
+    @Override
+    public boolean persist() {
+        return false; // todo: persist settings
     }
 
     @Override
     public boolean removeWorld(World world) {
-        return worlds.remove(world);
+        return worlds.removeIf(reference -> reference.refersTo(world));
     }
 
     @Override
@@ -136,6 +159,11 @@ public class PaperWorldGroup implements WorldGroup {
     @Override
     public void loadPlayerData(Player player) {
         readPlayerData(player).orElseGet(PaperPlayerData::new).apply(settings, player);
+    }
+
+    @Override
+    public void persistPlayerData() {
+        getPlayers().forEach(this::persistPlayerData);
     }
 
     @Override
