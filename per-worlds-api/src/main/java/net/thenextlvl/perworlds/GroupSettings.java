@@ -3,7 +3,11 @@ package net.thenextlvl.perworlds;
 public interface GroupSettings {
     boolean absorption();
 
+    boolean arrowsInBody();
+
     boolean attributes();
+
+    boolean beeStingersInBody();
 
     boolean chat();
 
@@ -51,7 +55,11 @@ public interface GroupSettings {
 
     void absorption(boolean enabled);
 
+    void arrowsInBody(boolean enabled);
+
     void attributes(boolean enabled);
+
+    void beeStingersInBody(boolean enabled);
 
     void chat(boolean enabled);
 

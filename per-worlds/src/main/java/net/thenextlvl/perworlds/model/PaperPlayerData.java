@@ -37,6 +37,8 @@ public class PaperPlayerData implements PlayerData {
     private float experience = 0;
     private float fallDistance = 0;
     private float saturation = 10;
+    private int arrowsInBody = 0;
+    private int beeStingersInBody = 0;
     private int fireTicks = 0;
     private int foodLevel = 20;
     private int freezeTicks = 0;
@@ -64,6 +66,8 @@ public class PaperPlayerData implements PlayerData {
                 .exhaustion(player.getExhaustion())
                 .experience(player.getExp())
                 .saturation(player.getSaturation())
+                .arrowsInBody(player.getArrowsInBody())
+                .beeStingersInBody(player.getBeeStingersInBody())
                 .fireTicks(player.getFireTicks())
                 .foodLevel(player.getFoodLevel())
                 .freezeTicks(player.getFreezeTicks())
@@ -76,6 +80,8 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public void apply(GroupSettings settings, Player player) {
         if (settings.absorption()) player.setAbsorptionAmount(absorption);
+        if (settings.arrowsInBody()) player.setArrowsInBody(arrowsInBody);
+        if (settings.beeStingersInBody()) player.setBeeStingersInBody(beeStingersInBody);
         if (settings.endCredits()) player.setHasSeenWinScreen(seenCredits);
         if (settings.exhaustion()) player.setExhaustion(exhaustion);
         if (settings.fallDistance()) player.setFallDistance(fallDistance);
@@ -151,8 +157,20 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public PaperPlayerData arrowsInBody(int arrowsInBody) {
+        this.arrowsInBody = arrowsInBody;
+        return this;
+    }
+
+    @Override
     public PaperPlayerData attributes(Collection<AttributeData> attributes) {
         this.attributes = Set.copyOf(attributes);
+        return this;
+    }
+
+    @Override
+    public PaperPlayerData beeStingersInBody(int beeStingersInBody) {
+        this.beeStingersInBody = beeStingersInBody;
         return this;
     }
 
@@ -313,6 +331,16 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public float saturation() {
         return saturation;
+    }
+
+    @Override
+    public int arrowsInBody() {
+        return arrowsInBody;
+    }
+
+    @Override
+    public int beeStingersInBody() {
+        return beeStingersInBody;
     }
 
     @Override

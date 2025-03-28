@@ -44,6 +44,8 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         root.optional("experience").map(Tag::getAsFloat).ifPresent(data::experience);
         root.optional("fallDistance").map(Tag::getAsFloat).ifPresent(data::fallDistance);
         root.optional("saturation").map(Tag::getAsFloat).ifPresent(data::saturation);
+        root.optional("arrowsInBody").map(Tag::getAsInt).ifPresent(data::arrowsInBody);
+        root.optional("beeStingersInBody").map(Tag::getAsInt).ifPresent(data::beeStingersInBody);
         root.optional("fireTicks").map(Tag::getAsInt).ifPresent(data::fireTicks);
         root.optional("foodLevel").map(Tag::getAsInt).ifPresent(data::foodLevel);
         root.optional("freezeTicks").map(Tag::getAsInt).ifPresent(data::freezeTicks);
@@ -72,6 +74,8 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         tag.add("experience", data.experience());
         tag.add("fallDistance", data.fallDistance());
         tag.add("saturation", data.saturation());
+        tag.add("arrowsInBody", data.arrowsInBody());
+        tag.add("beeStingersInBody", data.beeStingersInBody());
         tag.add("fireTicks", data.fireTicks());
         tag.add("foodLevel", data.foodLevel());
         tag.add("freezeTicks", data.freezeTicks());

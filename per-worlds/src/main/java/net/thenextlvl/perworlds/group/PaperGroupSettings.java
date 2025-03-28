@@ -4,7 +4,9 @@ import net.thenextlvl.perworlds.GroupSettings;
 
 public class PaperGroupSettings implements GroupSettings {
     private boolean absorption = true;
+    private boolean arrowsInBody = true;
     private boolean attributes = false;
+    private boolean beeStingersInBody = true;
     private boolean chat = false;
     private boolean enabled = true;
     private boolean endCredits = true;
@@ -34,8 +36,18 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
+    public boolean arrowsInBody() {
+        return arrowsInBody;
+    }
+
+    @Override
     public boolean attributes() {
         return attributes;
+    }
+
+    @Override
+    public boolean beeStingersInBody() {
+        return beeStingersInBody;
     }
 
     @Override
@@ -154,8 +166,18 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
+    public void arrowsInBody(boolean enabled) {
+        this.arrowsInBody = enabled;
+    }
+
+    @Override
     public void attributes(boolean enabled) {
         this.attributes = enabled;
+    }
+
+    @Override
+    public void beeStingersInBody(boolean enabled) {
+        this.beeStingersInBody = enabled;
     }
 
     @Override

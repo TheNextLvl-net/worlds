@@ -33,7 +33,11 @@ public interface PlayerData {
 
     PlayerData absorption(double absorption);
 
+    PlayerData arrowsInBody(int arrowsInBody);
+
     PlayerData attributes(Collection<AttributeData> attributes);
+
+    PlayerData beeStingersInBody(int beeStingers);
 
     PlayerData discoveredRecipes(Collection<NamespacedKey> recipes);
 
@@ -92,6 +96,10 @@ public interface PlayerData {
     float fallDistance();
 
     float saturation();
+
+    int arrowsInBody();
+
+    int beeStingersInBody();
 
     int fireTicks();
 
