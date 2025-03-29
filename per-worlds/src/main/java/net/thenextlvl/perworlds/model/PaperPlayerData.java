@@ -100,17 +100,6 @@ public class PaperPlayerData implements PlayerData {
 
     @Override
     public void apply(GroupSettings settings, Player player) {
-        player.setInvulnerable(invulnerable);
-        player.setPortalCooldown(portalCooldown);
-        player.setGliding(gliding);
-
-        player.setWardenTimeSinceLastWarning(wardenSpawnTracker.ticksSinceLastWarning());
-        player.setWardenWarningCooldown(wardenSpawnTracker.cooldownTicks());
-        player.setWardenWarningLevel(wardenSpawnTracker.warningLevel());
-
-        player.setLastDeathLocation(lastDeathLocation);
-        player.setVelocity(velocity);
-
         if (settings.absorption()) player.setAbsorptionAmount(absorption);
         if (settings.arrowsInBody()) player.setArrowsInBody(arrowsInBody);
         if (settings.beeStingersInBody()) player.setBeeStingersInBody(beeStingersInBody);
@@ -121,17 +110,28 @@ public class PaperPlayerData implements PlayerData {
         if (settings.foodLevel()) player.setFoodLevel(foodLevel);
         if (settings.freezeTicks()) player.setFreezeTicks(freezeTicks);
         if (settings.gameMode()) player.setGameMode(gameMode);
+        if (settings.gliding()) player.setGliding(gliding);
         if (settings.health()) player.setHealth(health);
+        if (settings.invulnerable()) player.setInvulnerable(invulnerable);
+        if (settings.lastDeathLocation()) player.setLastDeathLocation(lastDeathLocation);
+        if (settings.portalCooldown()) player.setPortalCooldown(portalCooldown);
         if (settings.remainingAir()) player.setRemainingAir(remainingAir);
         if (settings.respawnLocation()) player.setRespawnLocation(respawnLocation, true);
         if (settings.saturation()) player.setSaturation(saturation);
         if (settings.score()) player.setDeathScreenScore(score);
         if (settings.statistics()) stats.apply(player);
+        if (settings.velocity()) player.setVelocity(velocity);
 
         if (settings.attributes()) attributes.forEach(data -> {
             var attribute = player.getAttribute(data.attribute());
             if (attribute != null) attribute.setBaseValue(data.baseValue());
         });
+
+        if (settings.wardenSpawnTracker()) {
+            player.setWardenTimeSinceLastWarning(wardenSpawnTracker.ticksSinceLastWarning());
+            player.setWardenWarningCooldown(wardenSpawnTracker.cooldownTicks());
+            player.setWardenWarningLevel(wardenSpawnTracker.warningLevel());
+        }
 
         if (settings.recipes()) {
             var toAdd = new HashSet<>(recipes);

@@ -18,8 +18,13 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean freezeTicks = true;
     private boolean gameMode = true;
     private boolean gameRules = true;
+    private boolean gliding = true;
     private boolean health = true;
     private boolean inventory = true;
+    private boolean invulnerable = false;
+    private boolean lastDeathLocation = true;
+    private boolean lastLocation = false; // todo: add possibility to teleport player to their last position in a group
+    private boolean portalCooldown = true;
     private boolean potionEffects = true;
     private boolean recipes = true;
     private boolean remainingAir = true;
@@ -29,6 +34,8 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean statistics = true;
     private boolean tabList = false;
     private boolean time = true;
+    private boolean velocity = true;
+    private boolean wardenSpawnTracker = true;
     private boolean weather = true;
 
     @Override
@@ -117,6 +124,11 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
+    public boolean gliding() {
+        return gliding;
+    }
+
+    @Override
     public boolean health() {
         return health;
     }
@@ -124,6 +136,26 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean inventory() {
         return inventory;
+    }
+
+    @Override
+    public boolean invulnerable() {
+        return invulnerable;
+    }
+
+    @Override
+    public boolean lastDeathLocation() {
+        return lastDeathLocation;
+    }
+
+    @Override
+    public boolean lastLocation() {
+        return lastLocation;
+    }
+
+    @Override
+    public boolean portalCooldown() {
+        return portalCooldown;
     }
 
     @Override
@@ -159,6 +191,16 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean time() {
         return time;
+    }
+
+    @Override
+    public boolean velocity() {
+        return velocity;
+    }
+
+    @Override
+    public boolean wardenSpawnTracker() {
+        return wardenSpawnTracker;
     }
 
     @Override
@@ -252,6 +294,11 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
+    public void gliding(boolean enabled) {
+        this.gliding = enabled;
+    }
+
+    @Override
     public void health(boolean enabled) {
         this.health = enabled;
     }
@@ -259,6 +306,26 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void inventory(boolean enabled) {
         this.inventory = enabled;
+    }
+
+    @Override
+    public void invulnerable(boolean enabled) {
+        this.invulnerable = enabled;
+    }
+
+    @Override
+    public void lastDeathLocation(boolean enabled) {
+        this.lastDeathLocation = enabled;
+    }
+
+    @Override
+    public void lastLocation(boolean enabled) {
+        this.lastLocation = enabled;
+    }
+
+    @Override
+    public void portalCooldown(boolean enabled) {
+        this.portalCooldown = enabled;
     }
 
     @Override
@@ -294,6 +361,16 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void time(boolean enabled) {
         this.time = enabled;
+    }
+
+    @Override
+    public void velocity(boolean enabled) {
+        this.velocity = enabled;
+    }
+
+    @Override
+    public void wardenSpawnTracker(boolean enabled) {
+        this.wardenSpawnTracker = enabled;
     }
 
     @Override

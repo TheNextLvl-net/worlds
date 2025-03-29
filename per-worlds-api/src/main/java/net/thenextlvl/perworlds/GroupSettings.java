@@ -31,9 +31,19 @@ public interface GroupSettings {
 
     boolean gameRules();
 
+    boolean gliding();
+
     boolean health();
 
     boolean inventory();
+
+    boolean invulnerable();
+
+    boolean lastDeathLocation();
+
+    boolean lastLocation();
+
+    boolean portalCooldown();
 
     boolean potionEffects();
 
@@ -52,6 +62,10 @@ public interface GroupSettings {
     boolean tabList();
 
     boolean time();
+
+    boolean velocity();
+
+    boolean wardenSpawnTracker();
 
     boolean weather();
 
@@ -85,9 +99,19 @@ public interface GroupSettings {
 
     void gameRules(boolean enabled);
 
+    void gliding(boolean enabled);
+
     void health(boolean enabled);
 
     void inventory(boolean enabled);
+
+    void invulnerable(boolean enabled);
+
+    void lastDeathLocation(boolean enabled);
+
+    void lastLocation(boolean enabled);
+
+    void portalCooldown(boolean enabled);
 
     void potionEffects(boolean enabled);
 
@@ -106,6 +130,10 @@ public interface GroupSettings {
     void tabList(boolean enabled);
 
     void time(boolean enabled);
+
+    void velocity(boolean enabled);
+
+    void wardenSpawnTracker(boolean enabled);
 
     void weather(boolean enabled);
 }
