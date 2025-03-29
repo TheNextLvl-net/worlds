@@ -10,6 +10,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean chat = false;
     private boolean enabled = true;
     private boolean endCredits = true;
+    private boolean enderChest = true;
     private boolean exhaustion = true;
     private boolean experience = true;
     private boolean fallDistance = true;
@@ -20,6 +21,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean gameRules = true;
     private boolean gliding = true;
     private boolean health = true;
+    private boolean hotbarSlot = true;
     private boolean inventory = true;
     private boolean invulnerable = false;
     private boolean lastDeathLocation = true;
@@ -84,6 +86,11 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
+    public boolean enderChest() {
+        return enderChest;
+    }
+
+    @Override
     public boolean exhaustion() {
         return exhaustion;
     }
@@ -131,6 +138,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean health() {
         return health;
+    }
+
+    @Override
+    public boolean hotbarSlot() {
+        return hotbarSlot;
     }
 
     @Override
@@ -254,6 +266,11 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
+    public void enderChest(boolean enabled) {
+        this.enderChest = enabled;
+    }
+
+    @Override
     public void exhaustion(boolean enabled) {
         this.exhaustion = enabled;
     }
@@ -301,6 +318,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void health(boolean enabled) {
         this.health = enabled;
+    }
+
+    @Override
+    public void hotbarSlot(boolean enabled) {
+        this.hotbarSlot = enabled;
     }
 
     @Override

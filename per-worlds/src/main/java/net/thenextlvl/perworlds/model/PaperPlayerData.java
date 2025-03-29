@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
 @NullMarked
 public class PaperPlayerData implements PlayerData {
     private @Nullable GameMode previousGameMode = null;
-    private @Nullable ItemStack[] enderChestContents = new ItemStack[27];
-    private @Nullable ItemStack[] inventoryContents = new ItemStack[40];
+    private @Nullable ItemStack[] enderChest = new ItemStack[27];
+    private @Nullable ItemStack[] inventory = new ItemStack[40];
     private @Nullable Location lastDeathLocation = null;
     private @Nullable Location lastLocation = null;
     private @Nullable Location respawnLocation = null;
@@ -74,8 +74,8 @@ public class PaperPlayerData implements PlayerData {
                 .lastLocation(player.getLocation())
                 .velocity(player.getVelocity())
                 .previousGameMode(player.getPreviousGameMode())
-                .enderChestContents(player.getEnderChest().getContents())
-                .inventoryContents(player.getInventory().getContents())
+                .enderChest(player.getEnderChest().getContents())
+                .inventory(player.getInventory().getContents())
                 .respawnLocation(player.getPotentialRespawnLocation())
                 .potionEffects(player.getActivePotionEffects())
                 .gameMode(player.getGameMode())
@@ -104,6 +104,7 @@ public class PaperPlayerData implements PlayerData {
         if (settings.arrowsInBody()) player.setArrowsInBody(arrowsInBody);
         if (settings.beeStingersInBody()) player.setBeeStingersInBody(beeStingersInBody);
         if (settings.endCredits()) player.setHasSeenWinScreen(seenCredits);
+        if (settings.enderChest()) player.getEnderChest().setContents(enderChest);
         if (settings.exhaustion()) player.setExhaustion(exhaustion);
         if (settings.fallDistance()) player.setFallDistance(fallDistance);
         if (settings.fireTicks()) player.setFireTicks(fireTicks);
@@ -112,6 +113,8 @@ public class PaperPlayerData implements PlayerData {
         if (settings.gameMode()) player.setGameMode(gameMode);
         if (settings.gliding()) player.setGliding(gliding);
         if (settings.health()) player.setHealth(health);
+        if (settings.hotbarSlot()) player.getInventory().setHeldItemSlot(heldItemSlot);
+        if (settings.inventory()) player.getInventory().setContents(inventory);
         if (settings.invulnerable()) player.setInvulnerable(invulnerable);
         if (settings.lastDeathLocation()) player.setLastDeathLocation(lastDeathLocation);
         if (settings.portalCooldown()) player.setPortalCooldown(portalCooldown);
@@ -159,13 +162,13 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public @Nullable ItemStack[] enderChestContents() {
-        return enderChestContents;
+    public @Nullable ItemStack[] enderChest() {
+        return enderChest;
     }
 
     @Override
-    public @Nullable ItemStack[] inventoryContents() {
-        return inventoryContents;
+    public @Nullable ItemStack[] inventory() {
+        return inventory;
     }
 
     @Override
@@ -229,8 +232,8 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public PaperPlayerData enderChestContents(@Nullable ItemStack[] contents) {
-        this.enderChestContents = contents;
+    public PaperPlayerData enderChest(@Nullable ItemStack[] contents) {
+        this.enderChest = contents;
         return this;
     }
 
@@ -295,8 +298,8 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public PaperPlayerData inventoryContents(@Nullable ItemStack[] contents) {
-        this.inventoryContents = contents;
+    public PaperPlayerData inventory(@Nullable ItemStack[] contents) {
+        this.inventory = contents;
         return this;
     }
 

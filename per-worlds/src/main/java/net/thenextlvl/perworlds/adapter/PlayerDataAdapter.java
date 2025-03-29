@@ -30,8 +30,8 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         root.optional("attributes").map(Tag::getAsList).map(list ->
                 list.stream().map(attribute -> context.deserialize(attribute, AttributeData.class)).toList()
         ).ifPresent(data::attributes);
-        root.optional("enderChest").map(items -> context.deserialize(items, ItemStack[].class)).ifPresent(data::enderChestContents);
-        root.optional("inventory").map(items -> context.deserialize(items, ItemStack[].class)).ifPresent(data::inventoryContents);
+        root.optional("enderChest").map(items -> context.deserialize(items, ItemStack[].class)).ifPresent(data::enderChest);
+        root.optional("inventory").map(items -> context.deserialize(items, ItemStack[].class)).ifPresent(data::inventory);
         root.optional("respawnLocation").map(location -> context.deserialize(location, Location.class)).ifPresent(data::respawnLocation);
         root.optional("recipes").map(Tag::getAsList).map(list ->
                 list.stream().map(recipe -> context.deserialize(recipe, NamespacedKey.class)).toList()
@@ -72,8 +72,8 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
     public CompoundTag serialize(PlayerData data, TagSerializationContext context) throws ParserException {
         var tag = new CompoundTag();
         tag.add("attributes", new ListTag<>(data.attributes().stream().map(context::serialize).toList(), CompoundTag.ID));
-        tag.add("enderChest", context.serialize(data.enderChestContents()));
-        tag.add("inventory", context.serialize(data.inventoryContents()));
+        tag.add("enderChest", context.serialize(data.enderChest()));
+        tag.add("inventory", context.serialize(data.inventory()));
         var respawnLocation = data.respawnLocation();
         if (respawnLocation != null) tag.add("respawnLocation", context.serialize(respawnLocation));
         var previousGameMode = data.previousGameMode();

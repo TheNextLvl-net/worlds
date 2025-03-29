@@ -20,10 +20,10 @@ public interface PlayerData {
     // todo: achievements
 
     @Nullable
-    ItemStack[] enderChestContents();
+    ItemStack[] enderChest();
 
     @Nullable
-    ItemStack[] inventoryContents();
+    ItemStack[] inventory();
 
     @Unmodifiable
     List<PotionEffect> potionEffects();
@@ -52,7 +52,7 @@ public interface PlayerData {
 
     PlayerData discoveredRecipes(Collection<NamespacedKey> recipes);
 
-    PlayerData enderChestContents(@Nullable ItemStack[] contents);
+    PlayerData enderChest(@Nullable ItemStack[] contents);
 
     PlayerData exhaustion(float exhaustion);
 
@@ -74,7 +74,7 @@ public interface PlayerData {
 
     PlayerData heldItemSlot(int heldItemSlot);
 
-    PlayerData inventoryContents(@Nullable ItemStack[] contents);
+    PlayerData inventory(@Nullable ItemStack[] contents);
 
     PlayerData invulnerable(boolean invulnerable);
 

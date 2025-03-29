@@ -15,6 +15,8 @@ public interface GroupSettings {
 
     boolean endCredits();
 
+    boolean enderChest();
+
     boolean exhaustion();
 
     boolean experience();
@@ -34,6 +36,8 @@ public interface GroupSettings {
     boolean gliding();
 
     boolean health();
+
+    boolean hotbarSlot();
 
     boolean inventory();
 
@@ -83,6 +87,8 @@ public interface GroupSettings {
 
     void endCredits(boolean enabled);
 
+    void enderChest(boolean enabled);
+
     void exhaustion(boolean enabled);
 
     void experience(boolean enabled);
@@ -102,6 +108,8 @@ public interface GroupSettings {
     void gliding(boolean enabled);
 
     void health(boolean enabled);
+
+    void hotbarSlot(boolean enabled);
 
     void inventory(boolean enabled);
 
