@@ -15,7 +15,7 @@ public class SharedWorlds {
 
     public SharedWorlds(Plugin plugin) {
         this.groupProvider = new PaperGroupProvider(plugin);
-        this.metrics = new Metrics(plugin, 19652); // todo: create project
+        this.metrics = new Metrics(plugin, 25295);
         this.plugin = plugin;
     }
 
