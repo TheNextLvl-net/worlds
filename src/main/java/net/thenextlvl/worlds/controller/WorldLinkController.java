@@ -58,7 +58,7 @@ public class WorldLinkController implements LinkController {
     public boolean canLink(World source, World destination) {
         return source.getEnvironment().equals(World.Environment.NORMAL)
                && !destination.getEnvironment().equals(World.Environment.NORMAL)
-               && getTarget(source, destination.getEnvironment()).isEmpty();
+               && getTarget(destination, source.getEnvironment()).isEmpty();
     }
 
     @Override
