@@ -6,7 +6,7 @@ plugins {
     id("java")
     id("java-library")
     id("com.gradleup.shadow") version "9.0.0-beta9"
-    id("io.papermc.hangar-publish-plugin") version "0.1.2"
+    id("io.papermc.hangar-publish-plugin") version "0.1.3"
     id("net.minecrell.plugin-yml.paper") version "0.6.0"
 }
 
@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
 
     api("org.bstats:bstats-bukkit:3.1.0")
 
