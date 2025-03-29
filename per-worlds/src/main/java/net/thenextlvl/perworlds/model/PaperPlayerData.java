@@ -3,6 +3,7 @@ package net.thenextlvl.perworlds.model;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
+import net.thenextlvl.perworlds.data.WardenSpawnTracker;
 import net.thenextlvl.perworlds.statistics.Stats;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -11,6 +12,7 @@ import org.bukkit.Registry;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -24,14 +26,21 @@ import java.util.stream.Collectors;
 
 @NullMarked
 public class PaperPlayerData implements PlayerData {
+    private @Nullable GameMode previousGameMode = null;
     private @Nullable ItemStack[] enderChestContents = new ItemStack[27];
     private @Nullable ItemStack[] inventoryContents = new ItemStack[40];
+    private @Nullable Location lastDeathLocation = null;
+    private @Nullable Location lastLocation = null;
     private @Nullable Location respawnLocation = null;
     private GameMode gameMode = GameMode.SURVIVAL;
     private List<PotionEffect> potionEffects = List.of();
     private Set<AttributeData> attributes = Set.of();
     private Set<NamespacedKey> recipes = Set.of();
     private Stats stats = new PaperStats();
+    private Vector velocity = new Vector(0, 0, 0);
+    private WardenSpawnTracker wardenSpawnTracker = new PaperWardenSpawnTracker();
+    private boolean gliding = false;
+    private boolean invulnerable = false;
     private boolean seenCredits = false;
     private double absorption = 0;
     private double health = 20;
@@ -46,6 +55,7 @@ public class PaperPlayerData implements PlayerData {
     private int freezeTicks = 0;
     private int heldItemSlot = 0;
     private int level = 0;
+    private int portalCooldown = 0;
     private int remainingAir = 300;
     private int score = 0;
 
@@ -56,6 +66,14 @@ public class PaperPlayerData implements PlayerData {
                         .filter(Objects::nonNull)
                         .map(PaperAttributeData::new)
                         .collect(Collectors.toSet()))
+                .invulnerable(player.isInvulnerable())
+                .portalCooldown(player.getPortalCooldown())
+                .gliding(player.isGliding())
+                .wardenSpawnTracker(PaperWardenSpawnTracker.of(player))
+                .lastDeathLocation(player.getLastDeathLocation())
+                .lastLocation(player.getLocation())
+                .velocity(player.getVelocity())
+                .previousGameMode(player.getPreviousGameMode())
                 .enderChestContents(player.getEnderChest().getContents())
                 .inventoryContents(player.getInventory().getContents())
                 .respawnLocation(player.getPotentialRespawnLocation())
@@ -82,6 +100,17 @@ public class PaperPlayerData implements PlayerData {
 
     @Override
     public void apply(GroupSettings settings, Player player) {
+        player.setInvulnerable(invulnerable);
+        player.setPortalCooldown(portalCooldown);
+        player.setGliding(gliding);
+
+        player.setWardenTimeSinceLastWarning(wardenSpawnTracker.ticksSinceLastWarning());
+        player.setWardenWarningCooldown(wardenSpawnTracker.cooldownTicks());
+        player.setWardenWarningLevel(wardenSpawnTracker.warningLevel());
+
+        player.setLastDeathLocation(lastDeathLocation);
+        player.setVelocity(velocity);
+
         if (settings.absorption()) player.setAbsorptionAmount(absorption);
         if (settings.arrowsInBody()) player.setArrowsInBody(arrowsInBody);
         if (settings.beeStingersInBody()) player.setBeeStingersInBody(beeStingersInBody);
@@ -140,11 +169,6 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public @Nullable Location respawnLocation() {
-        return respawnLocation;
-    }
-
-    @Override
     public @Unmodifiable List<PotionEffect> potionEffects() {
         return potionEffects;
     }
@@ -152,6 +176,26 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public GameMode gameMode() {
         return gameMode;
+    }
+
+    @Override
+    public @Nullable GameMode previousGameMode() {
+        return previousGameMode;
+    }
+
+    @Override
+    public @Nullable Location lastDeathLocation() {
+        return lastDeathLocation;
+    }
+
+    @Override
+    public @Nullable Location lastLocation() {
+        return lastLocation;
+    }
+
+    @Override
+    public @Nullable Location respawnLocation() {
+        return respawnLocation;
     }
 
     @Override
@@ -233,6 +277,12 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public PaperPlayerData gliding(boolean gliding) {
+        this.gliding = gliding;
+        return this;
+    }
+
+    @Override
     public PaperPlayerData health(double health) {
         this.health = health;
         return this;
@@ -251,6 +301,24 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public PaperPlayerData invulnerable(boolean invulnerable) {
+        this.invulnerable = invulnerable;
+        return this;
+    }
+
+    @Override
+    public PaperPlayerData lastDeathLocation(@Nullable Location location) {
+        this.lastDeathLocation = location;
+        return this;
+    }
+
+    @Override
+    public PaperPlayerData lastLocation(@Nullable Location location) {
+        this.lastLocation = location;
+        return this;
+    }
+
+    @Override
     public PaperPlayerData seenCredits(boolean seenCredits) {
         this.seenCredits = seenCredits;
         return this;
@@ -263,14 +331,38 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public PaperPlayerData velocity(Vector velocity) {
+        this.velocity = velocity;
+        return this;
+    }
+
+    @Override
+    public PaperPlayerData wardenSpawnTracker(WardenSpawnTracker tracker) {
+        this.wardenSpawnTracker = tracker;
+        return this;
+    }
+
+    @Override
     public PaperPlayerData level(int level) {
         this.level = level;
         return this;
     }
 
     @Override
+    public PaperPlayerData portalCooldown(int cooldown) {
+        this.portalCooldown = cooldown;
+        return this;
+    }
+
+    @Override
     public PaperPlayerData potionEffects(Collection<PotionEffect> effects) {
         this.potionEffects = List.copyOf(effects);
+        return this;
+    }
+
+    @Override
+    public PaperPlayerData previousGameMode(@Nullable GameMode gameMode) {
+        this.previousGameMode = gameMode;
         return this;
     }
 
@@ -311,6 +403,26 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public Stats stats() {
         return stats;
+    }
+
+    @Override
+    public Vector velocity() {
+        return velocity;
+    }
+
+    @Override
+    public WardenSpawnTracker wardenSpawnTracker() {
+        return wardenSpawnTracker;
+    }
+
+    @Override
+    public boolean gliding() {
+        return gliding;
+    }
+
+    @Override
+    public boolean invulnerable() {
+        return invulnerable;
     }
 
     @Override
@@ -381,6 +493,11 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public int level() {
         return level;
+    }
+
+    @Override
+    public int portalCooldown() {
+        return portalCooldown;
     }
 
     @Override

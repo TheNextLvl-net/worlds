@@ -8,6 +8,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.Nullable;
 
@@ -24,13 +25,22 @@ public interface PlayerData {
     @Nullable
     ItemStack[] inventoryContents();
 
-    @Nullable
-    Location respawnLocation();
-
     @Unmodifiable
     List<PotionEffect> potionEffects();
 
     GameMode gameMode();
+
+    @Nullable
+    GameMode previousGameMode();
+
+    @Nullable
+    Location lastDeathLocation();
+
+    @Nullable
+    Location lastLocation();
+
+    @Nullable
+    Location respawnLocation();
 
     PlayerData absorption(double absorption);
 
@@ -58,15 +68,27 @@ public interface PlayerData {
 
     PlayerData gameMode(GameMode gameMode);
 
+    PlayerData gliding(boolean gliding);
+
     PlayerData health(double health);
 
     PlayerData heldItemSlot(int heldItemSlot);
 
     PlayerData inventoryContents(@Nullable ItemStack[] contents);
 
+    PlayerData invulnerable(boolean invulnerable);
+
+    PlayerData lastDeathLocation(@Nullable Location location);
+
+    PlayerData lastLocation(@Nullable Location location);
+
     PlayerData level(int level);
 
+    PlayerData portalCooldown(int cooldown);
+
     PlayerData potionEffects(Collection<PotionEffect> effects);
+
+    PlayerData previousGameMode(@Nullable GameMode gameMode);
 
     PlayerData remainingAir(int remainingAir);
 
@@ -80,6 +102,10 @@ public interface PlayerData {
 
     PlayerData stats(Stats stats);
 
+    PlayerData velocity(Vector velocity);
+
+    PlayerData wardenSpawnTracker(WardenSpawnTracker tracker);
+
     @Unmodifiable
     Set<AttributeData> attributes();
 
@@ -87,6 +113,14 @@ public interface PlayerData {
     Set<NamespacedKey> discoveredRecipes();
 
     Stats stats();
+
+    Vector velocity();
+
+    WardenSpawnTracker wardenSpawnTracker();
+
+    boolean gliding();
+
+    boolean invulnerable();
 
     boolean seenCredits();
 
@@ -115,6 +149,8 @@ public interface PlayerData {
     int heldItemSlot();
 
     int level();
+
+    int portalCooldown();
 
     int remainingAir();
 
