@@ -25,6 +25,8 @@ public interface GroupSettings {
 
     boolean fireTicks();
 
+    boolean flyState();
+
     boolean foodLevel();
 
     boolean freezeTicks();
@@ -96,6 +98,8 @@ public interface GroupSettings {
     void fallDistance(boolean enabled);
 
     void fireTicks(boolean enabled);
+
+    void flyState(boolean enabled);
 
     void foodLevel(boolean enabled);
 

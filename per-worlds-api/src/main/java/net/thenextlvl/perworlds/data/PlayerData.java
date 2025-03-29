@@ -62,6 +62,8 @@ public interface PlayerData {
 
     PlayerData fireTicks(int fireTicks);
 
+    PlayerData flying(boolean flying);
+
     PlayerData foodLevel(int foodLevel);
 
     PlayerData freezeTicks(int freezeTicks);
@@ -83,6 +85,8 @@ public interface PlayerData {
     PlayerData lastLocation(@Nullable Location location);
 
     PlayerData level(int level);
+
+    PlayerData mayFly(boolean mayFly);
 
     PlayerData portalCooldown(int cooldown);
 
@@ -118,9 +122,13 @@ public interface PlayerData {
 
     WardenSpawnTracker wardenSpawnTracker();
 
+    boolean flying();
+
     boolean gliding();
 
     boolean invulnerable();
+
+    boolean mayFly();
 
     boolean seenCredits();
 

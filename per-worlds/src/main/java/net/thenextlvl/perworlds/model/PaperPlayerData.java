@@ -39,8 +39,10 @@ public class PaperPlayerData implements PlayerData {
     private Stats stats = new PaperStats();
     private Vector velocity = new Vector(0, 0, 0);
     private WardenSpawnTracker wardenSpawnTracker = new PaperWardenSpawnTracker();
+    private boolean flying = false;
     private boolean gliding = false;
     private boolean invulnerable = false;
+    private boolean mayFly = false;
     private boolean seenCredits = false;
     private double absorption = 0;
     private double health = 20;
@@ -74,6 +76,8 @@ public class PaperPlayerData implements PlayerData {
                 .lastLocation(player.getLocation())
                 .velocity(player.getVelocity())
                 .previousGameMode(player.getPreviousGameMode())
+                .flying(player.isFlying())
+                .mayFly(player.getAllowFlight())
                 .enderChest(player.getEnderChest().getContents())
                 .inventory(player.getInventory().getContents())
                 .respawnLocation(player.getPotentialRespawnLocation())
@@ -146,11 +150,11 @@ public class PaperPlayerData implements PlayerData {
             player.undiscoverRecipes(toRemove);
         }
 
-        if (settings.inventory()) {
-            player.getEnderChest().setContents(enderChestContents);
-            player.getInventory().setContents(inventoryContents);
-            player.getInventory().setHeldItemSlot(heldItemSlot);
+        if (settings.flyState()) {
+            player.setAllowFlight(mayFly);
+            player.setFlying(flying);
         }
+
         if (settings.potionEffects()) {
             player.clearActivePotionEffects();
             player.addPotionEffects(potionEffects);
@@ -262,6 +266,12 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public PaperPlayerData flying(boolean flying) {
+        this.flying = flying;
+        return this;
+    }
+
+    @Override
     public PaperPlayerData foodLevel(int foodLevel) {
         this.foodLevel = foodLevel;
         return this;
@@ -352,6 +362,12 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public PaperPlayerData mayFly(boolean mayFly) {
+        this.mayFly = mayFly;
+        return this;
+    }
+
+    @Override
     public PaperPlayerData portalCooldown(int cooldown) {
         this.portalCooldown = cooldown;
         return this;
@@ -419,6 +435,11 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public boolean flying() {
+        return flying;
+    }
+
+    @Override
     public boolean gliding() {
         return gliding;
     }
@@ -426,6 +447,11 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public boolean invulnerable() {
         return invulnerable;
+    }
+
+    @Override
+    public boolean mayFly() {
+        return mayFly;
     }
 
     @Override

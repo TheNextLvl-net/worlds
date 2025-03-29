@@ -15,6 +15,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean experience = true;
     private boolean fallDistance = true;
     private boolean fireTicks = true;
+    private boolean flyState = true;
     private boolean foodLevel = true;
     private boolean freezeTicks = true;
     private boolean gameMode = true;
@@ -108,6 +109,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean fireTicks() {
         return fireTicks;
+    }
+
+    @Override
+    public boolean flyState() {
+        return flyState;
     }
 
     @Override
@@ -288,6 +294,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void fireTicks(boolean enabled) {
         this.fireTicks = enabled;
+    }
+
+    @Override
+    public void flyState(boolean enabled) {
+        this.flyState = enabled;
     }
 
     @Override

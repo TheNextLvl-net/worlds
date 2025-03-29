@@ -52,6 +52,8 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         root.optional("beeStingersInBody").map(Tag::getAsInt).ifPresent(data::beeStingersInBody);
         root.optional("fireTicks").map(Tag::getAsInt).ifPresent(data::fireTicks);
         root.optional("foodLevel").map(Tag::getAsInt).ifPresent(data::foodLevel);
+        root.optional("mayFly").map(Tag::getAsBoolean).ifPresent(data::mayFly);
+        root.optional("flying").map(Tag::getAsBoolean).ifPresent(data::flying);
         root.optional("freezeTicks").map(Tag::getAsInt).ifPresent(data::freezeTicks);
         root.optional("heldItemSlot").map(Tag::getAsInt).ifPresent(data::heldItemSlot);
         root.optional("level").map(Tag::getAsInt).ifPresent(data::level);
@@ -88,6 +90,8 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         tag.add("gameMode", context.serialize(data.gameMode()));
         tag.add("seenCredits", data.seenCredits());
         tag.add("absorption", data.absorption());
+        tag.add("mayFly", data.mayFly());
+        tag.add("flying", data.flying());
         tag.add("health", data.health());
         tag.add("exhaustion", data.exhaustion());
         tag.add("experience", data.experience());
