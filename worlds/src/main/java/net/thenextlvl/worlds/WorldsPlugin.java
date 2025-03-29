@@ -41,8 +41,6 @@ import static org.bukkit.persistence.PersistentDataType.STRING;
 
 @NullMarked
 public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
-    public static final String BUG_REPORTING = "https://github.com/TheNextLvl-net/worlds/issues/new?template=bug_report.yml";
-
     private final boolean runningFolia = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
 
     private final GeneratorView generatorView = new PluginGeneratorView();
@@ -147,7 +145,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     private void warnExperimental() {
         getComponentLogger().warn("Folia builds of Worlds are extremely experimental");
-        getComponentLogger().warn("Please report any issues you encounter to {}", BUG_REPORTING);
+        getComponentLogger().warn("Please report any issues you encounter to {}", SharedWorlds.ISSUES);
     }
 
     private void unloadLevels() {
