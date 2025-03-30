@@ -27,7 +27,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean inventory = true;
     private boolean invulnerable = false;
     private boolean lastDeathLocation = true;
-    private boolean lastLocation = false; // todo: add possibility to teleport player to their last position in a group
+    private boolean lastLocation = true;
     private boolean portalCooldown = true;
     private boolean potionEffects = true;
     private boolean recipes = true;

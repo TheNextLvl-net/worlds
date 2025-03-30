@@ -42,7 +42,7 @@ public interface WorldGroup {
 
     boolean writePlayerData(OfflinePlayer player, PlayerData data);
 
-    void loadPlayerData(Player player);
+    void loadPlayerData(Player player, boolean position);
 
     void persistPlayerData();
 

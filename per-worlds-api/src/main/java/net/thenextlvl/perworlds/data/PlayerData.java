@@ -167,5 +167,5 @@ public interface PlayerData {
 
     int score();
 
-    void apply(GroupSettings settings, Player player);
+    void apply(GroupSettings settings, Player player, boolean position);
 }

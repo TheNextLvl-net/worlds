@@ -157,8 +157,8 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
-    public void loadPlayerData(Player player) {
-        readPlayerData(player).orElseGet(PaperPlayerData::new).apply(settings, player);
+    public void loadPlayerData(Player player, boolean position) {
+        readPlayerData(player).orElseGet(PaperPlayerData::new).apply(settings, player, position);
     }
 
     @Override

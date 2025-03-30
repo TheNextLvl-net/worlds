@@ -112,14 +112,14 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public void apply(GroupSettings settings, Player player) {
+    public void apply(GroupSettings settings, Player player, boolean position) {
         if (settings.absorption()) player.setAbsorptionAmount(absorption);
         if (settings.arrowsInBody()) player.setArrowsInBody(arrowsInBody);
         if (settings.beeStingersInBody()) player.setBeeStingersInBody(beeStingersInBody);
         if (settings.endCredits()) player.setHasSeenWinScreen(seenCredits);
         if (settings.enderChest()) player.getEnderChest().setContents(enderChest);
         if (settings.exhaustion()) player.setExhaustion(exhaustion);
-        if (settings.fallDistance()) player.setFallDistance(fallDistance);
+        if (settings.fallDistance() && position) player.setFallDistance(fallDistance);
         if (settings.fireTicks()) player.setFireTicks(fireTicks);
         if (settings.foodLevel()) player.setFoodLevel(foodLevel);
         if (settings.freezeTicks()) player.setFreezeTicks(freezeTicks);
@@ -130,13 +130,14 @@ public class PaperPlayerData implements PlayerData {
         if (settings.inventory()) player.getInventory().setContents(inventory);
         if (settings.invulnerable()) player.setInvulnerable(invulnerable);
         if (settings.lastDeathLocation()) player.setLastDeathLocation(lastDeathLocation);
+        if (settings.lastLocation() && position && lastLocation != null) player.teleportAsync(lastLocation);
         if (settings.portalCooldown()) player.setPortalCooldown(portalCooldown);
         if (settings.remainingAir()) player.setRemainingAir(remainingAir);
         if (settings.respawnLocation()) player.setRespawnLocation(respawnLocation, true);
         if (settings.saturation()) player.setSaturation(saturation);
         if (settings.score()) player.setDeathScreenScore(score);
         if (settings.statistics()) stats.apply(player);
-        if (settings.velocity()) player.setVelocity(velocity);
+        if (settings.velocity() && position) player.setVelocity(velocity);
 
         // todo: only grant advancements internally
         if (settings.advancements()) {

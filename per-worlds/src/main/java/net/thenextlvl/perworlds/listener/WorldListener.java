@@ -27,7 +27,7 @@ public class WorldListener implements Listener {
         });
 
         groupProvider.getGroup(event.getPlayer().getWorld()).ifPresent(group ->
-                group.loadPlayerData(event.getPlayer()));
+                group.loadPlayerData(event.getPlayer(), true));
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -49,6 +49,6 @@ public class WorldListener implements Listener {
     public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
         var from = groupProvider.getGroup(event.getFrom());
         var to = groupProvider.getGroup(event.getPlayer().getWorld());
-        if (!from.equals(to)) to.ifPresent(group -> group.loadPlayerData(event.getPlayer()));
+        if (!from.equals(to)) to.ifPresent(group -> group.loadPlayerData(event.getPlayer(), false));
     }
 }
