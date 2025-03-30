@@ -138,6 +138,7 @@ public class PaperPlayerData implements PlayerData {
         if (settings.statistics()) stats.apply(player);
         if (settings.velocity()) player.setVelocity(velocity);
 
+        // todo: only grant advancements internally
         if (settings.advancements()) advancements.forEach(progress -> {
             var current = player.getAdvancementProgress(progress.getAdvancement());
             progress.getAwardedCriteria().forEach(current::awardCriteria);
@@ -155,6 +156,7 @@ public class PaperPlayerData implements PlayerData {
             player.setWardenWarningLevel(wardenSpawnTracker.warningLevel());
         }
 
+        // todo: only (un)discover recipes internally
         if (settings.recipes()) {
             var toAdd = new HashSet<>(recipes);
             toAdd.removeAll(player.getDiscoveredRecipes());
