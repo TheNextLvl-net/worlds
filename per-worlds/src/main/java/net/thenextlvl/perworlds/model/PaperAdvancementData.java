@@ -69,6 +69,11 @@ public class PaperAdvancementData implements AdvancementData {
     }
 
     @Override
+    public boolean shouldSerialize() {
+        return !awardedCriteria.isEmpty() && !remainingCriteria.isEmpty();
+    }
+
+    @Override
     public @Unmodifiable Set<String> getRemainingCriteria() {
         return Set.copyOf(remainingCriteria);
     }

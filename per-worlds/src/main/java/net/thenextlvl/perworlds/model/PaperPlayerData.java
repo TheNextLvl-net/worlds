@@ -6,7 +6,6 @@ import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.data.WardenSpawnTracker;
 import net.thenextlvl.perworlds.statistics.Stats;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -73,8 +72,9 @@ public class PaperPlayerData implements PlayerData {
                         .filter(Objects::nonNull)
                         .map(PaperAttributeData::new)
                         .collect(Collectors.toSet()))
-                .advancements(StreamSupport.stream(Spliterators.spliteratorUnknownSize(Bukkit.advancementIterator(), 0), false)
+                .advancements(StreamSupport.stream(Spliterators.spliteratorUnknownSize(player.getServer().advancementIterator(), 0), false)
                         .map(advancement -> new PaperAdvancementData(player.getAdvancementProgress(advancement)))
+                        .filter(AdvancementData::shouldSerialize)
                         .collect(Collectors.toSet()))
                 .invulnerable(player.isInvulnerable())
                 .portalCooldown(player.getPortalCooldown())
@@ -139,11 +139,24 @@ public class PaperPlayerData implements PlayerData {
         if (settings.velocity()) player.setVelocity(velocity);
 
         // todo: only grant advancements internally
-        if (settings.advancements()) advancements.forEach(progress -> {
-            var current = player.getAdvancementProgress(progress.getAdvancement());
-            progress.getAwardedCriteria().forEach(current::awardCriteria);
-            progress.getRemainingCriteria().forEach(current::revokeCriteria);
-        });
+        if (settings.advancements()) {
+            var toRemove = StreamSupport.stream(Spliterators.spliteratorUnknownSize(
+                    player.getServer().advancementIterator(), 0
+            ), false).collect(Collectors.toSet());
+            toRemove.removeAll(this.advancements.stream()
+                    .map(AdvancementData::getAdvancement)
+                    .collect(Collectors.toSet()));
+            toRemove.forEach(advancement -> {
+                var progress = player.getAdvancementProgress(advancement);
+                progress.getAwardedCriteria().forEach(progress::awardCriteria);
+            });
+
+            this.advancements.forEach(data -> {
+                var progress = player.getAdvancementProgress(data.getAdvancement());
+                data.getAwardedCriteria().forEach(progress::awardCriteria);
+                data.getRemainingCriteria().forEach(progress::revokeCriteria);
+            });
+        }
 
         if (settings.attributes()) attributes.forEach(data -> {
             var attribute = player.getAttribute(data.attribute());

@@ -18,4 +18,6 @@ public interface AdvancementData extends AdvancementProgress {
     Set<String> getRemainingCriteria();
 
     boolean setDateAwarded(String criteria, Date date);
+
+    boolean shouldSerialize();
 }
