@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Set;
 
 public interface PlayerData {
-    // todo: achievements
-
     @Nullable
     ItemStack[] enderChest();
 
@@ -43,6 +41,8 @@ public interface PlayerData {
     Location respawnLocation();
 
     PlayerData absorption(double absorption);
+
+    PlayerData advancements(Collection<AdvancementData> advancements);
 
     PlayerData arrowsInBody(int arrowsInBody);
 
@@ -109,6 +109,9 @@ public interface PlayerData {
     PlayerData velocity(Vector velocity);
 
     PlayerData wardenSpawnTracker(WardenSpawnTracker tracker);
+
+    @Unmodifiable
+    Set<AdvancementData> advancements();
 
     @Unmodifiable
     Set<AttributeData> attributes();

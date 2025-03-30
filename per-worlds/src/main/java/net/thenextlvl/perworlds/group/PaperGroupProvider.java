@@ -8,8 +8,10 @@ import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
+import net.thenextlvl.perworlds.adapter.AdvancementDataAdapter;
 import net.thenextlvl.perworlds.adapter.AttributeAdapter;
 import net.thenextlvl.perworlds.adapter.AttributeDataAdapter;
+import net.thenextlvl.perworlds.adapter.DateAdapter;
 import net.thenextlvl.perworlds.adapter.ItemStackArrayAdapter;
 import net.thenextlvl.perworlds.adapter.KeyAdapter;
 import net.thenextlvl.perworlds.adapter.LocationAdapter;
@@ -21,6 +23,7 @@ import net.thenextlvl.perworlds.adapter.StatisticsAdapter;
 import net.thenextlvl.perworlds.adapter.VectorAdapter;
 import net.thenextlvl.perworlds.adapter.WardenSpawnTrackerAdapter;
 import net.thenextlvl.perworlds.adapter.WorldAdapter;
+import net.thenextlvl.perworlds.data.AdvancementData;
 import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.data.WardenSpawnTracker;
@@ -42,6 +45,7 @@ import org.jspecify.annotations.NullMarked;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -57,8 +61,10 @@ public class PaperGroupProvider implements GroupProvider {
     public PaperGroupProvider(Plugin plugin) {
         this.dataFolder = new File("plugins/PerWorlds");
         this.nbt = new NBT.Builder()
+                .registerTypeHierarchyAdapter(AdvancementData.class, new AdvancementDataAdapter(plugin.getServer()))
                 .registerTypeHierarchyAdapter(Attribute.class, new AttributeAdapter())
                 .registerTypeHierarchyAdapter(AttributeData.class, new AttributeDataAdapter())
+                .registerTypeHierarchyAdapter(Date.class, new DateAdapter())
                 .registerTypeHierarchyAdapter(GameMode.class, new EnumAdapter<>(GameMode.class))
                 .registerTypeHierarchyAdapter(ItemStack[].class, new ItemStackArrayAdapter())
                 .registerTypeHierarchyAdapter(Key.class, new KeyAdapter())

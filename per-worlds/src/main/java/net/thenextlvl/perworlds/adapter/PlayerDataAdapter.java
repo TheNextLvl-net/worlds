@@ -8,6 +8,7 @@ import core.nbt.tag.CompoundTag;
 import core.nbt.tag.ListTag;
 import core.nbt.tag.StringTag;
 import core.nbt.tag.Tag;
+import net.thenextlvl.perworlds.data.AdvancementData;
 import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.data.WardenSpawnTracker;
@@ -27,6 +28,9 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
     public PlayerData deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
         var data = new PaperPlayerData();
         var root = tag.getAsCompound();
+        root.optional("advancements").map(Tag::getAsList).map(list ->
+                list.stream().map(advancement -> context.deserialize(advancement, AdvancementData.class)).toList()
+        ).ifPresent(data::advancements);
         root.optional("attributes").map(Tag::getAsList).map(list ->
                 list.stream().map(attribute -> context.deserialize(attribute, AttributeData.class)).toList()
         ).ifPresent(data::attributes);
@@ -73,6 +77,7 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
     @Override
     public CompoundTag serialize(PlayerData data, TagSerializationContext context) throws ParserException {
         var tag = new CompoundTag();
+        tag.add("advancements", new ListTag<>(data.advancements().stream().map(context::serialize).toList(), CompoundTag.ID));
         tag.add("attributes", new ListTag<>(data.attributes().stream().map(context::serialize).toList(), CompoundTag.ID));
         tag.add("enderChest", context.serialize(data.enderChest()));
         tag.add("inventory", context.serialize(data.inventory()));

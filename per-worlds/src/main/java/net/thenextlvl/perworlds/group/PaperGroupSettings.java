@@ -4,6 +4,7 @@ import net.thenextlvl.perworlds.GroupSettings;
 
 public class PaperGroupSettings implements GroupSettings {
     private boolean absorption = true;
+    private boolean advancements = true;
     private boolean arrowsInBody = true;
     private boolean attributes = false;
     private boolean beeStingersInBody = true;
@@ -44,6 +45,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean absorption() {
         return absorption;
+    }
+
+    @Override
+    public boolean advancements() {
+        return advancements;
     }
 
     @Override
@@ -229,6 +235,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void absorption(boolean enabled) {
         this.absorption = enabled;
+    }
+
+    @Override
+    public void advancements(boolean enabled) {
+        this.advancements = enabled;
     }
 
     @Override

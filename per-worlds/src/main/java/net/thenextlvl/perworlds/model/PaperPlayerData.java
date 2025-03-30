@@ -1,10 +1,12 @@
 package net.thenextlvl.perworlds.model;
 
 import net.thenextlvl.perworlds.GroupSettings;
+import net.thenextlvl.perworlds.data.AdvancementData;
 import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.data.WardenSpawnTracker;
 import net.thenextlvl.perworlds.statistics.Stats;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -22,7 +24,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Spliterators;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @NullMarked
 public class PaperPlayerData implements PlayerData {
@@ -34,6 +38,7 @@ public class PaperPlayerData implements PlayerData {
     private @Nullable Location respawnLocation = null;
     private GameMode gameMode = GameMode.SURVIVAL;
     private List<PotionEffect> potionEffects = List.of();
+    private Set<AdvancementData> advancements = Set.of();
     private Set<AttributeData> attributes = Set.of();
     private Set<NamespacedKey> recipes = Set.of();
     private Stats stats = new PaperStats();
@@ -67,6 +72,9 @@ public class PaperPlayerData implements PlayerData {
                         .map(player::getAttribute)
                         .filter(Objects::nonNull)
                         .map(PaperAttributeData::new)
+                        .collect(Collectors.toSet()))
+                .advancements(StreamSupport.stream(Spliterators.spliteratorUnknownSize(Bukkit.advancementIterator(), 0), false)
+                        .map(advancement -> new PaperAdvancementData(player.getAdvancementProgress(advancement)))
                         .collect(Collectors.toSet()))
                 .invulnerable(player.isInvulnerable())
                 .portalCooldown(player.getPortalCooldown())
@@ -129,6 +137,12 @@ public class PaperPlayerData implements PlayerData {
         if (settings.score()) player.setDeathScreenScore(score);
         if (settings.statistics()) stats.apply(player);
         if (settings.velocity()) player.setVelocity(velocity);
+
+        if (settings.advancements()) advancements.forEach(progress -> {
+            var current = player.getAdvancementProgress(progress.getAdvancement());
+            progress.getAwardedCriteria().forEach(current::awardCriteria);
+            progress.getRemainingCriteria().forEach(current::revokeCriteria);
+        });
 
         if (settings.attributes()) attributes.forEach(data -> {
             var attribute = player.getAttribute(data.attribute());
@@ -209,6 +223,12 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public PaperPlayerData absorption(double absorption) {
         this.absorption = absorption;
+        return this;
+    }
+
+    @Override
+    public PaperPlayerData advancements(Collection<AdvancementData> advancements) {
+        this.advancements = Set.copyOf(advancements);
         return this;
     }
 
@@ -354,6 +374,11 @@ public class PaperPlayerData implements PlayerData {
     public PaperPlayerData wardenSpawnTracker(WardenSpawnTracker tracker) {
         this.wardenSpawnTracker = tracker;
         return this;
+    }
+
+    @Override
+    public @Unmodifiable Set<AdvancementData> advancements() {
+        return Set.copyOf(advancements);
     }
 
     @Override

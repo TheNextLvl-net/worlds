@@ -3,6 +3,8 @@ package net.thenextlvl.perworlds;
 public interface GroupSettings {
     boolean absorption();
 
+    boolean advancements();
+
     boolean arrowsInBody();
 
     boolean attributes();
@@ -76,6 +78,8 @@ public interface GroupSettings {
     boolean weather();
 
     void absorption(boolean enabled);
+
+    void advancements(boolean enabled);
 
     void arrowsInBody(boolean enabled);
 
