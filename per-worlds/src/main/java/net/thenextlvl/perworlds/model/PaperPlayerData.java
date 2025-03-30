@@ -89,6 +89,7 @@ public class PaperPlayerData implements PlayerData {
                 .absorption(player.getAbsorptionAmount())
                 .health(player.getHealth())
                 .exhaustion(player.getExhaustion())
+                .fallDistance(player.getFallDistance())
                 .experience(player.getExp())
                 .saturation(player.getSaturation())
                 .arrowsInBody(player.getArrowsInBody())
