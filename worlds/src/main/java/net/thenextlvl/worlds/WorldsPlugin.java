@@ -122,6 +122,10 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         return commons.groupProvider();
     }
 
+    public SharedWorlds commons() {
+        return commons;
+    }
+
     public void persistWorld(World world, boolean enabled) {
         var worldKey = new NamespacedKey("worlds", "world_key");
         world.getPersistentDataContainer().set(worldKey, STRING, world.getKey().asString());

@@ -2,6 +2,7 @@ package net.thenextlvl.worlds.command;
 
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import net.thenextlvl.perworlds.command.GroupCommand;
 import net.thenextlvl.worlds.WorldsPlugin;
 import org.jspecify.annotations.NullMarked;
 
@@ -16,6 +17,7 @@ public class WorldCommand {
     public void register() {
         var command = Commands.literal("world")
                 .requires(source -> source.getSender().hasPermission("worlds.command"))
+                .then(GroupCommand.create(plugin.commons()))
                 .then(new WorldCloneCommand(plugin).create())
                 .then(new WorldCreateCommand(plugin).create())
                 .then(new WorldDeleteCommand(plugin).create())
