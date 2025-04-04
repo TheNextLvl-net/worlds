@@ -21,9 +21,9 @@ public interface GroupProvider {
 
     Optional<WorldGroup> getGroup(World world);
 
-    WorldGroup createGroup(String name, Consumer<GroupSettings> settings, Collection<World> worlds);
+    WorldGroup createGroup(String name, Consumer<GroupSettings> settings, Collection<World> worlds) throws IllegalStateException;
 
-    WorldGroup createGroup(String name, Consumer<GroupSettings> settings, World... worlds);
+    WorldGroup createGroup(String name, Consumer<GroupSettings> settings, World... worlds) throws IllegalStateException;
 
     boolean hasGroup(String name);
 
