@@ -1,12 +1,20 @@
 package net.thenextlvl.perworlds;
 
+import core.i18n.file.ComponentBundle;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.thenextlvl.perworlds.group.PaperGroupProvider;
 import net.thenextlvl.perworlds.listener.WorldListener;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
+import org.bukkit.Server;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 
+import java.io.File;
+import java.util.Locale;
 import java.util.Set;
 
 public class SharedWorlds {
@@ -14,11 +22,21 @@ public class SharedWorlds {
     private final PaperGroupProvider groupProvider;
     private final Metrics metrics;
     private final Plugin plugin;
+    private final ComponentBundle bundle;
+    private final File dataFolder = new File("plugins", "PerWorlds");
 
     public SharedWorlds(Plugin plugin) {
         this.groupProvider = new PaperGroupProvider(plugin);
         this.metrics = new Metrics(plugin, 25295);
         this.plugin = plugin;
+        this.bundle = new ComponentBundle(new File(dataFolder, "translations"), audience ->
+                audience instanceof Player player ? player.locale() : Locale.US)
+                .register("per-worlds", Locale.US)
+                .register("per-worlds_german", Locale.GERMANY)
+                .miniMessage(bundle -> MiniMessage.builder().tags(TagResolver.resolver(
+                        TagResolver.standard(),
+                        Placeholder.component("prefix", bundle.component(Locale.US, "prefix"))
+                )).build());
     }
 
     public void onLoad() {
@@ -38,8 +56,24 @@ public class SharedWorlds {
         metrics.shutdown();
     }
 
+    public Server getServer() {
+        return plugin.getServer();
+    }
+
+    public Plugin getPlugin() {
+        return plugin;
+    }
+
     public GroupProvider groupProvider() {
         return groupProvider;
+    }
+
+    public ComponentBundle bundle() {
+        return bundle;
+    }
+
+    public File getDataFolder() {
+        return dataFolder;
     }
 
     private void registerListeners() {
