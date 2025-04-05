@@ -46,8 +46,10 @@ public class PaperPlayerData implements PlayerData {
     private boolean flying = false;
     private boolean gliding = false;
     private boolean invulnerable = false;
+    private boolean lockFreezeTicks = false;
     private boolean mayFly = false;
     private boolean seenCredits = false;
+    private boolean visualFire = false;
     private double absorption = 0;
     private double health = 20;
     private float exhaustion = 0;
@@ -83,6 +85,8 @@ public class PaperPlayerData implements PlayerData {
                 .lastDeathLocation(player.getLastDeathLocation())
                 .lastLocation(player.getLocation())
                 .velocity(player.getVelocity())
+                .lockFreezeTicks(player.isFreezeTickingLocked())
+                .visualFire(player.isVisualFire())
                 .previousGameMode(player.getPreviousGameMode())
                 .flying(player.isFlying())
                 .mayFly(player.getAllowFlight())
@@ -131,6 +135,7 @@ public class PaperPlayerData implements PlayerData {
         if (settings.invulnerable()) player.setInvulnerable(invulnerable);
         if (settings.lastDeathLocation()) player.setLastDeathLocation(lastDeathLocation);
         if (settings.lastLocation() && position && lastLocation != null) player.teleportAsync(lastLocation);
+        if (settings.lockFreezeTicks()) player.lockFreezeTicks(lockFreezeTicks);
         if (settings.portalCooldown()) player.setPortalCooldown(portalCooldown);
         if (settings.remainingAir()) player.setRemainingAir(remainingAir);
         if (settings.respawnLocation()) player.setRespawnLocation(respawnLocation, true);
@@ -138,6 +143,7 @@ public class PaperPlayerData implements PlayerData {
         if (settings.score()) player.setDeathScreenScore(score);
         if (settings.statistics()) stats.apply(player);
         if (settings.velocity() && position) player.setVelocity(velocity);
+        if (settings.visualFire()) player.setVisualFire(visualFire);
 
         // todo: only grant advancements internally
         if (settings.advancements()) {
@@ -387,6 +393,12 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public PaperPlayerData visualFire(boolean visualFire) {
+        this.visualFire = visualFire;
+        return this;
+    }
+
+    @Override
     public PaperPlayerData wardenSpawnTracker(WardenSpawnTracker tracker) {
         this.wardenSpawnTracker = tracker;
         return this;
@@ -400,6 +412,12 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public PaperPlayerData level(int level) {
         this.level = level;
+        return this;
+    }
+
+    @Override
+    public PaperPlayerData lockFreezeTicks(boolean lockFreezeTicks) {
+        this.lockFreezeTicks = lockFreezeTicks;
         return this;
     }
 
@@ -492,6 +510,11 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public boolean lockFreezeTicks() {
+        return lockFreezeTicks;
+    }
+
+    @Override
     public boolean mayFly() {
         return mayFly;
     }
@@ -499,6 +522,11 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public boolean seenCredits() {
         return seenCredits;
+    }
+
+    @Override
+    public boolean visualFire() {
+        return visualFire;
     }
 
     @Override

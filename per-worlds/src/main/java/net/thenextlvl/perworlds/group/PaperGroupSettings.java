@@ -28,6 +28,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean invulnerable = false;
     private boolean lastDeathLocation = true;
     private boolean lastLocation = true;
+    private boolean lockFreezeTicks = false;
     private boolean portalCooldown = true;
     private boolean potionEffects = true;
     private boolean recipes = true;
@@ -39,6 +40,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean tabList = false;
     private boolean time = true;
     private boolean velocity = true;
+    private boolean visualFire = false;
     private boolean wardenSpawnTracker = true;
     private boolean weather = true;
 
@@ -178,6 +180,11 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
+    public boolean lockFreezeTicks() {
+        return lockFreezeTicks;
+    }
+
+    @Override
     public boolean portalCooldown() {
         return portalCooldown;
     }
@@ -220,6 +227,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean velocity() {
         return velocity;
+    }
+
+    @Override
+    public boolean visualFire() {
+        return visualFire;
     }
 
     @Override
@@ -368,6 +380,11 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
+    public void lockFreezeTicks(boolean enabled) {
+        this.lockFreezeTicks = enabled;
+    }
+
+    @Override
     public void portalCooldown(boolean enabled) {
         this.portalCooldown = enabled;
     }
@@ -410,6 +427,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void velocity(boolean enabled) {
         this.velocity = enabled;
+    }
+
+    @Override
+    public void visualFire(boolean enabled) {
+        this.visualFire = enabled;
     }
 
     @Override

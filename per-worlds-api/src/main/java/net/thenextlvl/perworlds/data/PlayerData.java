@@ -86,6 +86,8 @@ public interface PlayerData {
 
     PlayerData level(int level);
 
+    PlayerData lockFreezeTicks(boolean lockFreezeTicks);
+
     PlayerData mayFly(boolean mayFly);
 
     PlayerData portalCooldown(int cooldown);
@@ -107,6 +109,8 @@ public interface PlayerData {
     PlayerData stats(Stats stats);
 
     PlayerData velocity(Vector velocity);
+
+    PlayerData visualFire(boolean visualFire);
 
     PlayerData wardenSpawnTracker(WardenSpawnTracker tracker);
 
@@ -131,9 +135,13 @@ public interface PlayerData {
 
     boolean invulnerable();
 
+    boolean lockFreezeTicks();
+
     boolean mayFly();
 
     boolean seenCredits();
+
+    boolean visualFire();
 
     double absorption();
 

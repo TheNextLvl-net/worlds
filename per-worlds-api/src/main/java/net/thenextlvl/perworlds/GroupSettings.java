@@ -51,6 +51,8 @@ public interface GroupSettings {
 
     boolean lastLocation();
 
+    boolean lockFreezeTicks();
+
     boolean portalCooldown();
 
     boolean potionEffects();
@@ -72,6 +74,8 @@ public interface GroupSettings {
     boolean time();
 
     boolean velocity();
+
+    boolean visualFire();
 
     boolean wardenSpawnTracker();
 
@@ -127,6 +131,8 @@ public interface GroupSettings {
 
     void lastLocation(boolean enabled);
 
+    void lockFreezeTicks(boolean enabled);
+
     void portalCooldown(boolean enabled);
 
     void potionEffects(boolean enabled);
@@ -148,6 +154,8 @@ public interface GroupSettings {
     void time(boolean enabled);
 
     void velocity(boolean enabled);
+
+    void visualFire(boolean enabled);
 
     void wardenSpawnTracker(boolean enabled);
 
