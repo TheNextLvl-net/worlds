@@ -155,7 +155,7 @@ public class PaperPlayerData implements PlayerData {
                     .collect(Collectors.toSet()));
             toRemove.forEach(advancement -> {
                 var progress = player.getAdvancementProgress(advancement);
-                progress.getAwardedCriteria().forEach(progress::awardCriteria);
+                progress.getAwardedCriteria().forEach(progress::revokeCriteria);
             });
 
             this.advancements.forEach(data -> {
