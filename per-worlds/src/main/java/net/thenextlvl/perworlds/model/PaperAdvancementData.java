@@ -70,7 +70,7 @@ public class PaperAdvancementData implements AdvancementData {
 
     @Override
     public boolean shouldSerialize() {
-        return !awardedCriteria.isEmpty() && !remainingCriteria.isEmpty();
+        return !awardedCriteria.isEmpty();
     }
 
     @Override
