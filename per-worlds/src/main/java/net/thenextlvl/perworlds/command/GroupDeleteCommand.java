@@ -22,8 +22,8 @@ class GroupDeleteCommand {
         var sender = context.getSource().getSender();
         var group = context.getArgument("group", WorldGroup.class);
         var success = commons.groupProvider().removeGroup(group) | group.delete();
-        var message = success ? "group.created" : "group.exists";
-        commons.bundle().sendMessage(sender, message, Placeholder.unparsed("name", group.getName()));
+        var message = success ? "group.deleted" : "group.delete.failed";
+        commons.bundle().sendMessage(sender, message, Placeholder.unparsed("group", group.getName()));
         return success ? Command.SINGLE_SUCCESS : 0;
     }
 }
