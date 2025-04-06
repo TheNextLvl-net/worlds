@@ -8,14 +8,14 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.perworlds.WorldGroup;
-import net.thenextlvl.perworlds.command.argument.GroupArgument;
+
+import static net.thenextlvl.perworlds.command.GroupCommand.groupArgument;
 
 class GroupDeleteCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(SharedWorlds commons) {
         return Commands.literal("delete")
                 .requires(source -> source.getSender().hasPermission("perworlds.command.group.delete"))
-                .then(Commands.argument("group", new GroupArgument(commons))
-                        .executes(context -> delete(context, commons)));
+                .then(groupArgument(commons).executes(context -> delete(context, commons)));
     }
 
     private static int delete(CommandContext<CommandSourceStack> context, SharedWorlds commons) {

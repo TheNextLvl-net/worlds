@@ -9,9 +9,10 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.perworlds.WorldGroup;
-import net.thenextlvl.perworlds.command.argument.GroupArgument;
 import net.thenextlvl.perworlds.command.suggestion.UnassignedWorldsSuggestionProvider;
 import org.bukkit.World;
+
+import static net.thenextlvl.perworlds.command.GroupCommand.groupArgument;
 
 class GroupAddCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(SharedWorlds commons) {
@@ -23,8 +24,7 @@ class GroupAddCommand {
     private static ArgumentBuilder<CommandSourceStack, ?> add(SharedWorlds commons) {
         return Commands.argument("world", ArgumentTypes.world())
                 .suggests(new UnassignedWorldsSuggestionProvider<>(commons))
-                .then(Commands.argument("group", new GroupArgument(commons))
-                        .executes(context -> add(context, commons)));
+                .then(groupArgument(commons).executes(context -> add(context, commons)));
     }
 
     private static int add(CommandContext<CommandSourceStack> context, SharedWorlds commons) {

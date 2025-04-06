@@ -11,14 +11,16 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.perworlds.WorldGroup;
-import net.thenextlvl.perworlds.command.argument.GroupArgument;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import static net.thenextlvl.perworlds.command.GroupCommand.groupArgument;
+
 class GroupOptionCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(SharedWorlds commons) {
         return Commands.literal("option")
+                .requires(source -> source.getSender().hasPermission("perworlds.command.group.option"))
                 .then(option("absorption", GroupSettings::absorption, GroupSettings::absorption, commons))
                 .then(option("advancements", GroupSettings::advancements, GroupSettings::advancements, commons))
                 .then(option("arrowsInBody", GroupSettings::arrowsInBody, GroupSettings::arrowsInBody, commons))
@@ -63,7 +65,7 @@ class GroupOptionCommand {
     private static ArgumentBuilder<CommandSourceStack, ?> option(String name, Function<GroupSettings, Boolean> getter,
                                                                  BiConsumer<GroupSettings, Boolean> setter,
                                                                  SharedWorlds commons) {
-        return Commands.literal(name).then(Commands.argument("group", new GroupArgument(commons))
+        return Commands.literal(name).then(groupArgument(commons)
                 .then(Commands.argument("value", BoolArgumentType.bool())
                         .executes(context -> set(context, name, setter, commons)))
                 .executes(context -> query(context, name, getter, commons)));

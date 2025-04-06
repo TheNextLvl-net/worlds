@@ -1,9 +1,12 @@
 package net.thenextlvl.perworlds.command;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.thenextlvl.perworlds.SharedWorlds;
+import net.thenextlvl.perworlds.WorldGroup;
+import net.thenextlvl.perworlds.command.argument.GroupArgument;
 
 public class GroupCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(SharedWorlds commons) {
@@ -16,5 +19,9 @@ public class GroupCommand {
                 .then(GroupListCommand.create(commons))
                 .then(GroupOptionCommand.create(commons))
                 .then(GroupRemoveCommand.create(commons));
+    }
+
+    static RequiredArgumentBuilder<CommandSourceStack, WorldGroup> groupArgument(SharedWorlds commons) {
+        return Commands.argument("group", new GroupArgument(commons));
     }
 }

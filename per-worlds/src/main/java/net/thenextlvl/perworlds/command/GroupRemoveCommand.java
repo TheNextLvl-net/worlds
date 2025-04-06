@@ -9,9 +9,10 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.perworlds.WorldGroup;
-import net.thenextlvl.perworlds.command.argument.GroupArgument;
 import net.thenextlvl.perworlds.command.suggestion.GroupMemberSuggestionProvider;
 import org.bukkit.World;
+
+import static net.thenextlvl.perworlds.command.GroupCommand.groupArgument;
 
 class GroupRemoveCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(SharedWorlds commons) {
@@ -21,10 +22,9 @@ class GroupRemoveCommand {
     }
 
     private static ArgumentBuilder<CommandSourceStack, ?> remove(SharedWorlds commons) {
-        return Commands.argument("group", new GroupArgument(commons))
-                .then(Commands.argument("world", ArgumentTypes.world())
-                        .suggests(new GroupMemberSuggestionProvider<>())
-                        .executes(context -> remove(context, commons)));
+        return groupArgument(commons).then(Commands.argument("world", ArgumentTypes.world())
+                .suggests(new GroupMemberSuggestionProvider<>())
+                .executes(context -> remove(context, commons)));
     }
 
     private static int remove(CommandContext<CommandSourceStack> context, SharedWorlds commons) {
