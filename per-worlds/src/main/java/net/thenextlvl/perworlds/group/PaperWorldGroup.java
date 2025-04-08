@@ -21,6 +21,7 @@ import java.lang.ref.WeakReference;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -99,9 +100,12 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public boolean delete() {
-        var config = file.delete();
-        var data = dataFolder.delete();
-        return config || data;
+        return file.delete() | delete(dataFolder);
+    }
+
+    private boolean delete(File file) {
+        var files = file.listFiles();
+        return (files == null || Arrays.stream(files).allMatch(this::delete)) | file.delete();
     }
 
     @Override
