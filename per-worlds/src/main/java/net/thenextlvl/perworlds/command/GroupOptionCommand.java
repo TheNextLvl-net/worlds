@@ -67,15 +67,18 @@ class GroupOptionCommand {
                                                                  SharedWorlds commons) {
         return Commands.literal(name).then(groupArgument(commons)
                 .then(Commands.argument("value", BoolArgumentType.bool())
-                        .executes(context -> set(context, name, setter, commons)))
+                        .executes(context -> set(context, name, getter, setter, commons)))
                 .executes(context -> query(context, name, getter, commons)));
     }
 
-    private static int set(CommandContext<CommandSourceStack> context, String option, BiConsumer<GroupSettings, Boolean> setter, SharedWorlds commons) {
+    private static int set(CommandContext<CommandSourceStack> context, String option, Function<GroupSettings, Boolean> getter,
+                           BiConsumer<GroupSettings, Boolean> setter, SharedWorlds commons) {
         var value = context.getArgument("value", boolean.class);
         var group = context.getArgument("group", WorldGroup.class);
-        setter.accept(group.getSettings(), value);
-        commons.bundle().sendMessage(context.getSource().getSender(), "group.option.set",
+        var success = !getter.apply(group.getSettings()).equals(value);
+        if (success) setter.accept(group.getSettings(), value);
+        var message = success ? "group.option.set" : "nothing.changed";
+        commons.bundle().sendMessage(context.getSource().getSender(), message,
                 Formatter.booleanChoice("value", value),
                 Placeholder.unparsed("group", group.getName()),
                 Placeholder.unparsed("option", option));
