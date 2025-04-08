@@ -32,6 +32,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Keyed;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.inventory.ItemStack;
@@ -83,6 +84,10 @@ public class PaperGroupProvider implements GroupProvider {
 
     public ComponentLogger getLogger() {
         return plugin.getComponentLogger();
+    }
+
+    public Server getServer() {
+        return plugin.getServer();
     }
 
     @Override

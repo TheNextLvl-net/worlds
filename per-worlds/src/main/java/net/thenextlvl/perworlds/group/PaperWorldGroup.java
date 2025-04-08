@@ -1,12 +1,20 @@
 package net.thenextlvl.perworlds.group;
 
+import com.google.gson.GsonBuilder;
+import core.file.FileIO;
+import core.file.format.GsonFile;
 import core.io.IO;
 import core.nbt.NBTInputStream;
 import core.nbt.NBTOutputStream;
+import core.paper.adapters.key.KeyAdapter;
+import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
+import net.thenextlvl.perworlds.adapter.gson.GroupSettingsAdapter;
 import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.model.PaperPlayerData;
+import net.thenextlvl.perworlds.model.config.GroupConfig;
+import org.bukkit.Keyed;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -16,8 +24,6 @@ import org.jspecify.annotations.NullMarked;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -38,18 +44,22 @@ import static net.thenextlvl.perworlds.SharedWorlds.ISSUES;
 public class PaperWorldGroup implements WorldGroup {
     private final File dataFolder;
     private final File file;
-    private final GroupSettings settings;
+    private final FileIO<GroupConfig> config;
     private final PaperGroupProvider groupProvider;
-    private final Set<WeakReference<World>> worlds;
     private final String name;
 
     public PaperWorldGroup(PaperGroupProvider groupProvider, String name, GroupSettings settings, Set<World> worlds) {
         this.dataFolder = new File(groupProvider.getDataFolder(), name);
-        this.file = new File(dataFolder, name + ".json");
+        this.file = new File(groupProvider.getDataFolder(), name + ".json");
+        this.config = new GsonFile<>(IO.of(file), new GroupConfig(
+                name, worlds.stream().map(Keyed::key).collect(Collectors.toSet()), settings
+        ), new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(GroupSettings.class, new GroupSettingsAdapter())
+                .registerTypeAdapter(Key.class, new KeyAdapter.Kyori())
+                .create()).saveIfAbsent();
         this.groupProvider = groupProvider;
         this.name = name;
-        this.settings = settings;
-        this.worlds = worlds.stream().map(WeakReference::new).collect(Collectors.toSet());
     }
 
     @Override
@@ -64,7 +74,7 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public GroupSettings getSettings() {
-        return settings;
+        return config.getRoot().settings();
     }
 
     @Override
@@ -77,10 +87,16 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
+    public @Unmodifiable Set<Key> getPersistedWorlds() {
+        return Set.copyOf(config.getRoot().worlds());
+    }
+
+    @Override
     public @Unmodifiable Set<World> getWorlds() {
-        return worlds.stream().map(Reference::get)
+        return config.getRoot().worlds().stream()
+                .map(groupProvider.getServer()::getWorld)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toUnmodifiableSet());
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -90,12 +106,12 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public boolean addWorld(World world) {
-        return !groupProvider.hasGroup(world) && worlds.add(new WeakReference<>(world));
+        return !groupProvider.hasGroup(world) && config.getRoot().worlds().add(world.key());
     }
 
     @Override
     public boolean containsWorld(World world) {
-        return worlds.stream().anyMatch(reference -> reference.refersTo(world));
+        return config.getRoot().worlds().contains(world.key());
     }
 
     @Override
@@ -110,12 +126,13 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public boolean persist() {
-        return false; // todo: persist settings
+        config.save();
+        return true;
     }
 
     @Override
     public boolean removeWorld(World world) {
-        return worlds.removeIf(reference -> reference.refersTo(world));
+        return config.getRoot().worlds().remove(world.key());
     }
 
     @Override
@@ -162,7 +179,7 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public void loadPlayerData(Player player, boolean position) {
-        readPlayerData(player).orElseGet(PaperPlayerData::new).apply(settings, player, position);
+        readPlayerData(player).orElseGet(PaperPlayerData::new).apply(getSettings(), player, position);
     }
 
     @Override
