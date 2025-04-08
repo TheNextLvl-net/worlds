@@ -14,8 +14,8 @@ tasks.compileJava {
     options.release.set(21)
 }
 
-group = rootProject.group
-version = rootProject.version
+group = project(":worlds").group
+version = project(":worlds").version
 
 repositories {
     mavenCentral()

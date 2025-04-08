@@ -18,8 +18,8 @@ tasks.compileJava {
     options.release.set(21)
 }
 
-group = rootProject.group
-version = rootProject.version
+group = "net.thenextlvl.worlds"
+version = "0.1.0"
 
 repositories {
     mavenCentral()
