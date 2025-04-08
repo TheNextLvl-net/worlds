@@ -1,5 +1,6 @@
 package net.thenextlvl.perworlds;
 
+import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.data.PlayerData;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -24,6 +25,9 @@ public interface WorldGroup {
     List<Player> getPlayers();
 
     Optional<PlayerData> readPlayerData(OfflinePlayer player);
+
+    @Unmodifiable
+    Set<Key> getPersistedWorlds();
 
     @Unmodifiable
     Set<World> getWorlds();

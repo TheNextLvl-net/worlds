@@ -23,7 +23,10 @@ class GroupInfoCommand {
     private static int info(CommandContext<CommandSourceStack> context, SharedWorlds commons) {
         var sender = context.getSource().getSender();
         var group = context.getArgument("group", WorldGroup.class);
-        var worlds = group.getWorlds().stream().map(world -> Component.text(world.getName())).toList();
+        var worlds = group.getPersistedWorlds().stream().map(key -> {
+            var world = commons.getServer().getWorld(key);
+            return world != null ? world.getName() : key.asString();
+        }).map(Component::text).toList();
         commons.bundle().sendMessage(sender, "group.info",
                 Formatter.booleanChoice("single", worlds.size() == 1),
                 Formatter.joining("worlds", worlds),
