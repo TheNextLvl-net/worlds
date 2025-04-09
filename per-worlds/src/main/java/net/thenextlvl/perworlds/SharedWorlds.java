@@ -26,9 +26,8 @@ public class SharedWorlds {
     private final File dataFolder = new File("plugins", "PerWorlds");
 
     public SharedWorlds(Plugin plugin) {
-        this.groupProvider = new PaperGroupProvider(plugin);
-        this.metrics = new Metrics(plugin, 25295);
         this.plugin = plugin;
+        this.metrics = new Metrics(plugin, 25295);
         this.bundle = new ComponentBundle(new File(dataFolder, "translations"), audience ->
                 audience instanceof Player player ? player.locale() : Locale.US)
                 .register("per-worlds", Locale.US)
@@ -37,6 +36,7 @@ public class SharedWorlds {
                         TagResolver.standard(),
                         Placeholder.component("prefix", bundle.component(Locale.US, "prefix"))
                 )).build());
+        this.groupProvider = new PaperGroupProvider(this);
     }
 
     public void onLoad() {

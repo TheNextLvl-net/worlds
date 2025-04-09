@@ -7,6 +7,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.GroupSettings;
+import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.adapter.AdvancementDataAdapter;
 import net.thenextlvl.perworlds.adapter.AttributeAdapter;
@@ -36,7 +37,6 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -57,12 +57,12 @@ public class PaperGroupProvider implements GroupProvider {
     private final File dataFolder;
     private final List<WorldGroup> groups = new ArrayList<>(); // todo: move to config
     private final NBT nbt;
-    private final Plugin plugin;
+    private final SharedWorlds commons;
 
-    public PaperGroupProvider(Plugin plugin) {
-        this.dataFolder = new File("plugins/PerWorlds");
+    public PaperGroupProvider(SharedWorlds commons) {
+        this.dataFolder = new File(commons.getDataFolder(), "groups");
         this.nbt = new NBT.Builder()
-                .registerTypeHierarchyAdapter(AdvancementData.class, new AdvancementDataAdapter(plugin.getServer()))
+                .registerTypeHierarchyAdapter(AdvancementData.class, new AdvancementDataAdapter(commons.getServer()))
                 .registerTypeHierarchyAdapter(Attribute.class, new AttributeAdapter())
                 .registerTypeHierarchyAdapter(AttributeData.class, new AttributeDataAdapter())
                 .registerTypeHierarchyAdapter(Date.class, new DateAdapter())
@@ -77,17 +77,17 @@ public class PaperGroupProvider implements GroupProvider {
                 .registerTypeHierarchyAdapter(Stats.class, new StatisticsAdapter())
                 .registerTypeHierarchyAdapter(Vector.class, new VectorAdapter())
                 .registerTypeHierarchyAdapter(WardenSpawnTracker.class, new WardenSpawnTrackerAdapter())
-                .registerTypeHierarchyAdapter(World.class, new WorldAdapter(plugin.getServer()))
+                .registerTypeHierarchyAdapter(World.class, new WorldAdapter(commons.getServer()))
                 .build();
-        this.plugin = plugin;
+        this.commons = commons;
     }
 
     public ComponentLogger getLogger() {
-        return plugin.getComponentLogger();
+        return commons.getPlugin().getComponentLogger();
     }
 
     public Server getServer() {
-        return plugin.getServer();
+        return commons.getServer();
     }
 
     @Override
