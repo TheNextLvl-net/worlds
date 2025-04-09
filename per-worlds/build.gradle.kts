@@ -38,6 +38,14 @@ dependencies {
     api("net.thenextlvl.core:paper:2.0.4")
 
     api(project(":per-worlds-api"))
+
+    testImplementation(platform("org.junit:junit-bom:5.13.0-M2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 val generatedPath: java.nio.file.Path = layout.projectDirectory.dir("src/generated/java").asFile.toPath()
