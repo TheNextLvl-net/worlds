@@ -150,7 +150,7 @@ public class PaperGroupProvider implements GroupProvider {
 
     @Override
     public boolean removeGroup(String name) {
-        return groups.removeIf(group -> group.getName().equals(name));
+        return getGroup(name).map(this::removeGroup).orElse(false);
     }
 
     @Override
