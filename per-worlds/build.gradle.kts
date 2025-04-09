@@ -52,6 +52,10 @@ tasks.shadowJar {
     relocate("org.bstats", "net.thenextlvl.perworlds.bstats")
 }
 
+tasks.compileJava {
+    dependsOn(project(":source-generator").tasks.named("generate"))
+}
+
 paper {
     name = "PerWorlds"
     main = "net.thenextlvl.perworlds.WorldsPlugin"
