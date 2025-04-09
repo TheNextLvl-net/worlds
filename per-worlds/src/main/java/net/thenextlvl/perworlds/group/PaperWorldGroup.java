@@ -10,7 +10,7 @@ import core.paper.adapters.key.KeyAdapter;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
-import net.thenextlvl.perworlds.adapter.gson.GroupSettingsAdapter;
+import net.thenextlvl.perworlds.adapter.GroupSettingsAdapter;
 import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.model.PaperPlayerData;
 import net.thenextlvl.perworlds.model.config.GroupConfig;
