@@ -20,7 +20,9 @@ public abstract class Generator {
 
     protected abstract TypeSpec generate();
 
-    protected abstract JavaFile.Builder file(JavaFile.Builder builder);
+    protected JavaFile.Builder file(JavaFile.Builder builder) {
+        return builder;
+    }
 
     public void writeToFile(Path parent) throws IOException {
         file(JavaFile.builder(this.packageName, this.generate()))

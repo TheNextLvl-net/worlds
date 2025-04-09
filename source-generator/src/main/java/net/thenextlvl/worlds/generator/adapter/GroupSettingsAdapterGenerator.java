@@ -6,7 +6,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.palantir.javapoet.JavaFile;
 import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.ParameterizedTypeName;
 import com.palantir.javapoet.TypeSpec;
@@ -78,10 +77,5 @@ public class GroupSettingsAdapterGenerator extends Generator {
         return builder
                 .addStatement("return object")
                 .build();
-    }
-
-    @Override
-    protected JavaFile.Builder file(JavaFile.Builder builder) {
-        return builder;
     }
 }
