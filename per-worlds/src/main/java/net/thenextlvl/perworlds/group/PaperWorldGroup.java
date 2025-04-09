@@ -125,9 +125,8 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
-    public boolean persist() {
+    public void persist() {
         config.save();
-        return true;
     }
 
     @Override

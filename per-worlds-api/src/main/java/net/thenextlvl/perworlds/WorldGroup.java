@@ -40,13 +40,12 @@ public interface WorldGroup {
 
     boolean delete();
 
-    boolean persist();
-
     boolean removeWorld(World world);
 
     boolean writePlayerData(OfflinePlayer player, PlayerData data);
 
     void loadPlayerData(Player player, boolean position);
+    void persist();
 
     void persistPlayerData();
 
