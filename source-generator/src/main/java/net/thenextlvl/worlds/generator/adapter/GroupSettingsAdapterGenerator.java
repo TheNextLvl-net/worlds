@@ -4,6 +4,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.palantir.javapoet.MethodSpec;
@@ -55,7 +56,7 @@ public class GroupSettingsAdapterGenerator extends Generator {
         Arrays.stream(GroupSettings.class.getDeclaredMethods())
                 .map(Method::getName)
                 .distinct()
-                .forEach(s -> builder.addStatement("if (root.has($S)) settings.$L(root.get($S).getAsBoolean())", s, s, s));
+                .forEach(s -> builder.addStatement("if (root.get($S) instanceof $T primitive) settings.$L(primitive.getAsBoolean())", s, JsonPrimitive.class, s));
         return builder
                 .addStatement("return settings")
                 .build();
