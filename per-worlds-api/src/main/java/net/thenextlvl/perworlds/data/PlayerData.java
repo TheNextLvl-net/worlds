@@ -1,6 +1,7 @@
 package net.thenextlvl.perworlds.data;
 
 import net.thenextlvl.perworlds.GroupSettings;
+import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.statistics.Stats;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -175,5 +176,14 @@ public interface PlayerData {
 
     int score();
 
+    /**
+     * Applies the specified group settings to the given player instance. Depending on the provided
+     * parameters, it may also adjust the player's position and other game-related attributes.
+     *
+     * @param settings the group settings to be applied to the player
+     * @param player the player to which the settings are to be applied
+     * @param position whether to apply position-related settings
+     * @see WorldGroup#loadPlayerData(Player, boolean)
+     */
     void apply(GroupSettings settings, Player player, boolean position);
 }
