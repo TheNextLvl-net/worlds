@@ -27,6 +27,7 @@ class GroupOptionCommand {
                 .then(option("attributes", GroupSettings::attributes, GroupSettings::attributes, commons))
                 .then(option("beeStingersInBody", GroupSettings::beeStingersInBody, GroupSettings::beeStingersInBody, commons))
                 .then(option("chat", GroupSettings::chat, GroupSettings::chat, commons))
+                .then(option("enabled", GroupSettings::enabled, GroupSettings::enabled, commons))
                 .then(option("endCredits", GroupSettings::endCredits, GroupSettings::endCredits, commons))
                 .then(option("enderChest", GroupSettings::enderChest, GroupSettings::enderChest, commons))
                 .then(option("exhaustion", GroupSettings::exhaustion, GroupSettings::exhaustion, commons))
