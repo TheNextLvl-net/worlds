@@ -28,7 +28,6 @@ dependencies {
     api("net.thenextlvl.core:nbt:2.3.1")
 }
 
-
 publishing {
     publications.create<MavenPublication>("maven") {
         from(components["java"])
