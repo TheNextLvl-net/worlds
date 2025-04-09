@@ -116,7 +116,7 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public boolean delete() {
-        return file.delete() | delete(dataFolder);
+        return groupProvider.removeGroup(this) | file.delete() | delete(dataFolder);
     }
 
     private boolean delete(File file) {
