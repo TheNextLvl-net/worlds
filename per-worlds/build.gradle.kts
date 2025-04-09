@@ -3,6 +3,7 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import net.minecrell.pluginyml.paper.PaperPluginDescription
 
 plugins {
+    id("idea")
     id("java")
     id("java-library")
     id("com.gradleup.shadow") version "9.0.0-beta9"
@@ -36,7 +37,13 @@ dependencies {
     api("net.thenextlvl.core:i18n:1.0.21")
     api("net.thenextlvl.core:paper:2.0.4")
 
-    implementation(project(":per-worlds-api"))
+    api(project(":per-worlds-api"))
+}
+
+val generatedPath: java.nio.file.Path = layout.projectDirectory.dir("src/generated/java").asFile.toPath()
+idea.module.generatedSourceDirs.add(generatedPath.toFile())
+sourceSets.main {
+    java.srcDir(generatedPath)
 }
 
 tasks.shadowJar {
