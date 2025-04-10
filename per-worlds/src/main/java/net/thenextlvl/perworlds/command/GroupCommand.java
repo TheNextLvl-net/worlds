@@ -18,7 +18,8 @@ public class GroupCommand {
                 .then(GroupInfoCommand.create(commons))
                 .then(GroupListCommand.create(commons))
                 .then(GroupOptionCommand.create(commons))
-                .then(GroupRemoveCommand.create(commons));
+                .then(GroupRemoveCommand.create(commons))
+                .then(GroupTeleportCommand.create(commons));
     }
 
     static RequiredArgumentBuilder<CommandSourceStack, WorldGroup> groupArgument(SharedWorlds commons) {
