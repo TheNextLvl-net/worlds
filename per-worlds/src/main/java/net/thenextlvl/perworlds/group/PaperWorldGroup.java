@@ -119,6 +119,11 @@ public class PaperWorldGroup implements WorldGroup {
         return groupProvider.removeGroup(this) | file.delete() | delete(dataFolder);
     }
 
+    @Override
+    public boolean hasPlayerData(OfflinePlayer player) {
+        return new File(getDataFolder(), player.getUniqueId() + ".dat").exists();
+    }
+
     private boolean delete(File file) {
         var files = file.listFiles();
         return (files == null || Arrays.stream(files).allMatch(this::delete)) | file.delete();

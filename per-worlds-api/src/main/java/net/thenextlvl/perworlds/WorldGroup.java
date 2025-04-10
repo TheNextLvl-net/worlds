@@ -116,6 +116,14 @@ public interface WorldGroup {
     boolean delete();
 
     /**
+     * Checks if the specified offline player has associated persistent data within the group.
+     *
+     * @param player the offline player to check for associated data
+     * @return {@code true} if the player has persistent data in the group, {@code false} otherwise
+     */
+    boolean hasPlayerData(OfflinePlayer player);
+
+    /**
      * Removes the specified world from this world group.
      * <p>
      * If the world is successfully removed, it will no longer
