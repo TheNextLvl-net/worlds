@@ -41,6 +41,18 @@ public class SharedWorlds {
 
     public void onLoad() {
         registerServices();
+        loadGroups();
+    }
+
+    private void loadGroups() {
+        var suffix = ".json";
+        var files = groupProvider.getDataFolder().listFiles((file, name) -> name.endsWith(suffix));
+        if (files != null) for (var file : files) {
+            var name = file.getName();
+            name = name.substring(0, name.length() - suffix.length());
+            groupProvider.createGroup(name, settings -> {
+            });
+        }
     }
 
     public void onEnable() {

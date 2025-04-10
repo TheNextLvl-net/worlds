@@ -1,7 +1,6 @@
 package net.thenextlvl.perworlds.listener;
 
 import net.thenextlvl.perworlds.GroupProvider;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -19,13 +18,6 @@ public class WorldListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        // todo: remove, just for testing
-        Bukkit.getWorlds().forEach(world -> {
-            if (groupProvider.hasGroup(world)) return;
-            groupProvider.createGroup(world.getName(), settings -> {
-            }, world);
-        });
-
         groupProvider.getGroup(event.getPlayer().getWorld()).ifPresent(group ->
                 group.loadPlayerData(event.getPlayer(), true));
     }
