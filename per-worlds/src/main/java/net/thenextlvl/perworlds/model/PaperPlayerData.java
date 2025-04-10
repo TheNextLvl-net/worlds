@@ -117,33 +117,74 @@ public class PaperPlayerData implements PlayerData {
 
     @Override
     public void apply(GroupSettings settings, Player player, boolean position) {
-        if (settings.absorption()) player.setAbsorptionAmount(absorption);
-        if (settings.arrowsInBody()) player.setArrowsInBody(arrowsInBody);
-        if (settings.beeStingersInBody()) player.setBeeStingersInBody(beeStingersInBody);
-        if (settings.endCredits()) player.setHasSeenWinScreen(seenCredits);
-        if (settings.enderChest()) player.getEnderChest().setContents(enderChest);
-        if (settings.exhaustion()) player.setExhaustion(exhaustion);
+        if (settings.lastLocation() && position && lastLocation != null) player.teleportAsync(lastLocation);
         if (settings.fallDistance() && position) player.setFallDistance(fallDistance);
-        if (settings.fireTicks()) player.setFireTicks(fireTicks);
-        if (settings.foodLevel()) player.setFoodLevel(foodLevel);
-        if (settings.freezeTicks()) player.setFreezeTicks(freezeTicks);
-        if (settings.gameMode()) player.setGameMode(gameMode);
+        if (settings.velocity() && position) player.setVelocity(velocity);
+
+        if (settings.gameMode()) {
+            if (previousGameMode != null) player.setGameMode(previousGameMode);
+            player.setGameMode(gameMode);
+        }
+
+        if (settings.flyState()) {
+            player.setAllowFlight(mayFly);
+            player.setFlying(flying);
+        }
+
         if (settings.gliding()) player.setGliding(gliding);
-        if (settings.health()) player.setHealth(health);
+
+        if (settings.portalCooldown()) player.setPortalCooldown(portalCooldown);
+
         if (settings.hotbarSlot()) player.getInventory().setHeldItemSlot(heldItemSlot);
         if (settings.inventory()) player.getInventory().setContents(inventory);
-        if (settings.invulnerable()) player.setInvulnerable(invulnerable);
-        if (settings.lastDeathLocation()) player.setLastDeathLocation(lastDeathLocation);
-        if (settings.lastLocation() && position && lastLocation != null) player.teleportAsync(lastLocation);
-        if (settings.lockFreezeTicks()) player.lockFreezeTicks(lockFreezeTicks);
-        if (settings.portalCooldown()) player.setPortalCooldown(portalCooldown);
-        if (settings.remainingAir()) player.setRemainingAir(remainingAir);
-        if (settings.respawnLocation()) player.setRespawnLocation(respawnLocation, true);
-        if (settings.saturation()) player.setSaturation(saturation);
+        if (settings.enderChest()) player.getEnderChest().setContents(enderChest);
+
+        if (settings.endCredits()) player.setHasSeenWinScreen(seenCredits);
+
+        if (settings.arrowsInBody()) player.setArrowsInBody(arrowsInBody);
+        if (settings.beeStingersInBody()) player.setBeeStingersInBody(beeStingersInBody);
+
         if (settings.score()) player.setDeathScreenScore(score);
-        if (settings.statistics()) stats.apply(player);
-        if (settings.velocity() && position) player.setVelocity(velocity);
+        if (settings.experience()) {
+            player.setExp(experience);
+            player.setLevel(level);
+        }
+
+        if (settings.invulnerable()) player.setInvulnerable(invulnerable);
+        if (settings.health()) player.setHealth(health);
+
+        if (settings.absorption()) player.setAbsorptionAmount(absorption);
+        if (settings.exhaustion()) player.setExhaustion(exhaustion);
+        if (settings.foodLevel()) player.setFoodLevel(foodLevel);
+        if (settings.saturation()) player.setSaturation(saturation);
+
+        if (settings.fireTicks()) player.setFireTicks(fireTicks);
+        if (settings.freezeTicks()) player.setFreezeTicks(freezeTicks);
+        if (settings.lockFreezeTicks()) player.lockFreezeTicks(lockFreezeTicks);
+        if (settings.remainingAir()) player.setRemainingAir(remainingAir);
+
         if (settings.visualFire()) player.setVisualFire(visualFire);
+
+        if (settings.lastDeathLocation()) player.setLastDeathLocation(lastDeathLocation);
+        if (settings.respawnLocation()) player.setRespawnLocation(respawnLocation, true);
+
+        if (settings.potionEffects()) {
+            player.clearActivePotionEffects();
+            player.addPotionEffects(potionEffects);
+        }
+
+        if (settings.attributes()) attributes.forEach(data -> {
+            var attribute = player.getAttribute(data.attribute());
+            if (attribute != null) attribute.setBaseValue(data.baseValue());
+        });
+
+        if (settings.wardenSpawnTracker()) {
+            player.setWardenTimeSinceLastWarning(wardenSpawnTracker.ticksSinceLastWarning());
+            player.setWardenWarningCooldown(wardenSpawnTracker.cooldownTicks());
+            player.setWardenWarningLevel(wardenSpawnTracker.warningLevel());
+        }
+
+        if (settings.statistics()) stats.apply(player);
 
         // todo: only grant advancements internally
         if (settings.advancements()) {
@@ -165,17 +206,6 @@ public class PaperPlayerData implements PlayerData {
             });
         }
 
-        if (settings.attributes()) attributes.forEach(data -> {
-            var attribute = player.getAttribute(data.attribute());
-            if (attribute != null) attribute.setBaseValue(data.baseValue());
-        });
-
-        if (settings.wardenSpawnTracker()) {
-            player.setWardenTimeSinceLastWarning(wardenSpawnTracker.ticksSinceLastWarning());
-            player.setWardenWarningCooldown(wardenSpawnTracker.cooldownTicks());
-            player.setWardenWarningLevel(wardenSpawnTracker.warningLevel());
-        }
-
         // todo: only (un)discover recipes internally
         if (settings.recipes()) {
             var toAdd = new HashSet<>(recipes);
@@ -185,20 +215,6 @@ public class PaperPlayerData implements PlayerData {
             var toRemove = new HashSet<>(player.getDiscoveredRecipes());
             toRemove.removeAll(recipes);
             player.undiscoverRecipes(toRemove);
-        }
-
-        if (settings.flyState()) {
-            player.setAllowFlight(mayFly);
-            player.setFlying(flying);
-        }
-
-        if (settings.potionEffects()) {
-            player.clearActivePotionEffects();
-            player.addPotionEffects(potionEffects);
-        }
-        if (settings.experience()) {
-            player.setExp(experience);
-            player.setLevel(level);
         }
     }
 
