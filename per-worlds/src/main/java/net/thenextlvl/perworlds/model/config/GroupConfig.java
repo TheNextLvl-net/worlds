@@ -5,5 +5,5 @@ import net.thenextlvl.perworlds.GroupSettings;
 
 import java.util.Set;
 
-public record GroupConfig(String name, Set<Key> worlds, GroupSettings settings) {
+public record GroupConfig(Set<Key> worlds, GroupSettings settings) {
 }

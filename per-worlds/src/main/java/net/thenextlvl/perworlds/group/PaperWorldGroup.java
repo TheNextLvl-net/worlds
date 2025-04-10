@@ -53,7 +53,7 @@ public class PaperWorldGroup implements WorldGroup {
         this.dataFolder = new File(groupProvider.getDataFolder(), name);
         this.file = new File(groupProvider.getDataFolder(), name + ".json");
         this.config = new GsonFile<>(IO.of(file), new GroupConfig(
-                name, worlds.stream().map(Keyed::key).collect(Collectors.toSet()), settings
+                worlds.stream().map(Keyed::key).collect(Collectors.toSet()), settings
         ), new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(GroupSettings.class, new GroupSettingsAdapter())
