@@ -28,6 +28,8 @@ public class WorldListener implements Listener {
                 group.persistPlayerData(event.getPlayer()));
     }
 
+    // todo: fix respawning not persisting data
+
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         if (event.getFrom().getWorld().equals(event.getTo().getWorld())) return;
