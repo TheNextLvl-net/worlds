@@ -117,7 +117,7 @@ public class PaperPlayerData implements PlayerData {
 
     @Override
     public void apply(GroupSettings settings, Player player, boolean position) {
-        if (settings.lastLocation() && position && lastLocation != null) player.teleportAsync(lastLocation);
+        if (settings.lastLocation() && position && lastLocation != null) player.teleport(lastLocation); // todo: make async properly
         if (settings.fallDistance() && position) player.setFallDistance(fallDistance);
         if (settings.velocity() && position) player.setVelocity(velocity);
 
