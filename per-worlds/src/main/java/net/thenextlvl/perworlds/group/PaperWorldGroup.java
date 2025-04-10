@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.nio.file.StandardOpenOption.CREATE;
@@ -194,6 +195,13 @@ public class PaperWorldGroup implements WorldGroup {
     @Override
     public void persistPlayerData(Player player) {
         writePlayerData(player, PaperPlayerData.of(player));
+    }
+
+    @Override
+    public void persistPlayerData(Player player, Consumer<PlayerData> data) {
+        var playerData = PaperPlayerData.of(player);
+        data.accept(playerData);
+        writePlayerData(player, playerData);
     }
 
     private Optional<PlayerData> readPlayerData(File file) throws IOException {

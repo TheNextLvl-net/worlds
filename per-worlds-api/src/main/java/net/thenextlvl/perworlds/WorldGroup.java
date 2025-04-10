@@ -12,6 +12,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Represents a group of worlds, providing functionality to manage and interact
@@ -170,4 +171,14 @@ public interface WorldGroup {
      * @param player the player whose data is to be persisted
      */
     void persistPlayerData(Player player);
+
+    /**
+     * Persists and modifies the data of the specified player using the provided consumer.
+     * The method fetches the player's data, allows manipulation through the consumer,
+     * and ensures the updated data is saved to persistent storage.
+     *
+     * @param player the player whose data is to be persisted and modified
+     * @param data a {@link Consumer} that manipulates the {@link PlayerData} object
+     */
+    void persistPlayerData(Player player, Consumer<PlayerData> data);
 }
