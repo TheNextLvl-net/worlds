@@ -1,12 +1,15 @@
 package net.thenextlvl.perworlds.listener;
 
+import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import net.thenextlvl.perworlds.GroupProvider;
+import net.thenextlvl.perworlds.data.PlayerData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class WorldListener implements Listener {
@@ -28,7 +31,22 @@ public class WorldListener implements Listener {
                 group.persistPlayerData(event.getPlayer()));
     }
 
-    // todo: fix respawning not persisting data
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        provider.getGroup(event.getPlayer().getWorld()).ifPresent(group ->
+                group.readPlayerData(event.getPlayer())
+                        .map(PlayerData::respawnLocation)
+                        .ifPresentOrElse(event::setRespawnLocation, () -> {
+                            var location = group.getGroupData().spawnLocation();
+                            if (location != null) event.setRespawnLocation(location);
+                        }));
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerPostRespawn(PlayerPostRespawnEvent event) {
+        provider.getGroup(event.getPlayer().getWorld()).ifPresent(group ->
+                group.persistPlayerData(event.getPlayer()));
+    }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
