@@ -32,8 +32,7 @@ public class GroupDataAdapter implements JsonDeserializer<GroupData>, JsonSerial
         var rules = object.getAsJsonObject("gameRules");
         if (rules != null) rules.entrySet().forEach(entry -> {
             var rule = GameRule.getByName(entry.getKey());
-            if (rule == null) return;
-            data.setGameRule(rule, context.deserialize(entry.getValue(), Object.class));
+            if (rule != null) data.gameRule(rule, context.deserialize(entry.getValue(), Object.class));
         });
         if (object.has("rain")) data.rain(object.get("rain").getAsBoolean());
         if (object.has("thunder")) data.thunder(object.get("thunder").getAsBoolean());
@@ -45,7 +44,7 @@ public class GroupDataAdapter implements JsonDeserializer<GroupData>, JsonSerial
     public JsonObject serialize(GroupData data, Type type, JsonSerializationContext context) {
         var object = new JsonObject();
         var rules = new JsonObject();
-        for (var rule : GameRule.values()) rules.add(rule.getName(), context.serialize(data.getGameRule(rule)));
+        for (var rule : GameRule.values()) rules.add(rule.getName(), context.serialize(data.gameRule(rule)));
         object.add("defaultGameMode", context.serialize(data.defaultGameMode()));
         object.add("difficulty", context.serialize(data.difficulty()));
         object.add("spawnLocation", context.serialize(data.spawnLocation()));

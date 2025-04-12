@@ -10,7 +10,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @NullMarked
 public class PaperGroupData implements GroupData {
@@ -23,12 +22,12 @@ public class PaperGroupData implements GroupData {
     private int time = 0;
 
     @Override
-    public <T> @Nullable T getGameRule(GameRule<T> rule) {
+    public <T> @Nullable T gameRule(GameRule<T> rule) {
         return rule.getType().cast(gameRules.get(rule));
     }
 
     @Override
-    public <T> boolean setGameRule(GameRule<T> rule, @Nullable T value) {
+    public <T> boolean gameRule(GameRule<T> rule, @Nullable T value) {
         if (value == null) return gameRules.remove(rule) != null;
         return !value.equals(gameRules.put(rule, value));
     }
@@ -39,10 +38,8 @@ public class PaperGroupData implements GroupData {
     }
 
     @Override
-    public boolean difficulty(Difficulty difficulty) {
-        if (this.difficulty.equals(difficulty)) return false;
+    public void difficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
-        return true;
     }
 
     @Override
@@ -51,10 +48,8 @@ public class PaperGroupData implements GroupData {
     }
 
     @Override
-    public boolean defaultGameMode(GameMode gameMode) {
-        if (defaultGameMode.equals(gameMode)) return false;
+    public void defaultGameMode(GameMode gameMode) {
         this.defaultGameMode = gameMode;
-        return true;
     }
 
     @Override
@@ -63,10 +58,8 @@ public class PaperGroupData implements GroupData {
     }
 
     @Override
-    public boolean spawnLocation(@Nullable Location location) {
-        if (Objects.equals(spawnLocation, location)) return false;
+    public void spawnLocation(@Nullable Location location) {
         this.spawnLocation = location;
-        return true;
     }
 
     @Override
@@ -75,10 +68,8 @@ public class PaperGroupData implements GroupData {
     }
 
     @Override
-    public boolean rain(boolean rain) {
-        if (this.rain == rain) return false;
+    public void rain(boolean rain) {
         this.rain = rain;
-        return true;
     }
 
     @Override
@@ -87,10 +78,8 @@ public class PaperGroupData implements GroupData {
     }
 
     @Override
-    public boolean thunder(boolean thunder) {
-        if (this.thunder == thunder) return false;
+    public void thunder(boolean thunder) {
         this.thunder = thunder;
-        return true;
     }
 
     @Override
@@ -99,9 +88,7 @@ public class PaperGroupData implements GroupData {
     }
 
     @Override
-    public boolean time(int time) {
-        if (this.time == time) return false;
+    public void time(int time) {
         this.time = time;
-        return true;
     }
 }

@@ -14,44 +14,127 @@ public interface GroupData {
      * @param rule the GameRule to check
      * @param <T> the GameRule's type
      * @return the current value
+     * @see #gameRule(GameRule, Object)
      */
     @Nullable
-    <T> T getGameRule(@NonNull GameRule<T> rule);
+    <T> T gameRule(@NonNull GameRule<T> rule);
 
     /**
      * Set the given {@link GameRule}'s new value.
      *
      * @param rule the GameRule to update
-     * @param newValue the new value
      * @param <T> the value type of the GameRule
      * @return true if the value was successfully set
+     * @see #gameRule(GameRule)
      */
-    <T> boolean setGameRule(@NonNull GameRule<T> rule, @NonNull T value);
+    <T> boolean gameRule(@NonNull GameRule<T> rule, @NonNull T value);
 
+    /**
+     * Retrieves the current difficulty level applied to the group.
+     *
+     * @return the current {@link Difficulty} of the group
+     * @see #difficulty(Difficulty)
+     */
     @NonNull
     Difficulty difficulty();
 
-    boolean difficulty(@NonNull Difficulty difficulty);
+    /**
+     * Sets the difficulty level for the group.
+     * The difficulty level dictates the gameplay challenges, such as
+     * mob behavior and damage levels, associated with the group.
+     *
+     * @param difficulty the new {@link Difficulty} to be set
+     * @see #difficulty()
+     */
+    void difficulty(@NonNull Difficulty difficulty);
 
+    /**
+     * Retrieves the default {@link GameMode} for the group.
+     *
+     * @return the default {@link GameMode} for the group, never null
+     * @see #defaultGameMode(GameMode)
+     */
     @NonNull
     GameMode defaultGameMode();
 
-    boolean defaultGameMode(@NonNull GameMode gameMode);
+    /**
+     * Sets the default {@link GameMode} for the group.
+     *
+     * @param gameMode the {@link GameMode} to be set as the default for the group
+     * @see #defaultGameMode()
+     */
+    void defaultGameMode(@NonNull GameMode gameMode);
 
+    /**
+     * Retrieves the spawn location associated with the group.
+     *
+     * @return the {@link Location} representing the group's spawn location,
+     *         or {@code null} if no spawn location is defined
+     * @see #spawnLocation(Location)
+     */
     @Nullable
     Location spawnLocation();
 
-    boolean spawnLocation(@Nullable Location location);
+    /**
+     * Sets the spawn location for the group.
+     * The spawn location is typically the default location where players appear
+     * when spawning within the group.
+     *
+     * @param location the {@link Location} to set as the group's spawn location.
+     *                 Can be {@code null} to unset or clear the spawn location.
+     * @see #spawnLocation()
+     */
+    void spawnLocation(@Nullable Location location);
 
+    /**
+     * Retrieves the current rain state for the group.
+     * Indicates whether it is currently raining within the group's environment.
+     *
+     * @return true if it is raining, false otherwise
+     * @see #rain(boolean)
+     */
     boolean rain();
 
-    boolean rain(boolean rain);
+    /**
+     * Sets the rain state for the group.
+     * Determines whether it should start or stop raining within the group's environment.
+     *
+     * @param rain true to enable rain, false to disable it
+     * @see #rain()
+     */
+    void rain(boolean rain);
 
+    /**
+     * Checks whether it is currently thundering within the group's environment.
+     *
+     * @return true if it is thundering, false otherwise
+     * @see #thunder(boolean)
+     */
     boolean thunder();
 
-    boolean thunder(boolean thunder);
+    /**
+     * Sets the thunder state for the group.
+     * Determines whether it should start or stop thundering within the group's environment.
+     *
+     * @param thunder true to enable thundering, false to disable it
+     * @see #thunder()
+     */
+    void thunder(boolean thunder);
 
+    /**
+     * Retrieves the current time value associated with the group.
+     *
+     * @return the current time as an integer
+     * @see #time(int)
+     */
     int time();
 
-    boolean time(int time);
+    /**
+     * Sets the current time value for the group.
+     * The time value typically represents the in-game time within the group's environment.
+     *
+     * @param time the time value to be set, represented as an integer
+     * @see #time()
+     */
+    void time(int time);
 }
