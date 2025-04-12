@@ -56,7 +56,7 @@ import java.util.function.Consumer;
 @NullMarked
 public class PaperGroupProvider implements GroupProvider {
     private final File dataFolder;
-    private final List<WorldGroup> groups = new ArrayList<>(); // todo: move to config
+    private final List<WorldGroup> groups = new ArrayList<>();
     private final NBT nbt;
     private final SharedWorlds commons;
 
