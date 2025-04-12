@@ -5,6 +5,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.thenextlvl.perworlds.group.PaperGroupProvider;
+import net.thenextlvl.perworlds.listener.ChatListener;
 import net.thenextlvl.perworlds.listener.WorldListener;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
@@ -89,6 +90,7 @@ public class SharedWorlds {
 
     private void registerListeners() {
         plugin.getServer().getPluginManager().registerEvents(new WorldListener(groupProvider), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new ChatListener(groupProvider), plugin);
     }
 
     private void registerServices() {
