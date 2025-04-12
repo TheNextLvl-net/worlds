@@ -7,14 +7,19 @@ import core.io.IO;
 import core.nbt.NBTInputStream;
 import core.nbt.NBTOutputStream;
 import core.paper.adapters.key.KeyAdapter;
+import core.paper.adapters.world.LocationAdapter;
+import core.paper.adapters.world.WorldAdapter;
 import net.kyori.adventure.key.Key;
+import net.thenextlvl.perworlds.GroupData;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
+import net.thenextlvl.perworlds.adapter.GroupDataAdapter;
 import net.thenextlvl.perworlds.adapter.GroupSettingsAdapter;
 import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.model.PaperPlayerData;
 import net.thenextlvl.perworlds.model.config.GroupConfig;
 import org.bukkit.Keyed;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -49,15 +54,18 @@ public class PaperWorldGroup implements WorldGroup {
     private final PaperGroupProvider groupProvider;
     private final String name;
 
-    public PaperWorldGroup(PaperGroupProvider groupProvider, String name, GroupSettings settings, Set<World> worlds) {
+    public PaperWorldGroup(PaperGroupProvider groupProvider, String name, GroupData data, GroupSettings settings, Set<World> worlds) {
         this.dataFolder = new File(groupProvider.getDataFolder(), name);
         this.file = new File(groupProvider.getDataFolder(), name + ".json");
         this.config = new GsonFile<>(IO.of(file), new GroupConfig(
-                worlds.stream().map(Keyed::key).collect(Collectors.toSet()), settings
+                worlds.stream().map(Keyed::key).collect(Collectors.toSet()), data, settings
         ), new GsonBuilder()
                 .setPrettyPrinting()
+                .registerTypeAdapter(GroupData.class, new GroupDataAdapter())
                 .registerTypeAdapter(GroupSettings.class, new GroupSettingsAdapter())
                 .registerTypeAdapter(Key.class, new KeyAdapter.Kyori())
+                .registerTypeAdapter(World.class, new WorldAdapter.Key())
+                .registerTypeAdapter(Location.class, new LocationAdapter.Simple())
                 .create()).saveIfAbsent();
         this.groupProvider = groupProvider;
         this.name = name;
@@ -71,6 +79,11 @@ public class PaperWorldGroup implements WorldGroup {
     @Override
     public File getFile() {
         return file;
+    }
+
+    @Override
+    public GroupData getGroupData() {
+        return config.getRoot().data();
     }
 
     @Override

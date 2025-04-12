@@ -35,6 +35,9 @@ public interface WorldGroup {
      */
     File getFile();
 
+
+    GroupData getGroupData();
+
     /**
      * Retrieves the settings for the group.
      * These settings include various configurations and toggles that dictate
