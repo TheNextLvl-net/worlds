@@ -10,21 +10,21 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class WorldListener implements Listener {
-    private final GroupProvider groupProvider;
+    private final GroupProvider provider;
 
-    public WorldListener(GroupProvider groupProvider) {
-        this.groupProvider = groupProvider;
+    public WorldListener(GroupProvider provider) {
+        this.provider = provider;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        groupProvider.getGroup(event.getPlayer().getWorld()).ifPresent(group ->
+        provider.getGroup(event.getPlayer().getWorld()).ifPresent(group ->
                 group.loadPlayerData(event.getPlayer(), true));
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
-        groupProvider.getGroup(event.getPlayer().getWorld()).ifPresent(group ->
+        provider.getGroup(event.getPlayer().getWorld()).ifPresent(group ->
                 group.persistPlayerData(event.getPlayer()));
     }
 
@@ -33,16 +33,16 @@ public class WorldListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         if (event.getFrom().getWorld().equals(event.getTo().getWorld())) return;
-        var from = groupProvider.getGroup(event.getFrom().getWorld());
-        var to = groupProvider.getGroup(event.getTo().getWorld());
+        var from = provider.getGroup(event.getFrom().getWorld());
+        var to = provider.getGroup(event.getTo().getWorld());
         if (from.equals(to)) return;
         from.ifPresent(group -> group.persistPlayerData(event.getPlayer()));
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
-        var from = groupProvider.getGroup(event.getFrom());
-        var to = groupProvider.getGroup(event.getPlayer().getWorld());
+        var from = provider.getGroup(event.getFrom());
+        var to = provider.getGroup(event.getPlayer().getWorld());
         if (!from.equals(to)) to.ifPresent(group -> group.loadPlayerData(event.getPlayer(), false));
     }
 }
