@@ -60,9 +60,10 @@ public class PaperGroupProvider implements GroupProvider {
     private final SharedWorlds commons;
 
     public PaperGroupProvider(SharedWorlds commons) {
+        this.commons = commons;
         this.dataFolder = new File(commons.getDataFolder(), "groups");
         this.nbt = new NBT.Builder()
-                .registerTypeHierarchyAdapter(AdvancementData.class, new AdvancementDataAdapter(commons.getServer()))
+                .registerTypeHierarchyAdapter(AdvancementData.class, new AdvancementDataAdapter(getServer()))
                 .registerTypeHierarchyAdapter(Attribute.class, new AttributeAdapter())
                 .registerTypeHierarchyAdapter(AttributeData.class, new AttributeDataAdapter())
                 .registerTypeHierarchyAdapter(Date.class, new DateAdapter())
@@ -77,9 +78,8 @@ public class PaperGroupProvider implements GroupProvider {
                 .registerTypeHierarchyAdapter(Stats.class, new StatisticsAdapter())
                 .registerTypeHierarchyAdapter(Vector.class, new VectorAdapter())
                 .registerTypeHierarchyAdapter(WardenSpawnTracker.class, new WardenSpawnTrackerAdapter())
-                .registerTypeHierarchyAdapter(World.class, new WorldAdapter(commons.getServer()))
+                .registerTypeHierarchyAdapter(World.class, new WorldAdapter(getServer()))
                 .build();
-        this.commons = commons;
     }
 
     public ComponentLogger getLogger() {
