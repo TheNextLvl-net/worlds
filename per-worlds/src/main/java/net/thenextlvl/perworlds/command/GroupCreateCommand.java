@@ -21,8 +21,7 @@ class GroupCreateCommand {
         var sender = context.getSource().getSender();
         var name = context.getArgument("name", String.class);
         var success = !commons.groupProvider().hasGroup(name);
-        if (success) commons.groupProvider().createGroup(name, settings -> {
-        });
+        if (success) commons.groupProvider().createGroup(name);
         var message = success ? "group.created" : "group.exists";
         commons.bundle().sendMessage(sender, message, Placeholder.unparsed("name", name));
         return success ? Command.SINGLE_SUCCESS : 0;

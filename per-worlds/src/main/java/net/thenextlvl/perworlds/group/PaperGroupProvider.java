@@ -132,8 +132,22 @@ public class PaperGroupProvider implements GroupProvider {
     }
 
     @Override
+    public WorldGroup createGroup(String name, Collection<World> worlds) throws IllegalStateException {
+        return createGroup(name, data -> {
+        }, settings -> {
+        }, worlds);
+    }
+
+    @Override
     public WorldGroup createGroup(String name, Consumer<GroupData> data, Consumer<GroupSettings> settings, World... worlds) {
         return createGroup(name, data, settings, List.of(worlds));
+    }
+
+    @Override
+    public WorldGroup createGroup(String name, World... worlds) throws IllegalStateException {
+        return createGroup(name, data -> {
+        }, settings -> {
+        }, worlds);
     }
 
     @Override
