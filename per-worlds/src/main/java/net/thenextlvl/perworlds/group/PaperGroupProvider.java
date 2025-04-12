@@ -5,6 +5,7 @@ import core.nbt.serialization.NBT;
 import core.nbt.serialization.adapter.EnumAdapter;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import net.thenextlvl.perworlds.GroupData;
 import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.SharedWorlds;
@@ -115,22 +116,24 @@ public class PaperGroupProvider implements GroupProvider {
     }
 
     @Override
-    public WorldGroup createGroup(String name, Consumer<GroupSettings> settings, Collection<World> worlds) {
+    public WorldGroup createGroup(String name, Consumer<GroupData> data, Consumer<GroupSettings> settings, Collection<World> worlds) {
         Preconditions.checkState(!hasGroup(name), "Cannot create multiple groups with the same key");
         var invalid = worlds.stream().filter(this::hasGroup).map(Keyed::key).map(Key::asString).toList();
         Preconditions.checkState(invalid.isEmpty(), "Worlds cannot be in multiple groups: {}", String.join(", ", invalid));
 
         var groupSettings = new PaperGroupSettings();
+        var groupData = new PaperGroupData();
         settings.accept(groupSettings);
+        data.accept(groupData);
 
-        var group = new PaperWorldGroup(this, name, groupSettings, Set.copyOf(worlds));
+        var group = new PaperWorldGroup(this, name, groupData, groupSettings, Set.copyOf(worlds));
         groups.add(group);
         return group;
     }
 
     @Override
-    public WorldGroup createGroup(String name, Consumer<GroupSettings> settings, World... worlds) {
-        return createGroup(name, settings, List.of(worlds));
+    public WorldGroup createGroup(String name, Consumer<GroupData> data, Consumer<GroupSettings> settings, World... worlds) {
+        return createGroup(name, data, settings, List.of(worlds));
     }
 
     @Override

@@ -51,30 +51,32 @@ public interface GroupProvider {
     Optional<WorldGroup> getGroup(World world);
 
     /**
-     * Creates a new {@link WorldGroup} with the specified name, settings, and a collection of worlds.
+     * Creates a new {@link WorldGroup} with the specified name, data, settings, and a collection of worlds.
      * The group must have a unique name and cannot conflict with already existing groups.
      *
      * @param name     the name of the group to be created.
+     * @param data     a {@link Consumer} to configure the {@link GroupData} for the new group.
      * @param settings a {@link Consumer} to configure the {@link GroupSettings} for the new group.
      * @param worlds   a collection of {@link World} instances that will be part of the group.
      * @return the created {@link WorldGroup} instance.
      * @throws IllegalStateException if a group with the specified name already exists,
      * or if a given world is already part of another group.
      */
-    WorldGroup createGroup(String name, Consumer<GroupSettings> settings, Collection<World> worlds) throws IllegalStateException;
+    WorldGroup createGroup(String name, Consumer<GroupData> data, Consumer<GroupSettings> settings, Collection<World> worlds) throws IllegalStateException;
 
     /**
-     * Creates a new {@link WorldGroup} with the specified name, settings, and a collection of worlds.
+     * Creates a new {@link WorldGroup} with the specified name, data, settings, and a collection of worlds.
      * The group must have a unique name and cannot conflict with already existing groups.
      *
      * @param name     the name of the group to be created.
+     * @param data     a {@link Consumer} to configure the {@link GroupData} for the new group.
      * @param settings a {@link Consumer} to configure the {@link GroupSettings} for the new group.
      * @param worlds   an array of {@link World} instances that will be part of the group.
      * @return the created {@link WorldGroup} instance.
      * @throws IllegalStateException if a group with the specified name already exists,
      * or if a given world is already part of another group.
      */
-    WorldGroup createGroup(String name, Consumer<GroupSettings> settings, World... worlds) throws IllegalStateException;
+    WorldGroup createGroup(String name, Consumer<GroupData> data, Consumer<GroupSettings> settings, World... worlds) throws IllegalStateException;
 
     /**
      * Checks if a group with the specified name exists.
