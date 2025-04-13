@@ -2,7 +2,6 @@ package net.thenextlvl.perworlds.listener;
 
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import net.thenextlvl.perworlds.GroupProvider;
-import net.thenextlvl.perworlds.data.PlayerData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -33,13 +32,11 @@ public class WorldListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        provider.getGroup(event.getPlayer().getWorld()).ifPresent(group ->
-                group.readPlayerData(event.getPlayer())
-                        .map(PlayerData::respawnLocation)
-                        .ifPresentOrElse(event::setRespawnLocation, () -> {
-                            var location = group.getGroupData().spawnLocation();
-                            if (location != null) event.setRespawnLocation(location);
-                        }));
+        if (event.isBedSpawn() || event.isAnchorSpawn()) return;
+        provider.getGroup(event.getPlayer().getWorld()).ifPresent(group -> {
+            var location = group.getGroupData().spawnLocation();
+            if (location != null) event.setRespawnLocation(location);
+        });
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
