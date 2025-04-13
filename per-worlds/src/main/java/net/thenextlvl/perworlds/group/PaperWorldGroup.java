@@ -61,11 +61,11 @@ public class PaperWorldGroup implements WorldGroup {
                 worlds.stream().map(Keyed::key).collect(Collectors.toSet()), data, settings
         ), new GsonBuilder()
                 .setPrettyPrinting()
-                .registerTypeAdapter(GroupData.class, new GroupDataAdapter())
-                .registerTypeAdapter(GroupSettings.class, new GroupSettingsAdapter())
-                .registerTypeAdapter(Key.class, new KeyAdapter.Kyori())
-                .registerTypeAdapter(World.class, new WorldAdapter.Key())
-                .registerTypeAdapter(Location.class, new LocationAdapter.Simple())
+                .registerTypeHierarchyAdapter(GroupData.class, new GroupDataAdapter())
+                .registerTypeHierarchyAdapter(GroupSettings.class, new GroupSettingsAdapter())
+                .registerTypeHierarchyAdapter(Key.class, new KeyAdapter.Kyori())
+                .registerTypeHierarchyAdapter(Location.class, new LocationAdapter.Complex())
+                .registerTypeHierarchyAdapter(World.class, new WorldAdapter.Key())
                 .create()).saveIfAbsent();
         this.groupProvider = groupProvider;
         this.name = name;
