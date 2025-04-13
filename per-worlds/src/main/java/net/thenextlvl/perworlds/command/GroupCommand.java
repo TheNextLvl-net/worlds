@@ -19,6 +19,7 @@ public class GroupCommand {
                 .then(GroupListCommand.create(commons))
                 .then(GroupOptionCommand.create(commons))
                 .then(GroupRemoveCommand.create(commons))
+                .then(GroupSetSpawnCommand.create(commons))
                 .then(GroupTeleportCommand.create(commons));
     }
 
