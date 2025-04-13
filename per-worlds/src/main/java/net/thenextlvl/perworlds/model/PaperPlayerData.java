@@ -166,7 +166,7 @@ public class PaperPlayerData implements PlayerData {
         if (settings.visualFire()) player.setVisualFire(visualFire);
 
         if (settings.lastDeathLocation()) player.setLastDeathLocation(lastDeathLocation);
-        if (settings.respawnLocation()) player.setRespawnLocation(respawnLocation, true);
+        if (settings.respawnLocation()) player.setRespawnLocation(respawnLocation, false);
 
         if (settings.potionEffects()) {
             player.clearActivePotionEffects();
