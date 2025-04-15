@@ -15,6 +15,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Set;
 
@@ -61,7 +62,9 @@ public class SharedWorlds {
     }
 
     public void onDisable() {
-        groupProvider.getGroups().forEach(group -> {
+        var groups = new ArrayList<>(groupProvider.getGroups());
+        groups.add(groupProvider.getUnownedWorldGroup());
+        groups.forEach(group -> {
             group.persistPlayerData();
             group.persist();
         });
