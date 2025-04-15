@@ -35,7 +35,12 @@ public interface WorldGroup {
      */
     File getFile();
 
-
+    /**
+     * Retrieves the group data associated with this group.
+     * The group data encapsulates various data attributes and metadata specific to the group.
+     *
+     * @return the {@link GroupData} object representing the data of this world group
+     */
     GroupData getGroupData();
 
     /**
