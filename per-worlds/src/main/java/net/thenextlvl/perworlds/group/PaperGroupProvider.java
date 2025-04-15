@@ -39,6 +39,7 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -92,6 +93,10 @@ public class PaperGroupProvider implements GroupProvider {
 
     public Server getServer() {
         return commons.getServer();
+    }
+
+    public Plugin getPlugin() {
+        return commons.getPlugin();
     }
 
     @Override

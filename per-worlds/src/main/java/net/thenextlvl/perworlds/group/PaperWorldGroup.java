@@ -23,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
@@ -198,7 +199,10 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public void loadPlayerData(Player player, boolean position) {
+        if (player.hasMetadata("loading")) return;
+        player.setMetadata("loading", new FixedMetadataValue(groupProvider.getPlugin(), null));
         readPlayerData(player).orElseGet(PaperPlayerData::new).apply(getSettings(), player, position);
+        player.removeMetadata("loading", groupProvider.getPlugin());
     }
 
     @Override
