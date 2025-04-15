@@ -126,7 +126,7 @@ public class PaperGroupProvider implements GroupProvider {
 
     @Override
     public WorldGroup createGroup(String name, Consumer<GroupData> data, Consumer<GroupSettings> settings, Collection<World> worlds) {
-        Preconditions.checkState(!hasGroup(name), "Cannot create multiple groups with the same key");
+        Preconditions.checkState(!hasGroup(name), "A WorldGroup named '%s' already exists", name);
         var invalid = worlds.stream().filter(this::hasGroup).map(Keyed::key).map(Key::asString).toList();
         Preconditions.checkState(invalid.isEmpty(), "Worlds cannot be in multiple groups: {}", String.join(", ", invalid));
 
