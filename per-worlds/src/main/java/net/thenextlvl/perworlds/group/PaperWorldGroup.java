@@ -48,10 +48,11 @@ import static net.thenextlvl.perworlds.SharedWorlds.ISSUES;
 
 @NullMarked
 public class PaperWorldGroup implements WorldGroup {
+    protected final PaperGroupProvider groupProvider;
+
     private final File dataFolder;
     private final File file;
     private final FileIO<GroupConfig> config;
-    private final PaperGroupProvider groupProvider;
     private final String name;
 
     public PaperWorldGroup(PaperGroupProvider groupProvider, String name, GroupData data, GroupSettings settings, Set<World> worlds) {
@@ -138,7 +139,7 @@ public class PaperWorldGroup implements WorldGroup {
         return new File(getDataFolder(), player.getUniqueId() + ".dat").exists();
     }
 
-    private boolean delete(File file) {
+    protected boolean delete(File file) {
         var files = file.listFiles();
         return (files == null || Arrays.stream(files).allMatch(this::delete)) | file.delete();
     }

@@ -9,6 +9,7 @@ import net.thenextlvl.perworlds.GroupData;
 import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.SharedWorlds;
+import net.thenextlvl.perworlds.UnownedWorldGroup;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.adapter.AdvancementDataAdapter;
 import net.thenextlvl.perworlds.adapter.AttributeAdapter;
@@ -59,6 +60,7 @@ public class PaperGroupProvider implements GroupProvider {
     private final List<WorldGroup> groups = new ArrayList<>();
     private final NBT nbt;
     private final SharedWorlds commons;
+    private final UnownedWorldGroup unownedWorldGroup;
 
     public PaperGroupProvider(SharedWorlds commons) {
         this.commons = commons;
@@ -81,6 +83,7 @@ public class PaperGroupProvider implements GroupProvider {
                 .registerTypeHierarchyAdapter(WardenSpawnTracker.class, new WardenSpawnTrackerAdapter())
                 .registerTypeHierarchyAdapter(World.class, new WorldAdapter(getServer()))
                 .build();
+        this.unownedWorldGroup = new PaperUnownedWorldGroup(this);
     }
 
     public ComponentLogger getLogger() {
@@ -107,12 +110,18 @@ public class PaperGroupProvider implements GroupProvider {
 
     @Override
     public Optional<WorldGroup> getGroup(String name) {
-        return groups.stream().filter(group -> group.getName().equals(name)).findAny();
+        return unownedWorldGroup.getName().equals(name) ? Optional.of(unownedWorldGroup)
+                : groups.stream().filter(group -> group.getName().equals(name)).findAny();
     }
 
     @Override
     public Optional<WorldGroup> getGroup(World world) {
         return groups.stream().filter(group -> group.containsWorld(world)).findAny();
+    }
+
+    @Override
+    public UnownedWorldGroup getUnownedWorldGroup() {
+        return unownedWorldGroup;
     }
 
     @Override
@@ -152,7 +161,8 @@ public class PaperGroupProvider implements GroupProvider {
 
     @Override
     public boolean hasGroup(String name) {
-        return groups.stream().anyMatch(group -> group.getName().equals(name));
+        return groups.stream().anyMatch(group -> group.getName().equals(name))
+               || unownedWorldGroup.getName().equals(name);
     }
 
     @Override

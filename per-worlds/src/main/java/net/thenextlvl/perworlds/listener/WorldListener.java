@@ -20,44 +20,46 @@ public class WorldListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        provider.getGroup(event.getPlayer().getWorld()).ifPresent(group ->
-                group.loadPlayerData(event.getPlayer(), true));
+        provider.getGroup(event.getPlayer().getWorld())
+                .orElse(provider.getUnownedWorldGroup())
+                .loadPlayerData(event.getPlayer(), true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
-        provider.getGroup(event.getPlayer().getWorld()).ifPresent(group ->
-                group.persistPlayerData(event.getPlayer()));
+        provider.getGroup(event.getPlayer().getWorld())
+                .orElse(provider.getUnownedWorldGroup())
+                .persistPlayerData(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         if (event.isBedSpawn() || event.isAnchorSpawn()) return;
-        provider.getGroup(event.getPlayer().getWorld()).ifPresent(group -> {
-            var location = group.getGroupData().spawnLocation();
-            if (location != null) event.setRespawnLocation(location);
-        });
+        var group = provider.getGroup(event.getPlayer().getWorld())
+                .orElse(provider.getUnownedWorldGroup());
+        var location = group.getGroupData().spawnLocation();
+        if (location != null) event.setRespawnLocation(location);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerPostRespawn(PlayerPostRespawnEvent event) {
-        provider.getGroup(event.getPlayer().getWorld()).ifPresent(group ->
-                group.persistPlayerData(event.getPlayer()));
+        provider.getGroup(event.getPlayer().getWorld())
+                .orElse(provider.getUnownedWorldGroup())
+                .persistPlayerData(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         if (event.getFrom().getWorld().equals(event.getTo().getWorld())) return;
-        var from = provider.getGroup(event.getFrom().getWorld());
-        var to = provider.getGroup(event.getTo().getWorld());
-        if (from.equals(to)) return;
-        from.ifPresent(group -> group.persistPlayerData(event.getPlayer()));
+        var from = provider.getGroup(event.getFrom().getWorld()).orElse(provider.getUnownedWorldGroup());
+        var to = provider.getGroup(event.getTo().getWorld()).orElse(provider.getUnownedWorldGroup());
+        if (!from.equals(to)) from.persistPlayerData(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
-        var from = provider.getGroup(event.getFrom());
-        var to = provider.getGroup(event.getPlayer().getWorld());
-        if (!from.equals(to)) to.ifPresent(group -> group.loadPlayerData(event.getPlayer(), false));
+        var from = provider.getGroup(event.getFrom()).orElse(provider.getUnownedWorldGroup());
+        var to = provider.getGroup(event.getPlayer().getWorld()).orElse(provider.getUnownedWorldGroup());
+        if (!from.equals(to)) to.loadPlayerData(event.getPlayer(), false);
     }
 }

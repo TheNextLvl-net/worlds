@@ -15,12 +15,12 @@ public class ChatListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onChat(AsyncChatEvent event) {
-        provider.getGroup(event.getPlayer().getWorld())
-                .filter(group -> group.getSettings().chat())
-                .ifPresent(group -> event.viewers().removeIf(audience ->
-                        audience instanceof Player player
-                        && !player.equals(event.getPlayer())
-                        && !group.containsWorld(player.getWorld())
-                ));
+        var group = provider.getGroup(event.getPlayer().getWorld())
+                .orElse(provider.getUnownedWorldGroup());
+        if (group.getSettings().chat()) event.viewers().removeIf(audience ->
+                audience instanceof Player player
+                && !player.equals(event.getPlayer())
+                && !group.containsWorld(player.getWorld())
+        );
     }
 }

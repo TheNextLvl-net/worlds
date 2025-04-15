@@ -60,10 +60,9 @@ class GroupSetSpawnCommand {
 
     private static int setSpawn(CommandContext<CommandSourceStack> context, SharedWorlds commons) {
         var location = context.getSource().getLocation();
-        var group = commons.groupProvider().getGroup(location.getWorld()).orElse(null);
-        if (group != null) return setSpawn(context, commons, group, location);
-        commons.bundle().sendMessage(context.getSource().getSender(), "group.outside");
-        return 0;
+        var group = commons.groupProvider().getGroup(location.getWorld())
+                .orElse(commons.groupProvider().getUnownedWorldGroup());
+        return setSpawn(context, commons, group, location);
     }
 
     private static int setSpawn(CommandContext<CommandSourceStack> context, SharedWorlds commons, WorldGroup group, Location location) {
