@@ -48,7 +48,7 @@ public interface WorldGroup {
      * These settings include various configurations and toggles that dictate
      * the behavior and properties specific to the group.
      *
-     * @return the {@code GroupSettings} object containing the configurations for the group
+     * @return the {@link GroupSettings} object containing the configurations for the group
      */
     GroupSettings getSettings();
 
@@ -66,7 +66,7 @@ public interface WorldGroup {
      * Reads and retrieves the data associated with the specified offline player.
      *
      * @param player the offline player whose data is to be read
-     * @return an {@code Optional} containing the player's data if it exists, or an empty {@code Optional} otherwise
+     * @return an {@link Optional} containing the player's data if it exists, or an empty {@link Optional} otherwise
      */
     Optional<PlayerData> readPlayerData(OfflinePlayer player);
 
@@ -108,9 +108,9 @@ public interface WorldGroup {
     boolean addWorld(World world);
 
     /**
-     * Checks if the specified {@code World} is part of this world group.
+     * Checks if the specified {@link World} is part of this world group.
      *
-     * @param world the {@code World} to check for membership in the group
+     * @param world the {@link World} to check for membership in the group
      * @return whether the world is a member of this group
      */
     boolean containsWorld(World world);
