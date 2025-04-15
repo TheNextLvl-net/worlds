@@ -36,7 +36,13 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         ).ifPresent(data::attributes);
         root.optional("enderChest").map(items -> context.deserialize(items, ItemStack[].class)).ifPresent(data::enderChest);
         root.optional("inventory").map(items -> context.deserialize(items, ItemStack[].class)).ifPresent(data::inventory);
-        root.optional("respawnLocation").map(location -> context.deserialize(location, Location.class)).ifPresent(data::respawnLocation);
+        root.optional("respawnLocation").map(location -> {
+            try {
+                return context.deserialize(location, Location.class);
+            } catch (ParserException e) {
+                return null;
+            }
+        }).ifPresent(data::respawnLocation);
         root.optional("recipes").map(Tag::getAsList).map(list ->
                 list.stream().map(recipe -> context.deserialize(recipe, NamespacedKey.class)).toList()
         ).ifPresent(data::discoveredRecipes);
@@ -66,8 +72,20 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         root.optional("remainingAir").map(Tag::getAsInt).ifPresent(data::remainingAir);
         root.optional("score").map(Tag::getAsInt).ifPresent(data::score);
         root.optional("previousGameMode").map(mode -> context.deserialize(mode, GameMode.class)).ifPresent(data::previousGameMode);
-        root.optional("lastDeathLocation").map(location -> context.deserialize(location, Location.class)).ifPresent(data::lastDeathLocation);
-        root.optional("lastLocation").map(location -> context.deserialize(location, Location.class)).ifPresent(data::lastLocation);
+        root.optional("lastDeathLocation").map(location -> {
+            try {
+                return context.deserialize(location, Location.class);
+            } catch (ParserException e) {
+                return null;
+            }
+        }).ifPresent(data::lastDeathLocation);
+        root.optional("lastLocation").map(location -> {
+            try {
+                return context.deserialize(location, Location.class);
+            } catch (ParserException e) {
+                return null;
+            }
+        }).ifPresent(data::lastLocation);
         root.optional("gliding").map(Tag::getAsBoolean).ifPresent(data::gliding);
         root.optional("invulnerable").map(Tag::getAsBoolean).ifPresent(data::invulnerable);
         root.optional("portalCooldown").map(Tag::getAsInt).ifPresent(data::portalCooldown);
