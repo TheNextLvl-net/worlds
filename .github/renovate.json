@@ -1,0 +1,66 @@
+{
+  "extends": [
+    "config:base",
+    ":disableDependencyDashboard"
+  ],
+  "enabledManagers": [
+    "gradle"
+  ],
+  "dependencyDashboard": true,
+  "schedule": [
+    "* 0-3 * * *"
+  ],
+  "timezone": "UTC",
+  "automerge": false,
+  "packageRules": [
+    {
+      "matchManagers": [
+        "gradle"
+      ],
+      "matchDepTypes": [
+        "plugin"
+      ],
+      "groupName": "Gradle plugins",
+      "semanticCommitType": "build"
+    },
+    {
+      "matchManagers": [
+        "gradle"
+      ],
+      "matchDepTypes": [
+        "implementation",
+        "compileOnly",
+        "api"
+      ],
+      "groupName": "App dependencies",
+      "semanticCommitType": "deps"
+    },
+    {
+      "matchManagers": [
+        "gradle"
+      ],
+      "matchDepTypes": [
+        "testImplementation",
+        "testRuntimeOnly",
+        "testCompileOnly"
+      ],
+      "groupName": "Test dependencies",
+      "semanticCommitType": "test"
+    },
+    {
+      "matchDatasources": [
+        "gradle-wrapper"
+      ],
+      "groupName": "Gradle wrapper",
+      "semanticCommitType": "build"
+    }
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "rebaseWhen": "conflicted",
+  "reviewers": [
+    "NonSwag"
+  ],
+  "semanticCommits": "enabled"
+}
