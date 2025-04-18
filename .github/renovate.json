@@ -6,7 +6,7 @@
   "enabledManagers": [
     "gradle"
   ],
-  "dependencyDashboard": true,
+  "dependencyDashboard": false,
   "schedule": [
     "* 0-3 * * *"
   ],
