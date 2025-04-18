@@ -3,6 +3,7 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import net.minecrell.pluginyml.paper.PaperPluginDescription
 
 plugins {
+    id("idea")
     id("java")
     id("java-library")
     id("com.gradleup.shadow") version "9.0.0-beta12"
@@ -18,8 +19,8 @@ tasks.compileJava {
     options.release.set(21)
 }
 
-group = rootProject.group
-version = rootProject.version
+group = "net.thenextlvl.worlds"
+version = "0.1.0"
 
 repositories {
     mavenCentral()
@@ -32,10 +33,35 @@ dependencies {
 
     api("org.bstats:bstats-bukkit:3.1.0")
 
+    api("net.thenextlvl.core:adapters:2.0.2")
     api("net.thenextlvl.core:i18n:1.0.21")
     api("net.thenextlvl.core:paper:2.0.4")
 
-    compileOnlyApi(project(":api"))
+    api(project(":per-worlds-api"))
+
+    testImplementation(platform("org.junit:junit-bom:5.13.0-M2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+val generatedPath: java.nio.file.Path = layout.projectDirectory.dir("src/generated/java").asFile.toPath()
+idea.module.generatedSourceDirs.add(generatedPath.toFile())
+sourceSets.main {
+    java.srcDir(generatedPath)
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("per-worlds")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    relocate("org.bstats", "net.thenextlvl.perworlds.bstats")
+}
+
+tasks.compileJava {
+    dependsOn(project(":source-generator").tasks.named("generate"))
 }
 
 paper {
@@ -52,6 +78,9 @@ paper {
             load = PaperPluginDescription.RelativeLoadOrder.BEFORE
             required = false
         }
+    }
+    permissions {
+        register("perworlds.command.group") { children = listOf("perworlds.command") }
     }
 }
 

@@ -8,7 +8,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class PluginVersionChecker extends PaperHangarVersionChecker<SemanticVersion> {
     public PluginVersionChecker(Plugin plugin) {
-        super(plugin, "TheNextLvl", "PerWorlds"); // todo: create project
+        super(plugin, "TheNextLvl", "PerWorlds");
     }
 
     @Override
