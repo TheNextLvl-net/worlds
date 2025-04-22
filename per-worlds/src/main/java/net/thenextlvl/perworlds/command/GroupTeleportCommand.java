@@ -48,7 +48,6 @@ class GroupTeleportCommand {
         var group = context.getArgument("group", WorldGroup.class);
         return teleport(context.getSource().getSender(), group, players.stream()
                 .filter(player -> !group.containsWorld(player.getWorld()))
-                .filter(group::hasPlayerData)
                 .toList(), commons);
     }
 
