@@ -27,7 +27,6 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean inventory = true;
     private boolean invulnerable = false;
     private boolean lastDeathLocation = true;
-    private boolean lastLocation = true;
     private boolean lockFreezeTicks = false;
     private boolean portalCooldown = true;
     private boolean potionEffects = true;
@@ -172,11 +171,6 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean lastDeathLocation() {
         return lastDeathLocation;
-    }
-
-    @Override
-    public boolean lastLocation() {
-        return lastLocation;
     }
 
     @Override
@@ -372,11 +366,6 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void lastDeathLocation(boolean enabled) {
         this.lastDeathLocation = enabled;
-    }
-
-    @Override
-    public void lastLocation(boolean enabled) {
-        this.lastLocation = enabled;
     }
 
     @Override
