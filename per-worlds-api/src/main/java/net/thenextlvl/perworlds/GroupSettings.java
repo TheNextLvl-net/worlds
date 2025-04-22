@@ -49,6 +49,8 @@ public interface GroupSettings {
 
     boolean lastDeathLocation();
 
+    boolean lastLocation();
+
     boolean lockFreezeTicks();
 
     boolean portalCooldown();
@@ -126,6 +128,8 @@ public interface GroupSettings {
     void invulnerable(boolean enabled);
 
     void lastDeathLocation(boolean enabled);
+
+    void lastLocation(boolean enabled);
 
     void lockFreezeTicks(boolean enabled);
 

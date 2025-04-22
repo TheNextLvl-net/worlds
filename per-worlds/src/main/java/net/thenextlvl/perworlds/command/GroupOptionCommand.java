@@ -45,6 +45,7 @@ class GroupOptionCommand {
                 .then(option("inventory", GroupSettings::inventory, GroupSettings::inventory, commons))
                 .then(option("invulnerable", GroupSettings::invulnerable, GroupSettings::invulnerable, commons))
                 .then(option("lastDeathLocation", GroupSettings::lastDeathLocation, GroupSettings::lastDeathLocation, commons))
+                .then(option("lastLocation", GroupSettings::lastLocation, GroupSettings::lastLocation, commons))
                 .then(option("lockFreezeTicks", GroupSettings::lockFreezeTicks, GroupSettings::lockFreezeTicks, commons))
                 .then(option("portalCooldown", GroupSettings::portalCooldown, GroupSettings::portalCooldown, commons))
                 .then(option("potionEffects", GroupSettings::potionEffects, GroupSettings::potionEffects, commons))
