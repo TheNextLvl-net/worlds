@@ -32,4 +32,6 @@ public interface Stats {
     void setStatistic(Statistic statistic, int value);
 
     void apply(Player player);
+
+    void clear(Player player);
 }

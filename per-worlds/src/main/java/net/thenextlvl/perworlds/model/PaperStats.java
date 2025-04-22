@@ -87,8 +87,14 @@ public class PaperStats implements Stats {
     }
 
     @Override
-    @SuppressWarnings({"DataFlowIssue", "deprecation"})
     public void apply(Player player) {
+        clear(player);
+        statistics.forEach((statistic, stat) -> stat.apply(statistic, player));
+    }
+
+    @Override
+    @SuppressWarnings({"DataFlowIssue", "deprecation"})
+    public void clear(Player player) {
         Registry.STATISTIC.forEach(statistic -> {
             switch (statistic.getType()) {
                 case UNTYPED -> player.setStatistic(statistic, 0);
@@ -97,7 +103,6 @@ public class PaperStats implements Stats {
                 case ENTITY -> Registry.ENTITY_TYPE.forEach(type -> player.setStatistic(statistic, type, 0));
             }
         });
-        statistics.forEach((statistic, stat) -> stat.apply(statistic, player));
     }
 
     @SuppressWarnings({"DataFlowIssue", "deprecation"})
