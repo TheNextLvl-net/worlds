@@ -2,6 +2,7 @@ package net.thenextlvl.perworlds.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -17,17 +18,67 @@ import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.command.suggestion.GroupMemberSuggestionProvider;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
+
+import java.util.concurrent.CompletableFuture;
 
 import static net.thenextlvl.perworlds.command.GroupCommand.groupArgument;
 
 @NullMarked
-class GroupSetSpawnCommand {
+class GroupSpawnCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(SharedWorlds commons) {
-        return Commands.literal("setspawn")
-                .requires(source -> source.getSender().hasPermission("perworlds.command.group.setspawn"))
+        return Commands.literal("spawn")
+                .requires(source -> source.getSender().hasPermission("perworlds.command.group.spawn"))
+                .then(setSpawn(commons))
+                .then(unsetSpawn(commons))
+                .executes(context -> spawn(context, commons));
+    }
+
+    private static int spawn(CommandContext<CommandSourceStack> context, SharedWorlds commons) {
+        var sender = context.getSource().getSender();
+        if (!(sender instanceof Player player)) {
+            commons.bundle().sendMessage(sender, "command.sender");
+            return 0;
+        }
+        var group = commons.groupProvider().getGroup(player.getWorld())
+                .orElse(commons.groupProvider().getUnownedWorldGroup());
+        group.getSpawnLocation().map(player::teleportAsync)
+                .orElseGet(() -> CompletableFuture.completedFuture(false))
+                .thenAccept(success -> {
+                    var message = success ? "group.teleport.self" : "group.teleport.failed";
+                    commons.bundle().sendMessage(player, message, Placeholder.parsed("group", group.getName()));
+                });
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static LiteralArgumentBuilder<CommandSourceStack> setSpawn(SharedWorlds commons) {
+        return Commands.literal("set")
+                .requires(source -> source.getSender().hasPermission("perworlds.command.group.spawn.set"))
                 .executes(context -> setSpawn(context, commons))
                 .then(targetArgument(commons));
+    }
+
+    private static LiteralArgumentBuilder<CommandSourceStack> unsetSpawn(SharedWorlds commons) {
+        return Commands.literal("unset")
+                .requires(source -> source.getSender().hasPermission("perworlds.command.group.spawn.unset"))
+                .then(groupArgument(commons).executes(context -> {
+                    var group = context.getArgument("group", WorldGroup.class);
+                    return unsetSpawn(context, group, commons);
+                })).executes(context -> {
+                    var world = context.getSource().getLocation().getWorld();
+                    var group = commons.groupProvider().getGroup(world)
+                            .orElse(commons.groupProvider().getUnownedWorldGroup());
+                    return unsetSpawn(context, group, commons);
+                });
+    }
+
+    private static int unsetSpawn(CommandContext<CommandSourceStack> context, WorldGroup group, SharedWorlds commons) {
+        var sender = context.getSource().getSender();
+        group.getGroupData().spawnLocation(null);
+        commons.bundle().sendMessage(sender, "group.spawn.unset",
+                Placeholder.parsed("group", group.getName()));
+        return Command.SINGLE_SUCCESS;
     }
 
     private static ArgumentBuilder<CommandSourceStack, ?> targetArgument(SharedWorlds commons) {

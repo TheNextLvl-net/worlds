@@ -115,7 +115,12 @@ public class PaperWorldGroup implements WorldGroup {
     public Optional<Location> getSpawnLocation(PlayerData data) {
         return Optional.ofNullable(data.lastLocation())
                 .filter(location -> getSettings().lastLocation())
-                .or(() -> Optional.ofNullable(getGroupData().spawnLocation()))
+                .or(this::getSpawnLocation);
+    }
+
+    @Override
+    public Optional<Location> getSpawnLocation() {
+        return Optional.ofNullable(getGroupData().spawnLocation())
                 .or(() -> getSpawnWorld().map(World::getSpawnLocation));
     }
 

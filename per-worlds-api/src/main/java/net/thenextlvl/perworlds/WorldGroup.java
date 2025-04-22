@@ -86,6 +86,13 @@ public interface WorldGroup {
     Optional<Location> getSpawnLocation(PlayerData data);
 
     /**
+     * Retrieves the general spawn location for this world group.
+     *
+     * @return an {@link Optional} containing the spawn {@link Location}
+     */
+    Optional<Location> getSpawnLocation();
+
+    /**
      * Retrieves the default spawn world for this world group.
      * The spawn world is the primary world associated with this group
      * where players or entities are typically spawned.
