@@ -2,6 +2,7 @@ package net.thenextlvl.perworlds;
 
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.data.PlayerData;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -63,12 +64,43 @@ public interface WorldGroup {
     List<Player> getPlayers();
 
     /**
+     * Retrieves the spawn location associated with the given offline player.
+     * This method determines the appropriate spawn location for the player
+     * within the context of the current world group.
+     *
+     * @param player the offline player for whom the spawn location is being determined
+     * @return an {@link Optional} containing the {@link Location} where the player should spawn
+     */
+    Optional<Location> getSpawnLocation(OfflinePlayer player);
+
+    /**
+     * Retrieves the spawn location associated with the provided player data.
+     * This method determines the appropriate spawn location based on the data
+     * provided for a specific player in the context of the world group.
+     *
+     * @param data the {@link PlayerData} object containing the player's information
+     *             used to determine the spawn location
+     * @return an {@link Optional} containing the {@link Location} where the player should spawn
+     */
+    Optional<Location> getSpawnLocation(PlayerData data);
+
+    /**
+     * Retrieves the default spawn world for this world group.
+     * The spawn world is the primary world associated with this group
+     * where players or entities are typically spawned.
+     *
+     * @return an {@link Optional} containing the spawn {@link World} if it exists,
+     *         or an empty {@link Optional} if no spawn world is defined for the group
+     */
+    Optional<World> getSpawnWorld();
+
+    /**
      * Reads and retrieves the data associated with the specified offline player.
      *
      * @param player the offline player whose data is to be read
      * @return an {@link Optional} containing the player's data if it exists, or an empty {@link Optional} otherwise
      */
-    Optional<PlayerData> readPlayerData(OfflinePlayer player);
+    Optional<? extends PlayerData> readPlayerData(OfflinePlayer player);
 
     /**
      * Retrieves all persisted keys of the worlds that are members of this group.
@@ -154,12 +186,22 @@ public interface WorldGroup {
     boolean writePlayerData(OfflinePlayer player, PlayerData data);
 
     /**
-     * Loads the saved data for the specified player and optionally restores their position, motion, and fall distance.
+     * Loads player data for a specific player.
+     * This method only functions if the player is not currently in the process of loading data.
+     * Optionally, it can also load the player's position data.
      *
-     * @param player the player whose data is to be loaded
-     * @param position indicates whether to teleport the player to the saved position, apply motion, and restore fall distance
+     * @param player   the player for whom data is to be loaded
+     * @param position whether to load the player's position data
      */
     void loadPlayerData(Player player, boolean position);
+
+    /**
+     * Checks whether data for the specified player is currently being loaded.
+     *
+     * @param player the player for whom the loading status is to be checked
+     * @return {@code true} if the player's data is currently being loaded, {@code false} otherwise
+     */
+    boolean isLoadingData(Player player);
 
     /**
      * Persists the settings and worlds of this group to the configuration.

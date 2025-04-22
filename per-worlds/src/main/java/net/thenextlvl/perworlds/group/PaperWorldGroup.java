@@ -22,6 +22,7 @@ import org.bukkit.Keyed;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.Unmodifiable;
@@ -103,6 +104,29 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
+    public Optional<Location> getSpawnLocation(OfflinePlayer player) {
+        return readPlayerData(player).flatMap(this::getSpawnLocation);
+    }
+
+    @Override
+    public Optional<Location> getSpawnLocation(PlayerData data) {
+        return Optional.ofNullable(data.lastLocation())
+                .or(() -> Optional.ofNullable(getGroupData().spawnLocation()))
+                .or(() -> getSpawnWorld().map(World::getSpawnLocation));
+    }
+
+    @Override
+    public Optional<World> getSpawnWorld() {
+        return Optional.ofNullable(getGroupData().spawnLocation())
+                .map(Location::getWorld)
+                .or(() -> getWorlds().stream().min(this::compare));
+    }
+
+    private int compare(World world, World other) {
+        return world.equals(other) ? 0 : world.getEnvironment().equals(Environment.NORMAL) ? -1 : 1;
+    }
+
+    @Override
     public @Unmodifiable Set<Key> getPersistedWorlds() {
         return Set.copyOf(config.getRoot().worlds());
     }
@@ -156,7 +180,7 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
-    public Optional<PlayerData> readPlayerData(OfflinePlayer player) {
+    public Optional<PaperPlayerData> readPlayerData(OfflinePlayer player) {
         var file = new File(getDataFolder(), player.getUniqueId() + ".dat");
         try {
             return readPlayerData(file);
@@ -181,7 +205,7 @@ public class PaperWorldGroup implements WorldGroup {
                     file.outputStream(WRITE, CREATE, TRUNCATE_EXISTING),
                     StandardCharsets.UTF_8
             )) {
-                outputStream.writeTag(null, groupProvider.nbt().toTag(data, PlayerData.class));
+                outputStream.writeTag(null, groupProvider.nbt().toTag(data, PaperPlayerData.class));
                 return true;
             }
         } catch (Throwable t) {
@@ -199,10 +223,15 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public void loadPlayerData(Player player, boolean position) {
-        if (player.hasMetadata("loading")) return;
+        if (isLoadingData(player)) return;
         player.setMetadata("loading", new FixedMetadataValue(groupProvider.getPlugin(), null));
-        readPlayerData(player).orElseGet(PaperPlayerData::new).apply(getSettings(), player, position);
+        readPlayerData(player).orElseGet(PaperPlayerData::new).load(player, this, position);
         player.removeMetadata("loading", groupProvider.getPlugin());
+    }
+
+    @Override
+    public boolean isLoadingData(Player player) {
+        return player.hasMetadata("loading");
     }
 
     @Override
@@ -222,11 +251,11 @@ public class PaperWorldGroup implements WorldGroup {
         writePlayerData(player, playerData);
     }
 
-    private Optional<PlayerData> readPlayerData(File file) throws IOException {
+    private Optional<PaperPlayerData> readPlayerData(File file) throws IOException {
         if (!file.exists()) return Optional.empty();
         try (var inputStream = stream(IO.of(file))) {
             return Optional.of(inputStream.readTag()).map(tag ->
-                    groupProvider.nbt().fromTag(tag, PlayerData.class));
+                    groupProvider.nbt().fromTag(tag, PaperPlayerData.class));
         } catch (Exception e) {
             var io = IO.of(file.getPath() + "_old");
             if (!io.exists()) throw e;
@@ -234,7 +263,7 @@ public class PaperWorldGroup implements WorldGroup {
             groupProvider.getLogger().warn("Falling back to {}", io);
             try (var inputStream = stream(io)) {
                 return Optional.of(inputStream.readTag()).map(tag ->
-                        groupProvider.nbt().fromTag(tag, PlayerData.class));
+                        groupProvider.nbt().fromTag(tag, PaperPlayerData.class));
             }
         }
     }
