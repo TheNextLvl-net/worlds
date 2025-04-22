@@ -127,7 +127,18 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     private int compare(World world, World other) {
-        return world.equals(other) ? 0 : world.getEnvironment().equals(Environment.NORMAL) ? -1 : 1;
+        var x = getPriority(world.getEnvironment());
+        var y = getPriority(other.getEnvironment());
+        return Integer.compare(x, y);
+    }
+
+    private int getPriority(Environment environment) {
+        return switch (environment) {
+            case NORMAL -> 0;
+            case NETHER -> 1;
+            case THE_END -> 2;
+            default -> 3;
+        };
     }
 
     @Override
