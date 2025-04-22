@@ -31,43 +31,75 @@ import java.util.stream.StreamSupport;
 
 @NullMarked
 public class PaperPlayerData implements PlayerData {
+    private static final @Nullable ItemStack[] DEFAULT_ENDERCHEST = new ItemStack[27];
+    private static final @Nullable ItemStack[] DEFAULT_INVENTORY = new ItemStack[40];
+    private static final @Nullable Location DEFAULT_LAST_DEATH_LOCATION = null;
+    private static final @Nullable Location DEFAULT_LAST_LOCATION = null;
+    private static final @Nullable Location DEFAULT_RESPAWN_LOCATION = null;
+    private static final GameMode DEFAULT_GAMEMODE = GameMode.SURVIVAL;
+    private static final Vector DEFAULT_VELOCITY = new Vector(0, 0, 0);
+    private static final WardenSpawnTracker DEFAULT_WARDEN_SPAWN_TRACKER = new PaperWardenSpawnTracker();
+    private static final boolean DEFAULT_FLYING = false;
+    private static final boolean DEFAULT_GLIDING = false;
+    private static final boolean DEFAULT_INVULNERABLE = false;
+    private static final boolean DEFAULT_LOCK_FREEZE_TICKS = false;
+    private static final boolean DEFAULT_MAY_FLY = false;
+    private static final boolean DEFAULT_SEEN_CREDITS = false;
+    private static final boolean DEFAULT_VISUAL_FIRE = false;
+    private static final double DEFAULT_ABSORPTION = 0;
+    private static final double DEFAULT_HEALTH = 20;
+    private static final float DEFAULT_EXHAUSTION = 0;
+    private static final float DEFAULT_EXPERIENCE = 0;
+    private static final float DEFAULT_FALL_DISTANCE = 0;
+    private static final float DEFAULT_SATURATION = 10;
+    private static final int DEFAULT_ARROWS_IN_BODY = 0;
+    private static final int DEFAULT_BEE_STINGERS_IN_BODY = 0;
+    private static final int DEFAULT_FIRE_TICKS = 0;
+    private static final int DEFAULT_FOOD_LEVEL = 20;
+    private static final int DEFAULT_FREEZE_TICKS = 0;
+    private static final int DEFAULT_HELD_ITEM_SLOT = 0;
+    private static final int DEFAULT_LEVEL = 0;
+    private static final int DEFAULT_PORTAL_COOLDOWN = 0;
+    private static final int DEFAULT_REMAINING_AIR = 300;
+    private static final int DEFAULT_SCORE = 0;
+
     private @Nullable GameMode previousGameMode = null;
-    private @Nullable ItemStack[] enderChest = new ItemStack[27];
-    private @Nullable ItemStack[] inventory = new ItemStack[40];
-    private @Nullable Location lastDeathLocation = null;
-    private @Nullable Location lastLocation = null;
-    private @Nullable Location respawnLocation = null;
-    private GameMode gameMode = GameMode.SURVIVAL;
+    private @Nullable ItemStack[] enderChest = DEFAULT_ENDERCHEST;
+    private @Nullable ItemStack[] inventory = DEFAULT_INVENTORY;
+    private @Nullable Location lastDeathLocation = DEFAULT_LAST_DEATH_LOCATION;
+    private @Nullable Location lastLocation = DEFAULT_LAST_LOCATION;
+    private @Nullable Location respawnLocation = DEFAULT_RESPAWN_LOCATION;
+    private GameMode gameMode = DEFAULT_GAMEMODE;
     private List<PotionEffect> potionEffects = List.of();
     private Set<AdvancementData> advancements = Set.of();
     private Set<AttributeData> attributes = Set.of();
     private Set<NamespacedKey> recipes = Set.of();
     private Stats stats = new PaperStats();
-    private Vector velocity = new Vector(0, 0, 0);
-    private WardenSpawnTracker wardenSpawnTracker = new PaperWardenSpawnTracker();
-    private boolean flying = false;
-    private boolean gliding = false;
-    private boolean invulnerable = false;
-    private boolean lockFreezeTicks = false;
-    private boolean mayFly = false;
-    private boolean seenCredits = false;
-    private boolean visualFire = false;
-    private double absorption = 0;
-    private double health = 20;
-    private float exhaustion = 0;
-    private float experience = 0;
-    private float fallDistance = 0;
-    private float saturation = 10;
-    private int arrowsInBody = 0;
-    private int beeStingersInBody = 0;
-    private int fireTicks = 0;
-    private int foodLevel = 20;
-    private int freezeTicks = 0;
-    private int heldItemSlot = 0;
-    private int level = 0;
-    private int portalCooldown = 0;
-    private int remainingAir = 300;
-    private int score = 0;
+    private Vector velocity = DEFAULT_VELOCITY;
+    private WardenSpawnTracker wardenSpawnTracker = DEFAULT_WARDEN_SPAWN_TRACKER;
+    private boolean flying = DEFAULT_FLYING;
+    private boolean gliding = DEFAULT_GLIDING;
+    private boolean invulnerable = DEFAULT_INVULNERABLE;
+    private boolean lockFreezeTicks = DEFAULT_LOCK_FREEZE_TICKS;
+    private boolean mayFly = DEFAULT_MAY_FLY;
+    private boolean seenCredits = DEFAULT_SEEN_CREDITS;
+    private boolean visualFire = DEFAULT_VISUAL_FIRE;
+    private double absorption = DEFAULT_ABSORPTION;
+    private double health = DEFAULT_HEALTH;
+    private float exhaustion = DEFAULT_EXHAUSTION;
+    private float experience = DEFAULT_EXPERIENCE;
+    private float fallDistance = DEFAULT_FALL_DISTANCE;
+    private float saturation = DEFAULT_SATURATION;
+    private int arrowsInBody = DEFAULT_ARROWS_IN_BODY;
+    private int beeStingersInBody = DEFAULT_BEE_STINGERS_IN_BODY;
+    private int fireTicks = DEFAULT_FIRE_TICKS;
+    private int foodLevel = DEFAULT_FOOD_LEVEL;
+    private int freezeTicks = DEFAULT_FREEZE_TICKS;
+    private int heldItemSlot = DEFAULT_HELD_ITEM_SLOT;
+    private int level = DEFAULT_LEVEL;
+    private int portalCooldown = DEFAULT_PORTAL_COOLDOWN;
+    private int remainingAir = DEFAULT_REMAINING_AIR;
+    private int score = DEFAULT_SCORE;
 
     public static PaperPlayerData of(Player player) {
         return new PaperPlayerData()
@@ -129,8 +161,8 @@ public class PaperPlayerData implements PlayerData {
         if (location == null) return CompletableFuture.completedFuture(false);
         return player.teleportAsync(location).thenApply(success -> {
             if (!success) return false;
-            if (settings.fallDistance()) player.setFallDistance(fallDistance);
-            if (settings.velocity()) player.setVelocity(velocity);
+            player.setFallDistance(settings.fallDistance() ? fallDistance : DEFAULT_FALL_DISTANCE);
+            player.setVelocity(settings.velocity() ? velocity : DEFAULT_VELOCITY);
             load(player, settings);
             return true;
         });
@@ -139,91 +171,73 @@ public class PaperPlayerData implements PlayerData {
     private void load(Player player, GroupSettings settings) {
         // todo: load default states for disabled settings
 
-        if (settings.gameMode()) {
-            if (previousGameMode != null) player.setGameMode(previousGameMode);
-            player.setGameMode(gameMode);
-        }
+        if (settings.gameMode() && previousGameMode != null) player.setGameMode(previousGameMode);
+        player.setGameMode(settings.gameMode() ? gameMode : DEFAULT_GAMEMODE);
 
-        if (settings.flyState()) {
-            player.setAllowFlight(mayFly);
-            player.setFlying(flying);
-        }
+        player.setAllowFlight(settings.flyState() ? mayFly : DEFAULT_MAY_FLY);
+        player.setFlying(settings.flyState() ? flying : DEFAULT_FLYING);
 
-        if (settings.gliding()) player.setGliding(gliding);
+        player.setGliding(settings.gliding() ? gliding : DEFAULT_GLIDING);
 
-        if (settings.portalCooldown()) player.setPortalCooldown(portalCooldown);
+        player.setPortalCooldown(settings.portalCooldown() ? portalCooldown : DEFAULT_PORTAL_COOLDOWN);
 
-        if (settings.hotbarSlot()) player.getInventory().setHeldItemSlot(heldItemSlot);
-        if (settings.inventory()) player.getInventory().setContents(inventory);
-        if (settings.enderChest()) player.getEnderChest().setContents(enderChest);
+        player.getInventory().setHeldItemSlot(settings.hotbarSlot() ? heldItemSlot : DEFAULT_HELD_ITEM_SLOT);
+        player.getInventory().setContents(settings.inventory() ? inventory : DEFAULT_INVENTORY);
+        player.getEnderChest().setContents(settings.enderChest() ? enderChest : DEFAULT_ENDERCHEST);
 
-        if (settings.endCredits()) player.setHasSeenWinScreen(seenCredits);
+        player.setHasSeenWinScreen(settings.endCredits() ? seenCredits : DEFAULT_SEEN_CREDITS);
 
-        if (settings.arrowsInBody()) player.setArrowsInBody(arrowsInBody);
-        if (settings.beeStingersInBody()) player.setBeeStingersInBody(beeStingersInBody);
+        player.setArrowsInBody(settings.arrowsInBody() ? arrowsInBody : DEFAULT_ARROWS_IN_BODY);
+        player.setBeeStingersInBody(settings.beeStingersInBody() ? beeStingersInBody : DEFAULT_BEE_STINGERS_IN_BODY);
 
-        if (settings.score()) player.setDeathScreenScore(score);
-        if (settings.experience()) {
-            player.setExp(experience);
-            player.setLevel(level);
-        }
+        player.setDeathScreenScore(settings.score() ? score : DEFAULT_SCORE);
+        player.setExp(settings.experience() ? experience : DEFAULT_EXPERIENCE);
+        player.setLevel(settings.experience() ? level : DEFAULT_LEVEL);
 
-        if (settings.invulnerable()) player.setInvulnerable(invulnerable);
-        if (settings.health()) player.setHealth(health);
+        player.setInvulnerable(settings.invulnerable() ? invulnerable : DEFAULT_INVULNERABLE);
+        player.setHealth(settings.health() ? health : DEFAULT_HEALTH);
 
-        if (settings.absorption()) player.setAbsorptionAmount(absorption);
-        if (settings.exhaustion()) player.setExhaustion(exhaustion);
-        if (settings.foodLevel()) player.setFoodLevel(foodLevel);
-        if (settings.saturation()) player.setSaturation(saturation);
+        player.setAbsorptionAmount(settings.absorption() ? absorption : DEFAULT_ABSORPTION);
+        player.setExhaustion(settings.exhaustion() ? exhaustion : DEFAULT_EXHAUSTION);
+        player.setFoodLevel(settings.foodLevel() ? foodLevel : DEFAULT_FOOD_LEVEL);
+        player.setSaturation(settings.saturation() ? saturation : DEFAULT_SATURATION);
 
-        if (settings.fireTicks()) player.setFireTicks(fireTicks);
-        if (settings.freezeTicks()) player.setFreezeTicks(freezeTicks);
-        if (settings.lockFreezeTicks()) player.lockFreezeTicks(lockFreezeTicks);
-        if (settings.remainingAir()) player.setRemainingAir(remainingAir);
+        player.setFireTicks(settings.fireTicks() ? fireTicks : DEFAULT_FIRE_TICKS);
+        player.setFreezeTicks(settings.freezeTicks() ? freezeTicks : DEFAULT_FREEZE_TICKS);
+        player.lockFreezeTicks(settings.lockFreezeTicks() ? lockFreezeTicks : DEFAULT_LOCK_FREEZE_TICKS);
+        player.setRemainingAir(settings.remainingAir() ? remainingAir : DEFAULT_REMAINING_AIR);
 
-        if (settings.visualFire()) player.setVisualFire(visualFire);
+        player.setVisualFire(settings.visualFire() ? visualFire : DEFAULT_VISUAL_FIRE);
 
-        if (settings.lastDeathLocation()) player.setLastDeathLocation(lastDeathLocation);
-        if (settings.respawnLocation()) player.setRespawnLocation(respawnLocation, false);
+        player.setLastDeathLocation(settings.lastDeathLocation() ? lastDeathLocation : DEFAULT_LAST_DEATH_LOCATION);
+        player.setRespawnLocation(settings.respawnLocation() ? respawnLocation : DEFAULT_RESPAWN_LOCATION, false);
 
-        if (settings.potionEffects()) {
-            player.clearActivePotionEffects();
-            player.addPotionEffects(potionEffects);
-        }
+        player.clearActivePotionEffects();
+        if (settings.potionEffects()) player.addPotionEffects(potionEffects);
 
         if (settings.attributes()) attributes.forEach(data -> {
             var attribute = player.getAttribute(data.attribute());
             if (attribute != null) attribute.setBaseValue(data.baseValue());
         });
+        // todo: restore real default value
+        // else Registry.ATTRIBUTE.forEach(type -> {
+        //     var attribute = player.getAttribute(type);
+        //     if (attribute != null) attribute.setBaseValue(attribute.getBaseValue());
+        // });
 
-        if (settings.wardenSpawnTracker()) {
-            player.setWardenTimeSinceLastWarning(wardenSpawnTracker.ticksSinceLastWarning());
-            player.setWardenWarningCooldown(wardenSpawnTracker.cooldownTicks());
-            player.setWardenWarningLevel(wardenSpawnTracker.warningLevel());
-        }
+        var tracker = settings.wardenSpawnTracker() ? wardenSpawnTracker : DEFAULT_WARDEN_SPAWN_TRACKER;
+        player.setWardenTimeSinceLastWarning(tracker.ticksSinceLastWarning());
+        player.setWardenWarningCooldown(tracker.cooldownTicks());
+        player.setWardenWarningLevel(tracker.warningLevel());
 
         if (settings.statistics()) stats.apply(player);
+        else stats.clear(player);
 
-        // todo: only grant advancements internally
-        if (settings.advancements()) {
-            var toRemove = StreamSupport.stream(Spliterators.spliteratorUnknownSize(
-                    player.getServer().advancementIterator(), 0
-            ), false).collect(Collectors.toSet());
-            toRemove.removeAll(this.advancements.stream()
-                    .map(AdvancementData::getAdvancement)
-                    .collect(Collectors.toSet()));
-            toRemove.forEach(advancement -> {
-                var progress = player.getAdvancementProgress(advancement);
-                progress.getAwardedCriteria().forEach(progress::revokeCriteria);
-            });
+        applyAdvancements(player, settings);
+        applyRecipes(player, settings);
+    }
 
-            this.advancements.forEach(data -> {
-                var progress = player.getAdvancementProgress(data.getAdvancement());
-                data.getAwardedCriteria().forEach(progress::awardCriteria);
-                data.getRemainingCriteria().forEach(progress::revokeCriteria);
-            });
-        }
-
+    private void applyRecipes(Player player, GroupSettings settings) {
         // todo: only (un)discover recipes internally
         if (settings.recipes()) {
             var toAdd = new HashSet<>(recipes);
@@ -233,7 +247,29 @@ public class PaperPlayerData implements PlayerData {
             var toRemove = new HashSet<>(player.getDiscoveredRecipes());
             toRemove.removeAll(recipes);
             player.undiscoverRecipes(toRemove);
-        }
+        } else player.undiscoverRecipes(player.getDiscoveredRecipes());
+    }
+
+    private void applyAdvancements(Player player, GroupSettings settings) {
+        // todo: only grant advancements internally
+        var toRemove = StreamSupport.stream(Spliterators.spliteratorUnknownSize(
+                player.getServer().advancementIterator(), 0
+        ), false).collect(Collectors.toSet());
+
+        if (settings.advancements()) toRemove.removeAll(advancements.stream()
+                .map(AdvancementData::getAdvancement)
+                .collect(Collectors.toSet()));
+
+        toRemove.forEach(advancement -> {
+            var progress = player.getAdvancementProgress(advancement);
+            progress.getAwardedCriteria().forEach(progress::revokeCriteria);
+        });
+
+        if (settings.advancements()) advancements.forEach(data -> {
+            var progress = player.getAdvancementProgress(data.getAdvancement());
+            data.getAwardedCriteria().forEach(progress::awardCriteria);
+            data.getRemainingCriteria().forEach(progress::revokeCriteria);
+        });
     }
 
     @Override
