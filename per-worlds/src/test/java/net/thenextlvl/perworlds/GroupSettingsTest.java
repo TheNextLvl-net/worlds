@@ -63,7 +63,6 @@ public class GroupSettingsTest {
                 arguments(GroupSettings::inventory, GroupSettings::inventory),
                 arguments(GroupSettings::invulnerable, GroupSettings::invulnerable),
                 arguments(GroupSettings::lastDeathLocation, GroupSettings::lastDeathLocation),
-                arguments(GroupSettings::lastLocation, GroupSettings::lastLocation),
                 arguments(GroupSettings::lockFreezeTicks, GroupSettings::lockFreezeTicks),
                 arguments(GroupSettings::portalCooldown, GroupSettings::portalCooldown),
                 arguments(GroupSettings::potionEffects, GroupSettings::potionEffects),
