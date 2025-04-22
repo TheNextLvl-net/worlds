@@ -6,7 +6,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean absorption = true;
     private boolean advancements = true;
     private boolean arrowsInBody = true;
-    private boolean attributes = false;
+    private boolean attributes = true;
     private boolean beeStingersInBody = true;
     private boolean chat = false;
     private boolean enabled = true;
