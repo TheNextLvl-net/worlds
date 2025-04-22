@@ -1,6 +1,7 @@
 package net.thenextlvl.perworlds.model;
 
 import net.thenextlvl.perworlds.GroupSettings;
+import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.data.AdvancementData;
 import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Spliterators;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -116,10 +118,26 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public void apply(GroupSettings settings, Player player, boolean position) {
-        if (settings.lastLocation() && position && lastLocation != null) player.teleport(lastLocation); // todo: make async properly
-        if (settings.fallDistance() && position) player.setFallDistance(fallDistance);
-        if (settings.velocity() && position) player.setVelocity(velocity);
+    public CompletableFuture<Boolean> load(Player player, WorldGroup group, boolean position) {
+        var settings = group.getSettings();
+        if (!position) {
+            load(player, settings);
+            return CompletableFuture.completedFuture(true);
+        }
+
+        var location = group.getSpawnLocation(this).orElse(null);
+        if (location == null) return CompletableFuture.completedFuture(false);
+        return player.teleportAsync(location).thenApply(success -> {
+            if (!success) return false;
+            if (settings.fallDistance()) player.setFallDistance(fallDistance);
+            if (settings.velocity()) player.setVelocity(velocity);
+            load(player, settings);
+            return true;
+        });
+    }
+
+    private void load(Player player, GroupSettings settings) {
+        // todo: load default states for disabled settings
 
         if (settings.gameMode()) {
             if (previousGameMode != null) player.setGameMode(previousGameMode);

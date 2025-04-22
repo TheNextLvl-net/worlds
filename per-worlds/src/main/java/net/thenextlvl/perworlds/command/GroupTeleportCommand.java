@@ -55,11 +55,9 @@ class GroupTeleportCommand {
         var message = group.getWorlds().isEmpty() ? "group.teleport.empty"
                 : players.size() == 1 ? "group.teleport.other"
                 : players.isEmpty() ? "group.teleport.none" : "group.teleport.others";
-        players.forEach(player -> {
-            group.loadPlayerData(player, true);
-            commons.bundle().sendMessage(player, "group.teleport.self",
-                    Placeholder.parsed("group", group.getName()));
-        });
+        players.forEach(player -> group.loadPlayerData(player, true).thenAccept(success ->
+                commons.bundle().sendMessage(player, success ? "group.teleport.self" : "group.teleport.failed",
+                        Placeholder.parsed("group", group.getName()))));
         if (players.size() == 1 && players.getFirst().equals(sender)) return Command.SINGLE_SUCCESS;
         commons.bundle().sendMessage(sender, message,
                 Placeholder.component("player", players.isEmpty() ? Component.empty() : players.getFirst().name()),

@@ -1,6 +1,5 @@
 package net.thenextlvl.perworlds.data;
 
-import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.statistics.Stats;
 import org.bukkit.GameMode;
@@ -16,6 +15,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public interface PlayerData {
     @Nullable
@@ -177,13 +177,12 @@ public interface PlayerData {
     int score();
 
     /**
-     * Applies the specified group settings to the given player instance. Depending on the provided
-     * parameters, it may also adjust the player's position and other game-related attributes.
+     * Loads the player's data based on the specified group and optionally modifies the player's
+     * position and related attributes according to the group's configuration.
      *
-     * @param settings the group settings to be applied to the player
-     * @param player the player to which the settings are to be applied
-     * @param position whether to apply position-related settings
-     * @see WorldGroup#loadPlayerData(Player, boolean)
+     * @param player the player whose data is being loaded
+     * @param group the group containing the settings to be applied to the player
+     * @param position defines whether position-related settings should be applied
      */
-    void apply(GroupSettings settings, Player player, boolean position);
+    CompletableFuture<Boolean> load(Player player, WorldGroup group, boolean position);
 }

@@ -22,7 +22,7 @@ public class PaperUnownedWorldGroup extends PaperWorldGroup implements UnownedWo
 
     @Override
     public @Unmodifiable Set<World> getWorlds() {
-        return groupProvider.getServer().getWorlds().stream()
+        return provider.getServer().getWorlds().stream()
                 .filter(this::containsWorld)
                 .collect(Collectors.toUnmodifiableSet());
     }
@@ -34,6 +34,6 @@ public class PaperUnownedWorldGroup extends PaperWorldGroup implements UnownedWo
 
     @Override
     public boolean containsWorld(World world) {
-        return !groupProvider.hasGroup(world);
+        return !provider.hasGroup(world);
     }
 }

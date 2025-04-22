@@ -1,7 +1,7 @@
 package net.thenextlvl.perworlds.listener;
 
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
-import net.thenextlvl.perworlds.GroupProvider;
+import net.thenextlvl.perworlds.group.PaperGroupProvider;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.event.EventHandler;
@@ -12,11 +12,13 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class WorldListener implements Listener {
-    private final GroupProvider provider;
+    private final PaperGroupProvider provider;
 
-    public WorldListener(GroupProvider provider) {
+    public WorldListener(PaperGroupProvider provider) {
         this.provider = provider;
     }
 

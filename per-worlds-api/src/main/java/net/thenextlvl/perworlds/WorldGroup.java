@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 /**
@@ -193,7 +194,7 @@ public interface WorldGroup {
      * @param player   the player for whom data is to be loaded
      * @param position whether to load the player's position data
      */
-    void loadPlayerData(Player player, boolean position);
+    CompletableFuture<Boolean> loadPlayerData(Player player, boolean position);
 
     /**
      * Checks whether data for the specified player is currently being loaded.

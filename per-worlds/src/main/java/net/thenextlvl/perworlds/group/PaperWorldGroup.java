@@ -10,6 +10,8 @@ import core.paper.adapters.key.KeyAdapter;
 import core.paper.adapters.world.LocationAdapter;
 import core.paper.adapters.world.WorldAdapter;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.thenextlvl.perworlds.GroupData;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
@@ -39,6 +41,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -50,16 +53,16 @@ import static net.thenextlvl.perworlds.SharedWorlds.ISSUES;
 
 @NullMarked
 public class PaperWorldGroup implements WorldGroup {
-    protected final PaperGroupProvider groupProvider;
+    protected final PaperGroupProvider provider;
 
     private final File dataFolder;
     private final File file;
     private final FileIO<GroupConfig> config;
     private final String name;
 
-    public PaperWorldGroup(PaperGroupProvider groupProvider, String name, GroupData data, GroupSettings settings, Set<World> worlds) {
-        this.dataFolder = new File(groupProvider.getDataFolder(), name);
-        this.file = new File(groupProvider.getDataFolder(), name + ".json");
+    public PaperWorldGroup(PaperGroupProvider provider, String name, GroupData data, GroupSettings settings, Set<World> worlds) {
+        this.dataFolder = new File(provider.getDataFolder(), name);
+        this.file = new File(provider.getDataFolder(), name + ".json");
         this.config = new GsonFile<>(IO.of(file), new GroupConfig(
                 worlds.stream().map(Keyed::key).collect(Collectors.toSet()), data, settings
         ), new GsonBuilder()
@@ -70,7 +73,7 @@ public class PaperWorldGroup implements WorldGroup {
                 .registerTypeHierarchyAdapter(Location.class, new LocationAdapter.Complex())
                 .registerTypeHierarchyAdapter(World.class, new WorldAdapter.Key())
                 .create()).saveIfAbsent();
-        this.groupProvider = groupProvider;
+        this.provider = provider;
         this.name = name;
     }
 
@@ -134,7 +137,7 @@ public class PaperWorldGroup implements WorldGroup {
     @Override
     public @Unmodifiable Set<World> getWorlds() {
         return config.getRoot().worlds().stream()
-                .map(groupProvider.getServer()::getWorld)
+                .map(provider.getServer()::getWorld)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
@@ -146,7 +149,7 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public boolean addWorld(World world) {
-        return !groupProvider.hasGroup(world) && config.getRoot().worlds().add(world.key());
+        return !provider.hasGroup(world) && config.getRoot().worlds().add(world.key());
     }
 
     @Override
@@ -156,7 +159,7 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public boolean delete() {
-        return groupProvider.removeGroup(this) | file.delete() | delete(dataFolder);
+        return provider.removeGroup(this) | file.delete() | delete(dataFolder);
     }
 
     @Override
@@ -185,11 +188,11 @@ public class PaperWorldGroup implements WorldGroup {
         try {
             return readPlayerData(file);
         } catch (EOFException e) {
-            groupProvider.getLogger().error("The player data file {} is irrecoverably broken", file.getPath());
+            provider.getLogger().error("The player data file {} is irrecoverably broken", file.getPath());
             return Optional.empty();
         } catch (Exception e) {
-            groupProvider.getLogger().error("Failed to load player data from {}", file.getPath(), e);
-            groupProvider.getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
+            provider.getLogger().error("Failed to load player data from {}", file.getPath(), e);
+            provider.getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
             return Optional.empty();
         }
     }
@@ -205,28 +208,34 @@ public class PaperWorldGroup implements WorldGroup {
                     file.outputStream(WRITE, CREATE, TRUNCATE_EXISTING),
                     StandardCharsets.UTF_8
             )) {
-                outputStream.writeTag(null, groupProvider.nbt().toTag(data, PaperPlayerData.class));
+                outputStream.writeTag(null, provider.nbt().toTag(data, PaperPlayerData.class));
                 return true;
             }
         } catch (Throwable t) {
             if (backup.exists()) try {
                 Files.copy(backup.getPath(), file.getPath(), StandardCopyOption.REPLACE_EXISTING);
-                groupProvider.getLogger().warn("Recovered {} from potential data loss", player.getUniqueId());
+                provider.getLogger().warn("Recovered {} from potential data loss", player.getUniqueId());
             } catch (IOException e) {
-                groupProvider.getLogger().error("Failed to recover player data {}", player.getUniqueId(), e);
+                provider.getLogger().error("Failed to recover player data {}", player.getUniqueId(), e);
             }
-            groupProvider.getLogger().error("Failed to save player data {}", player.getUniqueId(), t);
-            groupProvider.getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
+            provider.getLogger().error("Failed to save player data {}", player.getUniqueId(), t);
+            provider.getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
             return false;
         }
     }
 
     @Override
-    public void loadPlayerData(Player player, boolean position) {
-        if (isLoadingData(player)) return;
-        player.setMetadata("loading", new FixedMetadataValue(groupProvider.getPlugin(), null));
-        readPlayerData(player).orElseGet(PaperPlayerData::new).load(player, this, position);
-        player.removeMetadata("loading", groupProvider.getPlugin());
+    public CompletableFuture<Boolean> loadPlayerData(Player player, boolean position) {
+        if (isLoadingData(player)) return CompletableFuture.completedFuture(false);
+        player.setMetadata("loading", new FixedMetadataValue(provider.getPlugin(), null));
+        return readPlayerData(player).orElseGet(PaperPlayerData::new).load(player, this, position)
+                .whenComplete((success, throwable) -> player.removeMetadata("loading", provider.getPlugin()))
+                .exceptionally(throwable -> {
+                    provider.getLogger().error("Failed to load group data for player {}", player.getName(), throwable);
+                    provider.getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
+                    player.kick(Component.text("Failed to load group data", NamedTextColor.RED));
+                    return false;
+                });
     }
 
     @Override
@@ -255,15 +264,15 @@ public class PaperWorldGroup implements WorldGroup {
         if (!file.exists()) return Optional.empty();
         try (var inputStream = stream(IO.of(file))) {
             return Optional.of(inputStream.readTag()).map(tag ->
-                    groupProvider.nbt().fromTag(tag, PaperPlayerData.class));
+                    provider.nbt().fromTag(tag, PaperPlayerData.class));
         } catch (Exception e) {
             var io = IO.of(file.getPath() + "_old");
             if (!io.exists()) throw e;
-            groupProvider.getLogger().warn("Failed to load player data from {}", file.getPath(), e);
-            groupProvider.getLogger().warn("Falling back to {}", io);
+            provider.getLogger().warn("Failed to load player data from {}", file.getPath(), e);
+            provider.getLogger().warn("Falling back to {}", io);
             try (var inputStream = stream(io)) {
                 return Optional.of(inputStream.readTag()).map(tag ->
-                        groupProvider.nbt().fromTag(tag, PaperPlayerData.class));
+                        provider.nbt().fromTag(tag, PaperPlayerData.class));
             }
         }
     }
