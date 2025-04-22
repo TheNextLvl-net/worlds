@@ -33,7 +33,7 @@ dependencies {
     api("org.bstats:bstats-bukkit:3.1.0")
 
     api("net.thenextlvl.core:i18n:1.0.21")
-    api("net.thenextlvl.core:paper:2.0.4")
+    api("net.thenextlvl.core:paper:2.1.1")
 
     compileOnlyApi(project(":api"))
 }
