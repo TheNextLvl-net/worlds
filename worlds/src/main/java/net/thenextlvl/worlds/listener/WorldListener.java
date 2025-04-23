@@ -16,17 +16,9 @@ public class WorldListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onWorldDelete(WorldDeleteEvent event) {
         plugin.groupProvider().getGroup(event.getWorld()).ifPresent(group -> {
-            if (!group.removeWorld(event.getWorld())) return;
-            if (!group.getPersistedWorlds().isEmpty()) return;
-            if (plugin.groupProvider().removeGroup(group) && group.getDataFolder().delete())
-                plugin.getComponentLogger().info(
-                        "Cleaned up group data {} ({})",
-                        group.getName(), group.getDataFolder()
-                );
-            else plugin.getComponentLogger().warn(
-                    "Failed to delete group data {} ({})",
-                    group.getName(), group.getDataFolder()
-            );
+            if (group.removeWorld(event.getWorld())) return;
+            plugin.getComponentLogger().error("Failed to removed deleted world {} from group {}",
+                    event.getWorld().getName(), group.getName());
         });
     }
 }
