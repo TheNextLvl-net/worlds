@@ -1,6 +1,7 @@
 package net.thenextlvl.perworlds.group;
 
 import net.thenextlvl.perworlds.GroupData;
+import net.thenextlvl.perworlds.data.WorldBorderData;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
@@ -15,6 +16,7 @@ import java.util.Map;
 public class PaperGroupData implements GroupData {
     private final Map<GameRule<?>, Object> gameRules = new HashMap<>();
     private @Nullable Location spawnLocation = null;
+    private @Nullable WorldBorderData worldBorder = null;
     private Difficulty difficulty = Difficulty.NORMAL;
     private GameMode defaultGameMode = GameMode.SURVIVAL;
     private boolean rain = false;
@@ -50,6 +52,16 @@ public class PaperGroupData implements GroupData {
     @Override
     public void defaultGameMode(GameMode gameMode) {
         this.defaultGameMode = gameMode;
+    }
+
+    @Override
+    public @Nullable WorldBorderData worldBorder() {
+        return worldBorder;
+    }
+
+    @Override
+    public void worldBorder(@Nullable WorldBorderData worldBorder) {
+        this.worldBorder = worldBorder;
     }
 
     @Override

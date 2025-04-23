@@ -8,11 +8,13 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import net.thenextlvl.perworlds.GroupData;
+import net.thenextlvl.perworlds.data.WorldBorderData;
 import net.thenextlvl.perworlds.group.PaperGroupData;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
+import org.bukkit.Server;
 import org.jspecify.annotations.NullMarked;
 
 import java.lang.reflect.Type;
@@ -29,6 +31,8 @@ public class GroupDataAdapter implements JsonDeserializer<GroupData>, JsonSerial
             data.difficulty(context.deserialize(object.get("difficulty"), Difficulty.class));
         if (object.has("spawnLocation"))
             data.spawnLocation(context.deserialize(object.get("spawnLocation"), Location.class));
+        if (object.has("worldBorder"))
+            data.worldBorder(context.deserialize(object.get("worldBorder"), WorldBorderData.class));
         var rules = object.getAsJsonObject("gameRules");
         if (rules != null) rules.entrySet().forEach(entry -> {
             var rule = GameRule.getByName(entry.getKey());
@@ -48,6 +52,7 @@ public class GroupDataAdapter implements JsonDeserializer<GroupData>, JsonSerial
         object.add("defaultGameMode", context.serialize(data.defaultGameMode()));
         object.add("difficulty", context.serialize(data.difficulty()));
         object.add("spawnLocation", context.serialize(data.spawnLocation()));
+        object.add("worldBorder", context.serialize(data.worldBorder()));
         object.add("gameRules", rules);
         object.addProperty("rain", data.rain());
         object.addProperty("thunder", data.thunder());

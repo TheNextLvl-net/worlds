@@ -1,5 +1,6 @@
 package net.thenextlvl.perworlds;
 
+import net.thenextlvl.perworlds.data.WorldBorderData;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
@@ -64,6 +65,25 @@ public interface GroupData {
      * @see #defaultGameMode()
      */
     void defaultGameMode(@NonNull GameMode gameMode);
+
+    /**
+     * Retrieves the {@link WorldBorderData} associated with the group.
+     *
+     * @return the {@link WorldBorderData} instance representing the world's border configuration
+     * @see #worldBorder(WorldBorderData)
+     */
+    @Nullable
+    WorldBorderData worldBorder();
+
+    /**
+     * Sets the {@link WorldBorderData} configuration for the group.
+     * The world border defines boundaries and related settings such as size,
+     * center, and warning distances for the game world.
+     *
+     * @param worldBorder the {@link WorldBorderData} instance to set, or {@code null}
+     *                    to remove any existing world border configuration
+     */
+    void worldBorder(@Nullable WorldBorderData worldBorder);
 
     /**
      * Retrieves the spawn location associated with the group.

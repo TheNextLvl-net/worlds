@@ -26,9 +26,11 @@ import net.thenextlvl.perworlds.adapter.StatisticsAdapter;
 import net.thenextlvl.perworlds.adapter.VectorAdapter;
 import net.thenextlvl.perworlds.adapter.WardenSpawnTrackerAdapter;
 import net.thenextlvl.perworlds.adapter.WorldAdapter;
+import net.thenextlvl.perworlds.adapter.WorldBorderAdapter;
 import net.thenextlvl.perworlds.data.AdvancementData;
 import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.WardenSpawnTracker;
+import net.thenextlvl.perworlds.data.WorldBorderData;
 import net.thenextlvl.perworlds.model.PaperPlayerData;
 import net.thenextlvl.perworlds.statistics.Stats;
 import org.bukkit.GameMode;
@@ -83,6 +85,7 @@ public class PaperGroupProvider implements GroupProvider {
                 .registerTypeHierarchyAdapter(Vector.class, new VectorAdapter())
                 .registerTypeHierarchyAdapter(WardenSpawnTracker.class, new WardenSpawnTrackerAdapter())
                 .registerTypeHierarchyAdapter(World.class, new WorldAdapter(getServer()))
+                .registerTypeHierarchyAdapter(WorldBorderData.class, new WorldBorderAdapter())
                 .build();
         this.unownedWorldGroup = new PaperUnownedWorldGroup(this);
     }
