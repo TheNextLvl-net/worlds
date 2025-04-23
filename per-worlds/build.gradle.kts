@@ -6,6 +6,7 @@ plugins {
     id("idea")
     id("java")
     id("java-library")
+    id("maven-publish")
     id("com.gradleup.shadow") version "9.0.0-beta12"
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
     id("de.eldoria.plugin-yml.paper") version "0.7.1"
@@ -100,6 +101,20 @@ hangarPublish { // docs - https://docs.papermc.io/misc/hangar-publishing
         platforms.register(Platforms.PAPER) {
             jar.set(tasks.shadowJar.flatMap { it.archiveFile })
             platformVersions.set(versions)
+        }
+    }
+}
+
+publishing {
+    publications.create<MavenPublication>("maven") {
+        from(components["java"])
+    }
+    repositories.maven {
+        val branch = if (version.toString().contains("-pre")) "snapshots" else "releases"
+        url = uri("https://repo.thenextlvl.net/$branch")
+        credentials {
+            username = System.getenv("REPOSITORY_USER")
+            password = System.getenv("REPOSITORY_TOKEN")
         }
     }
 }
