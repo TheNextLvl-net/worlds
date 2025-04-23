@@ -66,6 +66,6 @@ public class WorldListener implements Listener {
     public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
         var from = provider.getGroup(event.getFrom()).orElse(provider.getUnownedWorldGroup());
         var to = provider.getGroup(event.getPlayer().getWorld()).orElse(provider.getUnownedWorldGroup());
-        if (!from.equals(to)) to.loadPlayerData(event.getPlayer(), false);
+        if (!from.equals(to)) to.loadPlayerData(event.getPlayer());
     }
 }

@@ -242,6 +242,11 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
+    public CompletableFuture<Boolean> loadPlayerData(Player player) {
+        return loadPlayerData(player, false);
+    }
+
+    @Override
     public CompletableFuture<Boolean> loadPlayerData(Player player, boolean position) {
         if (isLoadingData(player)) return CompletableFuture.completedFuture(false);
         player.setMetadata("loading", new FixedMetadataValue(provider.getPlugin(), null));

@@ -196,6 +196,17 @@ public interface WorldGroup {
     /**
      * Loads player data for a specific player.
      * This method only functions if the player is not currently in the process of loading data.
+     * <p>
+     * This method is the equivalent of calling {@link #loadPlayerData(Player, boolean) loadPlayerData(player, false)}.
+     *
+     * @param player   the player for whom data is to be loaded
+     * @see #loadPlayerData(Player, boolean)
+     */
+    CompletableFuture<Boolean> loadPlayerData(Player player);
+
+    /**
+     * Loads player data for a specific player.
+     * This method only functions if the player is not currently in the process of loading data.
      * Optionally, it can also load the player's position data.
      *
      * @param player   the player for whom data is to be loaded
