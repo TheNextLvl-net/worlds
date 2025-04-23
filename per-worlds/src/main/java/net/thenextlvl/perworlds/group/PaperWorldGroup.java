@@ -166,7 +166,12 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public boolean addWorld(World world) {
-        return !provider.hasGroup(world) && config.getRoot().worlds().add(world.key());
+        if (provider.hasGroup(world)) return false;
+        var previous = provider.getGroup(world).orElse(provider.getUnownedWorldGroup());
+        if (!config.getRoot().worlds().add(world.key())) return false;
+        world.getPlayers().forEach(previous::persistPlayerData);
+        world.getPlayers().forEach(this::loadPlayerData); // todo: do we need blocking?
+        return true;
     }
 
     @Override
@@ -196,7 +201,9 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public boolean removeWorld(World world) {
-        return config.getRoot().worlds().remove(world.key());
+        if (!config.getRoot().worlds().remove(world.key())) return false;
+        world.getPlayers().forEach(provider.getUnownedWorldGroup()::loadPlayerData); // todo: do we need blocking?
+        return true;
     }
 
     @Override
