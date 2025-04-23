@@ -27,6 +27,9 @@ public interface PlayerData {
     @Unmodifiable
     List<PotionEffect> potionEffects();
 
+    GameMode defaultGameMode();
+
+    @Nullable
     GameMode gameMode();
 
     @Nullable
@@ -51,6 +54,8 @@ public interface PlayerData {
 
     PlayerData beeStingersInBody(int beeStingers);
 
+    PlayerData defaultGameMode(GameMode gameMode);
+
     PlayerData discoveredRecipes(Collection<NamespacedKey> recipes);
 
     PlayerData enderChest(@Nullable ItemStack[] contents);
@@ -69,7 +74,7 @@ public interface PlayerData {
 
     PlayerData freezeTicks(int freezeTicks);
 
-    PlayerData gameMode(GameMode gameMode);
+    PlayerData gameMode(@Nullable GameMode gameMode);
 
     PlayerData gliding(boolean gliding);
 

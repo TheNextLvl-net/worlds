@@ -279,12 +279,12 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public void persistPlayerData(Player player) {
-        writePlayerData(player, PaperPlayerData.of(player));
+        writePlayerData(player, PaperPlayerData.of(player, this));
     }
 
     @Override
     public void persistPlayerData(Player player, Consumer<PlayerData> data) {
-        var playerData = PaperPlayerData.of(player);
+        var playerData = PaperPlayerData.of(player, this);
         data.accept(playerData);
         writePlayerData(player, playerData);
     }

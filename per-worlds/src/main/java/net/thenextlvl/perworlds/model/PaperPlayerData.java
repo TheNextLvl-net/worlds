@@ -36,7 +36,6 @@ public class PaperPlayerData implements PlayerData {
     private static final @Nullable Location DEFAULT_LAST_DEATH_LOCATION = null;
     private static final @Nullable Location DEFAULT_LAST_LOCATION = null;
     private static final @Nullable Location DEFAULT_RESPAWN_LOCATION = null;
-    private static final GameMode DEFAULT_GAMEMODE = GameMode.SURVIVAL;
     private static final Vector DEFAULT_VELOCITY = new Vector(0, 0, 0);
     private static final WardenSpawnTracker DEFAULT_WARDEN_SPAWN_TRACKER = new PaperWardenSpawnTracker();
     private static final boolean DEFAULT_FLYING = false;
@@ -63,13 +62,14 @@ public class PaperPlayerData implements PlayerData {
     private static final int DEFAULT_REMAINING_AIR = 300;
     private static final int DEFAULT_SCORE = 0;
 
+    private @Nullable GameMode gameMode = null;
     private @Nullable GameMode previousGameMode = null;
     private @Nullable ItemStack[] enderChest = DEFAULT_ENDERCHEST;
     private @Nullable ItemStack[] inventory = DEFAULT_INVENTORY;
     private @Nullable Location lastDeathLocation = DEFAULT_LAST_DEATH_LOCATION;
     private @Nullable Location lastLocation = DEFAULT_LAST_LOCATION;
     private @Nullable Location respawnLocation = DEFAULT_RESPAWN_LOCATION;
-    private GameMode gameMode = DEFAULT_GAMEMODE;
+    private GameMode defaultGameMode = GameMode.SURVIVAL;
     private List<PotionEffect> potionEffects = List.of();
     private Set<AdvancementData> advancements = Set.of();
     private Set<AttributeData> attributes = Set.of();
@@ -101,8 +101,9 @@ public class PaperPlayerData implements PlayerData {
     private int remainingAir = DEFAULT_REMAINING_AIR;
     private int score = DEFAULT_SCORE;
 
-    public static PaperPlayerData of(Player player) {
+    public static PaperPlayerData of(Player player, WorldGroup group) {
         return new PaperPlayerData()
+                .defaultGameMode(group.getGroupData().defaultGameMode())
                 .attributes(Registry.ATTRIBUTE.stream()
                         .map(player::getAttribute)
                         .filter(Objects::nonNull)
@@ -169,10 +170,8 @@ public class PaperPlayerData implements PlayerData {
     }
 
     private void load(Player player, GroupSettings settings) {
-        // todo: load default states for disabled settings
-
-        if (settings.gameMode() && previousGameMode != null) player.setGameMode(previousGameMode);
-        player.setGameMode(settings.gameMode() ? gameMode : DEFAULT_GAMEMODE);
+        player.setGameMode(settings.gameMode() && previousGameMode != null ? previousGameMode : defaultGameMode());
+        player.setGameMode(settings.gameMode() && gameMode != null ? gameMode : defaultGameMode());
 
         player.setAllowFlight(settings.flyState() ? mayFly : DEFAULT_MAY_FLY);
         player.setFlying(settings.flyState() ? flying : DEFAULT_FLYING);
@@ -288,7 +287,12 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public GameMode gameMode() {
+    public GameMode defaultGameMode() {
+        return defaultGameMode;
+    }
+
+    @Override
+    public @Nullable GameMode gameMode() {
         return gameMode;
     }
 
@@ -339,6 +343,12 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public PaperPlayerData beeStingersInBody(int beeStingersInBody) {
         this.beeStingersInBody = beeStingersInBody;
+        return this;
+    }
+
+    @Override
+    public PaperPlayerData defaultGameMode(GameMode gameMode) {
+        this.defaultGameMode = gameMode;
         return this;
     }
 
@@ -397,7 +407,7 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public PaperPlayerData gameMode(GameMode gameMode) {
+    public PaperPlayerData gameMode(@Nullable GameMode gameMode) {
         this.gameMode = gameMode;
         return this;
     }
