@@ -44,6 +44,7 @@ public class GroupDataAdapter implements JsonDeserializer<GroupData>, JsonSerial
             var rule = GameRule.getByName(entry.getKey());
             if (rule != null) data.gameRule(rule, context.deserialize(entry.getValue(), Object.class));
         });
+        if (object.has("hardcore")) data.hardcore(object.get("hardcore").getAsBoolean());
         if (object.has("rain")) data.rain(object.get("rain").getAsBoolean());
         if (object.has("thunder")) data.thunder(object.get("thunder").getAsBoolean());
         if (object.has("time")) data.time(object.get("time").getAsInt());
@@ -60,6 +61,7 @@ public class GroupDataAdapter implements JsonDeserializer<GroupData>, JsonSerial
         object.add("spawnLocation", context.serialize(data.spawnLocation()));
         object.add("worldBorder", context.serialize(data.worldBorder()));
         object.add("gameRules", rules);
+        object.addProperty("hardcore", data.hardcore());
         object.addProperty("rain", data.rain());
         object.addProperty("thunder", data.thunder());
         object.addProperty("time", data.time());

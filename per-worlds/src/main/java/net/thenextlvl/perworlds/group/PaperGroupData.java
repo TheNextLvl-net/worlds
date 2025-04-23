@@ -20,12 +20,14 @@ public class PaperGroupData implements GroupData {
     private @Nullable WorldBorderData worldBorder = null;
     private Difficulty difficulty = Difficulty.NORMAL;
     private GameMode defaultGameMode;
+    private boolean hardcore;
     private boolean rain = false;
     private boolean thunder = false;
     private int time = 0;
 
     public PaperGroupData(Server server) {
         this.defaultGameMode = server.getDefaultGameMode();
+        this.hardcore = server.isHardcore();
     }
 
     @Override
@@ -41,7 +43,7 @@ public class PaperGroupData implements GroupData {
 
     @Override
     public Difficulty difficulty() {
-        return difficulty;
+        return hardcore ? Difficulty.HARD : difficulty;
     }
 
     @Override
@@ -77,6 +79,16 @@ public class PaperGroupData implements GroupData {
     @Override
     public void spawnLocation(@Nullable Location location) {
         this.spawnLocation = location;
+    }
+
+    @Override
+    public boolean hardcore() {
+        return hardcore;
+    }
+
+    @Override
+    public void hardcore(boolean hardcore) {
+        this.hardcore = hardcore;
     }
 
     @Override

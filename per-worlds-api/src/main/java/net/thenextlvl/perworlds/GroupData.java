@@ -107,6 +107,22 @@ public interface GroupData {
     void spawnLocation(@Nullable Location location);
 
     /**
+     * Checks whether the group is in hardcore mode.
+     *
+     * @return true if the group is in hardcore mode, false otherwise
+     * @see #hardcore(boolean)
+     */
+    boolean hardcore();
+
+    /**
+     * Sets the hardcore mode for the group.
+     *
+     * @param hardcore true to enable hardcore mode, false to disable it
+     * @see #hardcore()
+     */
+    void hardcore(boolean hardcore);
+
+    /**
      * Retrieves the current rain state for the group.
      * Indicates whether it is currently raining within the group's environment.
      *
