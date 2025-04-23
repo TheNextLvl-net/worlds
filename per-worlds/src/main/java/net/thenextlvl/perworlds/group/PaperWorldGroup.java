@@ -20,6 +20,7 @@ import net.thenextlvl.perworlds.adapter.GroupSettingsAdapter;
 import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.model.PaperPlayerData;
 import net.thenextlvl.perworlds.model.config.GroupConfig;
+import org.bukkit.GameRule;
 import org.bukkit.Keyed;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -265,6 +266,31 @@ public class PaperWorldGroup implements WorldGroup {
                     player.kick(Component.text("Failed to load group data", NamedTextColor.RED));
                     return false;
                 });
+    }
+
+    // todo: update on start and on world add/remove/load/unload
+    @SuppressWarnings("unchecked")
+    public void update(World world) {
+        Arrays.stream(GameRule.values())
+                .map(rule -> (GameRule<Object>) rule)
+                .forEach(rule -> {
+                    var value = getGroupData().gameRule(rule);
+                    if (value != null) world.setGameRule(rule, value);
+                });
+        // todo: figure out proper time and weather syncing
+        world.setTime(getGroupData().time());
+        world.setDifficulty(getGroupData().difficulty());
+        var border = getGroupData().worldBorder();
+        if (border != null) {
+            var worldBorder = world.getWorldBorder();
+            worldBorder.setSize(border.size());
+            worldBorder.setCenter(border.centerX(), border.centerZ());
+            worldBorder.setDamageAmount(border.damageAmount());
+            worldBorder.setDamageBuffer(border.damageBuffer());
+            worldBorder.setWarningDistance(border.warningDistance());
+            worldBorder.setWarningTime(border.warningTime());
+        }
+        world.setHardcore(getGroupData().hardcore());
     }
 
     @Override
