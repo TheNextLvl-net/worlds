@@ -26,7 +26,8 @@ public class PaperGroupData implements GroupData {
     private int time = 0;
 
     public PaperGroupData(Server server) {
-        this.defaultGameMode = server.getDefaultGameMode();
+        // this.defaultGameMode = server.getDefaultGameMode(); // todo: load after overworld? throws npe
+        this.defaultGameMode = GameMode.SURVIVAL;
         this.hardcore = server.isHardcore();
     }
 
