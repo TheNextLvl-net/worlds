@@ -21,9 +21,15 @@ import java.lang.reflect.Type;
 
 @NullMarked
 public class GroupDataAdapter implements JsonDeserializer<GroupData>, JsonSerializer<GroupData> {
+    private final Server server;
+
+    public GroupDataAdapter(Server server) {
+        this.server = server;
+    }
+
     @Override
     public GroupData deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
-        var data = new PaperGroupData();
+        var data = new PaperGroupData(server);
         var object = element.getAsJsonObject();
         if (object.has("defaultGameMode"))
             data.defaultGameMode(context.deserialize(object.get("defaultGameMode"), GameMode.class));

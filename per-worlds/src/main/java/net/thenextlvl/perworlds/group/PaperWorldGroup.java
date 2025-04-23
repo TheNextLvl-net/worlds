@@ -67,7 +67,7 @@ public class PaperWorldGroup implements WorldGroup {
                 worlds.stream().map(Keyed::key).collect(Collectors.toSet()), data, settings
         ), new GsonBuilder()
                 .setPrettyPrinting()
-                .registerTypeHierarchyAdapter(GroupData.class, new GroupDataAdapter())
+                .registerTypeHierarchyAdapter(GroupData.class, new GroupDataAdapter(provider.getServer()))
                 .registerTypeHierarchyAdapter(GroupSettings.class, new GroupSettingsAdapter())
                 .registerTypeHierarchyAdapter(Key.class, new KeyAdapter.Kyori())
                 .registerTypeHierarchyAdapter(Location.class, new LocationAdapter.Complex())

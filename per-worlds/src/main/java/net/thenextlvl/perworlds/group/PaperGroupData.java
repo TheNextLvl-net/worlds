@@ -6,6 +6,7 @@ import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
+import org.bukkit.Server;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -18,10 +19,14 @@ public class PaperGroupData implements GroupData {
     private @Nullable Location spawnLocation = null;
     private @Nullable WorldBorderData worldBorder = null;
     private Difficulty difficulty = Difficulty.NORMAL;
-    private GameMode defaultGameMode = GameMode.SURVIVAL;
+    private GameMode defaultGameMode;
     private boolean rain = false;
     private boolean thunder = false;
     private int time = 0;
+
+    public PaperGroupData(Server server) {
+        this.defaultGameMode = server.getDefaultGameMode();
+    }
 
     @Override
     public <T> @Nullable T gameRule(GameRule<T> rule) {

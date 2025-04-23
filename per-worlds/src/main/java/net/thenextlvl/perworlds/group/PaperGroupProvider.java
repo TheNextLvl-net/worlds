@@ -139,7 +139,7 @@ public class PaperGroupProvider implements GroupProvider {
         Preconditions.checkState(invalid.isEmpty(), "Worlds cannot be in multiple groups: {}", String.join(", ", invalid));
 
         var groupSettings = new PaperGroupSettings();
-        var groupData = new PaperGroupData();
+        var groupData = new PaperGroupData(getServer());
         settings.accept(groupSettings);
         data.accept(groupData);
 
