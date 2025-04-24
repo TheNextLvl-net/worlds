@@ -4,13 +4,13 @@ import io.papermc.paper.math.Position;
 import net.thenextlvl.perworlds.data.WorldBorderData;
 
 public class PaperWorldBorderData implements WorldBorderData {
-    private double x;
-    private double z;
-    private double size;
-    private double damageAmount;
-    private double damageBuffer;
-    private int warningDistance;
-    private int warningTime;
+    private double x = 0D;
+    private double z = 0D;
+    private double size = 5.9999968E7;
+    private double damageAmount = 0.2D;
+    private double damageBuffer = 5.0D;
+    private int warningDistance = 5;
+    private int warningTime = 15;
 
     @Override
     public double centerX() {
