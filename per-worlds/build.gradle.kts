@@ -70,7 +70,7 @@ paper {
     main = "net.thenextlvl.perworlds.WorldsPlugin"
     apiVersion = "1.21"
     description = "Per-world customization for gameplay and settings"
-    load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
+    load = BukkitPluginDescription.PluginLoadOrder.STARTUP
     website = "https://thenextlvl.net"
     authors = listOf("NonSwag")
     foliaSupported = true

@@ -65,6 +65,9 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
     private final Metrics metrics = new Metrics(this, 19652);
 
+    public WorldsPlugin() {
+        registerCommands();
+    }
 
     @Override
     public void onLoad() {
@@ -85,7 +88,6 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     @Override
     public void onEnable() {
         registerListeners();
-        registerCommands();
         commons.onEnable();
     }
 

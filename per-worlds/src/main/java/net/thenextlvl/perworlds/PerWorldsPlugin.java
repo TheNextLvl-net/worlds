@@ -9,6 +9,10 @@ public class PerWorldsPlugin extends JavaPlugin {
     private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
     private final SharedWorlds commons = new SharedWorlds(this);
 
+    public PerWorldsPlugin() {
+        registerCommands();
+    }
+
     @Override
     public void onLoad() {
         versionChecker.checkVersion();
@@ -18,7 +22,6 @@ public class PerWorldsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         commons.onEnable();
-        registerCommands();
     }
 
     @Override
