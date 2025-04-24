@@ -47,7 +47,7 @@ public class GroupDataAdapter implements JsonDeserializer<GroupData>, JsonSerial
         if (object.has("hardcore")) data.hardcore(object.get("hardcore").getAsBoolean());
         if (object.has("rain")) data.rain(object.get("rain").getAsBoolean());
         if (object.has("thunder")) data.thunder(object.get("thunder").getAsBoolean());
-        if (object.has("time")) data.time(object.get("time").getAsInt());
+        if (object.has("time")) data.time(object.get("time").getAsLong());
         return data;
     }
 

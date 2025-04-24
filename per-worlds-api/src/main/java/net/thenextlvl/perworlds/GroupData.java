@@ -160,17 +160,17 @@ public interface GroupData {
     /**
      * Retrieves the current time value associated with the group.
      *
-     * @return the current time as an integer
-     * @see #time(int)
+     * @return the current time as a long
+     * @see #time(long)
      */
-    int time();
+    long time();
 
     /**
      * Sets the current time value for the group.
      * The time value typically represents the in-game time within the group's environment.
      *
-     * @param time the time value to be set, represented as an integer
+     * @param time the time value to be set, represented as a long
      * @see #time()
      */
-    void time(int time);
+    void time(long time);
 }

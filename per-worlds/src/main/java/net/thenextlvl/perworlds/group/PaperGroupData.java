@@ -23,7 +23,7 @@ public class PaperGroupData implements GroupData {
     private boolean hardcore;
     private boolean rain = false;
     private boolean thunder = false;
-    private int time = 0;
+    private long time = 0;
 
     public PaperGroupData(Server server) {
         // this.defaultGameMode = server.getDefaultGameMode(); // todo: load after overworld? throws npe
@@ -113,12 +113,12 @@ public class PaperGroupData implements GroupData {
     }
 
     @Override
-    public int time() {
+    public long time() {
         return time;
     }
 
     @Override
-    public void time(int time) {
+    public void time(long time) {
         this.time = time;
     }
 }
