@@ -44,10 +44,20 @@ public class GroupDataAdapter implements JsonDeserializer<GroupData>, JsonSerial
             var rule = GameRule.getByName(entry.getKey());
             if (rule != null) data.gameRule(rule, context.deserialize(entry.getValue(), Object.class));
         });
-        if (object.has("hardcore")) data.hardcore(object.get("hardcore").getAsBoolean());
-        if (object.has("rain")) data.rain(object.get("rain").getAsBoolean());
-        if (object.has("thunder")) data.thunder(object.get("thunder").getAsBoolean());
-        if (object.has("time")) data.time(object.get("time").getAsLong());
+        if (object.has("hardcore"))
+            data.hardcore(object.get("hardcore").getAsBoolean());
+        if (object.has("raining"))
+            data.raining(object.get("raining").getAsBoolean());
+        if (object.has("thundering"))
+            data.thundering(object.get("thundering").getAsBoolean());
+        if (object.has("thunderDuration"))
+            data.thunderDuration(object.get("thunderDuration").getAsInt());
+        if (object.has("clearWeatherDuration"))
+            data.clearWeatherDuration(object.get("clearWeatherDuration").getAsInt());
+        if (object.has("rainDuration"))
+            data.rainDuration(object.get("rainDuration").getAsInt());
+        if (object.has("time"))
+            data.time(object.get("time").getAsLong());
         return data;
     }
 
@@ -62,8 +72,11 @@ public class GroupDataAdapter implements JsonDeserializer<GroupData>, JsonSerial
         object.add("worldBorder", context.serialize(data.worldBorder()));
         object.add("gameRules", rules);
         object.addProperty("hardcore", data.hardcore());
-        object.addProperty("rain", data.rain());
-        object.addProperty("thunder", data.thunder());
+        object.addProperty("raining", data.raining());
+        object.addProperty("thundering", data.thundering());
+        object.addProperty("thunderDuration", data.thunderDuration());
+        object.addProperty("clearWeatherDuration", data.clearWeatherDuration());
+        object.addProperty("rainDuration", data.rainDuration());
         object.addProperty("time", data.time());
         return object;
     }

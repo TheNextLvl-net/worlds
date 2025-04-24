@@ -269,15 +269,43 @@ public class PaperWorldGroup implements WorldGroup {
                 });
     }
 
-    // todo: update on on world add/remove/unload
     @Override
     public void updateWorldData(World world) {
-        if (getSettings().difficulty()) world.setDifficulty(getGroupData().difficulty());
-        if (getSettings().gameRules()) applyGameRules(world);
-        // todo: figure out proper time and weather syncing
-        if (getSettings().time()) world.setTime(getGroupData().time());
-        if (getSettings().worldBorder()) applyWorldBorder(world);
-        world.setHardcore(getGroupData().hardcore());
+        for (var type : GroupData.Type.values()) updateWorldData(world, type);
+    }
+
+    // todo: update on on world add/remove/unload
+    @Override
+    public void updateWorldData(World world, GroupData.Type type) {
+        if (isEnabled(type)) switch (type) {
+            case DIFFICULTY -> world.setDifficulty(getGroupData().difficulty());
+            case TIME -> world.setTime(getGroupData().time());
+            case GAME_RULE -> applyGameRules(world);
+            case WORLD_BORDER -> applyWorldBorder(world);
+            case HARDCORE -> world.setHardcore(getGroupData().hardcore());
+            case WEATHER -> applyWeather(world);
+        }
+    }
+
+    private boolean isEnabled(GroupData.Type type) {
+        return switch (type) {
+            case DEFAULT_GAME_MODE -> getSettings().gameMode();
+            case DIFFICULTY -> getSettings().difficulty();
+            case GAME_RULE -> getSettings().gameRules();
+            case HARDCORE -> getSettings().hardcore();
+            case SPAWN_LOCATION -> true;
+            case TIME -> getSettings().time();
+            case WEATHER -> getSettings().weather();
+            case WORLD_BORDER -> getSettings().worldBorder();
+        };
+    }
+
+    private void applyWeather(World world) {
+        world.setStorm(getGroupData().raining());
+        world.setThundering(getGroupData().thundering());
+        world.setClearWeatherDuration(getGroupData().clearWeatherDuration());
+        world.setThunderDuration(getGroupData().thunderDuration());
+        world.setWeatherDuration(getGroupData().rainDuration());
     }
 
     @SuppressWarnings("unchecked")

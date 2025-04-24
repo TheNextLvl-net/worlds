@@ -21,8 +21,11 @@ public class PaperGroupData implements GroupData {
     private Difficulty difficulty = Difficulty.NORMAL;
     private GameMode defaultGameMode;
     private boolean hardcore;
-    private boolean rain = false;
-    private boolean thunder = false;
+    private boolean raining = false;
+    private boolean thundering = false;
+    private int clearWeatherDuration;
+    private int rainDuration;
+    private int thunderDuration;
     private long time = 0;
 
     public PaperGroupData(Server server) {
@@ -93,23 +96,53 @@ public class PaperGroupData implements GroupData {
     }
 
     @Override
-    public boolean rain() {
-        return rain;
+    public boolean raining() {
+        return raining;
     }
 
     @Override
-    public void rain(boolean rain) {
-        this.rain = rain;
+    public void raining(boolean raining) {
+        this.raining = raining;
     }
 
     @Override
-    public boolean thunder() {
-        return thunder;
+    public boolean thundering() {
+        return thundering;
     }
 
     @Override
-    public void thunder(boolean thunder) {
-        this.thunder = thunder;
+    public void thundering(boolean thundering) {
+        this.thundering = thundering;
+    }
+
+    @Override
+    public int clearWeatherDuration() {
+        return clearWeatherDuration;
+    }
+
+    @Override
+    public void clearWeatherDuration(int duration) {
+        this.clearWeatherDuration = duration;
+    }
+
+    @Override
+    public int thunderDuration() {
+        return thunderDuration;
+    }
+
+    @Override
+    public void thunderDuration(int duration) {
+        this.thunderDuration = duration;
+    }
+
+    @Override
+    public int rainDuration() {
+        return rainDuration;
+    }
+
+    @Override
+    public void rainDuration(int duration) {
+        this.rainDuration = duration;
     }
 
     @Override

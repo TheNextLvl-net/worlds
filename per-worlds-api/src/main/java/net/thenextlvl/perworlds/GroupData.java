@@ -5,6 +5,7 @@ import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -129,7 +130,7 @@ public interface GroupData {
      * @return true if it is raining, false otherwise
      * @see #rain(boolean)
      */
-    boolean rain();
+    boolean raining();
 
     /**
      * Sets the rain state for the group.
@@ -138,7 +139,7 @@ public interface GroupData {
      * @param rain true to enable rain, false to disable it
      * @see #rain()
      */
-    void rain(boolean rain);
+    void raining(boolean raining);
 
     /**
      * Checks whether it is currently thundering within the group's environment.
@@ -146,16 +147,73 @@ public interface GroupData {
      * @return true if it is thundering, false otherwise
      * @see #thunder(boolean)
      */
-    boolean thunder();
+    boolean thundering();
 
     /**
      * Sets the thunder state for the group.
      * Determines whether it should start or stop thundering within the group's environment.
      *
-     * @param thunder true to enable thundering, false to disable it
-     * @see #thunder()
+     * @param thundering true to enable thundering, false to disable it
+     * @see World#setThundering(boolean)
      */
-    void thunder(boolean thunder);
+    void thundering(boolean thundering);
+
+    /**
+     * Retrieves the duration for which the weather will remain clear in the group.
+     * The duration is specified in ticks and indicates how long the clear weather will last.
+     *
+     * @return the remaining duration of clear weather in ticks
+     * @see World#getClearWeatherDuration()
+     */
+    int clearWeatherDuration();
+
+    /**
+     * Sets the duration for clear weather in the group.
+     * The duration specifies how long the clear weather should last
+     * before transitioning to a different weather state.
+     *
+     * @param duration the number of ticks for the clear weather duration
+     * @see World#setClearWeatherDuration(int)
+     */
+    void clearWeatherDuration(int duration);
+
+    /**
+     * Retrieves the duration for which it will continue thundering in the group.
+     * The duration is specified in ticks and indicates how long the current thunderstorm will last.
+     *
+     * @return the remaining duration of the thunderstorm in ticks
+     * @see World#getThunderDuration()
+     */
+    int thunderDuration();
+
+    /**
+     * Sets the duration for thundering in the group.
+     * The duration specifies how long the thunder should last
+     * before transitioning to a different weather state.
+     *
+     * @param duration the number of ticks for the thundering duration
+     * @see World#setThunderDuration(int)
+     */
+    void thunderDuration(int duration);
+
+    /**
+     * Retrieves the duration for which it will continue raining in the group.
+     * The duration is specified in ticks and indicates how long the current rain session will last.
+     *
+     * @return the remaining duration of the rain in ticks
+     * @see World#getWeatherDuration()
+     */
+    int rainDuration();
+
+    /**
+     * Sets the duration for raining in the group.
+     * The duration specifies how long the rain should last
+     * before transitioning to a different weather state.
+     *
+     * @param duration the number of ticks for the raining duration
+     * @see World#setWeatherDuration(int)
+     */
+    void rainDuration(int duration);
 
     /**
      * Retrieves the current time value associated with the group.
@@ -173,4 +231,19 @@ public interface GroupData {
      * @see #time()
      */
     void time(long time);
+
+    /**
+     * Represents various types of group data that can be manipulated within the game.
+     * Each enum constant corresponds to a specific configurable or retrievable attribute within a {@link WorldGroup}.
+     */
+    enum Type {
+        DEFAULT_GAME_MODE,
+        DIFFICULTY,
+        GAME_RULE,
+        HARDCORE,
+        SPAWN_LOCATION,
+        TIME,
+        WEATHER,
+        WORLD_BORDER,
+    }
 }

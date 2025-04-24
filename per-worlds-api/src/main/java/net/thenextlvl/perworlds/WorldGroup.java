@@ -214,7 +214,24 @@ public interface WorldGroup {
      */
     CompletableFuture<Boolean> loadPlayerData(Player player, boolean position);
 
-    void updateWorldData(World world);
+    /**
+     * Propagates the {@link #getGroupData() group's data} onto the given world.
+     *
+     * @param world the world whose data is to be updated
+     * @throws IllegalArgumentException thrown if the specified world is not part of this group
+     */
+    void updateWorldData(World world) throws IllegalArgumentException;
+
+    /**
+     * Updates the data of the specified world within the group with the given type.
+     * <p>
+     * The update applies changes according to the specified {@link GroupData.Type}.
+     *
+     * @param world the world whose data is to be updated
+     * @param type the type of update to apply to the world's data
+     * @throws IllegalArgumentException if the specified world is not part of this group
+     */
+    void updateWorldData(World world, GroupData.Type type) throws IllegalArgumentException;
 
     /**
      * Checks whether data for the specified player is currently being loaded.
