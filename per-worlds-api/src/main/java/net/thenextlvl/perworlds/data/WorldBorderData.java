@@ -4,9 +4,6 @@ import io.papermc.paper.math.Position;
 import org.bukkit.WorldBorder;
 
 public interface WorldBorderData {
-    double MAX_CENTER_COORDINATE = 2.9999984E7F;
-    double MAX_SIZE = 5.9999968E7;
-
     /**
      * Retrieves the center X-coordinate of the world's border.
      *
@@ -29,7 +26,8 @@ public interface WorldBorderData {
      * @param x The new X-coordinate of the border center.
      * @param z The new Z-coordinate of the border center.
      *
-     * @throws IllegalArgumentException if the absolute value of {@code x} or {@code z} is higher than {@link #MAX_CENTER_COORDINATE}
+     * @throws IllegalArgumentException if the absolute value of {@code x} or {@code z}
+     * is higher than {@link WorldBorder#getMaxCenterCoordinate()}
      */
     void center(double x, double z);
 
@@ -38,7 +36,8 @@ public interface WorldBorderData {
      *
      * @param position The new position of the border center.
      *
-     * @throws IllegalArgumentException if the absolute value of {@link Position#x()} or {@link Position#z()} is higher than {@link #MAX_CENTER_COORDINATE}
+     * @throws IllegalArgumentException if the absolute value of {@link Position#x()} or {@link Position#z()}
+     * is higher than {@link WorldBorder#getMaxCenterCoordinate()}
      */
     void center(Position position);
 
@@ -87,7 +86,7 @@ public interface WorldBorderData {
      *
      * @param size The new size of the border.
      *
-     * @throws IllegalArgumentException if {@code size} is less than 1.0D or greater than {@link #MAX_SIZE}
+     * @throws IllegalArgumentException if {@code size} is less than 1.0D or greater than {@link WorldBorder#getMaxSize()}
      * @see WorldBorder#setSize(double)
      */
     void size(double size);
