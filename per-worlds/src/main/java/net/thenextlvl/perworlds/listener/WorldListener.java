@@ -52,14 +52,14 @@ public class WorldListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onWorldGameRuleChange(TimeSkipEvent event) {
+    public void onTimeSkip(TimeSkipEvent event) {
         var group = provider.getGroup(event.getWorld())
                 .orElse(provider.getUnownedWorldGroup());
         if (!processingTime.add(group)) return;
         group.getGroupData().time(event.getWorld().getFullTime() + event.getSkipAmount());
         group.getWorlds().stream()
                 .filter(world -> !world.equals(event.getWorld()))
-                .forEach(group::updateWorldData);
+                .forEach(world -> group.updateWorldData(world, Type.TIME));
         processingTime.remove(group);
     }
 

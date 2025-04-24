@@ -279,7 +279,7 @@ public class PaperWorldGroup implements WorldGroup {
     public void updateWorldData(World world, GroupData.Type type) {
         if (isEnabled(type)) switch (type) {
             case DIFFICULTY -> world.setDifficulty(getGroupData().difficulty());
-            case TIME -> world.setTime(getGroupData().time());
+            case TIME -> world.setFullTime(getGroupData().time());
             case GAME_RULE -> applyGameRules(world);
             case WORLD_BORDER -> applyWorldBorder(world);
             case HARDCORE -> world.setHardcore(getGroupData().hardcore());
