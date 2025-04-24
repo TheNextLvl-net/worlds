@@ -4,13 +4,12 @@ import net.thenextlvl.perworlds.GroupSettings;
 
 public class PaperGroupSettings implements GroupSettings {
     private boolean absorption = true;
-    private boolean worldBorder = true;
-    private boolean difficulty = true;
     private boolean advancements = true;
     private boolean arrowsInBody = true;
     private boolean attributes = true;
     private boolean beeStingersInBody = true;
     private boolean chat = false;
+    private boolean difficulty = true;
     private boolean enabled = true;
     private boolean endCredits = true;
     private boolean enderChest = true;
@@ -46,6 +45,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean visualFire = false;
     private boolean wardenSpawnTracker = true;
     private boolean weather = true;
+    private boolean worldBorder = true;
 
     @Override
     public boolean absorption() {
