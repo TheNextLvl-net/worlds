@@ -16,7 +16,7 @@ public interface GroupData {
      * @param rule the GameRule to check
      * @param <T> the GameRule's type
      * @return the current value
-     * @see #gameRule(GameRule, Object)
+     * @see World#getGameRuleValue(GameRule)
      */
     @Nullable
     <T> T gameRule(@NonNull GameRule<T> rule);
@@ -27,7 +27,7 @@ public interface GroupData {
      * @param rule the GameRule to update
      * @param <T> the value type of the GameRule
      * @return true if the value was successfully set
-     * @see #gameRule(GameRule)
+     * @see World#setGameRule(GameRule, Object)
      */
     <T> boolean gameRule(@NonNull GameRule<T> rule, @NonNull T value);
 
@@ -35,7 +35,7 @@ public interface GroupData {
      * Retrieves the current difficulty level applied to the group.
      *
      * @return the current {@link Difficulty} of the group
-     * @see #difficulty(Difficulty)
+     * @see World#getDifficulty()
      */
     @NonNull
     Difficulty difficulty();
@@ -46,7 +46,7 @@ public interface GroupData {
      * mob behavior and damage levels, associated with the group.
      *
      * @param difficulty the new {@link Difficulty} to be set
-     * @see #difficulty()
+     * @see World#setDifficulty(Difficulty)
      */
     void difficulty(@NonNull Difficulty difficulty);
 
@@ -71,7 +71,7 @@ public interface GroupData {
      * Retrieves the {@link WorldBorderData} associated with the group.
      *
      * @return the {@link WorldBorderData} instance representing the world's border configuration
-     * @see #worldBorder(WorldBorderData)
+     * @see World#getWorldBorder()
      */
     @Nullable
     WorldBorderData worldBorder();
@@ -83,6 +83,7 @@ public interface GroupData {
      *
      * @param worldBorder the {@link WorldBorderData} instance to set, or {@code null}
      *                    to remove any existing world border configuration
+     * @see World#getWorldBorder()
      */
     void worldBorder(@Nullable WorldBorderData worldBorder);
 
@@ -111,7 +112,7 @@ public interface GroupData {
      * Checks whether the group is in hardcore mode.
      *
      * @return true if the group is in hardcore mode, false otherwise
-     * @see #hardcore(boolean)
+     * @see World#isHardcore()
      */
     boolean hardcore();
 
@@ -119,7 +120,7 @@ public interface GroupData {
      * Sets the hardcore mode for the group.
      *
      * @param hardcore true to enable hardcore mode, false to disable it
-     * @see #hardcore()
+     * @see World#setHardcore(boolean)
      */
     void hardcore(boolean hardcore);
 
@@ -128,7 +129,7 @@ public interface GroupData {
      * Indicates whether it is currently raining within the group's environment.
      *
      * @return true if it is raining, false otherwise
-     * @see #rain(boolean)
+     * @see World#setStorm(boolean)
      */
     boolean raining();
 
@@ -136,8 +137,8 @@ public interface GroupData {
      * Sets the rain state for the group.
      * Determines whether it should start or stop raining within the group's environment.
      *
-     * @param rain true to enable rain, false to disable it
-     * @see #rain()
+     * @param raining true to enable rain, false to disable it
+     * @see World#setStorm(boolean) 
      */
     void raining(boolean raining);
 
@@ -145,7 +146,7 @@ public interface GroupData {
      * Checks whether it is currently thundering within the group's environment.
      *
      * @return true if it is thundering, false otherwise
-     * @see #thunder(boolean)
+     * @see World#setThundering(boolean)
      */
     boolean thundering();
 
@@ -219,7 +220,7 @@ public interface GroupData {
      * Retrieves the current time value associated with the group.
      *
      * @return the current time as a long
-     * @see #time(long)
+     * @see World#getFullTime()
      */
     long time();
 
@@ -228,7 +229,7 @@ public interface GroupData {
      * The time value typically represents the in-game time within the group's environment.
      *
      * @param time the time value to be set, represented as a long
-     * @see #time()
+     * @see World#setFullTime(long)
      */
     void time(long time);
 
