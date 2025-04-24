@@ -269,28 +269,36 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     // todo: update on start and on world add/remove/load/unload
+    @Override
+    public void updateWorldData(World world) {
+        if (getSettings().difficulty()) world.setDifficulty(getGroupData().difficulty());
+        if (getSettings().gameRules()) applyGameRules(world);
+        // todo: figure out proper time and weather syncing
+        if (getSettings().time()) world.setTime(getGroupData().time());
+        if (getSettings().worldBorder()) applyWorldBorder(world);
+        world.setHardcore(getGroupData().hardcore());
+    }
+
     @SuppressWarnings("unchecked")
-    public void update(World world) {
+    private void applyGameRules(World world) {
         Arrays.stream(GameRule.values())
                 .map(rule -> (GameRule<Object>) rule)
                 .forEach(rule -> {
                     var value = getGroupData().gameRule(rule);
                     if (value != null) world.setGameRule(rule, value);
                 });
-        // todo: figure out proper time and weather syncing
-        world.setTime(getGroupData().time());
-        world.setDifficulty(getGroupData().difficulty());
+    }
+
+    private void applyWorldBorder(World world) {
         var border = getGroupData().worldBorder();
-        if (border != null) {
-            var worldBorder = world.getWorldBorder();
-            worldBorder.setSize(border.size());
-            worldBorder.setCenter(border.centerX(), border.centerZ());
-            worldBorder.setDamageAmount(border.damageAmount());
-            worldBorder.setDamageBuffer(border.damageBuffer());
-            worldBorder.setWarningDistance(border.warningDistance());
-            worldBorder.setWarningTime(border.warningTime());
-        }
-        world.setHardcore(getGroupData().hardcore());
+        if (border == null) return;
+        var worldBorder = world.getWorldBorder();
+        worldBorder.setSize(border.size());
+        worldBorder.setCenter(border.centerX(), border.centerZ());
+        worldBorder.setDamageAmount(border.damageAmount());
+        worldBorder.setDamageBuffer(border.damageBuffer());
+        worldBorder.setWarningDistance(border.warningDistance());
+        worldBorder.setWarningTime(border.warningTime());
     }
 
     @Override

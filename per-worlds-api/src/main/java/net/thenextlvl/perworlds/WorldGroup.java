@@ -214,6 +214,8 @@ public interface WorldGroup {
      */
     CompletableFuture<Boolean> loadPlayerData(Player player, boolean position);
 
+    void updateWorldData(World world);
+
     /**
      * Checks whether data for the specified player is currently being loaded.
      *
