@@ -310,12 +310,10 @@ public class PaperWorldGroup implements WorldGroup {
 
     @SuppressWarnings("unchecked")
     private void applyGameRules(World world) {
-        Arrays.stream(GameRule.values())
-                .map(rule -> (GameRule<Object>) rule)
-                .forEach(rule -> {
-                    var value = getGroupData().gameRule(rule);
-                    if (value != null) world.setGameRule(rule, value);
-                });
+        Arrays.stream(GameRule.values()).map(rule -> (GameRule<Object>) rule)
+                .forEach(rule -> Optional.ofNullable(getGroupData().gameRule(rule))
+                        .or(() -> Optional.ofNullable(world.getGameRuleDefault(rule)))
+                        .ifPresent(value -> world.setGameRule(rule, value)));
     }
 
     private void applyWorldBorder(World world) {
