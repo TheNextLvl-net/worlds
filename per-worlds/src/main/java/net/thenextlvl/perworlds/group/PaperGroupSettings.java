@@ -24,6 +24,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean gameMode = true;
     private boolean gameRules = true;
     private boolean gliding = true;
+    private boolean hardcore = true;
     private boolean health = true;
     private boolean hotbarSlot = true;
     private boolean inventory = true;
@@ -154,6 +155,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean gliding() {
         return gliding;
+    }
+
+    @Override
+    public boolean hardcore() {
+        return hardcore;
     }
 
     @Override
@@ -364,6 +370,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void gliding(boolean enabled) {
         this.gliding = enabled;
+    }
+
+    @Override
+    public void hardcore(boolean enabled) {
+        this.hardcore = enabled;
     }
 
     @Override

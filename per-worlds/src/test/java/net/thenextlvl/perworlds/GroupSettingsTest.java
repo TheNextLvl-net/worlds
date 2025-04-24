@@ -110,6 +110,7 @@ public class GroupSettingsTest {
             Map.entry("gameMode", new Setting(GroupSettings::gameMode, GroupSettings::gameMode)),
             Map.entry("gameRules", new Setting(GroupSettings::gameRules, GroupSettings::gameRules)),
             Map.entry("gliding", new Setting(GroupSettings::gliding, GroupSettings::gliding)),
+            Map.entry("hardcore", new Setting(GroupSettings::hardcore, GroupSettings::hardcore)),
             Map.entry("health", new Setting(GroupSettings::health, GroupSettings::health)),
             Map.entry("hotbarSlot", new Setting(GroupSettings::hotbarSlot, GroupSettings::hotbarSlot)),
             Map.entry("inventory", new Setting(GroupSettings::inventory, GroupSettings::inventory)),
