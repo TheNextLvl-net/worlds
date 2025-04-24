@@ -13,6 +13,8 @@ public interface GroupSettings {
 
     boolean chat();
 
+    boolean difficulty();
+
     boolean enabled();
 
     boolean endCredits();
@@ -81,6 +83,8 @@ public interface GroupSettings {
 
     boolean weather();
 
+    boolean worldBorder();
+
     void absorption(boolean enabled);
 
     void advancements(boolean enabled);
@@ -92,6 +96,8 @@ public interface GroupSettings {
     void beeStingersInBody(boolean enabled);
 
     void chat(boolean enabled);
+
+    void difficulty(boolean enabled);
 
     void enabled(boolean enabled);
 
@@ -160,4 +166,6 @@ public interface GroupSettings {
     void wardenSpawnTracker(boolean enabled);
 
     void weather(boolean enabled);
+
+    void worldBorder(boolean enabled);
 }

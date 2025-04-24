@@ -27,6 +27,7 @@ class GroupOptionCommand {
                 .then(option("attributes", GroupSettings::attributes, GroupSettings::attributes, commons))
                 .then(option("beeStingersInBody", GroupSettings::beeStingersInBody, GroupSettings::beeStingersInBody, commons))
                 .then(option("chat", GroupSettings::chat, GroupSettings::chat, commons))
+                .then(option("difficulty", GroupSettings::difficulty, GroupSettings::difficulty, commons))
                 .then(option("enabled", GroupSettings::enabled, GroupSettings::enabled, commons))
                 .then(option("endCredits", GroupSettings::endCredits, GroupSettings::endCredits, commons))
                 .then(option("enderChest", GroupSettings::enderChest, GroupSettings::enderChest, commons))
@@ -60,7 +61,8 @@ class GroupOptionCommand {
                 .then(option("velocity", GroupSettings::velocity, GroupSettings::velocity, commons))
                 .then(option("visualFire", GroupSettings::visualFire, GroupSettings::visualFire, commons))
                 .then(option("wardenSpawnTracker", GroupSettings::wardenSpawnTracker, GroupSettings::wardenSpawnTracker, commons))
-                .then(option("weather", GroupSettings::weather, GroupSettings::weather, commons));
+                .then(option("weather", GroupSettings::weather, GroupSettings::weather, commons))
+                .then(option("worldBorder", GroupSettings::worldBorder, GroupSettings::worldBorder, commons));
     }
 
     private static ArgumentBuilder<CommandSourceStack, ?> option(String name, Function<GroupSettings, Boolean> getter,

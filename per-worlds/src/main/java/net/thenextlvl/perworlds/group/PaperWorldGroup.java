@@ -268,7 +268,7 @@ public class PaperWorldGroup implements WorldGroup {
                 });
     }
 
-    // todo: update on start and on world add/remove/load/unload
+    // todo: update on on world add/remove/unload
     @Override
     public void updateWorldData(World world) {
         if (getSettings().difficulty()) world.setDifficulty(getGroupData().difficulty());

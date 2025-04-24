@@ -4,6 +4,8 @@ import net.thenextlvl.perworlds.GroupSettings;
 
 public class PaperGroupSettings implements GroupSettings {
     private boolean absorption = true;
+    private boolean worldBorder = true;
+    private boolean difficulty = true;
     private boolean advancements = true;
     private boolean arrowsInBody = true;
     private boolean attributes = true;
@@ -72,6 +74,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean chat() {
         return chat;
+    }
+
+    @Override
+    public boolean difficulty() {
+        return difficulty;
     }
 
     @Override
@@ -245,6 +252,11 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
+    public boolean worldBorder() {
+        return worldBorder;
+    }
+
+    @Override
     public void absorption(boolean enabled) {
         this.absorption = enabled;
     }
@@ -272,6 +284,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void chat(boolean enabled) {
         this.chat = enabled;
+    }
+
+    @Override
+    public void difficulty(boolean enabled) {
+        this.difficulty = enabled;
     }
 
     @Override
@@ -442,5 +459,10 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void weather(boolean enabled) {
         this.weather = enabled;
+    }
+
+    @Override
+    public void worldBorder(boolean enabled) {
+        this.worldBorder = enabled;
     }
 }
