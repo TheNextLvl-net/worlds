@@ -7,6 +7,7 @@ import org.bukkit.GameRule;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.world.TimeSkipEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.jspecify.annotations.NullMarked;
 
@@ -48,6 +49,18 @@ public class WorldListener implements Listener {
                 .filter(world -> !world.equals(event.getWorld()))
                 .forEach(group::updateWorldData);
         processingGameRules.remove(group);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onWorldGameRuleChange(TimeSkipEvent event) {
+        var group = provider.getGroup(event.getWorld())
+                .orElse(provider.getUnownedWorldGroup());
+        if (!processingTime.add(group)) return;
+        group.getGroupData().time(event.getWorld().getFullTime() + event.getSkipAmount());
+        group.getWorlds().stream()
+                .filter(world -> !world.equals(event.getWorld()))
+                .forEach(group::updateWorldData);
+        processingTime.remove(group);
     }
 
     private Object parseValue(GameRule<?> rule, String value) {
