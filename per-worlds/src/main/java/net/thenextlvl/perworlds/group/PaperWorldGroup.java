@@ -19,6 +19,7 @@ import net.thenextlvl.perworlds.adapter.GroupDataAdapter;
 import net.thenextlvl.perworlds.adapter.GroupSettingsAdapter;
 import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.model.PaperPlayerData;
+import net.thenextlvl.perworlds.model.PaperWorldBorderData;
 import net.thenextlvl.perworlds.model.config.GroupConfig;
 import org.bukkit.GameRule;
 import org.bukkit.Keyed;
@@ -290,8 +291,8 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     private void applyWorldBorder(World world) {
-        var border = getGroupData().worldBorder();
-        if (border == null) return;
+        var border = Optional.ofNullable(getGroupData().worldBorder())
+                .orElseGet(PaperWorldBorderData::new);
         var worldBorder = world.getWorldBorder();
         worldBorder.setSize(border.size());
         worldBorder.setCenter(border.centerX(), border.centerZ());
