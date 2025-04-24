@@ -33,6 +33,16 @@ public class PaperUnownedWorldGroup extends PaperWorldGroup implements UnownedWo
     }
 
     @Override
+    public boolean addWorld(World world) {
+        return containsWorld(world);
+    }
+
+    @Override
+    public boolean removeWorld(World world) {
+        return containsWorld(world);
+    }
+
+    @Override
     public boolean containsWorld(World world) {
         return !provider.hasGroup(world);
     }
