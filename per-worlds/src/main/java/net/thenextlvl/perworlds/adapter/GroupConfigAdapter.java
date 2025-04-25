@@ -16,7 +16,7 @@ import net.thenextlvl.perworlds.model.config.GroupConfig;
 import org.bukkit.Server;
 import org.jspecify.annotations.NullMarked;
 
-import java.util.Set;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @NullMarked
@@ -40,7 +40,7 @@ public class GroupConfigAdapter implements TagAdapter<GroupConfig> {
                 .map(tags -> tags.stream()
                         .map(world -> context.deserialize(world, Key.class))
                         .collect(Collectors.toSet()))
-                .orElseGet(Set::of);
+                .orElseGet(HashSet::new);
         return new GroupConfig(worlds, data, settings);
     }
 
