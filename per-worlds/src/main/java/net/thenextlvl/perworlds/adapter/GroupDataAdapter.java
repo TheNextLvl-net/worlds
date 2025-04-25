@@ -52,10 +52,10 @@ public class GroupDataAdapter implements TagAdapter<GroupData> {
         var tag = new CompoundTag();
         var rules = new CompoundTag();
         data.forEachGameRule((rule, value) -> rules.add(rule.getName(), context.serialize(value)));
-        tag.add("defaultGameMode", context.serialize(data.defaultGameMode()));
-        tag.add("difficulty", context.serialize(data.difficulty()));
         var spawnLocation = data.spawnLocation();
         if (spawnLocation != null) tag.add("spawnLocation", context.serialize(spawnLocation));
+        tag.add("defaultGameMode", context.serialize(data.defaultGameMode()));
+        tag.add("difficulty", context.serialize(data.difficulty()));
         tag.add("worldBorder", context.serialize(data.worldBorder()));
         tag.add("gameRules", rules);
         tag.add("hardcore", data.hardcore());
