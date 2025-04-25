@@ -3,6 +3,8 @@ package net.thenextlvl.perworlds.data;
 import io.papermc.paper.math.Position;
 import org.bukkit.WorldBorder;
 
+import java.util.concurrent.TimeUnit;
+
 public interface WorldBorderData {
     /**
      * Retrieves the center X-coordinate of the world's border.
@@ -19,6 +21,22 @@ public interface WorldBorderData {
      * @see WorldBorder#getCenter()
      */
     double centerZ();
+
+    /**
+     * Retrieves the current transition duration of the world's border.
+     *
+     * @return the duration in milliseconds
+     * @see WorldBorder#setSize(double, TimeUnit, long)
+     */
+    long duration();
+
+    /**
+     * Sets the transition duration in milliseconds.
+     *
+     * @param duration the duration to be set, in milliseconds
+     * @see WorldBorder#setSize(double, TimeUnit, long)
+     */
+    void duration(long duration);
 
     /**
      * Sets the new border center.

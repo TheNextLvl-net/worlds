@@ -19,6 +19,7 @@ public class WorldBorderAdapter implements TagAdapter<WorldBorderData> {
         root.optional("x").map(Tag::getAsDouble).ifPresent(data::centerX);
         root.optional("z").map(Tag::getAsDouble).ifPresent(data::centerZ);
         root.optional("size").map(Tag::getAsDouble).ifPresent(data::size);
+        root.optional("duration").map(Tag::getAsLong).ifPresent(data::duration);
         root.optional("damageAmount").map(Tag::getAsDouble).ifPresent(data::damageAmount);
         root.optional("damageBuffer").map(Tag::getAsDouble).ifPresent(data::damageBuffer);
         root.optional("warningDistance").map(Tag::getAsInt).ifPresent(data::warningDistance);
@@ -32,6 +33,7 @@ public class WorldBorderAdapter implements TagAdapter<WorldBorderData> {
         tag.add("x", data.centerX());
         tag.add("z", data.centerZ());
         tag.add("size", data.size());
+        tag.add("duration", data.duration());
         tag.add("damageAmount", data.damageAmount());
         tag.add("damageBuffer", data.damageBuffer());
         tag.add("warningDistance", data.warningDistance());

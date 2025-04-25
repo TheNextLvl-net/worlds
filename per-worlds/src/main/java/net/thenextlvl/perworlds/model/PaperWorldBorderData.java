@@ -11,6 +11,7 @@ public class PaperWorldBorderData implements WorldBorderData {
     private double damageBuffer = 5.0D;
     private int warningDistance = 5;
     private int warningTime = 15;
+    private long duration = 0;
 
     @Override
     public double centerX() {
@@ -20,6 +21,16 @@ public class PaperWorldBorderData implements WorldBorderData {
     @Override
     public double centerZ() {
         return z;
+    }
+
+    @Override
+    public long duration() {
+        return duration;
+    }
+
+    @Override
+    public void duration(long duration) {
+        this.duration = duration;
     }
 
     public void centerX(double x) {
