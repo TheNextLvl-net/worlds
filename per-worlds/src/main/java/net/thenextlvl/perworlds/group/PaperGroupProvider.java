@@ -54,9 +54,9 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -65,7 +65,7 @@ import java.util.function.Consumer;
 @NullMarked
 public class PaperGroupProvider implements GroupProvider {
     private final File dataFolder;
-    private final List<WorldGroup> groups = new ArrayList<>();
+    private final Set<WorldGroup> groups = new HashSet<>();
     private final NBT nbt;
     private final SharedWorlds commons;
     private final UnownedWorldGroup unownedWorldGroup;
@@ -121,8 +121,8 @@ public class PaperGroupProvider implements GroupProvider {
     }
 
     @Override
-    public @Unmodifiable List<WorldGroup> getGroups() {
-        return List.copyOf(groups);
+    public @Unmodifiable Set<WorldGroup> getGroups() {
+        return Set.copyOf(groups);
     }
 
     @Override

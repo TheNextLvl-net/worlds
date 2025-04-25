@@ -6,8 +6,8 @@ import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -26,12 +26,12 @@ public interface GroupProvider {
     File getDataFolder();
 
     /**
-     * Retrieves an unmodifiable list of all world groups managed by this provider.
+     * Retrieves an unmodifiable set of all world groups managed by this provider.
      *
-     * @return an unmodifiable list of {@link WorldGroup} instances managed by this provider
+     * @return an unmodifiable set of {@link WorldGroup} instances managed by this provider
      */
     @Unmodifiable
-    List<WorldGroup> getGroups();
+    Set<WorldGroup> getGroups();
 
     /**
      * Retrieves a {@link WorldGroup} by its name.
