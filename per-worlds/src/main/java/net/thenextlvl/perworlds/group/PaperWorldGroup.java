@@ -178,6 +178,7 @@ public class PaperWorldGroup implements WorldGroup {
         if (!config.worlds().add(world.key())) return false;
         world.getPlayers().forEach(previous::persistPlayerData);
         world.getPlayers().forEach(this::loadPlayerData); // todo: do we need blocking?
+        updateWorldData(world);
         return true;
     }
 
@@ -231,6 +232,7 @@ public class PaperWorldGroup implements WorldGroup {
     public boolean removeWorld(World world) {
         if (!config.worlds().remove(world.key())) return false;
         world.getPlayers().forEach(provider.getUnownedWorldGroup()::loadPlayerData); // todo: do we need blocking?
+        provider.getUnownedWorldGroup().updateWorldData(world);
         return true;
     }
 
@@ -300,7 +302,6 @@ public class PaperWorldGroup implements WorldGroup {
         for (var type : GroupData.Type.values()) updateWorldData(world, type);
     }
 
-    // todo: update on on world add/remove/unload
     @Override
     public void updateWorldData(World world, GroupData.Type type) {
         if (isEnabled(type)) switch (type) {
