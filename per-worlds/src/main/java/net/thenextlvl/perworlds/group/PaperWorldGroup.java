@@ -1,25 +1,16 @@
 package net.thenextlvl.perworlds.group;
 
-import com.google.gson.GsonBuilder;
-import core.file.FileIO;
-import core.file.format.GsonFile;
 import core.io.IO;
 import core.nbt.NBTInputStream;
 import core.nbt.NBTOutputStream;
-import core.paper.adapters.key.KeyAdapter;
-import core.paper.adapters.world.LocationAdapter;
-import core.paper.adapters.world.WorldAdapter;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.thenextlvl.perworlds.GroupData;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
-import net.thenextlvl.perworlds.adapter.GroupDataAdapter;
-import net.thenextlvl.perworlds.adapter.GroupSettingsAdapter;
 import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.model.PaperPlayerData;
-import net.thenextlvl.perworlds.model.PaperWorldBorderData;
 import net.thenextlvl.perworlds.model.config.GroupConfig;
 import org.bukkit.GameRule;
 import org.bukkit.Keyed;
@@ -44,6 +35,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -59,24 +51,28 @@ public class PaperWorldGroup implements WorldGroup {
 
     private final File dataFolder;
     private final File file;
-    private final FileIO<GroupConfig> config;
+    private final GroupConfig config;
     private final String name;
 
     public PaperWorldGroup(PaperGroupProvider provider, String name, GroupData data, GroupSettings settings, Set<World> worlds) {
-        this.dataFolder = new File(provider.getDataFolder(), name);
-        this.file = new File(provider.getDataFolder(), name + ".json");
-        this.config = new GsonFile<>(IO.of(file), new GroupConfig(
-                worlds.stream().map(Keyed::key).collect(Collectors.toSet()), data, settings
-        ), new GsonBuilder()
-                .setPrettyPrinting()
-                .registerTypeHierarchyAdapter(GroupData.class, new GroupDataAdapter(provider.getServer()))
-                .registerTypeHierarchyAdapter(GroupSettings.class, new GroupSettingsAdapter())
-                .registerTypeHierarchyAdapter(Key.class, new KeyAdapter.Kyori())
-                .registerTypeHierarchyAdapter(Location.class, new LocationAdapter.Complex())
-                .registerTypeHierarchyAdapter(World.class, new WorldAdapter.Key())
-                .create()).saveIfAbsent();
         this.provider = provider;
+        this.dataFolder = new File(provider.getDataFolder(), name);
+        this.file = new File(provider.getDataFolder(), name + ".dat");
+        this.config = readConfig().orElseGet(() -> new GroupConfig(
+                worlds.stream().map(Keyed::key).collect(Collectors.toSet()), data, settings
+        ));
         this.name = name;
+    }
+
+    private Optional<GroupConfig> readConfig() {
+        var io = IO.of(file);
+        if (!io.exists()) return Optional.empty();
+        try (var inputStream = stream(io)) {
+            return Optional.of(provider.nbt().fromTag(inputStream.readTag(), GroupConfig.class));
+        } catch (IOException e) {
+            // todo: proper error handling
+            throw new RuntimeException("Failed to read group config", e);
+        }
     }
 
     @Override
@@ -91,12 +87,12 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public GroupData getGroupData() {
-        return config.getRoot().data();
+        return config.data();
     }
 
     @Override
     public GroupSettings getSettings() {
-        return config.getRoot().settings();
+        return config.settings();
     }
 
     @Override
@@ -150,12 +146,12 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public @Unmodifiable Set<Key> getPersistedWorlds() {
-        return Set.copyOf(config.getRoot().worlds());
+        return Set.copyOf(config.worlds());
     }
 
     @Override
     public @Unmodifiable Set<World> getWorlds() {
-        return config.getRoot().worlds().stream()
+        return config.worlds().stream()
                 .map(provider.getServer()::getWorld)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
@@ -170,7 +166,7 @@ public class PaperWorldGroup implements WorldGroup {
     public boolean addWorld(World world) {
         if (provider.hasGroup(world)) return false;
         var previous = provider.getGroup(world).orElse(provider.getUnownedWorldGroup());
-        if (!config.getRoot().worlds().add(world.key())) return false;
+        if (!config.worlds().add(world.key())) return false;
         world.getPlayers().forEach(previous::persistPlayerData);
         world.getPlayers().forEach(this::loadPlayerData); // todo: do we need blocking?
         return true;
@@ -178,7 +174,7 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public boolean containsWorld(World world) {
-        return config.getRoot().worlds().contains(world.key());
+        return config.worlds().contains(world.key());
     }
 
     @Override
@@ -197,13 +193,23 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
-    public void persist() {
-        config.save();
+    public boolean persist() {
+        try (var outputStream = new NBTOutputStream(
+                IO.of(file).outputStream(WRITE, CREATE, TRUNCATE_EXISTING),
+                StandardCharsets.UTF_8
+        )) {
+            outputStream.writeTag(null, provider.nbt().toTag(config));
+            return true;
+        } catch (IOException e) {
+            // todo: proper error handling
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public boolean removeWorld(World world) {
-        if (!config.getRoot().worlds().remove(world.key())) return false;
+        if (!config.worlds().remove(world.key())) return false;
         world.getPlayers().forEach(provider.getUnownedWorldGroup()::loadPlayerData); // todo: do we need blocking?
         return true;
     }
@@ -290,9 +296,8 @@ public class PaperWorldGroup implements WorldGroup {
     private boolean isEnabled(GroupData.Type type) {
         return switch (type) {
             case DEFAULT_GAME_MODE -> getSettings().gameMode();
-            case DIFFICULTY -> getSettings().difficulty();
+            case DIFFICULTY, HARDCORE -> getSettings().difficulty();
             case GAME_RULE -> getSettings().gameRules();
-            case HARDCORE -> getSettings().hardcore();
             case SPAWN_LOCATION -> true;
             case TIME -> getSettings().time();
             case WEATHER -> getSettings().weather();
@@ -310,17 +315,17 @@ public class PaperWorldGroup implements WorldGroup {
 
     @SuppressWarnings("unchecked")
     private void applyGameRules(World world) {
-        Arrays.stream(GameRule.values()).map(rule -> (GameRule<Object>) rule)
+        Arrays.stream(world.getGameRules()).map(GameRule::getByName)
+                .map(gameRule -> ((GameRule<Object>) gameRule)).filter(Objects::nonNull)
                 .forEach(rule -> Optional.ofNullable(getGroupData().gameRule(rule))
                         .or(() -> Optional.ofNullable(world.getGameRuleDefault(rule)))
                         .ifPresent(value -> world.setGameRule(rule, value)));
     }
 
     private void applyWorldBorder(World world) {
-        var border = Optional.ofNullable(getGroupData().worldBorder())
-                .orElseGet(PaperWorldBorderData::new);
+        var border = getGroupData().worldBorder();
         var worldBorder = world.getWorldBorder();
-        worldBorder.setSize(border.size());
+        worldBorder.setSize(border.size(), TimeUnit.MILLISECONDS, border.duration());
         worldBorder.setCenter(border.centerX(), border.centerZ());
         worldBorder.setDamageAmount(border.damageAmount());
         worldBorder.setDamageBuffer(border.damageBuffer());

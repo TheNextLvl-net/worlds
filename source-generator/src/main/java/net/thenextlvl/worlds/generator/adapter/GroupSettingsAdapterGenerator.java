@@ -1,22 +1,19 @@
 package net.thenextlvl.worlds.generator.adapter;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.ParameterizedTypeName;
 import com.palantir.javapoet.TypeSpec;
+import core.nbt.serialization.TagAdapter;
+import core.nbt.serialization.TagDeserializationContext;
+import core.nbt.serialization.TagSerializationContext;
+import core.nbt.tag.CompoundTag;
+import core.nbt.tag.Tag;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.worlds.generator.Generator;
 import org.jspecify.annotations.NullMarked;
 
 import javax.lang.model.element.Modifier;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 
 @NullMarked
@@ -30,11 +27,7 @@ public class GroupSettingsAdapterGenerator extends Generator {
         return TypeSpec.classBuilder(className)
                 .addModifiers(Modifier.PUBLIC)
                 .addSuperinterface(ParameterizedTypeName.get(
-                        JsonDeserializer.class,
-                        GroupSettings.class
-                ))
-                .addSuperinterface(ParameterizedTypeName.get(
-                        JsonSerializer.class,
+                        TagAdapter.class,
                         GroupSettings.class
                 ))
                 .addMethod(getDeserializeMethodSpec())
@@ -48,15 +41,14 @@ public class GroupSettingsAdapterGenerator extends Generator {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(GroupSettings.class)
-                .addParameter(JsonElement.class, "element")
-                .addParameter(Type.class, "type")
-                .addParameter(JsonDeserializationContext.class, "context")
-                .addStatement("var root = element.getAsJsonObject()")
+                .addParameter(Tag.class, "tag")
+                .addParameter(TagDeserializationContext.class, "context")
+                .addStatement("var root = tag.getAsCompound()")
                 .addStatement("var settings = new net.thenextlvl.perworlds.group.PaperGroupSettings()");
         Arrays.stream(GroupSettings.class.getDeclaredMethods())
                 .map(Method::getName)
                 .distinct()
-                .forEach(s -> builder.addStatement("if (root.get($S) instanceof $T primitive) settings.$L(primitive.getAsBoolean())", s, JsonPrimitive.class, s));
+                .forEach(s -> builder.addStatement("root.optional($S).map($T::getAsBoolean).ifPresent(settings::$L);", s, Tag.class, s));
         return builder
                 .addStatement("return settings")
                 .build();
@@ -66,17 +58,16 @@ public class GroupSettingsAdapterGenerator extends Generator {
         var builder = MethodSpec.methodBuilder("serialize")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .returns(JsonObject.class)
+                .returns(CompoundTag.class)
                 .addParameter(GroupSettings.class, "settings")
-                .addParameter(Type.class, "type")
-                .addParameter(JsonSerializationContext.class, "context")
-                .addStatement("var object = new $T()", JsonObject.class);
+                .addParameter(TagSerializationContext.class, "context")
+                .addStatement("var tag = new $T()", CompoundTag.class);
         Arrays.stream(GroupSettings.class.getDeclaredMethods())
                 .map(Method::getName)
                 .distinct()
-                .forEach(s -> builder.addStatement("object.addProperty($S, settings.$L())", s, s));
+                .forEach(s -> builder.addStatement("tag.add($S, settings.$L())", s, s));
         return builder
-                .addStatement("return object")
+                .addStatement("return tag")
                 .build();
     }
 }

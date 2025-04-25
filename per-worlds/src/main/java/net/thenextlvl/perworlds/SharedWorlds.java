@@ -50,7 +50,7 @@ public class SharedWorlds {
     }
 
     private void loadGroups() {
-        var suffix = ".json";
+        var suffix = ".dat";
         var files = groupProvider.getDataFolder().listFiles((file, name) -> name.endsWith(suffix));
         if (files != null) for (var file : files) {
             var name = file.getName();

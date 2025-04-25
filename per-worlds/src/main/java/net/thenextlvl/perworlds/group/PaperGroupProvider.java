@@ -15,6 +15,9 @@ import net.thenextlvl.perworlds.adapter.AdvancementDataAdapter;
 import net.thenextlvl.perworlds.adapter.AttributeAdapter;
 import net.thenextlvl.perworlds.adapter.AttributeDataAdapter;
 import net.thenextlvl.perworlds.adapter.DateAdapter;
+import net.thenextlvl.perworlds.adapter.GroupConfigAdapter;
+import net.thenextlvl.perworlds.adapter.GroupDataAdapter;
+import net.thenextlvl.perworlds.adapter.GroupSettingsAdapter;
 import net.thenextlvl.perworlds.adapter.ItemStackArrayAdapter;
 import net.thenextlvl.perworlds.adapter.KeyAdapter;
 import net.thenextlvl.perworlds.adapter.LocationAdapter;
@@ -32,7 +35,9 @@ import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.WardenSpawnTracker;
 import net.thenextlvl.perworlds.data.WorldBorderData;
 import net.thenextlvl.perworlds.model.PaperPlayerData;
+import net.thenextlvl.perworlds.model.config.GroupConfig;
 import net.thenextlvl.perworlds.statistics.Stats;
+import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.Keyed;
 import org.bukkit.Location;
@@ -73,7 +78,11 @@ public class PaperGroupProvider implements GroupProvider {
                 .registerTypeHierarchyAdapter(Attribute.class, new AttributeAdapter())
                 .registerTypeHierarchyAdapter(AttributeData.class, new AttributeDataAdapter())
                 .registerTypeHierarchyAdapter(Date.class, new DateAdapter())
+                .registerTypeHierarchyAdapter(Difficulty.class, new EnumAdapter<>(Difficulty.class))
                 .registerTypeHierarchyAdapter(GameMode.class, new EnumAdapter<>(GameMode.class))
+                .registerTypeHierarchyAdapter(GroupConfig.class, new GroupConfigAdapter(getServer()))
+                .registerTypeHierarchyAdapter(GroupData.class, new GroupDataAdapter(getServer()))
+                .registerTypeHierarchyAdapter(GroupSettings.class, new GroupSettingsAdapter())
                 .registerTypeHierarchyAdapter(ItemStack[].class, new ItemStackArrayAdapter())
                 .registerTypeHierarchyAdapter(Key.class, new KeyAdapter())
                 .registerTypeHierarchyAdapter(Location.class, new LocationAdapter())
