@@ -18,7 +18,9 @@ import org.bukkit.event.world.TimeSkipEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -38,17 +40,12 @@ public class WorldListener implements Listener {
     }
 
     // todo: there is no difficulty change event????
-    // private final Set<WorldGroup> processingDifficulty = new HashSet<>();
-    private final Set<WorldGroup> processingBorder = new HashSet<>();
-    private final Set<WorldGroup> processingGameRules = new HashSet<>();
-    private final Set<WorldGroup> processingRain = new HashSet<>();
-    private final Set<WorldGroup> processingThunder = new HashSet<>();
-    private final Set<WorldGroup> processingTime = new HashSet<>();
+    private final Map<Type, Set<WorldGroup>> lock = new HashMap<>();
 
     @SuppressWarnings("unchecked")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWorldGameRuleChange(WorldGameRuleChangeEvent event) {
-        processChangeUpdate(event.getWorld(), Type.GAME_RULE, processingGameRules, data -> {
+        processWorldDataUpdate(event.getWorld(), Type.GAME_RULE, data -> {
             var gameRule = (GameRule<Object>) event.getGameRule();
             var value = parseValue(gameRule, event.getValue());
             data.gameRule(gameRule, value);
@@ -57,13 +54,13 @@ public class WorldListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onTimeSkip(TimeSkipEvent event) {
-        processChangeUpdate(event.getWorld(), Type.TIME, processingTime, data ->
+        processWorldDataUpdate(event.getWorld(), Type.TIME, data ->
                 data.time(event.getWorld().getFullTime() + event.getSkipAmount()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWeatherChange(WeatherChangeEvent event) {
-        processChangeUpdate(event.getWorld(), Type.WEATHER, processingRain, data -> {
+        processWorldDataUpdate(event.getWorld(), Type.WEATHER, data -> {
             data.raining(event.toWeatherState());
             data.rainDuration(event.getWorld().getWeatherDuration());
         });
@@ -71,7 +68,7 @@ public class WorldListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onThunderChange(ThunderChangeEvent event) {
-        processChangeUpdate(event.getWorld(), Type.WEATHER, processingThunder, data -> {
+        processWorldDataUpdate(event.getWorld(), Type.WEATHER, data -> {
             data.thundering(event.toThunderState());
             data.thunderDuration(event.getWorld().getThunderDuration());
         });
@@ -79,7 +76,7 @@ public class WorldListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWorldBorderChange(WorldBorderBoundsChangeEvent event) {
-        processChangeUpdate(event.getWorld(), Type.WORLD_BORDER, processingBorder, data -> {
+        processWorldDataUpdate(event.getWorld(), Type.WORLD_BORDER, data -> {
             data.worldBorder().size(event.getNewSize());
             data.worldBorder().duration(event.getDuration());
         });
@@ -87,19 +84,22 @@ public class WorldListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWorldBorderChange(WorldBorderCenterChangeEvent event) {
-        processChangeUpdate(event.getWorld(), Type.WORLD_BORDER, processingBorder, data ->
+        processWorldDataUpdate(event.getWorld(), Type.WORLD_BORDER, data ->
                 data.worldBorder().center(event.getNewCenter()));
     }
 
-    private void processChangeUpdate(World world, Type type, Set<WorldGroup> lock, Consumer<GroupData> process) {
+    private void processWorldDataUpdate(World world, Type type, Consumer<GroupData> process) {
         var group = provider.getGroup(world)
                 .orElse(provider.getUnownedWorldGroup());
-        if (!lock.add(group)) return;
+        if (!lock.computeIfAbsent(type, ignored -> new HashSet<>()).add(group)) return;
         process.accept(group.getGroupData());
         group.getWorlds().stream()
                 .filter(target -> !target.equals(world))
                 .forEach(target -> group.updateWorldData(target, type));
-        lock.remove(group);
+        lock.computeIfPresent(type, (ignored, groups) -> {
+            groups.remove(group);
+            return groups.isEmpty() ? null : groups;
+        });
     }
 
     private Object parseValue(GameRule<?> rule, String value) {
