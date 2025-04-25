@@ -9,7 +9,16 @@ import org.bukkit.World;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.util.function.BiConsumer;
+
 public interface GroupData {
+    /**
+     * Iterates over each {@link GameRule} associated with the group and applies the given action.
+     *
+     * @param action a {@link BiConsumer} to accept each {@link GameRule} and its associated value.
+     */
+    void forEachGameRule(BiConsumer<GameRule<Object>, Object> action);
+
     /**
      * Get the current value for a given {@link GameRule}.
      *

@@ -13,6 +13,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 @NullMarked
 public class PaperGroupData implements GroupData {
@@ -33,6 +34,12 @@ public class PaperGroupData implements GroupData {
         // this.defaultGameMode = server.getDefaultGameMode(); // todo: load after overworld? throws npe
         this.defaultGameMode = GameMode.SURVIVAL;
         this.hardcore = server.isHardcore();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void forEachGameRule(BiConsumer<GameRule<Object>, Object> action) {
+        gameRules.forEach((rule, value) -> action.accept((GameRule<Object>) rule, value));
     }
 
     @Override
