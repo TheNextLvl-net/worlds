@@ -243,8 +243,10 @@ public interface WorldGroup {
 
     /**
      * Persists the settings and worlds of this group to the configuration.
+     *
+     * @return whether the group could be successfully saved
      */
-    void persist();
+    boolean persist();
 
     /**
      * Persists the data of all players within the current world group to persistent storage.
