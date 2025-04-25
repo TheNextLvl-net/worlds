@@ -41,8 +41,6 @@ public interface GroupSettings {
 
     boolean gliding();
 
-    boolean hardcore();
-
     boolean health();
 
     boolean hotbarSlot();
@@ -126,8 +124,6 @@ public interface GroupSettings {
     void gameRules(boolean enabled);
 
     void gliding(boolean enabled);
-
-    void hardcore(boolean enabled);
 
     void health(boolean enabled);
 

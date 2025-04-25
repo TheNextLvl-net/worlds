@@ -41,7 +41,6 @@ class GroupOptionCommand {
                 .then(option("gameMode", GroupSettings::gameMode, GroupSettings::gameMode, commons))
                 .then(option("gameRules", GroupSettings::gameRules, GroupSettings::gameRules, commons))
                 .then(option("gliding", GroupSettings::gliding, GroupSettings::gliding, commons))
-                .then(option("hardcore", GroupSettings::hardcore, GroupSettings::hardcore, commons))
                 .then(option("health", GroupSettings::health, GroupSettings::health, commons))
                 .then(option("hotbarSlot", GroupSettings::hotbarSlot, GroupSettings::hotbarSlot, commons))
                 .then(option("inventory", GroupSettings::inventory, GroupSettings::inventory, commons))
