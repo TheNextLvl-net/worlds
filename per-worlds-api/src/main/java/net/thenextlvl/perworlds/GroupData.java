@@ -73,7 +73,6 @@ public interface GroupData {
      * @return the {@link WorldBorderData} instance representing the world's border configuration
      * @see World#getWorldBorder()
      */
-    @Nullable
     WorldBorderData worldBorder();
 
     /**
@@ -85,7 +84,7 @@ public interface GroupData {
      *                    to remove any existing world border configuration
      * @see World#getWorldBorder()
      */
-    void worldBorder(@Nullable WorldBorderData worldBorder);
+    void worldBorder(WorldBorderData worldBorder);
 
     /**
      * Retrieves the spawn location associated with the group.
@@ -138,7 +137,7 @@ public interface GroupData {
      * Determines whether it should start or stop raining within the group's environment.
      *
      * @param raining true to enable rain, false to disable it
-     * @see World#setStorm(boolean) 
+     * @see World#setStorm(boolean)
      */
     void raining(boolean raining);
 
