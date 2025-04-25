@@ -33,9 +33,16 @@ public interface WorldGroup {
      * Retrieves the configuration file associated with this group.
      * The configuration file contains information such as settings, group name, and associated worlds.
      *
-     * @return the file object representing the configuration file for the current group
+     * @return the configuration file.
      */
-    File getFile();
+    File getConfigFile();
+
+    /**
+     * Retrieves the backup file for the configuration settings.
+     *
+     * @return the backup configuration file.
+     */
+    File getConfigFileBackup();
 
     /**
      * Retrieves the group data associated with this group.

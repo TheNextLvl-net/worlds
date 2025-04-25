@@ -17,7 +17,7 @@ public class PaperUnownedWorldGroup extends PaperWorldGroup implements UnownedWo
 
     @Override
     public boolean delete() {
-        return getFile().delete() | delete(getDataFolder());
+        return getConfigFile().delete() | getConfigFileBackup().delete() | delete(getDataFolder());
     }
 
     @Override

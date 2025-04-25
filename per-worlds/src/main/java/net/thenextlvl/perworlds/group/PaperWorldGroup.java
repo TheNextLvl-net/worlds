@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -39,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.READ;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
@@ -50,28 +50,32 @@ public class PaperWorldGroup implements WorldGroup {
     protected final PaperGroupProvider provider;
 
     private final File dataFolder;
-    private final File file;
+    private final File configFile;
+    private final File configFileBackup;
     private final GroupConfig config;
     private final String name;
 
     public PaperWorldGroup(PaperGroupProvider provider, String name, GroupData data, GroupSettings settings, Set<World> worlds) {
+        this.name = name;
         this.provider = provider;
         this.dataFolder = new File(provider.getDataFolder(), name);
-        this.file = new File(provider.getDataFolder(), name + ".dat");
+        this.configFile = new File(provider.getDataFolder(), name + ".dat");
+        this.configFileBackup = new File(provider.getDataFolder(), name + ".dat_old");
         this.config = readConfig().orElseGet(() -> new GroupConfig(
                 worlds.stream().map(Keyed::key).collect(Collectors.toSet()), data, settings
         ));
-        this.name = name;
     }
 
     private Optional<GroupConfig> readConfig() {
-        var io = IO.of(file);
-        if (!io.exists()) return Optional.empty();
-        try (var inputStream = stream(io)) {
-            return Optional.of(provider.nbt().fromTag(inputStream.readTag(), GroupConfig.class));
-        } catch (IOException e) {
-            // todo: proper error handling
-            throw new RuntimeException("Failed to read group config", e);
+        try {
+            return readFile(configFile, configFileBackup, GroupConfig.class);
+        } catch (EOFException e) {
+            provider.getLogger().error("The world group config file {} is irrecoverably broken", configFile.getPath());
+            return Optional.empty();
+        } catch (Exception e) {
+            provider.getLogger().error("Failed to load world group data from {}", configFile.getPath(), e);
+            provider.getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
+            return Optional.empty();
         }
     }
 
@@ -81,8 +85,13 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
-    public File getFile() {
-        return file;
+    public File getConfigFile() {
+        return configFile;
+    }
+
+    @Override
+    public File getConfigFileBackup() {
+        return configFileBackup;
     }
 
     @Override
@@ -179,7 +188,7 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public boolean delete() {
-        return provider.removeGroup(this) | file.delete() | delete(dataFolder);
+        return provider.removeGroup(this) | configFile.delete() | configFileBackup.delete() | delete(dataFolder);
     }
 
     @Override
@@ -194,15 +203,26 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public boolean persist() {
-        try (var outputStream = new NBTOutputStream(
-                IO.of(file).outputStream(WRITE, CREATE, TRUNCATE_EXISTING),
-                StandardCharsets.UTF_8
-        )) {
-            outputStream.writeTag(null, provider.nbt().toTag(config));
-            return true;
-        } catch (IOException e) {
-            // todo: proper error handling
-            e.printStackTrace();
+        try {
+            var file = IO.of(configFile);
+            if (file.exists()) Files.move(file.getPath(), configFileBackup.toPath(), REPLACE_EXISTING);
+            else file.createParents();
+            try (var outputStream = new NBTOutputStream(
+                    file.outputStream(WRITE, CREATE, TRUNCATE_EXISTING),
+                    StandardCharsets.UTF_8
+            )) {
+                outputStream.writeTag(null, provider.nbt().toTag(config));
+                return true;
+            }
+        } catch (Throwable t) {
+            if (configFileBackup.exists()) try {
+                Files.copy(configFileBackup.toPath(), configFile.toPath(), REPLACE_EXISTING);
+                provider.getLogger().warn("Recovered {} from potential data loss", configFile.getPath());
+            } catch (IOException e) {
+                provider.getLogger().error("Failed to recover world group config {}", configFile.getPath(), e);
+            }
+            provider.getLogger().error("Failed to save world group config {}", configFile.getPath(), t);
+            provider.getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
             return false;
         }
     }
@@ -234,7 +254,7 @@ public class PaperWorldGroup implements WorldGroup {
         var file = IO.of(new File(getDataFolder(), player.getUniqueId() + ".dat"));
         var backup = IO.of(new File(getDataFolder(), player.getUniqueId() + ".dat_old"));
         try {
-            if (file.exists()) Files.move(file.getPath(), backup.getPath(), StandardCopyOption.REPLACE_EXISTING);
+            if (file.exists()) Files.move(file.getPath(), backup.getPath(), REPLACE_EXISTING);
             else file.createParents();
             try (var outputStream = new NBTOutputStream(
                     file.outputStream(WRITE, CREATE, TRUNCATE_EXISTING),
@@ -245,7 +265,7 @@ public class PaperWorldGroup implements WorldGroup {
             }
         } catch (Throwable t) {
             if (backup.exists()) try {
-                Files.copy(backup.getPath(), file.getPath(), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(backup.getPath(), file.getPath(), REPLACE_EXISTING);
                 provider.getLogger().warn("Recovered {} from potential data loss", player.getUniqueId());
             } catch (IOException e) {
                 provider.getLogger().error("Failed to recover player data {}", player.getUniqueId(), e);
@@ -356,18 +376,19 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     private Optional<PaperPlayerData> readPlayerData(File file) throws IOException {
+        return readFile(file, new File(file.getPath() + "_old"), PaperPlayerData.class);
+    }
+
+    private <T> Optional<T> readFile(File file, File backup, Class<T> type) throws IOException {
         if (!file.exists()) return Optional.empty();
         try (var inputStream = stream(IO.of(file))) {
-            return Optional.of(inputStream.readTag()).map(tag ->
-                    provider.nbt().fromTag(tag, PaperPlayerData.class));
+            return Optional.of(inputStream.readTag()).map(tag -> provider.nbt().fromTag(tag, type));
         } catch (Exception e) {
-            var io = IO.of(file.getPath() + "_old");
-            if (!io.exists()) throw e;
+            if (!backup.exists()) throw e;
             provider.getLogger().warn("Failed to load player data from {}", file.getPath(), e);
-            provider.getLogger().warn("Falling back to {}", io);
-            try (var inputStream = stream(io)) {
-                return Optional.of(inputStream.readTag()).map(tag ->
-                        provider.nbt().fromTag(tag, PaperPlayerData.class));
+            provider.getLogger().warn("Falling back to {}", backup.getPath());
+            try (var inputStream = stream(IO.of(backup))) {
+                return Optional.of(inputStream.readTag()).map(tag -> provider.nbt().fromTag(tag, type));
             }
         }
     }
