@@ -48,6 +48,7 @@ import static net.thenextlvl.perworlds.SharedWorlds.ISSUES;
 
 @NullMarked
 public class PaperWorldGroup implements WorldGroup {
+    public static final String LOADING_METADATA_KEY = "perworlds_loading_data";
     protected final PaperGroupProvider provider;
 
     private final File dataFolder;
@@ -291,9 +292,9 @@ public class PaperWorldGroup implements WorldGroup {
     @Override
     public CompletableFuture<Boolean> loadPlayerData(Player player, boolean position) {
         if (isLoadingData(player)) return CompletableFuture.completedFuture(false);
-        player.setMetadata("loading", new FixedMetadataValue(provider.getPlugin(), null));
+        player.setMetadata(LOADING_METADATA_KEY, new FixedMetadataValue(provider.getPlugin(), null));
         return readPlayerData(player).orElseGet(PaperPlayerData::new).load(player, this, position)
-                .whenComplete((success, throwable) -> player.removeMetadata("loading", provider.getPlugin()))
+                .whenComplete((success, throwable) -> player.removeMetadata(LOADING_METADATA_KEY, provider.getPlugin()))
                 .exceptionally(throwable -> {
                     provider.getLogger().error("Failed to load group data for player {}", player.getName(), throwable);
                     provider.getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
@@ -364,7 +365,7 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public boolean isLoadingData(Player player) {
-        return player.hasMetadata("loading");
+        return player.hasMetadata(LOADING_METADATA_KEY);
     }
 
     @Override
