@@ -17,7 +17,6 @@ public class WorldCommand {
     public void register() {
         var command = Commands.literal("world")
                 .requires(source -> source.getSender().hasPermission("worlds.command"))
-                .then(GroupCommand.create(plugin.commons()))
                 .then(new WorldCloneCommand(plugin).create())
                 .then(new WorldCreateCommand(plugin).create())
                 .then(new WorldDeleteCommand(plugin).create())
@@ -34,9 +33,10 @@ public class WorldCommand {
                 .then(new WorldSetSpawnCommand(plugin).create())
                 .then(new WorldSpawnCommand(plugin).create())
                 .then(new WorldTeleportCommand(plugin).create())
-                .then(new WorldUnloadCommand(plugin).create())
-                .build();
+                .then(new WorldUnloadCommand(plugin).create());
+        var commons = plugin.commons();
+        if (commons != null) command.then(GroupCommand.create(commons));
         plugin.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS.newHandler(event ->
-                event.registrar().register(command)));
+                event.registrar().register(command.build())));
     }
 }

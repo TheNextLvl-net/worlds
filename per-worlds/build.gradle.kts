@@ -73,7 +73,7 @@ paper {
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
     website = "https://thenextlvl.net"
     authors = listOf("NonSwag")
-    foliaSupported = true
+    // foliaSupported = true // way too many events still not being called on folia
     serverDependencies {
         register("Worlds") {
             load = PaperPluginDescription.RelativeLoadOrder.BEFORE

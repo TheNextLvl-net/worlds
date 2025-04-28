@@ -32,6 +32,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.util.Locale;
@@ -48,7 +49,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     private final LinkController linkController = new WorldLinkController(this);
 
-    private final SharedWorlds commons = new SharedWorlds(this);
+    private final @Nullable SharedWorlds commons = runningFolia ? null : new SharedWorlds(this);
 
     private final File presetsFolder = new File(getDataFolder(), "presets");
     private final File translations = new File(getDataFolder(), "translations");
@@ -75,20 +76,20 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         if (runningFolia) warnExperimental();
         versionChecker.checkVersion();
         registerServices();
-        commons.onLoad();
+        if (commons != null) commons.onLoad();
     }
 
     @Override
     public void onDisable() {
-        commons.onDisable();
+        if (commons != null) commons.onDisable();
         metrics.shutdown();
         unloadLevels();
     }
 
     @Override
     public void onEnable() {
+        if (commons != null) commons.onEnable();
         registerListeners();
-        commons.onEnable();
     }
 
     public File presetsFolder() {
@@ -120,11 +121,11 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     }
 
     @Override
-    public GroupProvider groupProvider() {
-        return commons.groupProvider();
+    public @Nullable GroupProvider groupProvider() {
+        return commons != null ? commons.groupProvider() : null;
     }
 
-    public SharedWorlds commons() {
+    public @Nullable SharedWorlds commons() {
         return commons;
     }
 
