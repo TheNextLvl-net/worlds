@@ -4,11 +4,13 @@ import net.thenextlvl.perworlds.GroupSettings;
 
 public class PaperGroupSettings implements GroupSettings {
     private boolean absorption = true;
+    private boolean advancementMessages = true;
     private boolean advancements = true;
     private boolean arrowsInBody = true;
     private boolean attributes = true;
     private boolean beeStingersInBody = true;
     private boolean chat = false;
+    private boolean deathMessages = true;
     private boolean difficulty = true;
     private boolean enabled = true;
     private boolean endCredits = true;
@@ -27,11 +29,13 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean hotbarSlot = true;
     private boolean inventory = true;
     private boolean invulnerable = false;
+    private boolean joinMessages = false;
     private boolean lastDeathLocation = true;
     private boolean lastLocation = true;
     private boolean lockFreezeTicks = false;
     private boolean portalCooldown = true;
     private boolean potionEffects = true;
+    private boolean quitMessages = false;
     private boolean recipes = true;
     private boolean remainingAir = true;
     private boolean respawnLocation = true;
@@ -49,6 +53,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean absorption() {
         return absorption;
+    }
+
+    @Override
+    public boolean advancementMessages() {
+        return advancementMessages;
     }
 
     @Override
@@ -74,6 +83,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean chat() {
         return chat;
+    }
+
+    @Override
+    public boolean deathMessages() {
+        return deathMessages;
     }
 
     @Override
@@ -177,6 +191,11 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
+    public boolean joinMessages() {
+        return joinMessages;
+    }
+
+    @Override
     public boolean lastDeathLocation() {
         return lastDeathLocation;
     }
@@ -199,6 +218,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean potionEffects() {
         return potionEffects;
+    }
+
+    @Override
+    public boolean quitMessages() {
+        return quitMessages;
     }
 
     @Override
@@ -262,6 +286,11 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
+    public void advancementMessages(boolean enabled) {
+        this.advancementMessages = enabled;
+    }
+
+    @Override
     public void advancements(boolean enabled) {
         this.advancements = enabled;
     }
@@ -284,6 +313,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void chat(boolean enabled) {
         this.chat = enabled;
+    }
+
+    @Override
+    public void deathMessages(boolean enabled) {
+        this.deathMessages = enabled;
     }
 
     @Override
@@ -387,6 +421,11 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
+    public void joinMessages(boolean enabled) {
+        this.joinMessages = enabled;
+    }
+
+    @Override
     public void lastDeathLocation(boolean enabled) {
         this.lastDeathLocation = enabled;
     }
@@ -409,6 +448,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void potionEffects(boolean enabled) {
         this.potionEffects = enabled;
+    }
+
+    @Override
+    public void quitMessages(boolean enabled) {
+        this.quitMessages = enabled;
     }
 
     @Override

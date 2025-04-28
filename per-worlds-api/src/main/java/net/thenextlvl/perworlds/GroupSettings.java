@@ -3,6 +3,8 @@ package net.thenextlvl.perworlds;
 public interface GroupSettings {
     boolean absorption();
 
+    boolean advancementMessages();
+
     boolean advancements();
 
     boolean arrowsInBody();
@@ -12,6 +14,8 @@ public interface GroupSettings {
     boolean beeStingersInBody();
 
     boolean chat();
+
+    boolean deathMessages();
 
     boolean difficulty();
 
@@ -49,6 +53,8 @@ public interface GroupSettings {
 
     boolean invulnerable();
 
+    boolean joinMessages();
+
     boolean lastDeathLocation();
 
     boolean lastLocation();
@@ -58,6 +64,8 @@ public interface GroupSettings {
     boolean portalCooldown();
 
     boolean potionEffects();
+
+    boolean quitMessages();
 
     boolean recipes();
 
@@ -87,6 +95,8 @@ public interface GroupSettings {
 
     void absorption(boolean enabled);
 
+    void advancementMessages(boolean enabled);
+
     void advancements(boolean enabled);
 
     void arrowsInBody(boolean enabled);
@@ -96,6 +106,8 @@ public interface GroupSettings {
     void beeStingersInBody(boolean enabled);
 
     void chat(boolean enabled);
+
+    void deathMessages(boolean enabled);
 
     void difficulty(boolean enabled);
 
@@ -133,6 +145,8 @@ public interface GroupSettings {
 
     void invulnerable(boolean enabled);
 
+    void joinMessages(boolean enabled);
+
     void lastDeathLocation(boolean enabled);
 
     void lastLocation(boolean enabled);
@@ -142,6 +156,8 @@ public interface GroupSettings {
     void portalCooldown(boolean enabled);
 
     void potionEffects(boolean enabled);
+
+    void quitMessages(boolean enabled);
 
     void recipes(boolean enabled);
 

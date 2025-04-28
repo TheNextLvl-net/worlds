@@ -35,9 +35,9 @@ public class GroupSettingsTest {
         assertEquals(settings.size(), count, "Found more settings than expected");
     }
 
-    @DisplayName("setters")
     @ParameterizedTest
     @MethodSource("settingsProvider")
+    @DisplayName("Getters and Setters")
     public void testSettings(BiConsumer<GroupSettings, Boolean> setter, Function<GroupSettings, Boolean> getter) {
         var settings = new PaperGroupSettings();
         setter.accept(settings, true);
@@ -91,11 +91,13 @@ public class GroupSettingsTest {
 
     private static final Map<String, Setting> settings = Map.ofEntries(
             Map.entry("absorption", new Setting(GroupSettings::absorption, GroupSettings::absorption)),
+            Map.entry("advancementMessages", new Setting(GroupSettings::advancementMessages, GroupSettings::advancementMessages)),
             Map.entry("advancements", new Setting(GroupSettings::advancements, GroupSettings::advancements)),
             Map.entry("arrowsInBody", new Setting(GroupSettings::arrowsInBody, GroupSettings::arrowsInBody)),
             Map.entry("attributes", new Setting(GroupSettings::attributes, GroupSettings::attributes)),
             Map.entry("beeStingersInBody", new Setting(GroupSettings::beeStingersInBody, GroupSettings::beeStingersInBody)),
             Map.entry("chat", new Setting(GroupSettings::chat, GroupSettings::chat)),
+            Map.entry("deathMessages", new Setting(GroupSettings::deathMessages, GroupSettings::deathMessages)),
             Map.entry("difficulty", new Setting(GroupSettings::difficulty, GroupSettings::difficulty)),
             Map.entry("enabled", new Setting(GroupSettings::enabled, GroupSettings::enabled)),
             Map.entry("endCredits", new Setting(GroupSettings::endCredits, GroupSettings::endCredits)),
@@ -114,11 +116,13 @@ public class GroupSettingsTest {
             Map.entry("hotbarSlot", new Setting(GroupSettings::hotbarSlot, GroupSettings::hotbarSlot)),
             Map.entry("inventory", new Setting(GroupSettings::inventory, GroupSettings::inventory)),
             Map.entry("invulnerable", new Setting(GroupSettings::invulnerable, GroupSettings::invulnerable)),
+            Map.entry("joinMessages", new Setting(GroupSettings::joinMessages, GroupSettings::joinMessages)),
             Map.entry("lastDeathLocation", new Setting(GroupSettings::lastDeathLocation, GroupSettings::lastDeathLocation)),
             Map.entry("lastLocation", new Setting(GroupSettings::lastLocation, GroupSettings::lastLocation)),
             Map.entry("lockFreezeTicks", new Setting(GroupSettings::lockFreezeTicks, GroupSettings::lockFreezeTicks)),
             Map.entry("portalCooldown", new Setting(GroupSettings::portalCooldown, GroupSettings::portalCooldown)),
             Map.entry("potionEffects", new Setting(GroupSettings::potionEffects, GroupSettings::potionEffects)),
+            Map.entry("quitMessages", new Setting(GroupSettings::quitMessages, GroupSettings::quitMessages)),
             Map.entry("recipes", new Setting(GroupSettings::recipes, GroupSettings::recipes)),
             Map.entry("remainingAir", new Setting(GroupSettings::remainingAir, GroupSettings::remainingAir)),
             Map.entry("respawnLocation", new Setting(GroupSettings::respawnLocation, GroupSettings::respawnLocation)),
