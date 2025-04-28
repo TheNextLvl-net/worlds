@@ -2,31 +2,35 @@ package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.argument.CommandFlagsArgument;
-import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
 import java.util.Set;
 
+import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
+
 @NullMarked
 class WorldDeleteCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("delete")
                 .requires(source -> source.getSender().hasPermission("worlds.command.delete"))
-                .then(Commands.argument("world", ArgumentTypes.world())
-                        .suggests(new WorldSuggestionProvider<>(plugin))
-                        .then(Commands.argument("flags", new CommandFlagsArgument(
-                                Set.of("--confirm", "--schedule")
-                        )).executes(context -> delete(context, plugin)))
-                        .executes(context -> confirmationNeeded(context, plugin)));
+                .then(delete(plugin));
+    }
+
+    private static RequiredArgumentBuilder<CommandSourceStack, World> delete(WorldsPlugin plugin) {
+        return worldArgument(plugin)
+                .then(Commands.argument("flags", new CommandFlagsArgument(
+                        Set.of("--confirm", "--schedule")
+                )).executes(context -> delete(context, plugin)))
+                .executes(context -> confirmationNeeded(context, plugin));
     }
 
     private static int confirmationNeeded(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
