@@ -121,6 +121,13 @@ public class PaperGroupProvider implements GroupProvider {
     }
 
     @Override
+    public @Unmodifiable Set<WorldGroup> getAllGroups() {
+        var groups = new HashSet<>(getGroups());
+        groups.add(unownedWorldGroup);
+        return Set.copyOf(groups);
+    }
+
+    @Override
     public @Unmodifiable Set<WorldGroup> getGroups() {
         return Set.copyOf(groups);
     }
