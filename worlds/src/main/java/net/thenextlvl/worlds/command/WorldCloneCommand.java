@@ -2,17 +2,17 @@ package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -21,19 +21,21 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
+import static net.thenextlvl.worlds.command.WorldCommand.keyArgument;
+import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
 class WorldCloneCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("clone")
                 .requires(source -> source.getSender().hasPermission("worlds.command.clone"))
-                .then(Commands.argument("world", ArgumentTypes.world())
-                        .suggests(new WorldSuggestionProvider<>(plugin))
-                        .then(Commands.argument("key", ArgumentTypes.namespacedKey())
-                                .then(Commands.literal("template")
-                                        .executes(context -> clone(context, false, plugin)))
-                                .executes(context -> clone(context, true, plugin))));
+                .then(clone(plugin));
+    }
+
+    private static RequiredArgumentBuilder<CommandSourceStack, World> clone(WorldsPlugin plugin) {
+        return worldArgument(plugin).then(keyArgument(plugin).then(Commands.literal("template")
+                        .executes(context -> clone(context, false, plugin)))
+                .executes(context -> clone(context, true, plugin)));
     }
 
     private static int clone(CommandContext<CommandSourceStack> context, boolean full, WorldsPlugin plugin) {
@@ -47,7 +49,7 @@ class WorldCloneCommand {
         var message = clone != null ? "world.clone.success" : "world.clone.failed";
 
         if (clone != null && context.getSource().getSender() instanceof Player player)
-            player.teleportAsync(clone.getSpawnLocation(), COMMAND);
+            player.teleportAsync(clone.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
 
         plugin.bundle().sendMessage(context.getSource().getSender(), message, placeholder);
         return clone != null ? Command.SINGLE_SUCCESS : 0;
