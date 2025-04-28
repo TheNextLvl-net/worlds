@@ -3,11 +3,13 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import net.minecrell.pluginyml.paper.PaperPluginDescription
 
 plugins {
+    id("idea")
     id("java")
     id("java-library")
+    id("maven-publish")
     id("com.gradleup.shadow") version "9.0.0-beta12"
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
-    id("net.minecrell.plugin-yml.paper") version "0.6.0"
+    id("de.eldoria.plugin-yml.paper") version "0.7.1"
 }
 
 java {
@@ -18,8 +20,8 @@ tasks.compileJava {
     options.release.set(21)
 }
 
-group = rootProject.group
-version = rootProject.version
+group = "net.thenextlvl.worlds"
+version = "0.1.0"
 
 repositories {
     mavenCentral()
@@ -28,30 +30,62 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 
     api("org.bstats:bstats-bukkit:3.1.0")
 
+    api("net.thenextlvl.core:adapters:2.0.2")
     api("net.thenextlvl.core:i18n:1.0.21")
     api("net.thenextlvl.core:paper:2.1.1")
 
-    compileOnlyApi(project(":api"))
+    api(project(":per-worlds-api"))
+
+    testImplementation(platform("org.junit:junit-bom:5.13.0-M2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+val generatedPath: java.nio.file.Path = layout.projectDirectory.dir("src/generated/java").asFile.toPath()
+idea.module.generatedSourceDirs.add(generatedPath.toFile())
+sourceSets.main {
+    java.srcDir(generatedPath)
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("per-worlds")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    relocate("org.bstats", "net.thenextlvl.perworlds.bstats")
+}
+
+tasks.compileJava {
+    dependsOn(project(":source-generator").tasks.named("generate"))
 }
 
 paper {
     name = "PerWorlds"
-    main = "net.thenextlvl.perworlds.WorldsPlugin"
-    apiVersion = "1.21"
+    main = "net.thenextlvl.perworlds.PerWorldsPlugin"
+    apiVersion = "1.21.4"
     description = "Per-world customization for gameplay and settings"
-    load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
+    load = BukkitPluginDescription.PluginLoadOrder.STARTUP
     website = "https://thenextlvl.net"
     authors = listOf("NonSwag")
-    foliaSupported = true
-    serverDependencies {
-        register("Worlds") {
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-            required = false
-        }
+    // foliaSupported = true // way too many events still not being called on folia
+    permissions {
+        register("perworlds.command.group") { children = listOf("perworlds.command") }
+        register("perworlds.command.group.add") { children = listOf("perworlds.command.group") }
+        register("perworlds.command.group.create") { children = listOf("perworlds.command.group") }
+        register("perworlds.command.group.delete") { children = listOf("perworlds.command.group") }
+        register("perworlds.command.group.list") { children = listOf("perworlds.command.group") }
+        register("perworlds.command.group.option") { children = listOf("perworlds.command.group") }
+        register("perworlds.command.group.remove") { children = listOf("perworlds.command.group") }
+        register("perworlds.command.group.spawn") { children = listOf("perworlds.command.group") }
+        register("perworlds.command.group.spawn.set") { children = listOf("perworlds.command.group.spawn") }
+        register("perworlds.command.group.spawn.unset") { children = listOf("perworlds.command.group.spawn") }
+        register("perworlds.command.group.teleport") { children = listOf("perworlds.command.group") }
     }
 }
 
@@ -71,6 +105,20 @@ hangarPublish { // docs - https://docs.papermc.io/misc/hangar-publishing
         platforms.register(Platforms.PAPER) {
             jar.set(tasks.shadowJar.flatMap { it.archiveFile })
             platformVersions.set(versions)
+        }
+    }
+}
+
+publishing {
+    publications.create<MavenPublication>("maven") {
+        from(components["java"])
+    }
+    repositories.maven {
+        val branch = if (version.toString().contains("-pre")) "snapshots" else "releases"
+        url = uri("https://repo.thenextlvl.net/$branch")
+        credentials {
+            username = System.getenv("REPOSITORY_USER")
+            password = System.getenv("REPOSITORY_TOKEN")
         }
     }
 }

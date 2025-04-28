@@ -1,33 +1,42 @@
 package net.thenextlvl.perworlds;
 
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import net.thenextlvl.perworlds.command.WorldCommand;
 import net.thenextlvl.perworlds.version.PluginVersionChecker;
-import org.bstats.bukkit.Metrics;
-import org.bstats.charts.SimplePie;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class PerWorldsPlugin extends JavaPlugin {
     private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
-    private final Metrics metrics = new Metrics(this, 19652); // todo: create project
+    private final SharedWorlds commons = new SharedWorlds(this);
+
+    public PerWorldsPlugin() {
+        registerCommands();
+    }
 
     @Override
     public void onLoad() {
         versionChecker.checkVersion();
+        commons.onLoad();
     }
 
     @Override
     public void onEnable() {
-        addCustomCharts();
+        commons.onEnable();
     }
 
     @Override
     public void onDisable() {
-        metrics.shutdown();
+        commons.onDisable();
     }
 
-    private void addCustomCharts() {
-        metrics.addCustomChart(new SimplePie("worlds", () -> {
-            var worlds = getServer().getPluginManager().getPlugin("Worlds") != null;
-            return String.valueOf(worlds);
-        }));
+    public SharedWorlds commons() {
+        return commons;
+    }
+
+    private void registerCommands() {
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event ->
+                event.registrar().register(WorldCommand.create(this)));
     }
 }
