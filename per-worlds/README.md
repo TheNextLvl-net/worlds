@@ -5,16 +5,16 @@ Create world groups, define custom rules, and tailor gameplay experiences to sui
 
 ### 🔹 Key Features
 
-**📂 Customizable World Groups**
+#### **📂 Customizable World Groups**
 
 Organize worlds into **independent or shared groups** with tailor-made rules.
 
-🛠️ *Example:*
+#### 🛠️ *Example:*
 
 - **🍃 Group 1:** Lobby (Adventure mode, private chat, separate inventory).
 - **🔥 Group 2:** Farm world, Nether, End (Survival mode, shared chat, unified inventory).
 
-**⚙️ Per-World Rules and Syncing**
+#### **⚙️ Per-World Rules and Syncing**
 
 Define **what syncs and what doesn't** between worlds with precise control:
 
@@ -24,22 +24,22 @@ Define **what syncs and what doesn't** between worlds with precise control:
 - 🧬 Attributes (health, speed, XP, etc.)
 - 💬 Chat behavior, tablist visibility, and more!
 
-**✅ Seamless Integration**
+#### **✅ Seamless Integration**
 
 Built with modern server functionality, PerWorlds is designed to work **smoothly with existing plugins** and APIs.
 
-**🎨 Flexible and Configurable**
+#### **🎨 Flexible and Configurable**
 
 Tweak countless options to create **one-of-a-kind gameplay experiences**, perfect for multi-world servers or custom
 setups.
 
-### ❓ **Why Choose PerWorlds?**
+#### ❓ **Why Choose PerWorlds?**
 
 ✔️ Create unique spaces for different groups.  
 ✔️ Keep player routines organized with synced systems.  
 ✔️ Deliver a polished, organized server experience.
 
-### 🚀 Start Enhancing Your Server Today!
+#### 🚀 Start Enhancing Your Server Today!
 
 From grouping worlds into dynamic communities to fine-tuning every aspect of gameplay, PerWorlds unlocks limitless
 possibilities for server admins. Ready to revolutionize your player data management?
