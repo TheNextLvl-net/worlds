@@ -109,10 +109,11 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         if (lastDeathLocation != null) tag.add("lastDeathLocation", context.serialize(lastDeathLocation));
         var lastLocation = data.lastLocation();
         if (lastLocation != null) tag.add("lastLocation", context.serialize(lastLocation));
+        var gameMode = data.gameMode();
+        if (gameMode != null) tag.add("gameMode", context.serialize(gameMode));
         tag.add("recipes", new ListTag<>(data.discoveredRecipes().stream().map(context::serialize).toList(), StringTag.ID));
         tag.add("potionEffects", new ListTag<>(data.potionEffects().stream().map(context::serialize).toList(), CompoundTag.ID));
         tag.add("statistics", context.serialize(data.stats()));
-        tag.add("gameMode", context.serialize(data.gameMode()));
         tag.add("seenCredits", data.seenCredits());
         tag.add("absorption", data.absorption());
         tag.add("mayFly", data.mayFly());
