@@ -5,9 +5,9 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.thenextlvl.perworlds.group.PaperGroupProvider;
-import net.thenextlvl.perworlds.listener.MessageListener;
 import net.thenextlvl.perworlds.listener.ChatListener;
 import net.thenextlvl.perworlds.listener.ConnectionListener;
+import net.thenextlvl.perworlds.listener.MessageListener;
 import net.thenextlvl.perworlds.listener.RespawnListener;
 import net.thenextlvl.perworlds.listener.TeleportListener;
 import net.thenextlvl.perworlds.listener.WorldListener;
@@ -27,7 +27,7 @@ import java.util.Set;
 @NullMarked
 public class SharedWorlds {
     public static final String ISSUES = "https://github.com/TheNextLvl-net/worlds/issues/new?template=bug_report.yml";
-    private final PaperGroupProvider groupProvider;
+    private final PaperGroupProvider provider;
     private final Metrics metrics;
     private final Plugin plugin;
     private final ComponentBundle bundle;
@@ -44,7 +44,7 @@ public class SharedWorlds {
                         TagResolver.standard(),
                         Placeholder.component("prefix", bundle.component(Locale.US, "prefix"))
                 )).build());
-        this.groupProvider = new PaperGroupProvider(this);
+        this.provider = new PaperGroupProvider(this);
     }
 
     public void onLoad() {
@@ -54,11 +54,11 @@ public class SharedWorlds {
 
     private void loadGroups() {
         var suffix = ".dat";
-        var files = groupProvider.getDataFolder().listFiles((file, name) -> name.endsWith(suffix));
+        var files = provider.getDataFolder().listFiles((file, name) -> name.endsWith(suffix));
         if (files != null) for (var file : files) {
             var name = file.getName();
             name = name.substring(0, name.length() - suffix.length());
-            if (!groupProvider.hasGroup(name)) groupProvider.createGroup(name);
+            if (!provider.hasGroup(name)) provider.createGroup(name);
         }
     }
 
@@ -68,8 +68,8 @@ public class SharedWorlds {
     }
 
     public void onDisable() {
-        var groups = new ArrayList<>(groupProvider.getGroups());
-        groups.add(groupProvider.getUnownedWorldGroup());
+        var groups = new ArrayList<>(provider.getGroups());
+        groups.add(provider.getUnownedWorldGroup());
         groups.forEach(group -> {
             group.persistPlayerData();
             group.persist();
@@ -86,7 +86,7 @@ public class SharedWorlds {
     }
 
     public GroupProvider groupProvider() {
-        return groupProvider;
+        return provider;
     }
 
     public ComponentBundle bundle() {
@@ -98,16 +98,16 @@ public class SharedWorlds {
     }
 
     private void registerListeners() {
-        plugin.getServer().getPluginManager().registerEvents(new ChatListener(groupProvider), plugin);
-        plugin.getServer().getPluginManager().registerEvents(new ConnectionListener(groupProvider), plugin);
-        plugin.getServer().getPluginManager().registerEvents(new MessageListener(groupProvider), plugin);
-        plugin.getServer().getPluginManager().registerEvents(new RespawnListener(groupProvider), plugin);
-        plugin.getServer().getPluginManager().registerEvents(new TeleportListener(groupProvider), plugin);
-        plugin.getServer().getPluginManager().registerEvents(new WorldListener(groupProvider), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new ChatListener(provider), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new ConnectionListener(provider), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new MessageListener(provider), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new RespawnListener(provider), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new TeleportListener(provider), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new WorldListener(provider), plugin);
     }
 
     private void registerServices() {
-        plugin.getServer().getServicesManager().register(GroupProvider.class, groupProvider, plugin, ServicePriority.Highest);
+        plugin.getServer().getServicesManager().register(GroupProvider.class, provider, plugin, ServicePriority.Highest);
     }
 
     private static final Set<String> knownWorldManagers = Set.of( // list ordered by likelihood of a plugin being used
