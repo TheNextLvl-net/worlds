@@ -2,14 +2,13 @@ package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.argument.CommandFlagsArgument;
-import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.jspecify.annotations.NullMarked;
@@ -17,6 +16,7 @@ import org.jspecify.annotations.NullMarked;
 import java.io.File;
 import java.util.Set;
 
+import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
@@ -24,12 +24,15 @@ class WorldRegenerateCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("regenerate")
                 .requires(source -> source.getSender().hasPermission("worlds.command.regenerate"))
-                .then(Commands.argument("world", ArgumentTypes.world())
-                        .suggests(new WorldSuggestionProvider<>(plugin))
-                        .then(Commands.argument("flags", new CommandFlagsArgument(
-                                Set.of("--confirm", "--schedule")
-                        )).executes(context -> regenerate(context, plugin)))
-                        .executes(context -> confirmationNeeded(context, plugin)));
+                .then(regenerate(plugin));
+    }
+
+    private static RequiredArgumentBuilder<CommandSourceStack, World> regenerate(WorldsPlugin plugin) {
+        return worldArgument(plugin)
+                .then(Commands.argument("flags", new CommandFlagsArgument(
+                        Set.of("--confirm", "--schedule")
+                )).executes(context -> regenerate(context, plugin)))
+                .executes(context -> confirmationNeeded(context, plugin));
     }
 
     private static int confirmationNeeded(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {

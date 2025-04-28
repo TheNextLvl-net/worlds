@@ -2,6 +2,7 @@ package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -12,7 +13,6 @@ import io.papermc.paper.command.brigadier.argument.resolvers.selector.EntitySele
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -22,6 +22,7 @@ import org.jspecify.annotations.NullMarked;
 
 import java.util.List;
 
+import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
@@ -29,13 +30,20 @@ class WorldTeleportCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("teleport")
                 .requires(source -> source.getSender().hasPermission("worlds.command.teleport"))
-                .then(Commands.argument("world", ArgumentTypes.world())
-                        .suggests(new WorldSuggestionProvider<>(plugin))
-                        .then(Commands.argument("entities", ArgumentTypes.entities())
-                                .then(Commands.argument("position", ArgumentTypes.finePosition(true))
-                                        .executes(context -> teleportEntitiesPosition(context, plugin)))
-                                .executes(context -> teleportEntities(context, plugin)))
-                        .executes(context -> teleport(context, plugin)));
+                .then(teleport(plugin));
+    }
+
+    private static RequiredArgumentBuilder<CommandSourceStack, World> teleport(WorldsPlugin plugin) {
+        return worldArgument(plugin)
+                .then(teleportEntity(plugin))
+                .executes(context -> teleport(context, plugin));
+    }
+
+    private static RequiredArgumentBuilder<CommandSourceStack, EntitySelectorArgumentResolver> teleportEntity(WorldsPlugin plugin) {
+        return Commands.argument("entities", ArgumentTypes.entities())
+                .then(Commands.argument("position", ArgumentTypes.finePosition(true))
+                        .executes(context -> teleportEntitiesPosition(context, plugin)))
+                .executes(context -> teleportEntities(context, plugin));
     }
 
     private static int teleportEntitiesPosition(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) throws CommandSyntaxException {

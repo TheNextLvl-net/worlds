@@ -33,7 +33,7 @@ class WorldCloneCommand {
     }
 
     private static RequiredArgumentBuilder<CommandSourceStack, World> clone(WorldsPlugin plugin) {
-        return worldArgument(plugin).then(keyArgument(plugin).then(Commands.literal("template")
+        return worldArgument(plugin).then(keyArgument().then(Commands.literal("template")
                         .executes(context -> clone(context, false, plugin)))
                 .executes(context -> clone(context, true, plugin)));
     }

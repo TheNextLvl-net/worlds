@@ -3,6 +3,7 @@ package net.thenextlvl.worlds.command;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -23,9 +24,13 @@ class WorldLoadCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("load")
                 .requires(source -> source.getSender().hasPermission("worlds.command.load"))
-                .then(Commands.argument("world", StringArgumentType.string())
-                        .suggests(new LevelSuggestionProvider<>(plugin))
-                        .executes(context -> load(context, plugin)));
+                .then(load(plugin));
+    }
+
+    private static RequiredArgumentBuilder<CommandSourceStack, String> load(WorldsPlugin plugin) {
+        return Commands.argument("world", StringArgumentType.string())
+                .suggests(new LevelSuggestionProvider<>(plugin))
+                .executes(context -> load(context, plugin));
     }
 
     private static int load(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
