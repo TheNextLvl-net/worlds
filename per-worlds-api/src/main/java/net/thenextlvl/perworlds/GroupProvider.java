@@ -31,6 +31,7 @@ public interface GroupProvider {
      * This includes both explicitly defined world groups and the unowned world group.
      *
      * @return an unmodifiable set of {@link WorldGroup} instances managed by this provider
+     * @see #getGroups()
      */
     @Unmodifiable
     Set<WorldGroup> getAllGroups();
@@ -39,6 +40,7 @@ public interface GroupProvider {
      * Retrieves an unmodifiable set of all world groups managed by this provider.
      *
      * @return an unmodifiable set of {@link WorldGroup} instances managed by this provider
+     * @see #getAllGroups()
      */
     @Unmodifiable
     Set<WorldGroup> getGroups();
