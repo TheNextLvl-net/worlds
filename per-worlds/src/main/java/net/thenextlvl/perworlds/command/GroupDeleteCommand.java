@@ -8,9 +8,11 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.perworlds.WorldGroup;
+import org.jspecify.annotations.NullMarked;
 
 import static net.thenextlvl.perworlds.command.GroupCommand.groupArgument;
 
+@NullMarked
 class GroupDeleteCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(SharedWorlds commons) {
         return Commands.literal("delete")

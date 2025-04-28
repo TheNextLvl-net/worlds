@@ -7,7 +7,9 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.command.argument.GroupArgument;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class GroupCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(SharedWorlds commons) {
         return Commands.literal("group")

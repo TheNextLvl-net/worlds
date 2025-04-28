@@ -11,9 +11,11 @@ import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.command.suggestion.UnassignedWorldsSuggestionProvider;
 import org.bukkit.World;
+import org.jspecify.annotations.NullMarked;
 
 import static net.thenextlvl.perworlds.command.GroupCommand.groupArgument;
 
+@NullMarked
 class GroupAddCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(SharedWorlds commons) {
         return Commands.literal("add")

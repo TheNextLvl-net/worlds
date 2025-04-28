@@ -8,7 +8,9 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.perworlds.SharedWorlds;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 class GroupCreateCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(SharedWorlds commons) {
         return Commands.literal("create")

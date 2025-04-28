@@ -11,9 +11,11 @@ import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.command.suggestion.GroupMemberSuggestionProvider;
 import org.bukkit.World;
+import org.jspecify.annotations.NullMarked;
 
 import static net.thenextlvl.perworlds.command.GroupCommand.groupArgument;
 
+@NullMarked
 class GroupRemoveCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(SharedWorlds commons) {
         return Commands.literal("remove")

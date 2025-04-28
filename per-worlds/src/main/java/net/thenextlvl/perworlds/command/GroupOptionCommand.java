@@ -11,12 +11,14 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.perworlds.WorldGroup;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import static net.thenextlvl.perworlds.command.GroupCommand.groupArgument;
 
+@NullMarked
 class GroupOptionCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(SharedWorlds commons) {
         return Commands.literal("option")
