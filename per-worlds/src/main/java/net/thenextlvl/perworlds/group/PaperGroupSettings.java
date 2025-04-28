@@ -19,6 +19,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean experience = true;
     private boolean fallDistance = true;
     private boolean fireTicks = true;
+    private boolean flySpeed = true;
     private boolean flyState = true;
     private boolean foodLevel = true;
     private boolean freezeTicks = true;
@@ -46,6 +47,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean time = true;
     private boolean velocity = true;
     private boolean visualFire = false;
+    private boolean walkSpeed = true;
     private boolean wardenSpawnTracker = true;
     private boolean weather = true;
     private boolean worldBorder = true;
@@ -138,6 +140,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public boolean fireTicks() {
         return fireTicks;
+    }
+
+    @Override
+    public boolean flySpeed() {
+        return flySpeed;
     }
 
     @Override
@@ -266,6 +273,11 @@ public class PaperGroupSettings implements GroupSettings {
     }
 
     @Override
+    public boolean walkSpeed() {
+        return walkSpeed;
+    }
+
+    @Override
     public boolean wardenSpawnTracker() {
         return wardenSpawnTracker;
     }
@@ -368,6 +380,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void fireTicks(boolean enabled) {
         this.fireTicks = enabled;
+    }
+
+    @Override
+    public void flySpeed(boolean enabled) {
+        this.flySpeed = enabled;
     }
 
     @Override
@@ -493,6 +510,11 @@ public class PaperGroupSettings implements GroupSettings {
     @Override
     public void visualFire(boolean enabled) {
         this.visualFire = enabled;
+    }
+
+    @Override
+    public void walkSpeed(boolean enabled) {
+        this.walkSpeed = enabled;
     }
 
     @Override

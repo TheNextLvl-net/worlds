@@ -129,6 +129,8 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         tag.add("wardenSpawnTracker", context.serialize(data.wardenSpawnTracker()));
         tag.add("fallDistance", data.fallDistance());
         tag.add("saturation", data.saturation());
+        tag.add("flySpeed", data.flySpeed());
+        tag.add("walkSpeed", data.walkSpeed());
         tag.add("arrowsInBody", data.arrowsInBody());
         tag.add("beeStingersInBody", data.beeStingersInBody());
         tag.add("fireTicks", data.fireTicks());

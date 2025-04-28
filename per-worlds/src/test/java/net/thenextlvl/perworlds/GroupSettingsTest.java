@@ -106,6 +106,7 @@ public class GroupSettingsTest {
             Map.entry("experience", new Setting(GroupSettings::experience, GroupSettings::experience)),
             Map.entry("fallDistance", new Setting(GroupSettings::fallDistance, GroupSettings::fallDistance)),
             Map.entry("fireTicks", new Setting(GroupSettings::fireTicks, GroupSettings::fireTicks)),
+            Map.entry("flySpeed", new Setting(GroupSettings::flySpeed, GroupSettings::flySpeed)),
             Map.entry("flyState", new Setting(GroupSettings::flyState, GroupSettings::flyState)),
             Map.entry("foodLevel", new Setting(GroupSettings::foodLevel, GroupSettings::foodLevel)),
             Map.entry("freezeTicks", new Setting(GroupSettings::freezeTicks, GroupSettings::freezeTicks)),
@@ -133,6 +134,7 @@ public class GroupSettingsTest {
             Map.entry("time", new Setting(GroupSettings::time, GroupSettings::time)),
             Map.entry("velocity", new Setting(GroupSettings::velocity, GroupSettings::velocity)),
             Map.entry("visualFire", new Setting(GroupSettings::visualFire, GroupSettings::visualFire)),
+            Map.entry("walkSpeed", new Setting(GroupSettings::walkSpeed, GroupSettings::walkSpeed)),
             Map.entry("wardenSpawnTracker", new Setting(GroupSettings::wardenSpawnTracker, GroupSettings::wardenSpawnTracker)),
             Map.entry("weather", new Setting(GroupSettings::weather, GroupSettings::weather)),
             Map.entry("worldBorder", new Setting(GroupSettings::worldBorder, GroupSettings::worldBorder))

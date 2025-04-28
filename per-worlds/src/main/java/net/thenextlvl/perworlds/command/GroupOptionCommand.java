@@ -39,6 +39,7 @@ class GroupOptionCommand {
                 .then(option("experience", GroupSettings::experience, GroupSettings::experience, commons))
                 .then(option("fallDistance", GroupSettings::fallDistance, GroupSettings::fallDistance, commons))
                 .then(option("fireTicks", GroupSettings::fireTicks, GroupSettings::fireTicks, commons))
+                .then(option("flySpeed", GroupSettings::flySpeed, GroupSettings::flySpeed, commons))
                 .then(option("flyState", GroupSettings::flyState, GroupSettings::flyState, commons))
                 .then(option("foodLevel", GroupSettings::foodLevel, GroupSettings::foodLevel, commons))
                 .then(option("freezeTicks", GroupSettings::freezeTicks, GroupSettings::freezeTicks, commons))
@@ -66,6 +67,7 @@ class GroupOptionCommand {
                 .then(option("time", GroupSettings::time, GroupSettings::time, commons))
                 .then(option("velocity", GroupSettings::velocity, GroupSettings::velocity, commons))
                 .then(option("visualFire", GroupSettings::visualFire, GroupSettings::visualFire, commons))
+                .then(option("walkSpeed", GroupSettings::walkSpeed, GroupSettings::walkSpeed, commons))
                 .then(option("wardenSpawnTracker", GroupSettings::wardenSpawnTracker, GroupSettings::wardenSpawnTracker, commons))
                 .then(option("weather", GroupSettings::weather, GroupSettings::weather, commons))
                 .then(option("worldBorder", GroupSettings::worldBorder, GroupSettings::worldBorder, commons));

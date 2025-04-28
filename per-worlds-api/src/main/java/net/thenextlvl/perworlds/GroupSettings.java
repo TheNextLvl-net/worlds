@@ -33,6 +33,8 @@ public interface GroupSettings {
 
     boolean fireTicks();
 
+    boolean flySpeed();
+
     boolean flyState();
 
     boolean foodLevel();
@@ -87,6 +89,8 @@ public interface GroupSettings {
 
     boolean visualFire();
 
+    boolean walkSpeed();
+
     boolean wardenSpawnTracker();
 
     boolean weather();
@@ -124,6 +128,8 @@ public interface GroupSettings {
     void fallDistance(boolean enabled);
 
     void fireTicks(boolean enabled);
+
+    void flySpeed(boolean enabled);
 
     void flyState(boolean enabled);
 
@@ -178,6 +184,8 @@ public interface GroupSettings {
     void velocity(boolean enabled);
 
     void visualFire(boolean enabled);
+
+    void walkSpeed(boolean enabled);
 
     void wardenSpawnTracker(boolean enabled);
 

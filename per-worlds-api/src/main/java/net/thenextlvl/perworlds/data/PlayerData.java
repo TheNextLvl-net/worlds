@@ -68,6 +68,8 @@ public interface PlayerData {
 
     PlayerData fireTicks(int fireTicks);
 
+    PlayerData flySpeed(float speed);
+
     PlayerData flying(boolean flying);
 
     PlayerData foodLevel(int foodLevel);
@@ -118,6 +120,8 @@ public interface PlayerData {
 
     PlayerData visualFire(boolean visualFire);
 
+    PlayerData walkSpeed(float speed);
+
     PlayerData wardenSpawnTracker(WardenSpawnTracker tracker);
 
     @Unmodifiable
@@ -159,7 +163,11 @@ public interface PlayerData {
 
     float fallDistance();
 
+    float flySpeed();
+
     float saturation();
+
+    float walkSpeed();
 
     int arrowsInBody();
 

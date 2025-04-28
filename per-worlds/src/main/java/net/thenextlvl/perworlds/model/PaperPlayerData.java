@@ -11,6 +11,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -50,7 +51,9 @@ public class PaperPlayerData implements PlayerData {
     private static final float DEFAULT_EXHAUSTION = 0;
     private static final float DEFAULT_EXPERIENCE = 0;
     private static final float DEFAULT_FALL_DISTANCE = 0;
+    private static final float DEFAULT_FLY_SPEED = 0.1F;
     private static final float DEFAULT_SATURATION = 10;
+    private static final float DEFAULT_WALK_SPEED = 0.2F;
     private static final int DEFAULT_ARROWS_IN_BODY = 0;
     private static final int DEFAULT_BEE_STINGERS_IN_BODY = 0;
     private static final int DEFAULT_FIRE_TICKS = 0;
@@ -89,7 +92,9 @@ public class PaperPlayerData implements PlayerData {
     private float exhaustion = DEFAULT_EXHAUSTION;
     private float experience = DEFAULT_EXPERIENCE;
     private float fallDistance = DEFAULT_FALL_DISTANCE;
+    private float flySpeed = DEFAULT_FLY_SPEED;
     private float saturation = DEFAULT_SATURATION;
+    private float walkSpeed = DEFAULT_WALK_SPEED;
     private int arrowsInBody = DEFAULT_ARROWS_IN_BODY;
     private int beeStingersInBody = DEFAULT_BEE_STINGERS_IN_BODY;
     private int fireTicks = DEFAULT_FIRE_TICKS;
@@ -140,6 +145,8 @@ public class PaperPlayerData implements PlayerData {
                 .experience(player.getExp())
                 .saturation(player.getSaturation())
                 .arrowsInBody(player.getArrowsInBody())
+                .walkSpeed(player.getWalkSpeed())
+                .flySpeed(player.getFlySpeed())
                 .beeStingersInBody(player.getBeeStingersInBody())
                 .fireTicks(player.getFireTicks())
                 .foodLevel(player.getFoodLevel())
@@ -215,6 +222,9 @@ public class PaperPlayerData implements PlayerData {
 
         player.setLastDeathLocation(settings.lastDeathLocation() ? lastDeathLocation : DEFAULT_LAST_DEATH_LOCATION);
         player.setRespawnLocation(settings.respawnLocation() ? respawnLocation : DEFAULT_RESPAWN_LOCATION, false);
+
+        player.setFlySpeed(settings.flySpeed() ? flySpeed : DEFAULT_FLY_SPEED);
+        player.setWalkSpeed(settings.walkSpeed() ? walkSpeed : DEFAULT_WALK_SPEED);
 
         player.clearActivePotionEffects();
         if (settings.potionEffects()) player.addPotionEffects(potionEffects);
@@ -412,6 +422,12 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public PaperPlayerData flySpeed(float speed) {
+        this.flySpeed = speed;
+        return this;
+    }
+
+    @Override
     public PaperPlayerData flying(boolean flying) {
         this.flying = flying;
         return this;
@@ -498,6 +514,12 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public PaperPlayerData visualFire(boolean visualFire) {
         this.visualFire = visualFire;
+        return this;
+    }
+
+    @Override
+    public PaperPlayerData walkSpeed(float speed) {
+        this.walkSpeed = speed;
         return this;
     }
 
@@ -658,8 +680,18 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public float flySpeed() {
+        return flySpeed;
+    }
+
+    @Override
     public float saturation() {
         return saturation;
+    }
+
+    @Override
+    public float walkSpeed() {
+        return flySpeed;
     }
 
     @Override
