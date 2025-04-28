@@ -207,7 +207,7 @@ public class PaperGroupProvider implements GroupProvider {
     @Override
     public boolean removeGroup(WorldGroup group) {
         if (!groups.remove(group)) return false;
-        group.getPlayers().forEach(getUnownedWorldGroup()::loadPlayerData); // todo: do we need blocking?
+        group.getPlayers().forEach(getUnownedWorldGroup()::loadPlayerData);
         return true;
     }
 }
