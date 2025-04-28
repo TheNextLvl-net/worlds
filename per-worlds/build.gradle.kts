@@ -68,7 +68,7 @@ tasks.compileJava {
 paper {
     name = "PerWorlds"
     main = "net.thenextlvl.perworlds.WorldsPlugin"
-    apiVersion = "1.21"
+    apiVersion = "1.21.4"
     description = "Per-world customization for gameplay and settings"
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
     website = "https://thenextlvl.net"
