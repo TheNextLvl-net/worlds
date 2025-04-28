@@ -48,6 +48,10 @@ public class SharedWorlds {
     }
 
     public void onLoad() {
+        provider.getLogger().warn("PerWorlds is still in early beta");
+        provider.getLogger().warn("Although mostly stable, please be sure to always use the latest version");
+        provider.getLogger().warn("We suggest taking backups of your player data before using this plugin");
+        provider.getLogger().warn("Please report any issues you encounter to {}", ISSUES);
         registerServices();
         loadGroups();
     }
