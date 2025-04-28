@@ -275,7 +275,6 @@ public class PaperPlayerData implements PlayerData {
     }
 
     private void applyRecipes(Player player, GroupSettings settings) {
-        // todo: only (un)discover recipes internally
         if (settings.recipes()) {
             var toAdd = new HashSet<>(recipes);
             toAdd.removeAll(player.getDiscoveredRecipes());

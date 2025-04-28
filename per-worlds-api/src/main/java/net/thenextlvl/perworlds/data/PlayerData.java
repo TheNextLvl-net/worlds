@@ -193,8 +193,8 @@ public interface PlayerData {
      * Loads the player's data based on the specified group and optionally modifies the player's
      * position and related attributes according to the group's configuration.
      *
-     * @param player the player whose data is being loaded
-     * @param group the group containing the settings to be applied to the player
+     * @param player   the player whose data is being loaded
+     * @param group    the group containing the settings to be applied to the player
      * @param position defines whether position-related settings should be applied
      */
     CompletableFuture<Boolean> load(Player player, WorldGroup group, boolean position);
