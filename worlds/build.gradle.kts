@@ -85,64 +85,26 @@ paper {
                 "worlds.command.link.list"
             )
         }
-        register("worlds.command.link.create") {
-            this.children = listOf("worlds.command.link")
-        }
-        register("worlds.command.link.delete") {
-            this.children = listOf("worlds.command.link")
-        }
-        register("worlds.command.link.list") {
-            this.children = listOf("worlds.command.link")
-        }
+        register("worlds.command.link.create") { children = listOf("worlds.command.link") }
+        register("worlds.command.link.delete") { children = listOf("worlds.command.link") }
+        register("worlds.command.link.list") { children = listOf("worlds.command.link") }
 
-        register("worlds.command.link") {
-            this.children = listOf("worlds.command")
-        }
-        register("worlds.command.clone") {
-            this.children = listOf("worlds.command")
-        }
-        register("worlds.command.create") {
-            this.children = listOf("worlds.command")
-        }
-        register("worlds.command.delete") {
-            this.children = listOf("worlds.command")
-        }
-        register("worlds.command.import") {
-            this.children = listOf("worlds.command")
-        }
-        register("worlds.command.info") {
-            this.children = listOf("worlds.command")
-        }
-        register("worlds.command.list") {
-            this.children = listOf("worlds.command")
-        }
-        register("worlds.command.load") {
-            this.children = listOf("worlds.command")
-        }
-        register("worlds.command.save") {
-            this.children = listOf("worlds.command")
-        }
-        register("worlds.command.save-all") {
-            this.children = listOf("worlds.command")
-        }
-        register("worlds.command.save-off") {
-            this.children = listOf("worlds.command")
-        }
-        register("worlds.command.save-on") {
-            this.children = listOf("worlds.command")
-        }
-        register("worlds.command.setspawn") {
-            this.children = listOf("worlds.command")
-        }
-        register("worlds.command.spawn") {
-            this.children = listOf("worlds.command")
-        }
-        register("worlds.command.teleport") {
-            this.children = listOf("worlds.command")
-        }
-        register("worlds.command.unload") {
-            this.children = listOf("worlds.command")
-        }
+        register("worlds.command.link") { children = listOf("worlds.command") }
+        register("worlds.command.clone") { children = listOf("worlds.command") }
+        register("worlds.command.create") { children = listOf("worlds.command") }
+        register("worlds.command.delete") { children = listOf("worlds.command") }
+        register("worlds.command.import") { children = listOf("worlds.command") }
+        register("worlds.command.info") { children = listOf("worlds.command") }
+        register("worlds.command.list") { children = listOf("worlds.command") }
+        register("worlds.command.load") { children = listOf("worlds.command") }
+        register("worlds.command.save") { children = listOf("worlds.command") }
+        register("worlds.command.save-all") { children = listOf("worlds.command") }
+        register("worlds.command.save-off") { children = listOf("worlds.command") }
+        register("worlds.command.save-on") { children = listOf("worlds.command") }
+        register("worlds.command.setspawn") { children = listOf("worlds.command") }
+        register("worlds.command.spawn") { children = listOf("worlds.command") }
+        register("worlds.command.teleport") { children = listOf("worlds.command") }
+        register("worlds.command.unload") { children = listOf("worlds.command") }
     }
 }
 
