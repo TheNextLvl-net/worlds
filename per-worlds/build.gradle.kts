@@ -82,6 +82,16 @@ paper {
     }
     permissions {
         register("perworlds.command.group") { children = listOf("perworlds.command") }
+        register("perworlds.command.group.add") { children = listOf("perworlds.command.group") }
+        register("perworlds.command.group.create") { children = listOf("perworlds.command.group") }
+        register("perworlds.command.group.delete") { children = listOf("perworlds.command.group") }
+        register("perworlds.command.group.list") { children = listOf("perworlds.command.group") }
+        register("perworlds.command.group.option") { children = listOf("perworlds.command.group") }
+        register("perworlds.command.group.remove") { children = listOf("perworlds.command.group") }
+        register("perworlds.command.group.spawn") { children = listOf("perworlds.command.group") }
+        register("perworlds.command.group.spawn.set") { children = listOf("perworlds.command.group.spawn") }
+        register("perworlds.command.group.spawn.unset") { children = listOf("perworlds.command.group.spawn") }
+        register("perworlds.command.group.teleport") { children = listOf("perworlds.command.group") }
     }
 }
 
