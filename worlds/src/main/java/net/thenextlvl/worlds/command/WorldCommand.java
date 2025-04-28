@@ -1,42 +1,56 @@
 package net.thenextlvl.worlds.command;
 
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.command.GroupCommand;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.api.model.Generator;
+import net.thenextlvl.worlds.command.argument.GeneratorArgument;
+import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
+import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class WorldCommand {
-    private final WorldsPlugin plugin;
-
-    public WorldCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    public void register() {
+    public static LiteralCommandNode<CommandSourceStack> create(WorldsPlugin plugin) {
         var command = Commands.literal("world")
                 .requires(source -> source.getSender().hasPermission("worlds.command"))
-                .then(new WorldCloneCommand(plugin).create())
-                .then(new WorldCreateCommand(plugin).create())
-                .then(new WorldDeleteCommand(plugin).create())
-                .then(new WorldImportCommand(plugin).create())
-                .then(new WorldInfoCommand(plugin).create())
-                .then(new WorldLinkCommand(plugin).create())
-                .then(new WorldListCommand(plugin).create())
-                .then(new WorldLoadCommand(plugin).create())
-                .then(new WorldRegenerateCommand(plugin).create())
-                .then(new WorldSaveAllCommand(plugin).create())
-                .then(new WorldSaveCommand(plugin).create())
-                .then(new WorldSaveOffCommand(plugin).create())
-                .then(new WorldSaveOnCommand(plugin).create())
-                .then(new WorldSetSpawnCommand(plugin).create())
-                .then(new WorldSpawnCommand(plugin).create())
-                .then(new WorldTeleportCommand(plugin).create())
-                .then(new WorldUnloadCommand(plugin).create());
+                .then(WorldCloneCommand.create(plugin))
+                .then(WorldCreateCommand.create(plugin))
+                .then(WorldDeleteCommand.create(plugin))
+                .then(WorldImportCommand.create(plugin))
+                .then(WorldInfoCommand.create(plugin))
+                .then(WorldLinkCommand.create(plugin))
+                .then(WorldListCommand.create(plugin))
+                .then(WorldLoadCommand.create(plugin))
+                .then(WorldRegenerateCommand.create(plugin))
+                .then(WorldSaveAllCommand.create(plugin))
+                .then(WorldSaveCommand.create(plugin))
+                .then(WorldSaveOffCommand.create(plugin))
+                .then(WorldSaveOnCommand.create(plugin))
+                .then(WorldSetSpawnCommand.create(plugin))
+                .then(WorldSpawnCommand.create(plugin))
+                .then(WorldTeleportCommand.create(plugin))
+                .then(WorldUnloadCommand.create(plugin));
         var commons = plugin.commons();
         if (commons != null) command.then(GroupCommand.create(commons));
-        plugin.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS.newHandler(event ->
-                event.registrar().register(command.build())));
+        return command.build();
+    }
+
+    public static RequiredArgumentBuilder<CommandSourceStack, World> worldArgument(WorldsPlugin plugin) {
+        return Commands.argument("world", ArgumentTypes.world())
+                .suggests(new WorldSuggestionProvider<>(plugin));
+    }
+
+    public static RequiredArgumentBuilder<CommandSourceStack, Key> keyArgument() {
+        return Commands.argument("key", ArgumentTypes.key());
+    }
+
+    public static RequiredArgumentBuilder<CommandSourceStack, Generator> generatorArgument(WorldsPlugin plugin) {
+        return Commands.argument("generator", new GeneratorArgument(plugin));
     }
 }

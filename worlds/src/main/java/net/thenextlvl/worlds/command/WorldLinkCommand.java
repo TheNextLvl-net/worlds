@@ -8,17 +8,11 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 class WorldLinkCommand {
-    private final WorldsPlugin plugin;
-
-    WorldLinkCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("link")
                 .requires(source -> source.getSender().hasPermission("worlds.command.link"))
-                .then(new WorldLinkCreateCommand(plugin).create())
-                .then(new WorldLinkListCommand(plugin).create())
-                .then(new WorldLinkRemoveCommand(plugin).create());
+                .then(WorldLinkCreateCommand.create(plugin))
+                .then(WorldLinkListCommand.create(plugin))
+                .then(WorldLinkRemoveCommand.create(plugin));
     }
 }

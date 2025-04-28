@@ -11,20 +11,14 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 class WorldSaveAllCommand {
-    private final WorldsPlugin plugin;
-
-    WorldSaveAllCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("save-all")
                 .requires(source -> source.getSender().hasPermission("worlds.command.save-all"))
-                .then(Commands.literal("flush").executes(context -> saveAll(context.getSource(), true)))
-                .executes(context -> saveAll(context.getSource(), false));
+                .then(Commands.literal("flush").executes(context -> saveAll(context.getSource(), true, plugin)))
+                .executes(context -> saveAll(context.getSource(), false, plugin));
     }
 
-    private int saveAll(CommandSourceStack source, boolean flush) {
+    private static int saveAll(CommandSourceStack source, boolean flush, WorldsPlugin plugin) {
         plugin.bundle().sendMessage(source.getSender(), "world.save.saving");
         var server = ((CraftServer) plugin.getServer()).getServer();
         var saved = server.saveEverything(!(source.getSender() instanceof ConsoleCommandSender), flush, true);

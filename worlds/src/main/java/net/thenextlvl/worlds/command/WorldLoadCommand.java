@@ -3,6 +3,7 @@ package net.thenextlvl.worlds.command;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -20,21 +21,19 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
 class WorldLoadCommand {
-    private final WorldsPlugin plugin;
-
-    WorldLoadCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("load")
                 .requires(source -> source.getSender().hasPermission("worlds.command.load"))
-                .then(Commands.argument("world", StringArgumentType.string())
-                        .suggests(new LevelSuggestionProvider<>(plugin))
-                        .executes(this::load));
+                .then(load(plugin));
     }
 
-    private int load(CommandContext<CommandSourceStack> context) {
+    private static RequiredArgumentBuilder<CommandSourceStack, String> load(WorldsPlugin plugin) {
+        return Commands.argument("world", StringArgumentType.string())
+                .suggests(new LevelSuggestionProvider<>(plugin))
+                .executes(context -> load(context, plugin));
+    }
+
+    private static int load(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
         var name = context.getArgument("world", String.class);
         var level = new File(plugin.getServer().getWorldContainer(), name);
 

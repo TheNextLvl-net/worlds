@@ -2,6 +2,8 @@ package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
@@ -12,40 +14,47 @@ import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
+
 @NullMarked
 class WorldUnloadCommand {
-    private final WorldsPlugin plugin;
-
-    WorldUnloadCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("unload")
                 .requires(source -> source.getSender().hasPermission("worlds.command.unload"))
-                .then(Commands.argument("world", ArgumentTypes.world())
-                        .suggests(new WorldSuggestionProvider<>(plugin))
-                        .then(Commands.argument("fallback", ArgumentTypes.world())
-                                .suggests(new WorldSuggestionProvider<>(plugin, (context, world) ->
-                                        !world.equals(context.getLastChild().getArgument("world", World.class))))
-                                .executes(context -> {
-                                    var world = context.getArgument("world", World.class);
-                                    var fallback = context.getArgument("fallback", World.class);
-                                    var message = unload(world, fallback);
-                                    plugin.bundle().sendMessage(context.getSource().getSender(), message,
-                                            Placeholder.parsed("world", world.getName()));
-                                    return Command.SINGLE_SUCCESS;
-                                }))
-                        .executes(context -> {
-                            var world = context.getArgument("world", World.class);
-                            var message = unload(world, null);
-                            plugin.bundle().sendMessage(context.getSource().getSender(), message,
-                                    Placeholder.parsed("world", world.getName()));
-                            return Command.SINGLE_SUCCESS;
-                        }));
+                .then(unload(plugin));
     }
 
-    private String unload(World world, @Nullable World fallback) {
+    private static RequiredArgumentBuilder<CommandSourceStack, World> unload(WorldsPlugin plugin) {
+        return worldArgument(plugin)
+                .then(unloadFallback(plugin))
+                .executes(context -> unload(plugin, context));
+    }
+
+    private static int unload(WorldsPlugin plugin, CommandContext<CommandSourceStack> context) {
+        var world = context.getArgument("world", World.class);
+        var message = unload(world, null, plugin);
+        plugin.bundle().sendMessage(context.getSource().getSender(), message,
+                Placeholder.parsed("world", world.getName()));
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static RequiredArgumentBuilder<CommandSourceStack, World> unloadFallback(WorldsPlugin plugin) {
+        return Commands.argument("fallback", ArgumentTypes.world())
+                .suggests(new WorldSuggestionProvider<>(plugin, (context, world) ->
+                        !world.equals(context.getLastChild().getArgument("world", World.class))))
+                .executes(context -> unloadFallback(plugin, context));
+    }
+
+    private static int unloadFallback(WorldsPlugin plugin, CommandContext<CommandSourceStack> context) {
+        var world = context.getArgument("world", World.class);
+        var fallback = context.getArgument("fallback", World.class);
+        var message = unload(world, fallback, plugin);
+        plugin.bundle().sendMessage(context.getSource().getSender(), message,
+                Placeholder.parsed("world", world.getName()));
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static String unload(World world, @Nullable World fallback, WorldsPlugin plugin) {
         if (plugin.isRunningFolia())
             return "world.unload.disallowed.folia";
         if (world.getKey().toString().equals("minecraft:overworld"))

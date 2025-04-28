@@ -2,14 +2,13 @@ package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.argument.CommandFlagsArgument;
-import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.jspecify.annotations.NullMarked;
@@ -17,28 +16,26 @@ import org.jspecify.annotations.NullMarked;
 import java.io.File;
 import java.util.Set;
 
+import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
 class WorldRegenerateCommand {
-    private final WorldsPlugin plugin;
-
-    WorldRegenerateCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("regenerate")
                 .requires(source -> source.getSender().hasPermission("worlds.command.regenerate"))
-                .then(Commands.argument("world", ArgumentTypes.world())
-                        .suggests(new WorldSuggestionProvider<>(plugin))
-                        .then(Commands.argument("flags", new CommandFlagsArgument(
-                                Set.of("--confirm", "--schedule")
-                        )).executes(this::regenerate))
-                        .executes(this::confirmationNeeded));
+                .then(regenerate(plugin));
     }
 
-    private int confirmationNeeded(CommandContext<CommandSourceStack> context) {
+    private static RequiredArgumentBuilder<CommandSourceStack, World> regenerate(WorldsPlugin plugin) {
+        return worldArgument(plugin)
+                .then(Commands.argument("flags", new CommandFlagsArgument(
+                        Set.of("--confirm", "--schedule")
+                )).executes(context -> regenerate(context, plugin)))
+                .executes(context -> confirmationNeeded(context, plugin));
+    }
+
+    private static int confirmationNeeded(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
         var sender = context.getSource().getSender();
         plugin.bundle().sendMessage(sender, "command.confirmation",
                 Placeholder.parsed("action", "/" + context.getInput()),
@@ -46,25 +43,25 @@ class WorldRegenerateCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private int regenerate(CommandContext<CommandSourceStack> context) {
+    private static int regenerate(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
         var flags = context.getArgument("flags", CommandFlagsArgument.Flags.class);
-        if (!flags.contains("--confirm")) return confirmationNeeded(context);
+        if (!flags.contains("--confirm")) return confirmationNeeded(context, plugin);
         var world = context.getArgument("world", World.class);
-        var result = regenerate(world, flags.contains("--schedule"));
+        var result = regenerate(world, flags.contains("--schedule"), plugin);
         plugin.bundle().sendMessage(context.getSource().getSender(), result,
                 Placeholder.parsed("world", world.getName()));
         return Command.SINGLE_SUCCESS;
     }
 
-    private String regenerate(World world, boolean schedule) {
+    private static String regenerate(World world, boolean schedule, WorldsPlugin plugin) {
 
         var dragonBattle = world.getEnderDragonBattle();
         if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
 
-        return schedule ? scheduleRegeneration(world) : regenerateNow(world);
+        return schedule ? scheduleRegeneration(world) : regenerateNow(world, plugin);
     }
 
-    private String regenerateNow(World world) {
+    private static String regenerateNow(World world, WorldsPlugin plugin) {
         if (plugin.isRunningFolia())
             return "world.regenerate.disallowed.folia";
         if (world.getKey().toString().equals("minecraft:overworld"))
@@ -92,13 +89,13 @@ class WorldRegenerateCommand {
         return regenerated != null ? "world.regenerate.success" : "world.regenerate.failed";
     }
 
-    private String scheduleRegeneration(World world) {
+    private static String scheduleRegeneration(World world) {
         Runtime.getRuntime().addShutdownHook(new Thread(() ->
                 regenerate(world.getWorldFolder())));
         return "world.regenerate.scheduled";
     }
 
-    private void regenerate(File level) {
+    private static void regenerate(File level) {
         delete(new File(level, "DIM-1"));
         delete(new File(level, "DIM1"));
         delete(new File(level, "advancements"));
@@ -111,7 +108,7 @@ class WorldRegenerateCommand {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    private boolean delete(File file) {
+    private static boolean delete(File file) {
         if (file.isFile()) return file.delete();
         var files = file.listFiles();
         if (files == null) return false;
