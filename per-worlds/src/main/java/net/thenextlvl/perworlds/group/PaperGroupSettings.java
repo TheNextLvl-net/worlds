@@ -29,7 +29,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean health = true;
     private boolean hotbarSlot = true;
     private boolean inventory = true;
-    private boolean invulnerable = false;
+    private boolean invulnerable = true;
     private boolean joinMessages = true;
     private boolean lastDeathLocation = true;
     private boolean lastLocation = true;
