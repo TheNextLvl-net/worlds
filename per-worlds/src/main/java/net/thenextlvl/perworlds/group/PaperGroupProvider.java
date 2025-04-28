@@ -64,6 +64,7 @@ import java.util.function.Consumer;
 
 @NullMarked
 public class PaperGroupProvider implements GroupProvider {
+    private final ComponentLogger logger = ComponentLogger.logger("PerWorlds");
     private final File dataFolder;
     private final Set<WorldGroup> groups = new HashSet<>();
     private final NBT nbt;
@@ -100,7 +101,7 @@ public class PaperGroupProvider implements GroupProvider {
     }
 
     public ComponentLogger getLogger() {
-        return commons.getPlugin().getComponentLogger();
+        return logger;
     }
 
     public Server getServer() {
