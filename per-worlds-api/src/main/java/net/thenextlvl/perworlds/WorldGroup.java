@@ -113,7 +113,7 @@ public interface WorldGroup {
      * where players or entities are typically spawned.
      *
      * @return an {@link Optional} containing the spawn {@link World} if it exists,
-     *         or an empty {@link Optional} if no spawn world is defined for the group
+     * or an empty {@link Optional} if no spawn world is defined for the group
      */
     Optional<World> getSpawnWorld();
 
@@ -157,7 +157,7 @@ public interface WorldGroup {
      *
      * @param world the world to be added to the group.
      * @return {@code true} if the world was successfully added to the group,
-     *         {@code false} if the world is already part of a group
+     * {@code false} if the world is already part of a group
      */
     boolean addWorld(World world);
 
@@ -202,7 +202,7 @@ public interface WorldGroup {
      * Writes the provided player data for the specified offline player to persistent storage.
      *
      * @param player the offline player whose data is to be written
-     * @param data the player data to be stored
+     * @param data   the player data to be stored
      * @return {@code true} if the player's data was successfully written, {@code false} otherwise
      */
     boolean writePlayerData(OfflinePlayer player, PlayerData data);
@@ -213,7 +213,7 @@ public interface WorldGroup {
      * <p>
      * This method is the equivalent of calling {@link #loadPlayerData(Player, boolean) loadPlayerData(player, false)}.
      *
-     * @param player   the player for whom data is to be loaded
+     * @param player the player for whom data is to be loaded
      * @see #loadPlayerData(Player, boolean)
      */
     CompletableFuture<Boolean> loadPlayerData(Player player);
@@ -242,7 +242,7 @@ public interface WorldGroup {
      * The update applies changes according to the specified {@link GroupData.Type}.
      *
      * @param world the world whose data is to be updated
-     * @param type the type of update to apply to the world's data
+     * @param type  the type of update to apply to the world's data
      * @throws IllegalArgumentException if the specified world is not part of this group
      */
     void updateWorldData(World world, GroupData.Type type) throws IllegalArgumentException;
@@ -282,7 +282,7 @@ public interface WorldGroup {
      * and ensures the updated data is saved to persistent storage.
      *
      * @param player the player whose data is to be persisted and modified
-     * @param data a {@link Consumer} that manipulates the {@link PlayerData} object
+     * @param data   a {@link Consumer} that manipulates the {@link PlayerData} object
      */
     void persistPlayerData(Player player, Consumer<PlayerData> data);
 }
