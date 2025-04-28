@@ -304,22 +304,22 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public void updateWorldData(World world) {
-        for (var type : GroupData.Type.values()) updateWorldData(world, type);
+        provider.getServer().getGlobalRegionScheduler().run(provider.getPlugin(), task -> {
+            for (var type : GroupData.Type.values()) updateWorldData(world, type);
+        });
     }
 
     @Override
     public void updateWorldData(World world, GroupData.Type type) {
         // todo: fix properly, bricks everything
-        // provider.getServer().getGlobalRegionScheduler().run(provider.getPlugin(), task -> {
-            if (isEnabled(type)) switch (type) {
-                case DIFFICULTY -> world.setDifficulty(getGroupData().difficulty());
-                case TIME -> world.setFullTime(getGroupData().time());
-                case GAME_RULE -> applyGameRules(world);
-                case WORLD_BORDER -> applyWorldBorder(world);
-                case HARDCORE -> world.setHardcore(getGroupData().hardcore());
-                case WEATHER -> applyWeather(world);
-            }
-        // });
+        if (isEnabled(type)) switch (type) {
+            case DIFFICULTY -> world.setDifficulty(getGroupData().difficulty());
+            case TIME -> world.setFullTime(getGroupData().time());
+            case GAME_RULE -> applyGameRules(world);
+            case WORLD_BORDER -> applyWorldBorder(world);
+            case HARDCORE -> world.setHardcore(getGroupData().hardcore());
+            case WEATHER -> applyWeather(world);
+        }
     }
 
     private boolean isEnabled(GroupData.Type type) {
