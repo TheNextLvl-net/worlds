@@ -2,9 +2,11 @@ package net.thenextlvl.perworlds.data;
 
 import io.papermc.paper.math.Position;
 import org.bukkit.WorldBorder;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.concurrent.TimeUnit;
 
+@NullMarked
 public interface WorldBorderData {
     /**
      * Retrieves the center X-coordinate of the world's border.

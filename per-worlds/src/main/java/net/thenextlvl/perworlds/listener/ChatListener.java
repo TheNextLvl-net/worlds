@@ -5,7 +5,9 @@ import net.thenextlvl.perworlds.GroupProvider;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ChatListener implements Listener {
     private final GroupProvider provider;
 

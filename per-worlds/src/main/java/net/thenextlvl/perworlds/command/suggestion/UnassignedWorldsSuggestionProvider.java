@@ -7,9 +7,11 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.SharedWorlds;
 import org.bukkit.Keyed;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.concurrent.CompletableFuture;
 
+@NullMarked
 public class UnassignedWorldsSuggestionProvider<S> implements SuggestionProvider<S> {
     private final SharedWorlds commons;
 

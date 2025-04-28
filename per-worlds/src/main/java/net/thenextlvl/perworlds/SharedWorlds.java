@@ -17,12 +17,14 @@ import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Set;
 
+@NullMarked
 public class SharedWorlds {
     public static final String ISSUES = "https://github.com/TheNextLvl-net/worlds/issues/new?template=bug_report.yml";
     private final PaperGroupProvider groupProvider;

@@ -2,7 +2,9 @@ package net.thenextlvl.perworlds.model;
 
 import io.papermc.paper.math.Position;
 import net.thenextlvl.perworlds.data.WorldBorderData;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class PaperWorldBorderData implements WorldBorderData {
     private double x = 0D;
     private double z = 0D;
