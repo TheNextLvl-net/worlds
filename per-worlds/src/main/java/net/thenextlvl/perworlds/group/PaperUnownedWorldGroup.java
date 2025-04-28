@@ -8,6 +8,7 @@ import org.jspecify.annotations.NullMarked;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @NullMarked
 public class PaperUnownedWorldGroup extends PaperWorldGroup implements UnownedWorldGroup {
@@ -21,15 +22,15 @@ public class PaperUnownedWorldGroup extends PaperWorldGroup implements UnownedWo
     }
 
     @Override
-    public @Unmodifiable Set<World> getWorlds() {
+    public Stream<World> getWorlds() {
         return provider.getServer().getWorlds().stream()
-                .filter(this::containsWorld)
-                .collect(Collectors.toUnmodifiableSet());
+                .filter(this::containsWorld);
     }
 
     @Override
     public @Unmodifiable Set<Key> getPersistedWorlds() {
-        return getWorlds().stream().map(World::key).collect(Collectors.toUnmodifiableSet());
+        return getWorlds().map(World::key)
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     @Override

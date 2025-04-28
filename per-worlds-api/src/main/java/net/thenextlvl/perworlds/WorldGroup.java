@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * Represents a group of worlds, providing functionality to manage and interact
@@ -138,10 +139,9 @@ public interface WorldGroup {
      * Retrieves all loaded worlds that are members of this group.
      * This method involves a potentially expensive operation and should not be called frequently.
      *
-     * @return an unmodifiable set containing all loaded worlds associated with this group
+     * @return a stream of all loaded worlds associated with this group
      */
-    @Unmodifiable
-    Set<World> getWorlds();
+    Stream<World> getWorlds();
 
     /**
      * Retrieves the name of the world group.

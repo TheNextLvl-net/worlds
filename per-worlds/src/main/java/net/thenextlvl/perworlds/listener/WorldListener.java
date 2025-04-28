@@ -95,7 +95,7 @@ public class WorldListener implements Listener {
                 .orElse(provider.getUnownedWorldGroup());
         if (!lock.computeIfAbsent(type, ignored -> new HashSet<>()).add(group)) return;
         process.accept(group.getGroupData());
-        group.getWorlds().stream()
+        group.getWorlds()
                 .filter(target -> !target.equals(world))
                 .forEach(target -> group.updateWorldData(target, type));
         lock.computeIfPresent(type, (ignored, groups) -> {

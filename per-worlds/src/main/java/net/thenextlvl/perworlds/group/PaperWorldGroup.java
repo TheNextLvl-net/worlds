@@ -37,6 +37,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardOpenOption.CREATE;
@@ -111,7 +112,7 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public @Unmodifiable List<Player> getPlayers() {
-        return getWorlds().stream()
+        return getWorlds()
                 .map(World::getPlayers)
                 .flatMap(List::stream)
                 .filter(player -> !player.hasMetadata("NPC"))
@@ -140,7 +141,7 @@ public class PaperWorldGroup implements WorldGroup {
     public Optional<World> getSpawnWorld() {
         return Optional.ofNullable(getGroupData().spawnLocation())
                 .map(Location::getWorld)
-                .or(() -> getWorlds().stream().min(this::compare));
+                .or(() -> getWorlds().min(this::compare));
     }
 
     private int compare(World world, World other) {
@@ -164,11 +165,10 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
-    public @Unmodifiable Set<World> getWorlds() {
+    public @Unmodifiable Stream<World> getWorlds() {
         return config.worlds().stream()
                 .map(provider.getServer()::getWorld)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+                .filter(Objects::nonNull);
     }
 
     @Override

@@ -52,7 +52,7 @@ class GroupTeleportCommand {
     }
 
     private static int teleport(CommandSender sender, WorldGroup group, List<Player> players, SharedWorlds commons) {
-        var message = group.getWorlds().isEmpty() ? "group.teleport.empty"
+        var message = group.getWorlds().findAny().isEmpty() ? "group.teleport.empty"
                 : players.size() == 1 ? "group.teleport.other"
                 : players.isEmpty() ? "group.teleport.none" : "group.teleport.others";
         players.forEach(player -> group.loadPlayerData(player, true).thenAccept(success ->

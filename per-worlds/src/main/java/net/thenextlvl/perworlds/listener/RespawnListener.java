@@ -2,7 +2,6 @@ package net.thenextlvl.perworlds.listener;
 
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import net.thenextlvl.perworlds.group.PaperGroupProvider;
-import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -24,8 +23,7 @@ public class RespawnListener implements Listener {
                 .orElse(provider.getUnownedWorldGroup());
         var location = group.getGroupData().spawnLocation();
         if (location != null) event.setRespawnLocation(location);
-        else group.getWorlds().stream().filter(world -> world.getEnvironment() == World.Environment.NORMAL)
-                .findAny().map(World::getSpawnLocation).ifPresent(event::setRespawnLocation);
+        else group.getSpawnLocation().ifPresent(event::setRespawnLocation);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
