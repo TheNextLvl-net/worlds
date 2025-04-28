@@ -229,16 +229,6 @@ public class PaperPlayerData implements PlayerData {
         player.clearActivePotionEffects();
         if (settings.potionEffects()) player.addPotionEffects(potionEffects);
 
-        if (settings.attributes()) attributes.forEach(data -> {
-            var attribute = player.getAttribute(data.attribute());
-            if (attribute != null) attribute.setBaseValue(data.baseValue());
-        });
-        // todo: restore real default value
-        // else Registry.ATTRIBUTE.forEach(type -> {
-        //     var attribute = player.getAttribute(type);
-        //     if (attribute != null) attribute.setBaseValue(attribute.getBaseValue());
-        // });
-
         var tracker = settings.wardenSpawnTracker() ? wardenSpawnTracker : DEFAULT_WARDEN_SPAWN_TRACKER;
         player.setWardenTimeSinceLastWarning(tracker.ticksSinceLastWarning());
         player.setWardenWarningCooldown(tracker.cooldownTicks());
@@ -249,8 +239,23 @@ public class PaperPlayerData implements PlayerData {
 
         updateTablistVisibility(player, group);
 
+        applyAttributes(player, settings);
         applyAdvancements(player, settings);
         applyRecipes(player, settings);
+    }
+
+    private void applyAttributes(Player player, GroupSettings settings) {
+        var attributeDefaults = EntityType.PLAYER.getDefaultAttributes();
+        Registry.ATTRIBUTE.forEach(type -> {
+            var attribute = player.getAttribute(type);
+            var defaults = attributeDefaults.getAttribute(type);
+            if (defaults == null || attribute == null) return;
+            attribute.setBaseValue(defaults.getDefaultValue());
+        });
+        if (settings.attributes()) attributes.forEach(data -> {
+            var attribute = player.getAttribute(data.attribute());
+            if (attribute != null) attribute.setBaseValue(data.baseValue());
+        });
     }
 
     private void updateTablistVisibility(Player player, WorldGroup group) {
