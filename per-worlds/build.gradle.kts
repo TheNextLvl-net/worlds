@@ -74,12 +74,6 @@ paper {
     website = "https://thenextlvl.net"
     authors = listOf("NonSwag")
     // foliaSupported = true // way too many events still not being called on folia
-    serverDependencies {
-        register("Worlds") {
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-            required = false
-        }
-    }
     permissions {
         register("perworlds.command.group") { children = listOf("perworlds.command") }
         register("perworlds.command.group.add") { children = listOf("perworlds.command.group") }
