@@ -40,6 +40,8 @@ public class WorldListener implements Listener {
     }
 
     // todo: there is no difficulty change event????
+    // https://github.com/PaperMC/Paper/pull/12471
+
     private final Map<Type, Set<WorldGroup>> lock = new HashMap<>();
 
     @SuppressWarnings("unchecked")
