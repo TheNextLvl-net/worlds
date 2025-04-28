@@ -13,13 +13,7 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 class WorldLinkCreateCommand {
-    private final WorldsPlugin plugin;
-
-    WorldLinkCreateCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("create")
                 .requires(source -> source.getSender().hasPermission("worlds.command.link.create"))
                 .then(Commands.argument("source", ArgumentTypes.world())

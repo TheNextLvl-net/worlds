@@ -15,13 +15,7 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 class WorldLinkRemoveCommand {
-    private final WorldsPlugin plugin;
-
-    WorldLinkRemoveCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("remove")
                 .requires(source -> source.getSender().hasPermission("worlds.command.link.remove"))
                 .then(Commands.argument("world", ArgumentTypes.world())

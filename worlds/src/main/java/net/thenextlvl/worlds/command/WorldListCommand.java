@@ -15,19 +15,13 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 class WorldListCommand {
-    private final WorldsPlugin plugin;
-
-    WorldListCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("list")
                 .requires(source -> source.getSender().hasPermission("worlds.command.list"))
-                .executes(this::list);
+                .executes(context -> list(context, plugin));
     }
 
-    private int list(CommandContext<CommandSourceStack> context) {
+    private static int list(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
         var sender = context.getSource().getSender();
         var worlds = plugin.getServer().getWorlds();
 

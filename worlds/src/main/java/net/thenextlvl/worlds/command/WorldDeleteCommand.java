@@ -18,24 +18,18 @@ import java.util.Set;
 
 @NullMarked
 class WorldDeleteCommand {
-    private final WorldsPlugin plugin;
-
-    WorldDeleteCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("delete")
                 .requires(source -> source.getSender().hasPermission("worlds.command.delete"))
                 .then(Commands.argument("world", ArgumentTypes.world())
                         .suggests(new WorldSuggestionProvider<>(plugin))
                         .then(Commands.argument("flags", new CommandFlagsArgument(
                                 Set.of("--confirm", "--schedule")
-                        )).executes(this::delete))
-                        .executes(this::confirmationNeeded));
+                        )).executes(context -> delete(context, plugin)))
+                        .executes(context -> confirmationNeeded(context, plugin)));
     }
 
-    private int confirmationNeeded(CommandContext<CommandSourceStack> context) {
+    private static int confirmationNeeded(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
         var sender = context.getSource().getSender();
         plugin.bundle().sendMessage(sender, "command.confirmation",
                 Placeholder.parsed("action", "/" + context.getInput()),
@@ -43,25 +37,25 @@ class WorldDeleteCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private int delete(CommandContext<CommandSourceStack> context) {
+    private static int delete(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
         var flags = context.getArgument("flags", CommandFlagsArgument.Flags.class);
-        if (!flags.contains("--confirm")) return confirmationNeeded(context);
+        if (!flags.contains("--confirm")) return confirmationNeeded(context, plugin);
         var world = context.getArgument("world", World.class);
-        var result = delete(world, flags.contains("--schedule"));
+        var result = delete(world, flags.contains("--schedule"), plugin);
         plugin.bundle().sendMessage(context.getSource().getSender(), result,
                 Placeholder.parsed("world", world.getName()));
         return Command.SINGLE_SUCCESS;
     }
 
-    private String delete(World world, boolean schedule) {
+    private static String delete(World world, boolean schedule, WorldsPlugin plugin) {
 
         var dragonBattle = world.getEnderDragonBattle();
         if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
 
-        return schedule ? scheduleDeletion(world) : deleteNow(world);
+        return schedule ? scheduleDeletion(world, plugin) : deleteNow(world, plugin);
     }
 
-    private String deleteNow(World world) {
+    private static String deleteNow(World world, WorldsPlugin plugin) {
         if (plugin.isRunningFolia())
             return "world.delete.disallowed.folia";
         if (world.getKey().toString().equals("minecraft:overworld"))
@@ -76,7 +70,7 @@ class WorldDeleteCommand {
         return delete(world.getWorldFolder()) ? "world.delete.success" : "world.delete.failed";
     }
 
-    private String scheduleDeletion(World world) {
+    private static String scheduleDeletion(World world, WorldsPlugin plugin) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (delete(world.getWorldFolder())) return;
             plugin.getComponentLogger().error("Failed to delete world {}", world.getName());
@@ -84,7 +78,7 @@ class WorldDeleteCommand {
         return "world.delete.scheduled";
     }
 
-    private boolean delete(File file) {
+    private static boolean delete(File file) {
         if (file.isFile()) return file.delete();
         var files = file.listFiles();
         if (files == null) return false;

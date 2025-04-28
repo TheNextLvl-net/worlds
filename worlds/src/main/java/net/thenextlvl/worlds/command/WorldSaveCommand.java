@@ -14,23 +14,17 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 class WorldSaveCommand {
-    private final WorldsPlugin plugin;
-
-    WorldSaveCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("save")
                 .requires(source -> source.getSender().hasPermission("worlds.command.save"))
                 .then(Commands.argument("world", ArgumentTypes.world())
                         .suggests(new WorldSuggestionProvider<>(plugin))
                         .then(Commands.literal("flush")
-                                .executes(context -> save(context, true)))
-                        .executes(context -> save(context, false)));
+                                .executes(context -> save(context, true, plugin)))
+                        .executes(context -> save(context, false, plugin)));
     }
 
-    private int save(CommandContext<CommandSourceStack> context, boolean flush) {
+    private static int save(CommandContext<CommandSourceStack> context, boolean flush, WorldsPlugin plugin) {
         var world = context.getArgument("world", World.class);
         var placeholder = Placeholder.parsed("world", world.getName());
         plugin.bundle().sendMessage(context.getSource().getSender(), "world.save", placeholder);

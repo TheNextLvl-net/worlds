@@ -13,13 +13,7 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
 class WorldSpawnCommand {
-    private final WorldsPlugin plugin;
-
-    WorldSpawnCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("spawn")
                 .requires(source -> source.getSender().hasPermission("worlds.command.spawn")
                                     && source.getSender() instanceof Player)

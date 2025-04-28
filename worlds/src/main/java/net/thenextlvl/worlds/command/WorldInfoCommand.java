@@ -21,31 +21,25 @@ import java.util.Optional;
 
 @NullMarked
 class WorldInfoCommand {
-    private final WorldsPlugin plugin;
-
-    WorldInfoCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("info")
                 .requires(source -> source.getSender().hasPermission("worlds.command.info"))
                 .then(Commands.argument("world", ArgumentTypes.world())
                         .suggests(new WorldSuggestionProvider<>(plugin))
                         .executes(context -> {
                             var world = context.getArgument("world", World.class);
-                            return list(context.getSource().getSender(), world);
+                            return list(context.getSource().getSender(), world, plugin);
                         }))
                 .executes(context -> {
                     if (!(context.getSource().getSender() instanceof Player player)) {
                         plugin.bundle().sendMessage(context.getSource().getSender(), "command.sender");
                         return 0;
-                    } else return list(context.getSource().getSender(), player.getWorld());
+                    } else return list(context.getSource().getSender(), player.getWorld(), plugin);
                 });
     }
 
     @SuppressWarnings("deprecation")
-    private int list(CommandSender sender, World world) {
+    private static int list(CommandSender sender, World world, WorldsPlugin plugin) {
         var root = plugin.levelView().getLevelDataFile(world.getWorldFolder()).getRoot();
         var data = root.<CompoundTag>optional("Data");
         var settings = data.flatMap(tag -> tag.<CompoundTag>optional("WorldGenSettings"));

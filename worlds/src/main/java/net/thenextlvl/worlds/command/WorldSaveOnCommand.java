@@ -13,24 +13,18 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 class WorldSaveOnCommand {
-    private final WorldsPlugin plugin;
-
-    WorldSaveOnCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("save-on")
                 .requires(source -> source.getSender().hasPermission("worlds.command.save-on"))
                 .then(Commands.argument("world", ArgumentTypes.world())
                         .suggests(new WorldSuggestionProvider<>(plugin))
                         .executes(context -> saveOn(context.getSource().getSender(),
-                                context.getArgument("world", World.class))))
+                                context.getArgument("world", World.class), plugin)))
                 .executes(context -> saveOn(context.getSource().getSender(),
-                        context.getSource().getLocation().getWorld()));
+                        context.getSource().getLocation().getWorld(), plugin));
     }
 
-    private int saveOn(CommandSender sender, World world) {
+    private static int saveOn(CommandSender sender, World world, WorldsPlugin plugin) {
         var message = world.isAutoSave() ? "world.save.already-on" : "world.save.on";
         world.setAutoSave(true);
         plugin.bundle().sendMessage(sender, message);

@@ -16,19 +16,13 @@ import java.util.Objects;
 
 @NullMarked
 class WorldLinkListCommand {
-    private final WorldsPlugin plugin;
-
-    WorldLinkListCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("list")
                 .requires(source -> source.getSender().hasPermission("worlds.command.link.list"))
-                .executes(this::list);
+                .executes(context -> list(context, plugin));
     }
 
-    private int list(CommandContext<CommandSourceStack> context) {
+    private static int list(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
         var sender = context.getSource().getSender();
         var links = plugin.getServer().getWorlds().stream()
                 .filter(world -> world.getEnvironment().equals(World.Environment.NORMAL))

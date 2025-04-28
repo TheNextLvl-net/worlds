@@ -15,13 +15,7 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 class WorldSetSpawnCommand {
-    private final WorldsPlugin plugin;
-
-    WorldSetSpawnCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("setspawn")
                 .requires(source -> source.getSender().hasPermission("worlds.command.setspawn"))
                 .then(Commands.argument("position", ArgumentTypes.blockPosition())
@@ -32,7 +26,8 @@ class WorldSetSpawnCommand {
                                     var position = resolver.resolve(context.getSource());
                                     return setSpawn(context.getSource().getSender(),
                                             context.getSource().getLocation().getWorld(),
-                                            position.blockX(), position.blockY(), position.blockZ(), angle
+                                            position.blockX(), position.blockY(), position.blockZ(), angle,
+                                            plugin
                                     );
                                 }))
                         .executes(context -> {
@@ -40,8 +35,8 @@ class WorldSetSpawnCommand {
                             var position = resolver.resolve(context.getSource());
                             return setSpawn(context.getSource().getSender(),
                                     context.getSource().getLocation().getWorld(),
-                                    position.blockX(), position.blockY(), position.blockZ(), 0
-                            );
+                                    position.blockX(), position.blockY(), position.blockZ(), 0,
+                                    plugin);
                         }))
                 .executes(context -> {
                     var location = context.getSource().getLocation();
@@ -49,12 +44,12 @@ class WorldSetSpawnCommand {
                             location.getWorld(),
                             location.blockX(),
                             location.blockY(),
-                            location.blockZ(), 0
-                    );
+                            location.blockZ(), 0,
+                            plugin);
                 });
     }
 
-    private int setSpawn(CommandSender sender, World world, int x, int y, int z, float angle) {
+    private static int setSpawn(CommandSender sender, World world, int x, int y, int z, float angle, WorldsPlugin plugin) {
         var success = world.setSpawnLocation(x, y, z, angle);
         var message = success ? "world.spawn.set.success" : "world.spawn.set.failed";
         plugin.bundle().sendMessage(sender, message,

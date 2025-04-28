@@ -2,6 +2,7 @@ package net.thenextlvl.worlds;
 
 import core.i18n.file.ComponentBundle;
 import io.papermc.paper.ServerBuildInfo;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -174,7 +175,8 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     }
 
     private void registerCommands() {
-        new WorldCommand(this).register();
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS.newHandler(event ->
+                event.registrar().register(WorldCommand.create(this))));
     }
 
     private void saveDefaultPresets() {

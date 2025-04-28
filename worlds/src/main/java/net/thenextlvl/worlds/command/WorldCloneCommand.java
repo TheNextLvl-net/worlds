@@ -25,27 +25,21 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
 class WorldCloneCommand {
-    private final WorldsPlugin plugin;
-
-    WorldCloneCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("clone")
                 .requires(source -> source.getSender().hasPermission("worlds.command.clone"))
                 .then(Commands.argument("world", ArgumentTypes.world())
                         .suggests(new WorldSuggestionProvider<>(plugin))
                         .then(Commands.argument("key", ArgumentTypes.namespacedKey())
                                 .then(Commands.literal("template")
-                                        .executes(context -> clone(context, false)))
-                                .executes(context -> clone(context, true))));
+                                        .executes(context -> clone(context, false, plugin)))
+                                .executes(context -> clone(context, true, plugin))));
     }
 
-    private int clone(CommandContext<CommandSourceStack> context, boolean full) {
+    private static int clone(CommandContext<CommandSourceStack> context, boolean full, WorldsPlugin plugin) {
         var world = context.getArgument("world", World.class);
         var key = context.getArgument("key", NamespacedKey.class);
-        var clone = clone(world, key, full);
+        var clone = clone(world, key, full, plugin);
 
         if (clone != null) plugin.persistWorld(clone, true);
 
@@ -59,7 +53,7 @@ class WorldCloneCommand {
         return clone != null ? Command.SINGLE_SUCCESS : 0;
     }
 
-    private @Nullable World clone(World world, NamespacedKey key, boolean full) {
+    private static @Nullable World clone(World world, NamespacedKey key, boolean full, WorldsPlugin plugin) {
         if (plugin.getServer().getWorld(key) != null) return null;
         if (plugin.getServer().getWorld(key.getKey()) != null) return null;
         if (new File(plugin.getServer().getWorldContainer(), key.getKey()).isDirectory()) return null;
@@ -67,13 +61,13 @@ class WorldCloneCommand {
         return new WorldCreator(key.getKey(), key).copy(world).createWorld();
     }
 
-    private void copy(World world, File destination) {
-        var files = world.getWorldFolder().listFiles(this::shouldCopy);
+    private static void copy(World world, File destination) {
+        var files = world.getWorldFolder().listFiles(WorldCloneCommand::shouldCopy);
         if (files == null) return;
         for (File file : files) copy(file, new File(destination, file.getName()));
     }
 
-    private boolean shouldCopy(File file, String name) {
+    private static boolean shouldCopy(File file, String name) {
         if (name.equals("advancements") && file.isDirectory()) return false;
         if (name.equals("datapacks") && file.isDirectory()) return false;
         if (name.equals("playerdata") && file.isDirectory()) return false;
@@ -82,20 +76,20 @@ class WorldCloneCommand {
         return !name.equals("uid.dat");
     }
 
-    private void copy(File source, File destination) {
+    private static void copy(File source, File destination) {
         if (source.isDirectory()) copyDirectory(source, destination);
         else copyFile(source, destination);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void copyDirectory(File source, File destination) {
+    private static void copyDirectory(File source, File destination) {
         if (!destination.exists()) destination.mkdirs();
         var list = source.listFiles();
         if (list == null) return;
         for (var file : list) copy(file, new File(destination, file.getName()));
     }
 
-    private void copyFile(File source, File destination) {
+    private static void copyFile(File source, File destination) {
         try (var in = new FileInputStream(source);
              var out = new FileOutputStream(destination)) {
             int length;

@@ -27,13 +27,7 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
 class WorldImportCommand {
-    private final WorldsPlugin plugin;
-
-    WorldImportCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("import")
                 .requires(source -> source.getSender().hasPermission("worlds.command.import"))
                 .then(Commands.argument("world", StringArgumentType.string())
@@ -45,22 +39,22 @@ class WorldImportCommand {
                                                     var environment = context.getArgument("dimension", World.Environment.class);
                                                     var generator = context.getArgument("generator", Generator.class);
                                                     var key = context.getArgument("key", NamespacedKey.class);
-                                                    return execute(context, key, environment, generator);
+                                                    return execute(context, key, environment, generator, plugin);
                                                 }))
                                         .executes(context -> {
                                             var environment = context.getArgument("dimension", World.Environment.class);
                                             var key = context.getArgument("key", NamespacedKey.class);
-                                            return execute(context, key, environment, null);
+                                            return execute(context, key, environment, null, plugin);
                                         }))
                                 .executes(context -> {
                                     var key = context.getArgument("key", NamespacedKey.class);
-                                    return execute(context, key, null, null);
+                                    return execute(context, key, null, null, plugin);
                                 }))
-                        .executes(context -> execute(context, null, null, null)));
+                        .executes(context -> execute(context, null, null, null, plugin)));
     }
 
-    private int execute(CommandContext<CommandSourceStack> context, @Nullable NamespacedKey key,
-                        World.@Nullable Environment environment, @Nullable Generator generator) {
+    private static int execute(CommandContext<CommandSourceStack> context, @Nullable NamespacedKey key,
+                               World.@Nullable Environment environment, @Nullable Generator generator, WorldsPlugin plugin) {
         var name = context.getArgument("world", String.class);
         var levelFolder = new File(plugin.getServer().getWorldContainer(), name);
 

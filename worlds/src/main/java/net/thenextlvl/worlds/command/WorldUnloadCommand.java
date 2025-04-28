@@ -14,13 +14,7 @@ import org.jspecify.annotations.Nullable;
 
 @NullMarked
 class WorldUnloadCommand {
-    private final WorldsPlugin plugin;
-
-    WorldUnloadCommand(WorldsPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    ArgumentBuilder<CommandSourceStack, ?> create() {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("unload")
                 .requires(source -> source.getSender().hasPermission("worlds.command.unload"))
                 .then(Commands.argument("world", ArgumentTypes.world())
@@ -31,21 +25,21 @@ class WorldUnloadCommand {
                                 .executes(context -> {
                                     var world = context.getArgument("world", World.class);
                                     var fallback = context.getArgument("fallback", World.class);
-                                    var message = unload(world, fallback);
+                                    var message = unload(world, fallback, plugin);
                                     plugin.bundle().sendMessage(context.getSource().getSender(), message,
                                             Placeholder.parsed("world", world.getName()));
                                     return Command.SINGLE_SUCCESS;
                                 }))
                         .executes(context -> {
                             var world = context.getArgument("world", World.class);
-                            var message = unload(world, null);
+                            var message = unload(world, null, plugin);
                             plugin.bundle().sendMessage(context.getSource().getSender(), message,
                                     Placeholder.parsed("world", world.getName()));
                             return Command.SINGLE_SUCCESS;
                         }));
     }
 
-    private String unload(World world, @Nullable World fallback) {
+    private static String unload(World world, @Nullable World fallback, WorldsPlugin plugin) {
         if (plugin.isRunningFolia())
             return "world.unload.disallowed.folia";
         if (world.getKey().toString().equals("minecraft:overworld"))
