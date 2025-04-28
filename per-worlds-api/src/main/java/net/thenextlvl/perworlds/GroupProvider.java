@@ -58,7 +58,7 @@ public interface GroupProvider {
      *
      * @param world the {@link World} for which the corresponding group is to be retrieved
      * @return an {@link Optional} containing the {@link WorldGroup} if the specified world is
-     *         part of a group, or {@link Optional#empty()} if the world does not belong to any group
+     * part of a group, or {@link Optional#empty()} if the world does not belong to any group
      */
     Optional<WorldGroup> getGroup(World world);
 
@@ -82,7 +82,7 @@ public interface GroupProvider {
      * @param worlds   a collection of {@link World} instances that will be part of the group.
      * @return the created {@link WorldGroup} instance.
      * @throws IllegalStateException if a group with the specified name already exists,
-     * or if a given world is already part of another group.
+     *                               or if a given world is already part of another group.
      */
     WorldGroup createGroup(String name, Consumer<GroupData> data, Consumer<GroupSettings> settings, Collection<World> worlds) throws IllegalStateException;
 
@@ -90,11 +90,11 @@ public interface GroupProvider {
      * Creates a new {@link WorldGroup} with the specified name and a collection of worlds.
      * The group must have a unique name and cannot conflict with already existing groups.
      *
-     * @param name     the name of the group to be created.
-     * @param worlds   a collection of {@link World} instances that will be part of the group.
+     * @param name   the name of the group to be created.
+     * @param worlds a collection of {@link World} instances that will be part of the group.
      * @return the created {@link WorldGroup} instance.
      * @throws IllegalStateException if a group with the specified name already exists,
-     * or if a given world is already part of another group.
+     *                               or if a given world is already part of another group.
      */
     WorldGroup createGroup(String name, Collection<World> worlds) throws IllegalStateException;
 
@@ -108,7 +108,7 @@ public interface GroupProvider {
      * @param worlds   an array of {@link World} instances that will be part of the group.
      * @return the created {@link WorldGroup} instance.
      * @throws IllegalStateException if a group with the specified name already exists,
-     * or if a given world is already part of another group.
+     *                               or if a given world is already part of another group.
      */
     WorldGroup createGroup(String name, Consumer<GroupData> data, Consumer<GroupSettings> settings, World... worlds) throws IllegalStateException;
 
@@ -116,11 +116,11 @@ public interface GroupProvider {
      * Creates a new {@link WorldGroup} with the specified name and a collection of worlds.
      * The group must have a unique name and cannot conflict with already existing groups.
      *
-     * @param name     the name of the group to be created.
-     * @param worlds   an array of {@link World} instances that will be part of the group.
+     * @param name   the name of the group to be created.
+     * @param worlds an array of {@link World} instances that will be part of the group.
      * @return the created {@link WorldGroup} instance.
      * @throws IllegalStateException if a group with the specified name already exists,
-     * or if a given world is already part of another group.
+     *                               or if a given world is already part of another group.
      */
     WorldGroup createGroup(String name, World... worlds) throws IllegalStateException;
 
