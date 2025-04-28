@@ -167,12 +167,14 @@ public class PaperPlayerData implements PlayerData {
             if (!success) return false;
             player.setFallDistance(settings.fallDistance() ? fallDistance : DEFAULT_FALL_DISTANCE);
             player.setVelocity(settings.velocity() ? velocity : DEFAULT_VELOCITY);
-            load(player, settings);
+            load(player, group);
             return true;
         });
     }
 
-    private void load(Player player, GroupSettings settings) {
+    private void load(Player player, WorldGroup group) {
+        var settings = group.getSettings();
+
         player.setGameMode(settings.gameMode() && previousGameMode != null ? previousGameMode : defaultGameMode());
         player.setGameMode(settings.gameMode() && gameMode != null ? gameMode : defaultGameMode());
 
