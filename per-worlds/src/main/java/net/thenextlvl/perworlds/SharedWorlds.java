@@ -5,7 +5,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.thenextlvl.perworlds.group.PaperGroupProvider;
-import net.thenextlvl.perworlds.listener.AdvancementListener;
+import net.thenextlvl.perworlds.listener.MessageListener;
 import net.thenextlvl.perworlds.listener.ChatListener;
 import net.thenextlvl.perworlds.listener.ConnectionListener;
 import net.thenextlvl.perworlds.listener.RespawnListener;
@@ -96,9 +96,9 @@ public class SharedWorlds {
     }
 
     private void registerListeners() {
-        plugin.getServer().getPluginManager().registerEvents(new AdvancementListener(groupProvider), plugin);
         plugin.getServer().getPluginManager().registerEvents(new ChatListener(groupProvider), plugin);
         plugin.getServer().getPluginManager().registerEvents(new ConnectionListener(groupProvider), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new MessageListener(groupProvider), plugin);
         plugin.getServer().getPluginManager().registerEvents(new RespawnListener(groupProvider), plugin);
         plugin.getServer().getPluginManager().registerEvents(new TeleportListener(groupProvider), plugin);
         plugin.getServer().getPluginManager().registerEvents(new WorldListener(groupProvider), plugin);
