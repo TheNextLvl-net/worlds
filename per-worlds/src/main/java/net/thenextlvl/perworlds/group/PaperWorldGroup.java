@@ -243,6 +243,12 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
+    public boolean removeWorld(Key key) {
+        var world = provider.getServer().getWorld(key);
+        return world != null ? removeWorld(world) : config.worlds().remove(key);
+    }
+
+    @Override
     public Optional<PaperPlayerData> readPlayerData(OfflinePlayer player) {
         var file = new File(getDataFolder(), player.getUniqueId() + ".dat");
         try {

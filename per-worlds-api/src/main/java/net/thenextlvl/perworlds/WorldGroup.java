@@ -194,9 +194,22 @@ public interface WorldGroup {
      *
      * @param world the world to be removed from the group
      * @return {@code true} if the world was successfully removed from the group,
-     *         {@code false} if the world is not part of this group
+     * {@code false} if the world is not part of this group
+     * @see #removeWorld(Key)
      */
     boolean removeWorld(World world);
+
+    /**
+     * Removes the world associated with the specified key.
+     * <p>
+     * This method is intended for the removal of worlds that are not currently loaded.<br>
+     * If the world is loaded it will call {@link #removeWorld(World)}.
+     *
+     * @param key The key corresponding to the world to be removed.
+     * @return true if the world was successfully removed, false otherwise.
+     * @see #removeWorld(World)
+     */
+    boolean removeWorld(Key key);
 
     /**
      * Writes the provided player data for the specified offline player to persistent storage.
