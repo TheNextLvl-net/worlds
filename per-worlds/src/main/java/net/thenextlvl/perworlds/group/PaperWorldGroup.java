@@ -100,6 +100,11 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
+    public PaperGroupProvider getGroupProvider() {
+        return provider;
+    }
+
+    @Override
     public GroupSettings getSettings() {
         return config.settings();
     }

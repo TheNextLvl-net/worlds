@@ -53,6 +53,13 @@ public interface WorldGroup {
     GroupData getGroupData();
 
     /**
+     * Retrieves the GroupProvider instance associated with this context.
+     *
+     * @return the GroupProvider instance
+     */
+    GroupProvider getGroupProvider();
+
+    /**
      * Retrieves the settings for the group.
      * These settings include various configurations and toggles that dictate
      * the behavior and properties specific to the group.
