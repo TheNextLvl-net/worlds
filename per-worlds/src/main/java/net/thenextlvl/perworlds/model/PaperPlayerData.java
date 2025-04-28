@@ -153,9 +153,12 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public CompletableFuture<Boolean> load(Player player, WorldGroup group, boolean position) {
         var settings = group.getSettings();
-        if (!position) {
-            load(player, settings);
+        if (!position && group.containsWorld(player.getWorld())) {
+            load(player, group);
             return CompletableFuture.completedFuture(true);
+        } else if (!position) {
+            var exception = new IllegalStateException("Cannot load player data while groups don't match");
+            return CompletableFuture.failedFuture(exception);
         }
 
         var location = group.getSpawnLocation(this).orElse(null);
