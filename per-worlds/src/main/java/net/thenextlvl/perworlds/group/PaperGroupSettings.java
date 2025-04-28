@@ -38,7 +38,7 @@ public class PaperGroupSettings implements GroupSettings {
     private boolean saturation = true;
     private boolean score = true;
     private boolean statistics = true;
-    private boolean tabList = false;
+    private boolean tabList = true;
     private boolean time = true;
     private boolean velocity = true;
     private boolean visualFire = false;
