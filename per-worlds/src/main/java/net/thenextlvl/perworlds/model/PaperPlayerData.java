@@ -237,8 +237,26 @@ public class PaperPlayerData implements PlayerData {
         if (settings.statistics()) stats.apply(player);
         else stats.clear(player);
 
+        updateTablistVisibility(player, group);
+
         applyAdvancements(player, settings);
         applyRecipes(player, settings);
+    }
+
+    private void updateTablistVisibility(Player player, WorldGroup group) {
+        player.getServer().getOnlinePlayers().forEach(other -> {
+            if (player.equals(other)) return;
+            var otherGroup = player.getWorld().equals(other.getWorld()) ? group
+                    : group.getGroupProvider().getGroup(other.getWorld())
+                    .orElse(group.getGroupProvider().getUnownedWorldGroup());
+            if (otherGroup.equals(group)) {
+                if (other.canSee(player)) other.listPlayer(player);
+                if (player.canSee(other)) player.listPlayer(other);
+            } else {
+                if (otherGroup.getSettings().tabList()) other.unlistPlayer(player);
+                if (group.getSettings().tabList()) player.unlistPlayer(other);
+            }
+        });
     }
 
     private void applyRecipes(Player player, GroupSettings settings) {
