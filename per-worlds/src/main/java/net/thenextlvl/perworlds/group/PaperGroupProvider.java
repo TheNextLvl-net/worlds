@@ -1,6 +1,7 @@
 package net.thenextlvl.perworlds.group;
 
 import com.google.common.base.Preconditions;
+import core.i18n.file.ComponentBundle;
 import core.nbt.serialization.NBT;
 import core.nbt.serialization.adapter.EnumAdapter;
 import net.kyori.adventure.key.Key;
@@ -119,6 +120,10 @@ public class PaperGroupProvider implements GroupProvider {
 
     public NBT nbt() {
         return nbt;
+    }
+
+    public ComponentBundle bundle() {
+        return commons.bundle();
     }
 
     @Override
