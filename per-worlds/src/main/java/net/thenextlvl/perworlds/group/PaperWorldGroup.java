@@ -4,8 +4,6 @@ import core.io.IO;
 import core.nbt.NBTInputStream;
 import core.nbt.NBTOutputStream;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.thenextlvl.perworlds.GroupData;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
@@ -304,7 +302,7 @@ public class PaperWorldGroup implements WorldGroup {
                 .exceptionally(throwable -> {
                     provider.getLogger().error("Failed to load group data for player {}", player.getName(), throwable);
                     provider.getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
-                    player.kick(Component.text("Failed to load group data", NamedTextColor.RED));
+                    player.kick(provider.bundle().component("group.load.failed", player));
                     return false;
                 });
     }
