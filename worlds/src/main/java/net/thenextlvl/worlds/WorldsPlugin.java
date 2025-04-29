@@ -55,6 +55,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     private final Key key = Key.key("worlds", "translations");
 
     private final ComponentBundle bundle = ComponentBundle.builder(key, translations)
+            .migrator(new MessageMigrator())
             .placeholder("prefix", "prefix")
             .resource("worlds.properties", Locale.US)
             .resource("worlds_german.properties", Locale.GERMANY)
