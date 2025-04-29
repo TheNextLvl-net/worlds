@@ -38,6 +38,7 @@ public class PaperPlayerData implements PlayerData {
     private static final @Nullable Location DEFAULT_LAST_DEATH_LOCATION = null;
     private static final @Nullable Location DEFAULT_LAST_LOCATION = null;
     private static final @Nullable Location DEFAULT_RESPAWN_LOCATION = null;
+    private static final Set<AttributeData> DEFAULT_ATTRIBUTES = defaultAttributes();
     private static final TriState DEFAULT_FLYING = TriState.NOT_SET;
     private static final TriState DEFAULT_MAY_FLY = TriState.NOT_SET;
     private static final Vector DEFAULT_VELOCITY = new Vector(0, 0, 0);
@@ -76,7 +77,7 @@ public class PaperPlayerData implements PlayerData {
     private GameMode defaultGameMode = GameMode.SURVIVAL;
     private List<PotionEffect> potionEffects = List.of();
     private Set<AdvancementData> advancements = Set.of();
-    private Set<AttributeData> attributes = Set.of();
+    private Set<AttributeData> attributes = DEFAULT_ATTRIBUTES;
     private Set<NamespacedKey> recipes = Set.of();
     private Stats stats = new PaperStats();
     private TriState flying = DEFAULT_FLYING;
@@ -248,17 +249,8 @@ public class PaperPlayerData implements PlayerData {
     }
 
     private void applyAttributes(Player player, GroupSettings settings) {
-        var attributeDefaults = EntityType.PLAYER.getDefaultAttributes();
-        Registry.ATTRIBUTE.forEach(type -> {
-            var attribute = player.getAttribute(type);
-            var defaults = attributeDefaults.getAttribute(type);
-            if (defaults == null || attribute == null) return;
-            attribute.setBaseValue(defaults.getDefaultValue());
-        });
-        if (settings.attributes()) attributes.forEach(data -> {
-            var attribute = player.getAttribute(data.attribute());
-            if (attribute != null) attribute.setBaseValue(data.baseValue());
-        });
+        if (settings.attributes()) attributes.forEach(data -> data.apply(player));
+        else DEFAULT_ATTRIBUTES.forEach(data -> data.apply(player));
     }
 
     private void updateTablistVisibility(Player player, WorldGroup group) {
@@ -749,5 +741,14 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public int score() {
         return score;
+    }
+
+    private static Set<AttributeData> defaultAttributes() {
+        var defaults = EntityType.PLAYER.getDefaultAttributes();
+        return Registry.ATTRIBUTE.stream()
+                .map(defaults::getAttribute)
+                .filter(Objects::nonNull)
+                .map(PaperAttributeData::new)
+                .collect(Collectors.toSet());
     }
 }

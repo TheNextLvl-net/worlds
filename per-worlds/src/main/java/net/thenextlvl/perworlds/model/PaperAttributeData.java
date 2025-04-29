@@ -3,6 +3,7 @@ package net.thenextlvl.perworlds.model;
 import net.thenextlvl.perworlds.data.AttributeData;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
@@ -33,5 +34,11 @@ public class PaperAttributeData implements AttributeData {
     @Override
     public double baseValue() {
         return baseValue;
+    }
+
+    @Override
+    public void apply(Player player) {
+        var instance = player.getAttribute(attribute);
+        if (instance != null) instance.setBaseValue(baseValue);
     }
 }
