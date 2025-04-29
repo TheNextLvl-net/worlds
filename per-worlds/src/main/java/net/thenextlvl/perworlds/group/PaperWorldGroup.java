@@ -297,7 +297,7 @@ public class PaperWorldGroup implements WorldGroup {
     public CompletableFuture<Boolean> loadPlayerData(Player player, boolean position) {
         if (isLoadingData(player)) return CompletableFuture.completedFuture(false);
         player.setMetadata(LOADING_METADATA_KEY, new FixedMetadataValue(provider.getPlugin(), null));
-        return readPlayerData(player).orElseGet(PaperPlayerData::new).load(player, this, position)
+        return readPlayerData(player).orElseGet(() -> new PaperPlayerData(this)).load(player, this, position)
                 .whenComplete((success, throwable) -> player.removeMetadata(LOADING_METADATA_KEY, provider.getPlugin()))
                 .exceptionally(throwable -> {
                     provider.getLogger().error("Failed to load group data for player {}", player.getName(), throwable);

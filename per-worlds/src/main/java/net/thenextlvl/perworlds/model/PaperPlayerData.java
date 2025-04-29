@@ -1,5 +1,6 @@
 package net.thenextlvl.perworlds.model;
 
+import net.kyori.adventure.util.TriState;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.data.AdvancementData;
@@ -37,13 +38,14 @@ public class PaperPlayerData implements PlayerData {
     private static final @Nullable Location DEFAULT_LAST_DEATH_LOCATION = null;
     private static final @Nullable Location DEFAULT_LAST_LOCATION = null;
     private static final @Nullable Location DEFAULT_RESPAWN_LOCATION = null;
+    private static final Set<AttributeData> DEFAULT_ATTRIBUTES = defaultAttributes();
+    private static final TriState DEFAULT_FLYING = TriState.NOT_SET;
+    private static final TriState DEFAULT_MAY_FLY = TriState.NOT_SET;
     private static final Vector DEFAULT_VELOCITY = new Vector(0, 0, 0);
     private static final WardenSpawnTracker DEFAULT_WARDEN_SPAWN_TRACKER = new PaperWardenSpawnTracker();
-    private static final boolean DEFAULT_FLYING = false;
     private static final boolean DEFAULT_GLIDING = false;
     private static final boolean DEFAULT_INVULNERABLE = false;
     private static final boolean DEFAULT_LOCK_FREEZE_TICKS = false;
-    private static final boolean DEFAULT_MAY_FLY = false;
     private static final boolean DEFAULT_SEEN_CREDITS = false;
     private static final boolean DEFAULT_VISUAL_FIRE = false;
     private static final double DEFAULT_ABSORPTION = 0;
@@ -75,16 +77,16 @@ public class PaperPlayerData implements PlayerData {
     private GameMode defaultGameMode = GameMode.SURVIVAL;
     private List<PotionEffect> potionEffects = List.of();
     private Set<AdvancementData> advancements = Set.of();
-    private Set<AttributeData> attributes = Set.of();
+    private Set<AttributeData> attributes = DEFAULT_ATTRIBUTES;
     private Set<NamespacedKey> recipes = Set.of();
     private Stats stats = new PaperStats();
+    private TriState flying = DEFAULT_FLYING;
+    private TriState mayFly = DEFAULT_MAY_FLY;
     private Vector velocity = DEFAULT_VELOCITY;
     private WardenSpawnTracker wardenSpawnTracker = DEFAULT_WARDEN_SPAWN_TRACKER;
-    private boolean flying = DEFAULT_FLYING;
     private boolean gliding = DEFAULT_GLIDING;
     private boolean invulnerable = DEFAULT_INVULNERABLE;
     private boolean lockFreezeTicks = DEFAULT_LOCK_FREEZE_TICKS;
-    private boolean mayFly = DEFAULT_MAY_FLY;
     private boolean seenCredits = DEFAULT_SEEN_CREDITS;
     private boolean visualFire = DEFAULT_VISUAL_FIRE;
     private double absorption = DEFAULT_ABSORPTION;
@@ -106,9 +108,15 @@ public class PaperPlayerData implements PlayerData {
     private int remainingAir = DEFAULT_REMAINING_AIR;
     private int score = DEFAULT_SCORE;
 
+    public PaperPlayerData(WorldGroup group) {
+        this.defaultGameMode = group.getGroupData().defaultGameMode();
+    }
+
+    public PaperPlayerData() {
+    }
+
     public static PaperPlayerData of(Player player, WorldGroup group) {
-        return new PaperPlayerData()
-                .defaultGameMode(group.getGroupData().defaultGameMode())
+        return new PaperPlayerData(group)
                 .attributes(Registry.ATTRIBUTE.stream()
                         .map(player::getAttribute)
                         .filter(Objects::nonNull)
@@ -128,8 +136,8 @@ public class PaperPlayerData implements PlayerData {
                 .lockFreezeTicks(player.isFreezeTickingLocked())
                 .visualFire(player.isVisualFire())
                 .previousGameMode(player.getPreviousGameMode())
-                .flying(player.isFlying())
-                .mayFly(player.getAllowFlight())
+                .flying(TriState.byBoolean(player.isFlying()))
+                .mayFly(TriState.byBoolean(player.getAllowFlight()))
                 .enderChest(player.getEnderChest().getContents())
                 .inventory(player.getInventory().getContents())
                 .respawnLocation(player.getPotentialRespawnLocation())
@@ -182,11 +190,13 @@ public class PaperPlayerData implements PlayerData {
     private void load(Player player, WorldGroup group) {
         var settings = group.getSettings();
 
-        player.setGameMode(settings.gameMode() && previousGameMode != null ? previousGameMode : defaultGameMode());
-        player.setGameMode(settings.gameMode() && gameMode != null ? gameMode : defaultGameMode());
+        player.setGameMode(settings.gameMode() && previousGameMode != null ? previousGameMode : defaultGameMode);
+        player.setGameMode(settings.gameMode() && gameMode != null ? gameMode : defaultGameMode);
 
-        player.setAllowFlight(settings.flyState() ? mayFly : DEFAULT_MAY_FLY);
-        player.setFlying(settings.flyState() ? flying : DEFAULT_FLYING);
+        player.setAllowFlight((settings.flyState() ? mayFly : DEFAULT_MAY_FLY)
+                .toBooleanOrElseGet(() -> player.getGameMode().isInvulnerable()));
+        player.setFlying((settings.flyState() ? flying : DEFAULT_FLYING)
+                .toBooleanOrElseGet(() -> player.getGameMode().equals(GameMode.SPECTATOR)));
 
         player.setGliding(settings.gliding() ? gliding : DEFAULT_GLIDING);
 
@@ -245,17 +255,8 @@ public class PaperPlayerData implements PlayerData {
     }
 
     private void applyAttributes(Player player, GroupSettings settings) {
-        var attributeDefaults = EntityType.PLAYER.getDefaultAttributes();
-        Registry.ATTRIBUTE.forEach(type -> {
-            var attribute = player.getAttribute(type);
-            var defaults = attributeDefaults.getAttribute(type);
-            if (defaults == null || attribute == null) return;
-            attribute.setBaseValue(defaults.getDefaultValue());
-        });
-        if (settings.attributes()) attributes.forEach(data -> {
-            var attribute = player.getAttribute(data.attribute());
-            if (attribute != null) attribute.setBaseValue(data.baseValue());
-        });
+        if (settings.attributes()) attributes.forEach(data -> data.apply(player));
+        else DEFAULT_ATTRIBUTES.forEach(data -> data.apply(player));
     }
 
     private void updateTablistVisibility(Player player, WorldGroup group) {
@@ -432,7 +433,7 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public PaperPlayerData flying(boolean flying) {
+    public PaperPlayerData flying(TriState flying) {
         this.flying = flying;
         return this;
     }
@@ -551,7 +552,7 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public PaperPlayerData mayFly(boolean mayFly) {
+    public PaperPlayerData mayFly(TriState mayFly) {
         this.mayFly = mayFly;
         return this;
     }
@@ -614,6 +615,16 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public TriState flying() {
+        return flying;
+    }
+
+    @Override
+    public TriState mayFly() {
+        return mayFly;
+    }
+
+    @Override
     public Vector velocity() {
         return velocity;
     }
@@ -621,11 +632,6 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public WardenSpawnTracker wardenSpawnTracker() {
         return wardenSpawnTracker;
-    }
-
-    @Override
-    public boolean flying() {
-        return flying;
     }
 
     @Override
@@ -641,11 +647,6 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public boolean lockFreezeTicks() {
         return lockFreezeTicks;
-    }
-
-    @Override
-    public boolean mayFly() {
-        return mayFly;
     }
 
     @Override
@@ -746,5 +747,14 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public int score() {
         return score;
+    }
+
+    private static Set<AttributeData> defaultAttributes() {
+        var defaults = EntityType.PLAYER.getDefaultAttributes();
+        return Registry.ATTRIBUTE.stream()
+                .map(defaults::getAttribute)
+                .filter(Objects::nonNull)
+                .map(PaperAttributeData::new)
+                .collect(Collectors.toSet());
     }
 }
