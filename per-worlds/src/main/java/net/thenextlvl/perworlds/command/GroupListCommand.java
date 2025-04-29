@@ -21,7 +21,7 @@ class GroupListCommand {
     private static int list(CommandContext<CommandSourceStack> context, SharedWorlds commons) {
         var sender = context.getSource().getSender();
         var groups = commons.groupProvider().getGroups().stream().map(group ->
-                commons.bundle().component(sender, "group.list.component",
+                commons.bundle().component("group.list.component", sender,
                         Placeholder.parsed("group", group.getName()))
         ).toList();
         commons.bundle().sendMessage(sender, "group.list",

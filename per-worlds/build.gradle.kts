@@ -35,7 +35,7 @@ dependencies {
     api("org.bstats:bstats-bukkit:3.1.0")
 
     api("net.thenextlvl.core:adapters:2.0.2")
-    api("net.thenextlvl.core:i18n:1.0.21")
+    api("net.thenextlvl.core:i18n:3.2.0")
     api("net.thenextlvl.core:paper:2.1.1")
 
     api(project(":per-worlds-api"))
