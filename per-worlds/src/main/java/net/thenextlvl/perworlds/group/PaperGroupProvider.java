@@ -6,6 +6,7 @@ import core.nbt.serialization.NBT;
 import core.nbt.serialization.adapter.EnumAdapter;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import net.kyori.adventure.util.TriState;
 import net.thenextlvl.perworlds.GroupData;
 import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.GroupSettings;
@@ -93,6 +94,7 @@ public class PaperGroupProvider implements GroupProvider {
                 .registerTypeHierarchyAdapter(PotionEffect.class, new PotionEffectAdapter())
                 .registerTypeHierarchyAdapter(PotionEffectType.class, new PotionEffectTypeAdapter())
                 .registerTypeHierarchyAdapter(Stats.class, new StatisticsAdapter())
+                .registerTypeHierarchyAdapter(TriState.class, new EnumAdapter<>(TriState.class))
                 .registerTypeHierarchyAdapter(Vector.class, new VectorAdapter())
                 .registerTypeHierarchyAdapter(WardenSpawnTracker.class, new WardenSpawnTrackerAdapter())
                 .registerTypeHierarchyAdapter(World.class, new WorldAdapter(getServer()))

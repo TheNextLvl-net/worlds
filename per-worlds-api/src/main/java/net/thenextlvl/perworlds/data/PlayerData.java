@@ -1,5 +1,6 @@
 package net.thenextlvl.perworlds.data;
 
+import net.kyori.adventure.util.TriState;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.statistics.Stats;
 import org.bukkit.GameMode;
@@ -70,7 +71,7 @@ public interface PlayerData {
 
     PlayerData flySpeed(float speed);
 
-    PlayerData flying(boolean flying);
+    PlayerData flying(TriState flying);
 
     PlayerData foodLevel(int foodLevel);
 
@@ -96,7 +97,7 @@ public interface PlayerData {
 
     PlayerData lockFreezeTicks(boolean lockFreezeTicks);
 
-    PlayerData mayFly(boolean mayFly);
+    PlayerData mayFly(TriState mayFly);
 
     PlayerData portalCooldown(int cooldown);
 
@@ -135,19 +136,19 @@ public interface PlayerData {
 
     Stats stats();
 
+    TriState flying();
+
+    TriState mayFly();
+
     Vector velocity();
 
     WardenSpawnTracker wardenSpawnTracker();
-
-    boolean flying();
 
     boolean gliding();
 
     boolean invulnerable();
 
     boolean lockFreezeTicks();
-
-    boolean mayFly();
 
     boolean seenCredits();
 

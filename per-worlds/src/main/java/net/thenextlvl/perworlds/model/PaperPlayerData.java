@@ -1,5 +1,6 @@
 package net.thenextlvl.perworlds.model;
 
+import net.kyori.adventure.util.TriState;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.data.AdvancementData;
@@ -37,13 +38,13 @@ public class PaperPlayerData implements PlayerData {
     private static final @Nullable Location DEFAULT_LAST_DEATH_LOCATION = null;
     private static final @Nullable Location DEFAULT_LAST_LOCATION = null;
     private static final @Nullable Location DEFAULT_RESPAWN_LOCATION = null;
+    private static final TriState DEFAULT_FLYING = TriState.NOT_SET;
+    private static final TriState DEFAULT_MAY_FLY = TriState.NOT_SET;
     private static final Vector DEFAULT_VELOCITY = new Vector(0, 0, 0);
     private static final WardenSpawnTracker DEFAULT_WARDEN_SPAWN_TRACKER = new PaperWardenSpawnTracker();
-    private static final boolean DEFAULT_FLYING = false;
     private static final boolean DEFAULT_GLIDING = false;
     private static final boolean DEFAULT_INVULNERABLE = false;
     private static final boolean DEFAULT_LOCK_FREEZE_TICKS = false;
-    private static final boolean DEFAULT_MAY_FLY = false;
     private static final boolean DEFAULT_SEEN_CREDITS = false;
     private static final boolean DEFAULT_VISUAL_FIRE = false;
     private static final double DEFAULT_ABSORPTION = 0;
@@ -78,13 +79,13 @@ public class PaperPlayerData implements PlayerData {
     private Set<AttributeData> attributes = Set.of();
     private Set<NamespacedKey> recipes = Set.of();
     private Stats stats = new PaperStats();
+    private TriState flying = DEFAULT_FLYING;
+    private TriState mayFly = DEFAULT_MAY_FLY;
     private Vector velocity = DEFAULT_VELOCITY;
     private WardenSpawnTracker wardenSpawnTracker = DEFAULT_WARDEN_SPAWN_TRACKER;
-    private boolean flying = DEFAULT_FLYING;
     private boolean gliding = DEFAULT_GLIDING;
     private boolean invulnerable = DEFAULT_INVULNERABLE;
     private boolean lockFreezeTicks = DEFAULT_LOCK_FREEZE_TICKS;
-    private boolean mayFly = DEFAULT_MAY_FLY;
     private boolean seenCredits = DEFAULT_SEEN_CREDITS;
     private boolean visualFire = DEFAULT_VISUAL_FIRE;
     private double absorption = DEFAULT_ABSORPTION;
@@ -128,8 +129,8 @@ public class PaperPlayerData implements PlayerData {
                 .lockFreezeTicks(player.isFreezeTickingLocked())
                 .visualFire(player.isVisualFire())
                 .previousGameMode(player.getPreviousGameMode())
-                .flying(player.isFlying())
-                .mayFly(player.getAllowFlight())
+                .flying(TriState.byBoolean(player.isFlying()))
+                .mayFly(TriState.byBoolean(player.getAllowFlight()))
                 .enderChest(player.getEnderChest().getContents())
                 .inventory(player.getInventory().getContents())
                 .respawnLocation(player.getPotentialRespawnLocation())
@@ -185,8 +186,10 @@ public class PaperPlayerData implements PlayerData {
         player.setGameMode(settings.gameMode() && previousGameMode != null ? previousGameMode : defaultGameMode());
         player.setGameMode(settings.gameMode() && gameMode != null ? gameMode : defaultGameMode());
 
-        player.setAllowFlight(settings.flyState() ? mayFly : DEFAULT_MAY_FLY);
-        player.setFlying(settings.flyState() ? flying : DEFAULT_FLYING);
+        player.setAllowFlight((settings.flyState() ? mayFly : DEFAULT_MAY_FLY)
+                .toBooleanOrElseGet(() -> player.getGameMode().isInvulnerable()));
+        player.setFlying((settings.flyState() ? flying : DEFAULT_FLYING)
+                .toBooleanOrElseGet(() -> player.getGameMode().equals(GameMode.SPECTATOR)));
 
         player.setGliding(settings.gliding() ? gliding : DEFAULT_GLIDING);
 
@@ -432,7 +435,7 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public PaperPlayerData flying(boolean flying) {
+    public PaperPlayerData flying(TriState flying) {
         this.flying = flying;
         return this;
     }
@@ -551,7 +554,7 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public PaperPlayerData mayFly(boolean mayFly) {
+    public PaperPlayerData mayFly(TriState mayFly) {
         this.mayFly = mayFly;
         return this;
     }
@@ -614,6 +617,16 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public TriState flying() {
+        return flying;
+    }
+
+    @Override
+    public TriState mayFly() {
+        return mayFly;
+    }
+
+    @Override
     public Vector velocity() {
         return velocity;
     }
@@ -621,11 +634,6 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public WardenSpawnTracker wardenSpawnTracker() {
         return wardenSpawnTracker;
-    }
-
-    @Override
-    public boolean flying() {
-        return flying;
     }
 
     @Override
@@ -641,11 +649,6 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public boolean lockFreezeTicks() {
         return lockFreezeTicks;
-    }
-
-    @Override
-    public boolean mayFly() {
-        return mayFly;
     }
 
     @Override
