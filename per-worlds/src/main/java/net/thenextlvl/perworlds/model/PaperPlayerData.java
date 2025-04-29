@@ -108,9 +108,15 @@ public class PaperPlayerData implements PlayerData {
     private int remainingAir = DEFAULT_REMAINING_AIR;
     private int score = DEFAULT_SCORE;
 
+    public PaperPlayerData(WorldGroup group) {
+        this.defaultGameMode = group.getGroupData().defaultGameMode();
+    }
+
+    public PaperPlayerData() {
+    }
+
     public static PaperPlayerData of(Player player, WorldGroup group) {
-        return new PaperPlayerData()
-                .defaultGameMode(group.getGroupData().defaultGameMode())
+        return new PaperPlayerData(group)
                 .attributes(Registry.ATTRIBUTE.stream()
                         .map(player::getAttribute)
                         .filter(Objects::nonNull)
@@ -184,8 +190,8 @@ public class PaperPlayerData implements PlayerData {
     private void load(Player player, WorldGroup group) {
         var settings = group.getSettings();
 
-        player.setGameMode(settings.gameMode() && previousGameMode != null ? previousGameMode : defaultGameMode());
-        player.setGameMode(settings.gameMode() && gameMode != null ? gameMode : defaultGameMode());
+        player.setGameMode(settings.gameMode() && previousGameMode != null ? previousGameMode : defaultGameMode);
+        player.setGameMode(settings.gameMode() && gameMode != null ? gameMode : defaultGameMode);
 
         player.setAllowFlight((settings.flyState() ? mayFly : DEFAULT_MAY_FLY)
                 .toBooleanOrElseGet(() -> player.getGameMode().isInvulnerable()));
