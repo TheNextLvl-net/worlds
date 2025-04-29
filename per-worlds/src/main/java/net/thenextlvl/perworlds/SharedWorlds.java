@@ -1,9 +1,7 @@
 package net.thenextlvl.perworlds;
 
 import core.i18n.file.ComponentBundle;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.group.PaperGroupProvider;
 import net.thenextlvl.perworlds.listener.ChatListener;
 import net.thenextlvl.perworlds.listener.ConnectionListener;
@@ -14,12 +12,12 @@ import net.thenextlvl.perworlds.listener.WorldListener;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bukkit.Server;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Set;
@@ -31,19 +29,18 @@ public class SharedWorlds {
     private final Metrics metrics;
     private final Plugin plugin;
     private final ComponentBundle bundle;
-    private final File dataFolder = new File("plugins", "PerWorlds");
+    private final Path dataPath = Path.of("plugins", "PerWorlds");
 
     public SharedWorlds(Plugin plugin) {
         this.plugin = plugin;
         this.metrics = new Metrics(plugin, 25295);
-        this.bundle = new ComponentBundle(new File(dataFolder, "translations"), audience ->
-                audience instanceof Player player ? player.locale() : Locale.US)
-                .register("per-worlds", Locale.US)
-                .register("per-worlds_german", Locale.GERMANY)
-                .miniMessage(bundle -> MiniMessage.builder().tags(TagResolver.resolver(
-                        TagResolver.standard(),
-                        Placeholder.component("prefix", bundle.component(Locale.US, "prefix"))
-                )).build());
+        var key = Key.key("perworlds", "translations");
+        var translations = dataPath.resolve("translations");
+        this.bundle = ComponentBundle.builder(key, translations)
+                .placeholder("prefix", "prefix")
+                .resource("per-worlds.properties", Locale.US)
+                .resource("per-worlds_german.properties", Locale.GERMANY)
+                .build();
         this.provider = new PaperGroupProvider(this);
     }
 
@@ -98,7 +95,7 @@ public class SharedWorlds {
     }
 
     public File getDataFolder() {
-        return dataFolder;
+        return dataPath.toFile();
     }
 
     private void registerListeners() {

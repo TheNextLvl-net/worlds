@@ -8,6 +8,8 @@ import net.thenextlvl.worlds.command.suggestion.DimensionSuggestionProvider;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.Map;
+
 @NullMarked
 public class DimensionArgument extends WrappedArgumentType<Key, World.Environment> {
     public DimensionArgument(WorldsPlugin plugin) {
@@ -16,6 +18,10 @@ public class DimensionArgument extends WrappedArgumentType<Key, World.Environmen
             case "minecraft:the_end" -> World.Environment.THE_END;
             case "minecraft:the_nether" -> World.Environment.NETHER;
             default -> throw new IllegalArgumentException("Custom dimensions are not yet supported");
-        }, new DimensionSuggestionProvider(plugin));
+        }, new DimensionSuggestionProvider(plugin, Map.of(
+                "minecraft:overworld", "environment.normal",
+                "minecraft:the_end", "environment.end",
+                "minecraft:the_nether", "environment.nether"
+        )));
     }
 }

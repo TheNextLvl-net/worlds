@@ -4,9 +4,6 @@ import core.i18n.file.ComponentBundle;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.worlds.api.WorldsProvider;
@@ -21,6 +18,7 @@ import net.thenextlvl.worlds.controller.WorldLinkController;
 import net.thenextlvl.worlds.listener.PortalListener;
 import net.thenextlvl.worlds.listener.ServerListener;
 import net.thenextlvl.worlds.listener.WorldListener;
+import net.thenextlvl.worlds.model.MessageMigrator;
 import net.thenextlvl.worlds.model.PaperLevelBuilder;
 import net.thenextlvl.worlds.version.PluginVersionChecker;
 import net.thenextlvl.worlds.view.FoliaLevelView;
@@ -29,13 +27,13 @@ import net.thenextlvl.worlds.view.PluginGeneratorView;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Locale;
 
 import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
@@ -53,16 +51,15 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     private final @Nullable SharedWorlds commons = runningFolia ? null : new SharedWorlds(this);
 
     private final File presetsFolder = new File(getDataFolder(), "presets");
-    private final File translations = new File(getDataFolder(), "translations");
+    private final Path translations = getDataPath().resolve("translations");
+    private final Key key = Key.key("worlds", "translations");
 
-    private final ComponentBundle bundle = new ComponentBundle(translations, audience ->
-            audience instanceof Player player ? player.locale() : Locale.US)
-            .register("worlds", Locale.US)
-            .register("worlds_german", Locale.GERMANY)
-            .miniMessage(bundle -> MiniMessage.builder().tags(TagResolver.resolver(
-                    TagResolver.standard(),
-                    Placeholder.component("prefix", bundle.component(Locale.US, "prefix"))
-            )).build());
+    private final ComponentBundle bundle = ComponentBundle.builder(key, translations)
+            .migrator(new MessageMigrator())
+            .placeholder("prefix", "prefix")
+            .resource("worlds.properties", Locale.US)
+            .resource("worlds_german.properties", Locale.GERMANY)
+            .build();
 
     private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
     private final Metrics metrics = new Metrics(this, 19652);
