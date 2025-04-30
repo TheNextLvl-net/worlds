@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     implementation("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
-    implementation("com.palantir.javapoet:javapoet:0.6.0")
+    implementation("com.palantir.javapoet:javapoet:0.7.0")
     implementation(project(":per-worlds-api"))
 
     testImplementation(platform("org.junit:junit-bom:5.13.0-SNAPSHOT"))
