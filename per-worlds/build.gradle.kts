@@ -40,7 +40,7 @@ dependencies {
 
     api(project(":per-worlds-api"))
 
-    testImplementation(platform("org.junit:junit-bom:5.13.0-M2"))
+    testImplementation(platform("org.junit:junit-bom:5.13.0-SNAPSHOT"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
