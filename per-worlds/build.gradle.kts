@@ -1,15 +1,14 @@
 import io.papermc.hangarpublishplugin.model.Platforms
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
-import net.minecrell.pluginyml.paper.PaperPluginDescription
 
 plugins {
     id("idea")
     id("java")
     id("java-library")
     id("maven-publish")
-    id("com.gradleup.shadow") version "9.0.0-beta13"
-    id("io.papermc.hangar-publish-plugin") version "0.1.3"
-    id("de.eldoria.plugin-yml.paper") version "0.7.1"
+    id("com.gradleup.shadow")
+    id("io.papermc.hangar-publish-plugin")
+    id("de.eldoria.plugin-yml.paper")
 }
 
 java {
