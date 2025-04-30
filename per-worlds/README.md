@@ -1,52 +1,29 @@
-## 🌍 PerWorlds – Powerful Per-World Group Management Plugin for Paper
+## 🌍 PerWorlds – Powerful world data management plugin for Paper
 
-PerWorlds is a modern, lightweight player data management plugin for **Paper** servers with unmatched flexibility.
-Create world groups, define custom rules, and tailor gameplay experiences to suit every need.
+PerWorlds is a modern and lightweight alternative to Multiverse-Inventories for **Paper** servers.  
+Create world groups and define custom rules that match your needs.
 
-### 🔹 Key Features
+### 🔹 Why Choose PerWorlds?
 
-#### **📂 Customizable World Groups**
+✅ PerWorlds is designed to work smoothly with existing plugins and APIs.  
+✅️ Highly configurable, yet easy to use, and fast to set up.  
+✅ Sync pretty much everything on a group-specific basis.  
+✅ Light on performance.
 
-Organize worlds into **independent or shared groups** with tailor-made rules.
+### ⚙️ Options and Syncing
 
-#### 🛠️ *Example:*
+Define which data is synced between groups:
 
-- **🍃 Group 1:** Lobby (Adventure mode, private chat, separate inventory).
-- **🔥 Group 2:** Farm world, Nether, End (Survival mode, shared chat, unified inventory).
+🎮 Game modes  
+🌤️ Time and weather  
+🎒 Inventories, Ender Chests, and stats  
+🧬 Attributes (health, speed, XP, etc.)  
+💬 Chat behavior, tablist visibility, and more!
 
-#### **⚙️ Per-World Rules and Syncing**
+---
 
-Define **what syncs and what doesn't** between worlds with precise control:
-
-- 🎮 Game modes
-- 🌤️ Time and weather
-- 🎒 Inventories, Ender Chests, and stats
-- 🧬 Attributes (health, speed, XP, etc.)
-- 💬 Chat behavior, tablist visibility, and more!
-
-#### **✅ Seamless Integration**
-
-Built with modern server functionality, PerWorlds is designed to work **smoothly with existing plugins** and APIs.
-
-#### **🎨 Flexible and Configurable**
-
-Tweak countless options to create **one-of-a-kind gameplay experiences**, perfect for multi-world servers or custom
-setups.
-
-#### ❓ **Why Choose PerWorlds?**
-
-✔️ Create unique spaces for different groups.  
-✔️ Keep player routines organized with synced systems.  
-✔️ Deliver a polished, organized server experience.
-
-#### 🚀 Start Enhancing Your Server Today!
-
-From grouping worlds into dynamic communities to fine-tuning every aspect of gameplay, PerWorlds unlocks limitless
-possibilities for server admins. Ready to revolutionize your player data management?
-
-🔗 [Download now on Hangar](https://hangar.papermc.io/TheNextLvl/PerWorlds)
-
-For detailed setup and configurations, visit the [Wiki](https://github.com/TheNextLvl-net/worlds/wiki/PerWorlds).
+🔗 [Download now on Hangar](https://hangar.papermc.io/TheNextLvl/PerWorlds)  
+📘 For detailed setup and configurations, visit the [Wiki](https://github.com/TheNextLvl-net/worlds/wiki/PerWorlds).
 
 ---
 
