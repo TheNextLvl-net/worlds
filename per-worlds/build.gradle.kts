@@ -29,13 +29,13 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
 
     api("org.bstats:bstats-bukkit:3.1.0")
 
     api("net.thenextlvl.core:adapters:2.0.2")
     api("net.thenextlvl.core:i18n:3.2.0")
-    api("net.thenextlvl.core:paper:2.1.1")
+    api("net.thenextlvl.core:paper:2.1.2")
 
     api(project(":per-worlds-api"))
 
