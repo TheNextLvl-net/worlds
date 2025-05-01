@@ -88,6 +88,12 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     @Override
     public void onEnable() {
+        if (isRunningFolia()) {
+            getComponentLogger().error("Folia 1.21.5 is not yet supported by Worlds");
+            getComponentLogger().error("Disabling...");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
         if (commons != null) commons.onEnable();
         warnVoidGeneratorPlugin();
         registerListeners();
