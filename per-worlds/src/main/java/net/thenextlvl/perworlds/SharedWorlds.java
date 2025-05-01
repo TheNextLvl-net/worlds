@@ -117,7 +117,7 @@ public class SharedWorlds {
         plugin.getServer().getServicesManager().register(GroupProvider.class, provider, plugin, ServicePriority.Highest);
     }
 
-    private static final Set<String> knownWorldManagers = Set.of( // list ordered by likelihood of a plugin being used
+    final Set<String> knownWorldManagers = Set.of( // list ordered by likelihood of a plugin being used
             "Worlds",
             "Multiverse-Core", // https://github.com/Multiverse/Multiverse-Core/
             "MultiWorld", // https://dev.bukkit.org/projects/multiworld-v-2-0 // https://modrinth.com/plugin/multiworld-bukkit
