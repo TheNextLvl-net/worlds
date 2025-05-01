@@ -35,6 +35,8 @@ import org.jspecify.annotations.Nullable;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
 import static org.bukkit.persistence.PersistentDataType.STRING;
@@ -87,7 +89,18 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     @Override
     public void onEnable() {
         if (commons != null) commons.onEnable();
+        warnVoidGeneratorPlugin();
         registerListeners();
+    }
+
+    private void warnVoidGeneratorPlugin() {
+        var names = Stream.of("VoidWorldGenerator", "VoidGen", "VoidGenerator", "VoidWorld");
+        if (names.map(getServer().getPluginManager()::getPlugin)
+                .filter(Objects::nonNull).findAny().isEmpty()) return;
+        getComponentLogger().warn("It appears you are using a plugin to generate void worlds");
+        getComponentLogger().warn("This is not required, and incompatible with Vanilla world generation");
+        getComponentLogger().warn("Please use the preset 'the-void' instead");
+        getComponentLogger().warn("You can do this with the command '/world create <key> preset the-void'");
     }
 
     public File presetsFolder() {
