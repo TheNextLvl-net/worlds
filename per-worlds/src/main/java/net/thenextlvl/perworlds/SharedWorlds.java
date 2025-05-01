@@ -2,6 +2,7 @@ package net.thenextlvl.perworlds;
 
 import core.i18n.file.ComponentBundle;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.thenextlvl.perworlds.group.PaperGroupProvider;
 import net.thenextlvl.perworlds.listener.ChatListener;
 import net.thenextlvl.perworlds.listener.ConnectionListener;
@@ -25,6 +26,7 @@ import java.util.Set;
 @NullMarked
 public class SharedWorlds {
     public static final String ISSUES = "https://github.com/TheNextLvl-net/worlds/issues/new?template=bug_report.yml";
+    private final ComponentLogger logger = ComponentLogger.logger("PerWorlds");
     private final PaperGroupProvider provider;
     private final Metrics metrics;
     private final Plugin plugin;
@@ -76,6 +78,10 @@ public class SharedWorlds {
             group.persist();
         });
         metrics.shutdown();
+    }
+
+    public ComponentLogger getLogger() {
+        return logger;
     }
 
     public Server getServer() {
