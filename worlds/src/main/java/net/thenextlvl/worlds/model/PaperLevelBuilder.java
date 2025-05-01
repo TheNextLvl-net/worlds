@@ -20,6 +20,7 @@ public class PaperLevelBuilder implements LevelBuilder {
 
     private @Nullable Boolean hardcore;
     private @Nullable Boolean structures;
+    private @Nullable Boolean bonusChest;
     private @Nullable Generator generator;
     private @Nullable Long seed;
     private @Nullable NamespacedKey key;
@@ -41,6 +42,11 @@ public class PaperLevelBuilder implements LevelBuilder {
     @Override
     public @Nullable Boolean structures() {
         return structures;
+    }
+
+    @Override
+    public @Nullable Boolean bonusChest() {
+        return bonusChest;
     }
 
     @Override
@@ -128,6 +134,12 @@ public class PaperLevelBuilder implements LevelBuilder {
     @Override
     public LevelBuilder structures(@Nullable Boolean structures) {
         this.structures = structures;
+        return this;
+    }
+
+    @Override
+    public LevelBuilder bonusChest(@Nullable Boolean bonusChest) {
+        this.bonusChest = bonusChest;
         return this;
     }
 

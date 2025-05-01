@@ -39,5 +39,7 @@ public interface Level extends Keyed {
 
     boolean structures();
 
+    boolean bonusChest();
+
     long seed();
 }
