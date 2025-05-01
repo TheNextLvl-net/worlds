@@ -17,6 +17,9 @@ public interface LevelBuilder {
     Boolean structures();
 
     @Nullable
+    Boolean bonusChest();
+
+    @Nullable
     Generator generator();
 
     @Nullable
@@ -53,6 +56,8 @@ public interface LevelBuilder {
     LevelBuilder seed(@Nullable Long seed);
 
     LevelBuilder structures(@Nullable Boolean structures);
+
+    LevelBuilder bonusChest(@Nullable Boolean bonusChest);
 
     LevelBuilder type(@Nullable WorldPreset type);
 

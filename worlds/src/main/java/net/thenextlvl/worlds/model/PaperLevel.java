@@ -39,6 +39,7 @@ public class PaperLevel implements Level {
     protected final boolean hardcore;
     protected final boolean importedBefore;
     protected final boolean structures;
+    protected final boolean bonusChest;
     protected final long seed;
 
     public PaperLevel(WorldsPlugin plugin, LevelBuilder builder) {
@@ -85,6 +86,10 @@ public class PaperLevel implements Level {
                 .or(() -> settings.flatMap(tag -> tag.<ByteTag>optional("generate_features"))
                         .map(ByteTag::getAsBoolean))
                 .orElse(plugin.getServer().getGenerateStructures());
+        this.bonusChest = Optional.ofNullable(builder.bonusChest())
+                .or(() -> settings.flatMap(tag -> tag.<ByteTag>optional("bonus_chest"))
+                        .map(ByteTag::getAsBoolean))
+                .orElse(false);
 
 
         var worldPreset = generator.flatMap(plugin.levelView()::getWorldPreset);
@@ -135,6 +140,7 @@ public class PaperLevel implements Level {
                 .generatorSettings(generatorSettings)
                 .hardcore(hardcore)
                 .seed(seed)
+                .bonusChest(bonusChest)
                 .type(typeOf(type));
 
         if (generator != null) creator.generator(generator.generator(creator.name()));
@@ -180,6 +186,11 @@ public class PaperLevel implements Level {
     @Override
     public boolean structures() {
         return structures;
+    }
+
+    @Override
+    public boolean bonusChest() {
+        return bonusChest;
     }
 
     @Override
