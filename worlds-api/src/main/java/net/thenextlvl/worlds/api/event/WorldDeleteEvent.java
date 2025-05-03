@@ -7,6 +7,13 @@ import org.bukkit.event.world.WorldEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
+/**
+ * Represents an event triggered when a {@link World} is deleted.
+ * This event allows developers to listen to or cancel the deletion of a world.
+ * It also provides an option to check if the deleted world is slated for regeneration.
+ *
+ * @see WorldRegenerateEvent
+ */
 @NullMarked
 public class WorldDeleteEvent extends WorldEvent implements Cancellable {
     private static final HandlerList handlerList = new HandlerList();
@@ -18,6 +25,12 @@ public class WorldDeleteEvent extends WorldEvent implements Cancellable {
         super(world, false);
     }
 
+    /**
+     * Gets whether this event will regenerate the world after deletion.
+     *
+     * @return whether the world is being regenerated
+     * @see WorldRegenerateEvent
+     */
     public boolean isRegenerating() {
         return false;
     }
