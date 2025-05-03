@@ -46,7 +46,7 @@ class WorldInfoCommand {
 
     @SuppressWarnings("deprecation")
     private static int list(CommandSender sender, World world, WorldsPlugin plugin) {
-        var root = plugin.levelView().getLevelDataFile(world.getWorldFolder()).getRoot();
+        var root = plugin.levelView().getLevelDataFile(world.getWorldFolder().toPath()).getRoot();
         var data = root.<CompoundTag>optional("Data");
         var settings = data.flatMap(tag -> tag.<CompoundTag>optional("WorldGenSettings"));
         var dimensions = settings.flatMap(tag -> tag.<CompoundTag>optional("dimensions"));

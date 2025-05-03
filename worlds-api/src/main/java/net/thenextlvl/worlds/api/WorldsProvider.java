@@ -10,7 +10,7 @@ import org.bukkit.plugin.Plugin;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.File;
+import java.nio.file.Path;
 
 /**
  * The WorldsProvider is the main API interface that enables interaction with world management
@@ -32,10 +32,10 @@ public interface WorldsProvider extends Plugin {
     /**
      * Creates a {@link LevelBuilder} instance to configure and build a level from the specified directory.
      *
-     * @param level the directory representing the level to be built
+     * @param level the path representing the level to be built
      * @return a {@link LevelBuilder} for configuring and creating the specified level
      */
-    LevelBuilder levelBuilder(File level);
+    LevelBuilder levelBuilder(Path level);
 
     /**
      * Provides access to the {@link LevelView} functionality, which includes operations

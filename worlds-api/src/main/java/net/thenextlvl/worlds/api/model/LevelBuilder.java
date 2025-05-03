@@ -6,7 +6,7 @@ import org.bukkit.World.Environment;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.File;
+import java.nio.file.Path;
 
 @NullMarked
 public interface LevelBuilder {
@@ -39,7 +39,7 @@ public interface LevelBuilder {
     @Nullable
     WorldPreset type();
 
-    File level();
+    Path level();
 
     LevelBuilder environment(@Nullable Environment environment);
 

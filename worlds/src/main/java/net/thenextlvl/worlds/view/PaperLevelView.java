@@ -23,11 +23,13 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
-import java.util.Arrays;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedHashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @NullMarked
 public class PaperLevelView implements LevelView {
@@ -38,11 +40,11 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public NBTFile<CompoundTag> getLevelDataFile(File level) {
+    public NBTFile<CompoundTag> getLevelDataFile(Path level) {
         return new NBTFile<>(Optional.of(
-                IO.of(level, "level.dat")
+                IO.of(level.resolve("level.dat"))
         ).filter(PathIO::exists).orElseGet(() ->
-                IO.of(level, "level.dat_old")
+                IO.of(level.resolve("level.dat_old"))
         ), new CompoundTag());
     }
 
@@ -150,10 +152,12 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public Stream<File> listLevels() {
-        return Optional.ofNullable(plugin.getServer().getWorldContainer()
-                        .listFiles(File::isDirectory)).stream()
-                .flatMap(files -> Arrays.stream(files).filter(this::isLevel));
+    public Set<Path> listLevels() {
+        try (var stream = Files.list(plugin.getServer().getWorldContainer().toPath())) {
+            return stream.filter(this::isLevel).collect(Collectors.toUnmodifiableSet());
+        } catch (IOException e) {
+            return Set.of();
+        }
     }
 
     @Override
@@ -168,7 +172,7 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public World.Environment getEnvironment(File level) {
+    public World.Environment getEnvironment(Path level) {
         var end = hasEndDimension(level);
         var nether = hasNetherDimension(level);
         if (end && nether) return World.Environment.NORMAL;
@@ -178,25 +182,26 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public boolean canLoad(File level) {
+    public boolean canLoad(Path level) {
         return plugin.getServer().getWorlds().stream()
                 .map(World::getWorldFolder)
+                .map(File::toPath)
                 .noneMatch(level::equals);
     }
 
     @Override
-    public boolean hasEndDimension(File level) {
-        return new File(level, "DIM1").isDirectory();
+    public boolean hasEndDimension(Path level) {
+        return Files.isDirectory(level.resolve("DIM1"));
     }
 
     @Override
-    public boolean hasNetherDimension(File level) {
-        return new File(level, "DIM-1").isDirectory();
+    public boolean hasNetherDimension(Path level) {
+        return Files.isDirectory(level.resolve("DIM-1"));
     }
 
     @Override
-    public boolean isLevel(File file) {
-        return file.isDirectory() && (new File(file, "level.dat").isFile() || new File(file, "level.dat_old").isFile());
+    public boolean isLevel(Path path) {
+        return Files.isRegularFile(path.resolve("level.dat")) || Files.isRegularFile(path.resolve("level.dat_old"));
     }
 
     @Override
