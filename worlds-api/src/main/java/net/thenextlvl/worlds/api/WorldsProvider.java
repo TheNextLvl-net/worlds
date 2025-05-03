@@ -1,7 +1,7 @@
 package net.thenextlvl.worlds.api;
 
 import net.thenextlvl.perworlds.GroupProvider;
-import net.thenextlvl.worlds.api.link.LinkController;
+import net.thenextlvl.worlds.api.link.LinkProvider;
 import net.thenextlvl.worlds.api.model.LevelBuilder;
 import net.thenextlvl.worlds.api.view.GeneratorView;
 import net.thenextlvl.worlds.api.view.LevelView;
@@ -19,7 +19,7 @@ public interface WorldsProvider extends Plugin {
 
     LevelView levelView();
 
-    LinkController linkController();
+    LinkProvider linkProvider();
 
     /**
      * Retrieves the {@link GroupProvider} instance responsible for managing and interacting with world groups.

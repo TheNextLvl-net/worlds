@@ -7,14 +7,13 @@ import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.worlds.api.WorldsProvider;
-import net.thenextlvl.worlds.api.link.LinkController;
 import net.thenextlvl.worlds.api.model.Generator;
 import net.thenextlvl.worlds.api.model.LevelBuilder;
 import net.thenextlvl.worlds.api.preset.Presets;
 import net.thenextlvl.worlds.api.view.GeneratorView;
 import net.thenextlvl.worlds.api.view.LevelView;
 import net.thenextlvl.worlds.command.WorldCommand;
-import net.thenextlvl.worlds.controller.WorldLinkController;
+import net.thenextlvl.worlds.link.WorldLinkProvider;
 import net.thenextlvl.worlds.listener.PortalListener;
 import net.thenextlvl.worlds.listener.ServerListener;
 import net.thenextlvl.worlds.listener.WorldListener;
@@ -48,7 +47,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     private final GeneratorView generatorView = new PluginGeneratorView();
     private final LevelView levelView = runningFolia ? new FoliaLevelView(this) : new PaperLevelView(this);
 
-    private final LinkController linkController = new WorldLinkController(this);
+    private final WorldLinkProvider linkProvider = new WorldLinkProvider(this);
 
     private final @Nullable SharedWorlds commons = runningFolia ? null : new SharedWorlds(this);
 
@@ -133,8 +132,8 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     }
 
     @Override
-    public LinkController linkController() {
-        return linkController;
+    public WorldLinkProvider linkProvider() {
+        return linkProvider;
     }
 
     @Override
