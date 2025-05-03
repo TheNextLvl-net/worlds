@@ -7,6 +7,7 @@ import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.worlds.api.WorldsProvider;
+import net.thenextlvl.worlds.api.link.Relative;
 import net.thenextlvl.worlds.api.model.Generator;
 import net.thenextlvl.worlds.api.model.LevelBuilder;
 import net.thenextlvl.worlds.api.preset.Presets;
@@ -26,6 +27,7 @@ import net.thenextlvl.worlds.view.PluginGeneratorView;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
@@ -162,6 +164,19 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         world.getPersistentDataContainer().set(generatorKey, STRING, generator.serialize());
     }
 
+    public void persistLinks(World world) {
+        if (!world.getEnvironment().equals(World.Environment.NORMAL)) return;
+        linkProvider().getLinkTree(world).ifPresent(tree -> {
+            var container = world.getPersistentDataContainer();
+            tree.getPersistedNether().map(Key::asString).ifPresentOrElse(
+                    nether -> container.set(Relative.NETHER.key(), PersistentDataType.STRING, nether),
+                    () -> container.remove(Relative.NETHER.key()));
+            tree.getPersistedEnd().map(Key::asString).ifPresentOrElse(
+                    nether -> container.set(Relative.THE_END.key(), PersistentDataType.STRING, nether),
+                    () -> container.remove(Relative.THE_END.key()));
+        });
+    }
+
     public boolean isRunningFolia() {
         return runningFolia;
     }
@@ -173,6 +188,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     }
 
     private void unloadLevels() {
+        getServer().getWorlds().forEach(this::persistLinks);
         getServer().getWorlds().stream().filter(world -> !world.isAutoSave()).forEach(world -> {
             world.getPlayers().forEach(player -> player.kick(getServer().shutdownMessage()));
             levelView().unloadLevel(world, false);
