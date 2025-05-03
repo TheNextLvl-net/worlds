@@ -2,7 +2,7 @@ package net.thenextlvl.worlds.api.model;
 
 import net.thenextlvl.worlds.api.preset.Preset;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -34,14 +34,14 @@ public interface LevelBuilder {
     @Nullable
     String name();
 
-    World.@Nullable Environment environment();
+    @Nullable Environment environment();
 
     @Nullable
     WorldPreset type();
 
     File level();
 
-    LevelBuilder environment(World.@Nullable Environment environment);
+    LevelBuilder environment(@Nullable Environment environment);
 
     LevelBuilder generator(@Nullable Generator generator);
 
