@@ -15,6 +15,11 @@ public class WorldRegenerateEvent extends WorldDeleteEvent {
     }
 
     @Override
+    public boolean isRegenerating() {
+        return true;
+    }
+
+    @Override
     public HandlerList getHandlers() {
         return handlerList;
     }
