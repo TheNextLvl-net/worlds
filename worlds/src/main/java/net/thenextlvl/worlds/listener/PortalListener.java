@@ -3,7 +3,6 @@ package net.thenextlvl.worlds.listener;
 import io.papermc.paper.event.entity.EntityPortalReadyEvent;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.model.PortalCooldown;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.PortalType;
@@ -31,10 +30,8 @@ public class PortalListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityPortal(EntityPortalReadyEvent event) {
-        if (event.getPortalType().equals(PortalType.CUSTOM)) return;
-        plugin.linkController().getTarget(event.getEntity().getWorld(), event.getPortalType())
-                .map(Bukkit::getWorld).ifPresentOrElse(event::setTargetWorld, () ->
-                        event.setTargetWorld(null));
+        plugin.linkProvider().getTarget(event.getEntity().getWorld(), event.getPortalType())
+                .ifPresentOrElse(event::setTargetWorld, () -> event.setTargetWorld(null));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
