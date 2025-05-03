@@ -35,7 +35,7 @@ class WorldLoadCommand {
 
     private static int load(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
         var name = context.getArgument("world", String.class);
-        var level = new File(plugin.getServer().getWorldContainer(), name);
+        var level = plugin.getServer().getWorldContainer().toPath().resolve(name);
 
         var build = plugin.levelView().isLevel(level) ? plugin.levelBuilder(level).build() : null;
         var world = Optional.ofNullable(build).filter(Level::importedBefore).flatMap(Level::create).orElse(null);

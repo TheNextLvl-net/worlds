@@ -20,7 +20,6 @@ import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.File;
 import java.util.Optional;
 
 import static net.thenextlvl.worlds.command.WorldCommand.generatorArgument;
@@ -73,7 +72,7 @@ class WorldImportCommand {
     private static int execute(CommandContext<CommandSourceStack> context, @Nullable NamespacedKey key,
                                World.@Nullable Environment environment, @Nullable Generator generator, WorldsPlugin plugin) {
         var name = context.getArgument("world", String.class);
-        var levelFolder = new File(plugin.getServer().getWorldContainer(), name);
+        var levelFolder = plugin.getServer().getWorldContainer().toPath().resolve(name);
 
         var build = plugin.levelView().isLevel(levelFolder)
                 ? plugin.levelBuilder(levelFolder).environment(environment)

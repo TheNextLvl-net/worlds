@@ -124,7 +124,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     }
 
     @Override
-    public LevelBuilder levelBuilder(File level) {
+    public LevelBuilder levelBuilder(Path level) {
         return new PaperLevelBuilder(this, level);
     }
 

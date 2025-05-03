@@ -47,7 +47,7 @@ public class PaperLevel implements Level {
         this.plugin = plugin;
 
         this.name = Optional.ofNullable(builder.name())
-                .orElseGet(() -> builder.level().getName());
+                .orElseGet(() -> builder.level().getFileName().toString());
 
         var data = levelData.getRoot().<CompoundTag>optional("Data");
         var extras = data.flatMap(plugin.levelView()::getExtras);
@@ -61,7 +61,7 @@ public class PaperLevel implements Level {
         this.key = Optional.ofNullable(builder.key())
                 .or(() -> extras.map(LevelExtras::key))
                 .orElseGet(() -> {
-                    var namespace = builder.level().getName().toLowerCase()
+                    var namespace = builder.level().getFileName().toString().toLowerCase()
                             .replace("(", "").replace(")", "")
                             .replace(" ", "_");
                     return new NamespacedKey("worlds", namespace);

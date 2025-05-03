@@ -11,12 +11,12 @@ import org.bukkit.World.Environment;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.File;
+import java.nio.file.Path;
 
 @NullMarked
 public class PaperLevelBuilder implements LevelBuilder {
     private final WorldsPlugin plugin;
-    private final File level;
+    private final Path level;
 
     private @Nullable Boolean hardcore;
     private @Nullable Boolean structures;
@@ -29,7 +29,7 @@ public class PaperLevelBuilder implements LevelBuilder {
     private @Nullable Environment environment;
     private @Nullable WorldPreset type;
 
-    public PaperLevelBuilder(WorldsPlugin plugin, File level) {
+    public PaperLevelBuilder(WorldsPlugin plugin, Path level) {
         this.plugin = plugin;
         this.level = level;
     }
@@ -85,7 +85,7 @@ public class PaperLevelBuilder implements LevelBuilder {
     }
 
     @Override
-    public File level() {
+    public Path level() {
         return level;
     }
 

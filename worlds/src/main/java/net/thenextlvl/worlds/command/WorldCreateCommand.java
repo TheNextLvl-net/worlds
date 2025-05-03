@@ -25,7 +25,6 @@ import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.File;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static net.thenextlvl.worlds.command.WorldCommand.generatorArgument;
@@ -122,7 +121,7 @@ class WorldCreateCommand {
 
         var name = key.getKey();
 
-        var levelFolder = new File(plugin.getServer().getWorldContainer(), name);
+        var levelFolder = plugin.getServer().getWorldContainer().toPath().resolve(name);
 
         var level = plugin.levelBuilder(levelFolder)
                 .environment(environment)
