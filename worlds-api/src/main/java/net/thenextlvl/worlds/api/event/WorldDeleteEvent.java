@@ -18,6 +18,10 @@ public class WorldDeleteEvent extends WorldEvent implements Cancellable {
         super(world, false);
     }
 
+    public boolean isRegenerating() {
+        return false;
+    }
+
     @Override
     public boolean isCancelled() {
         return this.cancelled;
