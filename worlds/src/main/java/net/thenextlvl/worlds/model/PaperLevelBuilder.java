@@ -7,7 +7,7 @@ import net.thenextlvl.worlds.api.model.LevelBuilder;
 import net.thenextlvl.worlds.api.model.WorldPreset;
 import net.thenextlvl.worlds.api.preset.Preset;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -26,7 +26,7 @@ public class PaperLevelBuilder implements LevelBuilder {
     private @Nullable NamespacedKey key;
     private @Nullable Preset preset;
     private @Nullable String name;
-    private World.@Nullable Environment environment;
+    private @Nullable Environment environment;
     private @Nullable WorldPreset type;
 
     public PaperLevelBuilder(WorldsPlugin plugin, File level) {
@@ -75,7 +75,7 @@ public class PaperLevelBuilder implements LevelBuilder {
     }
 
     @Override
-    public World.@Nullable Environment environment() {
+    public @Nullable Environment environment() {
         return environment;
     }
 
@@ -90,7 +90,7 @@ public class PaperLevelBuilder implements LevelBuilder {
     }
 
     @Override
-    public LevelBuilder environment(World.@Nullable Environment environment) {
+    public LevelBuilder environment(@Nullable Environment environment) {
         this.environment = environment;
         return this;
     }
