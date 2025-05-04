@@ -5,11 +5,12 @@ import net.kyori.adventure.key.Key;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.link.LinkProvider;
 import net.thenextlvl.worlds.api.link.LinkTree;
-import net.thenextlvl.worlds.api.link.Relative;
+import org.bukkit.NamespacedKey;
 import org.bukkit.PortalType;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
@@ -21,6 +22,9 @@ import static org.bukkit.persistence.PersistentDataType.STRING;
 
 @NullMarked
 public class WorldLinkProvider implements LinkProvider {
+    private static final NamespacedKey OLD_LINK_NETHER = new NamespacedKey("relative", "nether");
+    private static final NamespacedKey OLD_LINK_END = new NamespacedKey("relative", "the_end");
+
     private final Set<LinkTree> trees = new HashSet<>();
     private final WorldsPlugin plugin;
 
@@ -29,24 +33,44 @@ public class WorldLinkProvider implements LinkProvider {
     }
 
     public void unloadTree(World world) {
-        var overworld = world.getEnvironment().equals(Environment.NORMAL);
-        Preconditions.checkArgument(overworld, "Expected NORMAL but was %s for %s", world.getEnvironment(), world.getName());
-
+        if (!world.getEnvironment().equals(World.Environment.NORMAL)) return;
         trees.removeIf(tree -> tree.getPersistedOverworld().equals(world.key()));
     }
 
     public void loadTree(World world) {
-        var overworld = world.getEnvironment().equals(Environment.NORMAL);
-        Preconditions.checkArgument(overworld, "Expected NORMAL but was %s for %s", world.getEnvironment(), world.getName());
+        if (!world.getEnvironment().equals(World.Environment.NORMAL)) return;
 
         var noneMatch = trees.stream().noneMatch(tree -> tree.getPersistedOverworld().equals(world.key()));
         Preconditions.checkState(noneMatch, "World tree is already loaded for %s", world.getName());
 
         var tree = new WorldLinkTree(this, world.key());
         var data = world.getPersistentDataContainer();
-        Optional.ofNullable(data.get(Relative.NETHER.key(), STRING)).map(Key::key).ifPresent(tree::setNether);
-        Optional.ofNullable(data.get(Relative.THE_END.key(), STRING)).map(Key::key).ifPresent(tree::setEnd);
+
+        Optional.ofNullable(data.get(OLD_LINK_NETHER, STRING)).map(Key::key).ifPresent(key -> {
+            data.remove(OLD_LINK_NETHER);
+            tree.setNether(key);
+        });
+        Optional.ofNullable(data.get(OLD_LINK_END, STRING)).map(Key::key).ifPresent(key -> {
+            data.remove(OLD_LINK_END);
+            tree.setEnd(key);
+        });
+
+        Optional.ofNullable(data.get(WorldLinkTree.LINK_NETHER, STRING)).map(Key::key).ifPresent(tree::setNether);
+        Optional.ofNullable(data.get(WorldLinkTree.LINK_END, STRING)).map(Key::key).ifPresent(tree::setEnd);
         trees.add(tree);
+    }
+
+    public void persistTree(World world) {
+        if (!world.getEnvironment().equals(World.Environment.NORMAL)) return;
+        getLinkTree(world).ifPresent(tree -> {
+            var container = world.getPersistentDataContainer();
+            tree.getPersistedNether().map(Key::asString).ifPresentOrElse(
+                    nether -> container.set(WorldLinkTree.LINK_NETHER, PersistentDataType.STRING, nether),
+                    () -> container.remove(WorldLinkTree.LINK_NETHER));
+            tree.getPersistedEnd().map(Key::asString).ifPresentOrElse(
+                    nether -> container.set(WorldLinkTree.LINK_END, PersistentDataType.STRING, nether),
+                    () -> container.remove(WorldLinkTree.LINK_END));
+        });
     }
 
     @Override
@@ -68,26 +92,17 @@ public class WorldLinkProvider implements LinkProvider {
     public Optional<World> getTarget(World world, PortalType type) {
         return switch (type) {
             case NETHER -> switch (world.getEnvironment()) {
-                case NORMAL, THE_END -> getTarget(world, Relative.NETHER);
-                case NETHER -> getTarget(world, Relative.OVERWORLD);
+                case NORMAL, THE_END -> getLinkTree(world).flatMap(LinkTree::getNether);
+                case NETHER -> getLinkTree(world).flatMap(LinkTree::getOverworld);
                 default -> Optional.empty();
             };
             case ENDER -> switch (world.getEnvironment()) {
-                case NORMAL, NETHER -> getTarget(world, Relative.THE_END);
-                case THE_END -> getTarget(world, Relative.OVERWORLD);
+                case NORMAL, NETHER -> getLinkTree(world).flatMap(LinkTree::getEnd);
+                case THE_END -> getLinkTree(world).flatMap(LinkTree::getOverworld);
                 default -> Optional.empty();
             };
             default -> Optional.empty();
         };
-    }
-
-    @Override
-    public Optional<World> getTarget(World world, Relative relative) {
-        return getLinkTree(world).flatMap(tree -> switch (relative) {
-            case OVERWORLD -> tree.getOverworld();
-            case NETHER -> tree.getNether();
-            case THE_END -> tree.getEnd();
-        });
     }
 
     @Override

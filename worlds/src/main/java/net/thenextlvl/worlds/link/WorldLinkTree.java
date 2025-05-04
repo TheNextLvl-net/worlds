@@ -2,6 +2,7 @@ package net.thenextlvl.worlds.link;
 
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.worlds.api.link.LinkTree;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.jspecify.annotations.NullMarked;
@@ -11,6 +12,9 @@ import java.util.Optional;
 
 @NullMarked
 public class WorldLinkTree implements LinkTree {
+    public static final NamespacedKey LINK_NETHER = new NamespacedKey("worlds", "link_nether");
+    public static final NamespacedKey LINK_END = new NamespacedKey("worlds", "link_end");
+
     private final WorldLinkProvider provider;
     private final Key overworld;
     private @Nullable Key nether = null;

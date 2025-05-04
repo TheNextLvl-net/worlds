@@ -52,15 +52,6 @@ public interface LinkProvider {
     Optional<World> getTarget(World world, PortalType type);
 
     /**
-     * Retrieves the target world relative to the provided world based on the specified type of relationship.
-     *
-     * @param world    the current world context for which the relative target is determined
-     * @param relative the desired relative environment (e.g., OVERWORLD, NETHER, THE_END)
-     * @return an Optional containing the target world if available
-     */
-    Optional<World> getTarget(World world, Relative relative);
-
-    /**
      * Establishes a link between the specified source and destination world.
      * The link is created depending on the type of the destination world's environment.
      * <p>

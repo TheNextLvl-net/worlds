@@ -2,7 +2,6 @@ package net.thenextlvl.worlds.listener;
 
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.event.WorldDeleteEvent;
-import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -29,18 +28,16 @@ public class WorldListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onWorldLoad(WorldLoadEvent event) {
-        if (!event.getWorld().getEnvironment().equals(World.Environment.NORMAL)) return;
         plugin.linkProvider().loadTree(event.getWorld());
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onWorldLoad(WorldUnloadEvent event) {
-        if (!event.getWorld().getEnvironment().equals(World.Environment.NORMAL)) return;
         plugin.linkProvider().unloadTree(event.getWorld());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onWorldSave(WorldSaveEvent event) {
-        plugin.persistLinks(event.getWorld());
+        plugin.linkProvider().persistTree(event.getWorld());
     }
 }
