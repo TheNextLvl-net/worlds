@@ -11,11 +11,9 @@ import net.thenextlvl.worlds.api.model.Generator;
 import net.thenextlvl.worlds.api.model.LevelBuilder;
 import net.thenextlvl.worlds.api.preset.Presets;
 import net.thenextlvl.worlds.api.view.GeneratorView;
-import net.thenextlvl.worlds.api.view.LevelView;
 import net.thenextlvl.worlds.command.WorldCommand;
 import net.thenextlvl.worlds.link.WorldLinkProvider;
 import net.thenextlvl.worlds.listener.PortalListener;
-import net.thenextlvl.worlds.listener.ServerListener;
 import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.model.MessageMigrator;
 import net.thenextlvl.worlds.model.PaperLevelBuilder;
@@ -45,7 +43,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     private final boolean runningFolia = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
 
     private final GeneratorView generatorView = new PluginGeneratorView();
-    private final LevelView levelView = runningFolia ? new FoliaLevelView(this) : new PaperLevelView(this);
+    private final PaperLevelView levelView = runningFolia ? new FoliaLevelView(this) : new PaperLevelView(this);
 
     private final WorldLinkProvider linkProvider = new WorldLinkProvider(this);
 
@@ -127,7 +125,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     }
 
     @Override
-    public LevelView levelView() {
+    public PaperLevelView levelView() {
         return levelView;
     }
 
@@ -186,7 +184,6 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(new PortalListener(this), this);
-        getServer().getPluginManager().registerEvents(new ServerListener(this), this);
         getServer().getPluginManager().registerEvents(new WorldListener(this), this);
     }
 
