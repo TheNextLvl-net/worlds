@@ -37,7 +37,7 @@ public class WorldListener implements Listener {
                 if (!level.isEnabled()) return;
                 level.create().ifPresent(world -> plugin.getComponentLogger().debug(
                         "Loaded dimension {} ({}) from {}",
-                        world.key().asString(), level.getType().key().asString(),
+                        world.key().asString(), level.getGeneratorType().key().asString(),
                         world.getWorldFolder().getPath()
                 ));
             } catch (GeneratorException e) {

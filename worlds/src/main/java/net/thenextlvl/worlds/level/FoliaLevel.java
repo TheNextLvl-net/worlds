@@ -1,15 +1,14 @@
-package net.thenextlvl.worlds.model;
+package net.thenextlvl.worlds.level;
 
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.model.LevelBuilder;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public class FoliaLevel extends PaperLevel {
-    public FoliaLevel(WorldsPlugin plugin, LevelBuilder builder) {
+class FoliaLevel extends LevelData {
+    public FoliaLevel(WorldsPlugin plugin, Builder builder) {
         super(plugin, builder);
     }
 
