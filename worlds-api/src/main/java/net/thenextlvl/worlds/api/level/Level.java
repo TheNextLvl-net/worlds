@@ -97,6 +97,11 @@ public interface Level extends Keyed {
         Builder bonusChest(@Nullable Boolean bonusChest);
 
         @Nullable
+        Boolean worldKnown();
+
+        Builder worldKnown(@Nullable Boolean worldKnown);
+
+        @Nullable
         Long seed();
 
         Builder seed(@Nullable Long seed);

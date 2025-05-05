@@ -187,6 +187,7 @@ public abstract class LevelData implements Level {
         private @Nullable Boolean hardcore;
         private @Nullable Boolean structures;
         private @Nullable Boolean bonusChest;
+        private @Nullable Boolean worldKnown;
         private @Nullable Long seed;
 
         public Builder(WorldsPlugin plugin, Path directory) {
@@ -310,6 +311,17 @@ public abstract class LevelData implements Level {
         }
 
         @Override
+        public @Nullable Boolean worldKnown() {
+            return worldKnown;
+        }
+
+        @Override
+        public Level.Builder worldKnown(@Nullable Boolean worldKnown) {
+            this.worldKnown = worldKnown;
+            return this;
+        }
+
+        @Override
         public @Nullable Long seed() {
             return seed;
         }
@@ -357,13 +369,13 @@ public abstract class LevelData implements Level {
         var key = pdc.flatMap(tag -> tag.optional("worlds:world_key")
                 .map(Tag::getAsString).map(Key::key)).orElseGet(() -> createKey(name));
         var enabled = pdc.flatMap(tag -> tag.optional("worlds:enabled").map(Tag::getAsBoolean)).orElse(false);
-        var generator = pdc.flatMap(tag -> tag.optional("worlds:generator").map(Tag::getAsString)).map(serialized ->
+        var chunkGenerator = pdc.flatMap(tag -> tag.optional("worlds:generator").map(Tag::getAsString)).map(serialized ->
                 Generator.deserialize(plugin, serialized)).orElse(null);
         var dimensionType = getDimensionType(plugin, directory);
         var settings = data.flatMap(tag -> tag.<CompoundTag>optional("WorldGenSettings"));
         var dimensions = settings.flatMap(tag -> tag.<CompoundTag>optional("dimensions"));
         var dimension = dimensions.flatMap(tag -> tag.<CompoundTag>optional(dimensionType.key().asString()));
-        var generatorType = dimension.flatMap(tag -> tag.<CompoundTag>optional("generator"));
+        var generator = dimension.flatMap(tag -> tag.<CompoundTag>optional("generator"));
         var hardcore = settings.flatMap(tag -> tag.<ByteTag>optional("hardcore"))
                 .map(ByteTag::getAsBoolean).orElse(plugin.getServer().isHardcore());
         var seed = settings.flatMap(tag -> tag.<LongTag>optional("seed"))
@@ -372,21 +384,25 @@ public abstract class LevelData implements Level {
                 .map(ByteTag::getAsBoolean).orElse(plugin.getServer().getGenerateStructures());
         var bonusChest = settings.flatMap(tag -> tag.<ByteTag>optional("bonus_chest"))
                 .map(ByteTag::getAsBoolean).orElse(false);
-        var worldPreset = generatorType.flatMap(plugin.levelView()::getWorldPreset);
+        var worldPreset = generator.flatMap(plugin.levelView()::getWorldPreset);
         var preset = worldPreset.filter(type -> type.equals(GeneratorType.FLAT))
-                .flatMap(worldType -> generatorType.flatMap(plugin.levelView()::getFlatPreset))
+                .flatMap(worldType -> generator.flatMap(plugin.levelView()::getFlatPreset))
                 .orElse(null);
+        var generatorType = worldPreset.orElse(GeneratorType.NORMAL);
 
         return Optional.of(new Builder(plugin, directory)
                 .key(key)
                 .name(name)
                 .dimensionType(dimensionType)
-                .generator(generator)
-                .bonusChest(bonusChest)
-                .structures(structures)
+                .generatorType(generatorType)
+                .generator(chunkGenerator)
                 .preset(preset)
-                .seed(seed)
+                .enabled(enabled)
                 .hardcore(hardcore)
+                .structures(structures)
+                .bonusChest(bonusChest)
+                .worldKnown(worldKnown)
+                .seed(seed)
                 .build());
     }
 
