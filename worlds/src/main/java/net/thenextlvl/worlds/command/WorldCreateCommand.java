@@ -12,8 +12,9 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.model.Generator;
-import net.thenextlvl.worlds.api.model.WorldPreset;
+import net.thenextlvl.worlds.api.generator.DimensionType;
+import net.thenextlvl.worlds.api.generator.Generator;
+import net.thenextlvl.worlds.api.generator.GeneratorType;
 import net.thenextlvl.worlds.api.preset.Preset;
 import net.thenextlvl.worlds.command.argument.DimensionArgument;
 import net.thenextlvl.worlds.command.argument.SeedArgument;
@@ -102,11 +103,11 @@ class WorldCreateCommand {
 
     private static int create(WorldsPlugin plugin, CommandContext<CommandSourceStack> context) {
         return create(context, World.Environment.NORMAL, true,
-                ThreadLocalRandom.current().nextLong(), WorldPreset.NORMAL, null, null, plugin);
+                ThreadLocalRandom.current().nextLong(), GeneratorType.NORMAL, null, null, plugin);
     }
 
     private static int create(CommandContext<CommandSourceStack> context, World.Environment environment, boolean structures,
-                              long seed, WorldPreset type, @Nullable Preset preset, @Nullable Generator generator, WorldsPlugin plugin) {
+                              long seed, GeneratorType type, @Nullable Preset preset, @Nullable Generator generator, WorldsPlugin plugin) {
         var keyInput = context.getNodes().stream()
                 .filter(node -> node.getNode().getName().equals("key"))
                 .map(ParsedCommandNode::getRange)
@@ -124,18 +125,22 @@ class WorldCreateCommand {
         var levelFolder = plugin.getServer().getWorldContainer().toPath().resolve(name);
 
         var level = plugin.levelBuilder(levelFolder)
-                .environment(environment)
+                .dimensionType(switch (environment) {
+                    case THE_END -> DimensionType.THE_END;
+                    case NETHER -> DimensionType.THE_NETHER;
+                    default -> DimensionType.OVERWORLD;
+                })
                 .generator(generator)
                 .key(key)
                 .name(name)
                 .preset(preset)
                 .seed(seed)
                 .structures(structures)
-                .type(type)
+                .generatorType(type)
                 .build();
 
         var world = plugin.getServer().getWorld(level.key()) == null
-                    && plugin.getServer().getWorld(level.name()) == null
+                    && plugin.getServer().getWorld(level.getName()) == null
                 ? level.create().orElse(null) : null;
 
         var message = world != null ? "world.create.success" : "world.create.failed";
@@ -156,16 +161,16 @@ class WorldCreateCommand {
 
     private static int createGenerator(CommandContext<CommandSourceStack> context, World.Environment environment, boolean structures, long seed, WorldsPlugin plugin) {
         var generator = context.getArgument("generator", Generator.class);
-        return create(context, environment, structures, seed, WorldPreset.NORMAL, null, generator, plugin);
+        return create(context, environment, structures, seed, GeneratorType.NORMAL, null, generator, plugin);
     }
 
     private static int createPreset(CommandContext<CommandSourceStack> context, World.Environment environment, boolean structures, long seed, WorldsPlugin plugin) {
         var preset = context.getArgument("preset", Preset.class);
-        return create(context, environment, structures, seed, WorldPreset.FLAT, preset, null, plugin);
+        return create(context, environment, structures, seed, GeneratorType.FLAT, preset, null, plugin);
     }
 
     private static int createType(CommandContext<CommandSourceStack> context, World.Environment environment, boolean structures, long seed, WorldsPlugin plugin) {
-        var type = context.getArgument("type", WorldPreset.class);
+        var type = context.getArgument("type", GeneratorType.class);
         return create(context, environment, structures, seed, type, null, null, plugin);
     }
 

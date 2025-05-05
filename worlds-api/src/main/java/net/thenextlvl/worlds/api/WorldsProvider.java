@@ -1,9 +1,9 @@
 package net.thenextlvl.worlds.api;
 
 import net.thenextlvl.perworlds.GroupProvider;
+import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.link.LinkProvider;
 import net.thenextlvl.worlds.api.link.LinkTree;
-import net.thenextlvl.worlds.api.model.LevelBuilder;
 import net.thenextlvl.worlds.api.view.GeneratorView;
 import net.thenextlvl.worlds.api.view.LevelView;
 import org.bukkit.plugin.Plugin;
@@ -30,12 +30,12 @@ public interface WorldsProvider extends Plugin {
     GeneratorView generatorView();
 
     /**
-     * Creates a {@link LevelBuilder} instance to configure and build a level from the specified directory.
+     * Creates a {@link Level.Builder} instance to configure and build a level from the specified directory.
      *
      * @param level the path representing the level to be built
-     * @return a {@link LevelBuilder} for configuring and creating the specified level
+     * @return a {@link Level.Builder} for configuring and creating the specified level
      */
-    LevelBuilder levelBuilder(Path level);
+    Level.Builder levelBuilder(Path level);
 
     /**
      * Provides access to the {@link LevelView} functionality, which includes operations

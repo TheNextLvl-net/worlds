@@ -1,9 +1,8 @@
 package net.thenextlvl.worlds.api.view;
 
-import core.nbt.file.NBTFile;
 import core.nbt.tag.CompoundTag;
-import net.thenextlvl.worlds.api.model.LevelExtras;
-import net.thenextlvl.worlds.api.model.WorldPreset;
+import net.thenextlvl.worlds.api.generator.GeneratorType;
+import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.preset.Preset;
 import org.bukkit.World;
 import org.jetbrains.annotations.Unmodifiable;
@@ -15,9 +14,7 @@ import java.util.Set;
 
 @NullMarked
 public interface LevelView {
-    NBTFile<CompoundTag> getLevelDataFile(Path level);
-
-    Optional<LevelExtras> getExtras(CompoundTag data);
+    Optional<Level> read(Path directory);
 
     Optional<Preset> getFlatPreset(CompoundTag generator);
 
@@ -27,14 +24,10 @@ public interface LevelView {
 
     Optional<String> getGeneratorType(CompoundTag generator);
 
-    Optional<WorldPreset> getWorldPreset(CompoundTag generator);
+    Optional<GeneratorType> getWorldPreset(CompoundTag generator);
 
     @Unmodifiable
     Set<Path> listLevels();
-
-    String getDimension(CompoundTag dimensions, World.Environment environment);
-
-    World.Environment getEnvironment(Path level);
 
     boolean canLoad(Path level);
 

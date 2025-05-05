@@ -10,8 +10,9 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.model.Generator;
-import net.thenextlvl.worlds.api.model.Level;
+import net.thenextlvl.worlds.api.generator.DimensionType;
+import net.thenextlvl.worlds.api.generator.Generator;
+import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.command.argument.DimensionArgument;
 import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.NamespacedKey;
@@ -75,11 +76,18 @@ class WorldImportCommand {
         var levelFolder = plugin.getServer().getWorldContainer().toPath().resolve(name);
 
         var build = plugin.levelView().isLevel(levelFolder)
-                ? plugin.levelBuilder(levelFolder).environment(environment)
+                ? plugin.levelBuilder(levelFolder)
+                .dimensionType(switch (environment) {
+                    case null -> DimensionType.OVERWORLD;
+                    case NORMAL -> DimensionType.OVERWORLD;
+                    case NETHER -> DimensionType.THE_NETHER;
+                    case THE_END -> DimensionType.THE_END;
+                    default -> throw new IllegalStateException("Unexpected value: " + environment);
+                })
                 .generator(generator).key(key).build() : null;
 
         var world = Optional.ofNullable(build)
-                .filter(level -> !level.importedBefore())
+                .filter(level -> !level.isWorldKnown())
                 .flatMap(Level::create)
                 .orElse(null);
 

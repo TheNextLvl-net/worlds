@@ -1,7 +1,6 @@
 package net.thenextlvl.worlds.view;
 
 import core.io.IO;
-import core.io.PathIO;
 import core.nbt.file.NBTFile;
 import core.nbt.tag.CompoundTag;
 import core.nbt.tag.ListTag;
@@ -9,18 +8,18 @@ import core.nbt.tag.StringTag;
 import core.nbt.tag.Tag;
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.model.Generator;
-import net.thenextlvl.worlds.api.model.LevelExtras;
-import net.thenextlvl.worlds.api.model.WorldPreset;
+import net.thenextlvl.worlds.api.generator.GeneratorType;
+import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.preset.Biome;
 import net.thenextlvl.worlds.api.preset.Layer;
 import net.thenextlvl.worlds.api.preset.Preset;
 import net.thenextlvl.worlds.api.preset.Structure;
 import net.thenextlvl.worlds.api.view.LevelView;
-import org.bukkit.NamespacedKey;
+import net.thenextlvl.worlds.level.LevelData;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,25 +38,20 @@ public class PaperLevelView implements LevelView {
         this.plugin = plugin;
     }
 
-    @Override
-    public NBTFile<CompoundTag> getLevelDataFile(Path level) {
-        return new NBTFile<>(Optional.of(
-                IO.of(level.resolve("level.dat"))
-        ).filter(PathIO::exists).orElseGet(() ->
-                IO.of(level.resolve("level.dat_old"))
-        ), new CompoundTag());
+    public Optional<NBTFile<CompoundTag>> getLevelDataFile(Path level) {
+        return Optional.ofNullable(getFile(level, "level.dat"))
+                .or(() -> Optional.ofNullable(getFile(level, "level.dat_old")));
+    }
+
+    private static @Nullable NBTFile<CompoundTag> getFile(Path level, String other) {
+        var old = level.resolve(other);
+        if (!Files.exists(old)) return null;
+        return new NBTFile<>(IO.of(old), new CompoundTag());
     }
 
     @Override
-    public Optional<LevelExtras> getExtras(CompoundTag data) {
-        return data.optional("BukkitValues").map(Tag::getAsCompound).map(values -> {
-            var key = values.optional("worlds:world_key").map(Tag::getAsString).map(NamespacedKey::fromString);
-            var generator = values.optional("worlds:generator").map(Tag::getAsString).map(serialized ->
-                    Generator.deserialize(plugin, serialized));
-            var enabled = values.optional("worlds:enabled").map(Tag::getAsBoolean);
-            if (key.isEmpty() && generator.isEmpty() && enabled.isEmpty()) return null;
-            return new LevelExtras(key.orElse(null), generator.orElse(null), enabled.orElse(false));
-        });
+    public Optional<Level> read(Path directory) {
+        return LevelData.read(plugin, directory);
     }
 
     @Override
@@ -123,30 +117,30 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public Optional<WorldPreset> getWorldPreset(CompoundTag generator) {
+    public Optional<GeneratorType> getWorldPreset(CompoundTag generator) {
 
         var settings = getGeneratorSettings(generator);
-        if (settings.filter(s -> s.equals(WorldPreset.LARGE_BIOMES.key().asString())).isPresent())
-            return Optional.of(WorldPreset.LARGE_BIOMES);
-        if (settings.filter(s -> s.equals(WorldPreset.AMPLIFIED.key().asString())).isPresent())
-            return Optional.of(WorldPreset.AMPLIFIED);
+        if (settings.filter(s -> s.equals(GeneratorType.LARGE_BIOMES.key().asString())).isPresent())
+            return Optional.of(GeneratorType.LARGE_BIOMES);
+        if (settings.filter(s -> s.equals(GeneratorType.AMPLIFIED.key().asString())).isPresent())
+            return Optional.of(GeneratorType.AMPLIFIED);
 
         var type = generator.<CompoundTag>optional("biome_source")
                 .flatMap(tag -> tag.<StringTag>optional("type"))
                 .map(Tag::getAsString);
 
-        if (type.filter(s -> s.equals(WorldPreset.SINGLE_BIOME.key().asString())).isPresent())
-            return Optional.of(WorldPreset.SINGLE_BIOME);
-        if (type.filter(s -> s.equals(WorldPreset.CHECKERBOARD.key().asString())).isPresent())
-            return Optional.of(WorldPreset.CHECKERBOARD);
+        // if (type.filter(s -> s.equals(BiomeSource.SINGLE_BIOME.key().asString())).isPresent())
+        //     return Optional.of(GeneratorType.SINGLE_BIOME);
+        // if (type.filter(s -> s.equals(GeneratorType.CHECKERBOARD.key().asString())).isPresent())
+        //     return Optional.of(GeneratorType.CHECKERBOARD);
 
         var generatorType = getGeneratorType(generator);
-        if (generatorType.filter(s -> s.equals(WorldPreset.DEBUG.key().asString())).isPresent())
-            return Optional.of(WorldPreset.DEBUG);
-        if (generatorType.filter(s -> s.equals(WorldPreset.FLAT.key().asString())).isPresent())
-            return Optional.of(WorldPreset.FLAT);
-        if (generatorType.filter(s -> s.equals(WorldPreset.NORMAL.key().asString())).isPresent())
-            return Optional.of(WorldPreset.NORMAL);
+        if (generatorType.filter(s -> s.equals(GeneratorType.DEBUG.key().asString())).isPresent())
+            return Optional.of(GeneratorType.DEBUG);
+        if (generatorType.filter(s -> s.equals(GeneratorType.FLAT.key().asString())).isPresent())
+            return Optional.of(GeneratorType.FLAT);
+        if (generatorType.filter(s -> s.equals(GeneratorType.NORMAL.key().asString())).isPresent())
+            return Optional.of(GeneratorType.NORMAL);
 
         return Optional.empty();
     }
@@ -158,27 +152,6 @@ public class PaperLevelView implements LevelView {
         } catch (IOException e) {
             return Set.of();
         }
-    }
-
-    @Override
-    public String getDimension(CompoundTag dimensions, World.Environment environment) {
-        return switch (environment) {
-            case NORMAL -> "minecraft:overworld";
-            case NETHER -> "minecraft:the_nether";
-            case THE_END -> "minecraft:the_end";
-            case CUSTOM -> dimensions.keySet().stream().filter(s -> !s.startsWith("minecraft")).findAny()
-                    .orElseThrow(() -> new UnsupportedOperationException("Could not find custom dimension"));
-        };
-    }
-
-    @Override
-    public World.Environment getEnvironment(Path level) {
-        var end = hasEndDimension(level);
-        var nether = hasNetherDimension(level);
-        if (end && nether) return World.Environment.NORMAL;
-        if (end) return World.Environment.THE_END;
-        if (nether) return World.Environment.NETHER;
-        return World.Environment.NORMAL;
     }
 
     @Override
