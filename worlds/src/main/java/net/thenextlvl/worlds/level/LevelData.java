@@ -1,21 +1,19 @@
 package net.thenextlvl.worlds.level;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonObject;
 import core.nbt.tag.ByteTag;
 import core.nbt.tag.CompoundTag;
 import core.nbt.tag.LongTag;
 import core.nbt.tag.Tag;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.util.TriState;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.generator.DimensionType;
 import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.generator.GeneratorType;
+import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.preset.Preset;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -31,13 +29,15 @@ public abstract class LevelData implements Level {
 
     protected final Key key;
     protected final String name;
-    protected final DimensionType dimensionType;
+    protected final LevelStem levelStem;
     protected final GeneratorType generatorType;
 
     protected final @Nullable Generator generator;
     protected final @Nullable Preset preset;
 
-    protected final boolean enabled;
+    protected final TriState keepSpawnLoaded = TriState.NOT_SET;
+
+    protected final TriState enabled;
     protected final boolean hardcore;
     protected final boolean worldKnown;
     protected final boolean structures;
@@ -47,37 +47,33 @@ public abstract class LevelData implements Level {
     protected LevelData(WorldsPlugin plugin, Builder builder) {
         Preconditions.checkState(builder.key != null, "Key must be set");
         Preconditions.checkState(builder.name != null, "Name must be set");
-        Preconditions.checkState(builder.dimensionType != null, "Dimension type must be set");
+        Preconditions.checkState(builder.levelStem != null, "Dimension type must be set");
         Preconditions.checkState(builder.generatorType != null, "Generator type must be set");
-        Preconditions.checkState(builder.seed != null, "Seed must be set");
-        Preconditions.checkState(builder.hardcore != null, "Hardcore must be set");
-        Preconditions.checkState(builder.structures != null, "Structures must be set");
-        Preconditions.checkState(builder.bonusChest != null, "Bonus chest must be set");
 
         this.plugin = plugin;
         this.file = builder.directory;
         this.key = builder.key;
         this.name = builder.name;
-        this.dimensionType = builder.dimensionType;
+        this.levelStem = builder.levelStem;
         this.generatorType = builder.generatorType;
         this.generator = builder.generator;
         this.preset = builder.preset;
-        this.enabled = true;
-        this.hardcore = builder.hardcore;
-        this.worldKnown = false;
-        this.structures = builder.structures;
-        this.bonusChest = builder.bonusChest;
-        this.seed = builder.seed;
+        this.enabled = builder.enabled;
+        this.hardcore = builder.hardcore != null ? builder.hardcore : plugin.getServer().isHardcore();
+        this.worldKnown = builder.worldKnown != null ? builder.worldKnown : false;
+        this.structures = builder.structures != null ? builder.structures : plugin.getServer().getGenerateStructures();
+        this.bonusChest = builder.bonusChest != null ? builder.bonusChest : false;
+        this.seed = builder.seed != null ? builder.seed : ThreadLocalRandom.current().nextLong();
+    }
+
+    @Override
+    public Key key() {
+        return key;
     }
 
     @Override
     public Path getFile() {
         return file;
-    }
-
-    @Override
-    public Key getKey() {
-        return key;
     }
 
     @Override
@@ -91,8 +87,8 @@ public abstract class LevelData implements Level {
     }
 
     @Override
-    public DimensionType getDimensionType() {
-        return dimensionType;
+    public LevelStem getLevelStem() {
+        return levelStem;
     }
 
     @Override
@@ -106,7 +102,12 @@ public abstract class LevelData implements Level {
     }
 
     @Override
-    public boolean isEnabled() {
+    public TriState isKeepSpawnLoaded() {
+        return keepSpawnLoaded;
+    }
+
+    @Override
+    public TriState isEnabled() {
         return enabled;
     }
 
@@ -136,28 +137,21 @@ public abstract class LevelData implements Level {
     }
 
     @Override
-    public Optional<World> create() {
-        var generatorSettings = Optional.ofNullable(preset)
-                .map(Preset::serialize)
-                .map(JsonObject::toString)
-                .orElse("");
-
-        var creator = new WorldCreator(name, new NamespacedKey(key.namespace(), key.value()))
-                .environment(dimensionType.toBukkit())
-                .generateStructures(structures)
-                .generatorSettings(generatorSettings)
+    public Level.Builder toBuilder() {
+        return new Builder(plugin, file)
+                .key(key)
+                .name(name)
+                .levelStem(levelStem)
+                .generatorType(generatorType)
+                .generator(generator)
+                .preset(preset)
+                .enabled(enabled)
                 .hardcore(hardcore)
-                .seed(seed)
+                .worldKnown(worldKnown)
+                .structures(structures)
                 .bonusChest(bonusChest)
-                .type(typeOf(generatorType));
-
-        if (generator != null) creator.generator(generator.generator(creator.name()));
-        if (generator != null) creator.biomeProvider(generator.biomeProvider(creator.name()));
-
-        return Optional.ofNullable(createWorld(creator));
+                .seed(seed);
     }
-
-    protected abstract @Nullable World createWorld(WorldCreator creator);
 
     private WorldType typeOf(GeneratorType generatorType) {
         if (generatorType.equals(GeneratorType.AMPLIFIED)) return WorldType.AMPLIFIED;
@@ -168,22 +162,19 @@ public abstract class LevelData implements Level {
         return WorldType.NORMAL;
     }
 
-    @Override
-    public Key key() {
-        return key;
-    }
-
     public static class Builder implements Level.Builder {
         private final WorldsPlugin plugin;
         private final Path directory;
 
+        private TriState keepSpawnLoaded = TriState.NOT_SET;
+
         private @Nullable Key key;
         private @Nullable String name;
-        private @Nullable DimensionType dimensionType;
+        private @Nullable LevelStem levelStem;
         private @Nullable GeneratorType generatorType;
         private @Nullable Generator generator;
         private @Nullable Preset preset;
-        private @Nullable Boolean enabled;
+        private TriState enabled = TriState.NOT_SET;
         private @Nullable Boolean hardcore;
         private @Nullable Boolean structures;
         private @Nullable Boolean bonusChest;
@@ -223,13 +214,13 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public @Nullable DimensionType dimensionType() {
-            return dimensionType;
+        public @Nullable LevelStem levelStem() {
+            return levelStem;
         }
 
         @Override
-        public Level.Builder dimensionType(@Nullable DimensionType type) {
-            this.dimensionType = type;
+        public Level.Builder levelStem(@Nullable LevelStem levelStem) {
+            this.levelStem = levelStem;
             return this;
         }
 
@@ -267,12 +258,23 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public @Nullable Boolean enabled() {
+        public TriState keepSpawnLoaded() {
+            return keepSpawnLoaded;
+        }
+
+        @Override
+        public Level.Builder keepSpawnLoaded(TriState keepSpawnLoaded) {
+            this.keepSpawnLoaded = keepSpawnLoaded;
+            return this;
+        }
+
+        @Override
+        public TriState enabled() {
             return enabled;
         }
 
         @Override
-        public Level.Builder enabled(@Nullable Boolean enabled) {
+        public Level.Builder enabled(TriState enabled) {
             this.enabled = enabled;
             return this;
         }
@@ -344,7 +346,7 @@ public abstract class LevelData implements Level {
                "file=" + file +
                ", key=" + key +
                ", name='" + name + '\'' +
-               ", dimensionType=" + dimensionType.key() +
+               ", levelStem=" + levelStem +
                ", generatorType=" + generatorType.key() +
                ", generator=" + generator +
                ", preset=" + preset +
@@ -368,13 +370,14 @@ public abstract class LevelData implements Level {
         var worldKnown = pdc.map(LevelData::isKnown).orElse(false);
         var key = pdc.flatMap(tag -> tag.optional("worlds:world_key")
                 .map(Tag::getAsString).map(Key::key)).orElseGet(() -> createKey(name));
-        var enabled = pdc.flatMap(tag -> tag.optional("worlds:enabled").map(Tag::getAsBoolean)).orElse(false);
+        var enabled = pdc.flatMap(tag -> tag.optional("worlds:enabled").map(Tag::getAsBoolean)
+                .map(TriState::byBoolean)).orElse(TriState.NOT_SET);
         var chunkGenerator = pdc.flatMap(tag -> tag.optional("worlds:generator").map(Tag::getAsString)).map(serialized ->
                 Generator.deserialize(plugin, serialized)).orElse(null);
-        var dimensionType = getDimensionType(plugin, directory);
+        var levelStem = getLevelStem(plugin, directory);
         var settings = data.flatMap(tag -> tag.<CompoundTag>optional("WorldGenSettings"));
         var dimensions = settings.flatMap(tag -> tag.<CompoundTag>optional("dimensions"));
-        var dimension = dimensions.flatMap(tag -> tag.<CompoundTag>optional(dimensionType.key().asString()));
+        var dimension = dimensions.flatMap(tag -> tag.<CompoundTag>optional(levelStem.dimensionType().key().asString()));
         var generator = dimension.flatMap(tag -> tag.<CompoundTag>optional("generator"));
         var hardcore = settings.flatMap(tag -> tag.<ByteTag>optional("hardcore"))
                 .map(ByteTag::getAsBoolean).orElse(plugin.getServer().isHardcore());
@@ -393,7 +396,7 @@ public abstract class LevelData implements Level {
         return Optional.of(new Builder(plugin, directory)
                 .key(key)
                 .name(name)
-                .dimensionType(dimensionType)
+                .levelStem(levelStem)
                 .generatorType(generatorType)
                 .generator(chunkGenerator)
                 .preset(preset)
@@ -406,13 +409,13 @@ public abstract class LevelData implements Level {
                 .build());
     }
 
-    private static DimensionType getDimensionType(WorldsPlugin plugin, Path directory) {
+    private static LevelStem getLevelStem(WorldsPlugin plugin, Path directory) {
         var end = plugin.levelView().hasEndDimension(directory);
         var nether = plugin.levelView().hasNetherDimension(directory);
-        if (end && nether) return DimensionType.OVERWORLD;
-        if (end) return DimensionType.THE_END;
-        if (nether) return DimensionType.THE_NETHER;
-        return DimensionType.OVERWORLD;
+        if (end && nether) return LevelStem.OVERWORLD;
+        if (end) return LevelStem.END;
+        if (nether) return LevelStem.NETHER;
+        return LevelStem.OVERWORLD;
     }
 
     private static boolean isKnown(CompoundTag tag) {

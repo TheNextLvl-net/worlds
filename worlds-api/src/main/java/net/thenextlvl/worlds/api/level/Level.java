@@ -2,9 +2,10 @@ package net.thenextlvl.worlds.api.level;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
-import net.thenextlvl.worlds.api.generator.DimensionType;
+import net.kyori.adventure.util.TriState;
 import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.generator.GeneratorType;
+import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.preset.Preset;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
@@ -17,19 +18,19 @@ import java.util.Optional;
 public interface Level extends Keyed {
     Path getFile();
 
-    Key getKey();
-
     String getName();
 
     GeneratorType getGeneratorType();
 
-    DimensionType getDimensionType();
+    LevelStem getLevelStem();
 
     Optional<Preset> getPreset();
 
     Optional<Generator> getGenerator();
 
-    boolean isEnabled();
+    TriState isKeepSpawnLoaded();
+
+    TriState isEnabled();
 
     boolean isWorldKnown();
 
@@ -40,6 +41,8 @@ public interface Level extends Keyed {
     boolean hasBonusChest();
 
     long getSeed();
+
+    Builder toBuilder();
 
     Optional<World> create();
 
@@ -57,9 +60,9 @@ public interface Level extends Keyed {
         Builder name(@Nullable String name);
 
         @Nullable
-        DimensionType dimensionType();
+        LevelStem levelStem();
 
-        Builder dimensionType(@Nullable DimensionType type);
+        Builder levelStem(@Nullable LevelStem type);
 
         @Nullable
         GeneratorType generatorType();
@@ -76,10 +79,13 @@ public interface Level extends Keyed {
 
         Builder preset(@Nullable Preset preset);
 
-        @Nullable
-        Boolean enabled();
+        TriState keepSpawnLoaded();
 
-        Builder enabled(@Nullable Boolean enabled);
+        Builder keepSpawnLoaded(TriState keepSpawnLoaded);
+
+        TriState enabled();
+
+        Builder enabled(TriState enabled);
 
         @Nullable
         Boolean hardcore();
