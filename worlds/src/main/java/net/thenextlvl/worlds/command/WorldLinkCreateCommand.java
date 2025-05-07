@@ -9,7 +9,7 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
+import net.thenextlvl.worlds.command.suggestion.LinkSuggestionProvider;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
@@ -22,22 +22,20 @@ class WorldLinkCreateCommand {
     }
 
     private static RequiredArgumentBuilder<CommandSourceStack, World> createArgument(WorldsPlugin plugin) {
-        return Commands.argument("source", ArgumentTypes.world())
-                .suggests(new WorldSuggestionProvider<>(plugin, (context, world) ->
-                        world.getEnvironment().equals(World.Environment.NORMAL)))
+        return Commands.argument("world", ArgumentTypes.world())
+                .suggests(new LinkSuggestionProvider<>(plugin, false))
                 .then(Commands.argument("destination", ArgumentTypes.world())
-                        .suggests(new WorldSuggestionProvider<>(plugin, (context, world) ->
-                                !world.getEnvironment().equals(World.Environment.NORMAL)))
+                        .suggests(new LinkSuggestionProvider.Unlinked<>(plugin))
                         .executes(context -> create(plugin, context)));
     }
 
     private static int create(WorldsPlugin plugin, CommandContext<CommandSourceStack> context) {
-        var source = context.getArgument("source", World.class);
+        var world = context.getArgument("world", World.class);
         var destination = context.getArgument("destination", World.class);
-        var link = plugin.linkController().link(source, destination);
+        var link = plugin.linkProvider().link(world, destination);
         var message = link ? "world.link.success" : "world.link.failed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
-                Placeholder.parsed("source", source.key().asString()),
+                Placeholder.parsed("source", world.key().asString()),
                 Placeholder.parsed("destination", destination.key().asString()));
         return link ? Command.SINGLE_SUCCESS : 0;
     }

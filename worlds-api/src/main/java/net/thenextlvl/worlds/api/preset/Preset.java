@@ -7,15 +7,27 @@ import com.google.gson.annotations.SerializedName;
 import core.file.format.GsonFile;
 import core.io.IO;
 import core.paper.adapters.inventory.MaterialAdapter;
+import net.thenextlvl.worlds.api.generator.GeneratorType;
 import net.thenextlvl.worlds.api.preset.adapter.BiomeTypeAdapter;
 import net.thenextlvl.worlds.api.preset.adapter.StructureTypeAdapter;
 import org.bukkit.Material;
+import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
 import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Represents a preset configuration for generating flat world maps.
+ * <p>
+ * This class allows customization of features such as biomes, layers, structures, decorations, and additional settings.
+ * It provides methods for modifying the preset's properties and serializing/deserializing the configuration.
+ * <a href="https://minecraft.wiki/w/Superflat#Vanilla_superflat_level_generation_presets">Wiki</a>
+ *
+ * @see GeneratorType#FLAT
+ */
 @NullMarked
 public class Preset {
     private static final Gson gson = new GsonBuilder()
@@ -33,6 +45,12 @@ public class Preset {
     private LinkedHashSet<Layer> layers = new LinkedHashSet<>();
     @SerializedName("structure_overrides")
     private LinkedHashSet<Structure> structures = new LinkedHashSet<>();
+
+    // https://minecraft.wiki/w/Superflat#Preset_code_format
+    public static Preset parse(String presetCode) {
+        // todo: preset code parsing
+        return new Preset();
+    }
 
     /**
      * Retrieves the biome associated with the preset.
@@ -117,10 +135,10 @@ public class Preset {
     /**
      * Retrieves the set of layers associated with the preset.
      *
-     * @return a {@code LinkedHashSet} containing the layers of the preset
+     * @return a {@code Set} containing the layers of the preset
      */
-    public LinkedHashSet<Layer> layers() {
-        return layers;
+    public @Unmodifiable Set<Layer> layers() {
+        return Set.copyOf(layers);
     }
 
     /**
@@ -129,8 +147,8 @@ public class Preset {
      * @param layers the set of layers to be associated with the preset
      * @return the preset instance for method chaining
      */
-    public Preset layers(LinkedHashSet<Layer> layers) {
-        this.layers = layers;
+    public Preset layers(Set<Layer> layers) {
+        this.layers = new LinkedHashSet<>(layers);
         return this;
     }
 
@@ -139,8 +157,8 @@ public class Preset {
      *
      * @return a {@code LinkedHashSet} containing the structures of the preset
      */
-    public LinkedHashSet<Structure> structures() {
-        return structures;
+    public @Unmodifiable Set<Structure> structures() {
+        return Set.copyOf(structures);
     }
 
     /**
@@ -149,8 +167,8 @@ public class Preset {
      * @param structures the set of structures to be associated with the preset
      * @return the preset instance for method chaining
      */
-    public Preset structures(LinkedHashSet<Structure> structures) {
-        this.structures = structures;
+    public Preset structures(Set<Structure> structures) {
+        this.structures = new LinkedHashSet<>(structures);
         return this;
     }
 
@@ -161,7 +179,7 @@ public class Preset {
      * @return the preset
      */
     public Preset addLayer(Layer layer) {
-        layers().add(layer);
+        layers.add(layer);
         return this;
     }
 
@@ -172,7 +190,7 @@ public class Preset {
      * @return the preset
      */
     public Preset addStructure(Structure structure) {
-        structures().add(structure);
+        structures.add(structure);
         return this;
     }
 
@@ -200,7 +218,7 @@ public class Preset {
 
     @Override
     public String toString() {
-        var layers = layers().stream()
+        var layers = this.layers.stream()
                 .map(Layer::toString)
                 .collect(Collectors.joining(","));
         return layers + ";" + biome();

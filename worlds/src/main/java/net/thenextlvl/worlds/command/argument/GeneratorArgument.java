@@ -3,7 +3,7 @@ package net.thenextlvl.worlds.command.argument;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import core.paper.command.WrappedArgumentType;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.model.Generator;
+import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.command.suggestion.GeneratorSuggestionProvider;
 import org.jspecify.annotations.NullMarked;
 

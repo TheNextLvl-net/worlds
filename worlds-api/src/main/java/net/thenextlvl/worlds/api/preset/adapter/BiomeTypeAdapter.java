@@ -8,11 +8,13 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import net.thenextlvl.worlds.api.preset.Biome;
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
 import java.lang.reflect.Type;
 
 @NullMarked
+@ApiStatus.Internal
 public class BiomeTypeAdapter implements JsonSerializer<Biome>, JsonDeserializer<Biome> {
     @Override
     public Biome deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {

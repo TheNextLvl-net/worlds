@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.api.model;
+package net.thenextlvl.worlds.api.generator;
 
 import net.thenextlvl.worlds.api.WorldsProvider;
 import net.thenextlvl.worlds.api.exception.GeneratorException;
