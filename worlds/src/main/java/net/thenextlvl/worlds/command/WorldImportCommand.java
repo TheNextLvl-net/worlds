@@ -10,18 +10,15 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.generator.DimensionType;
 import net.thenextlvl.worlds.api.generator.Generator;
+import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
-import net.thenextlvl.worlds.command.argument.DimensionArgument;
+import net.thenextlvl.worlds.command.argument.LevelStemArgument;
 import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-
-import java.util.Optional;
 
 import static net.thenextlvl.worlds.command.WorldCommand.generatorArgument;
 import static net.thenextlvl.worlds.command.WorldCommand.keyArgument;
@@ -37,7 +34,7 @@ class WorldImportCommand {
 
     private static RequiredArgumentBuilder<CommandSourceStack, String> importWorld(WorldsPlugin plugin) {
         return Commands.argument("world", StringArgumentType.string())
-                .suggests(new LevelSuggestionProvider<>(plugin))
+                .suggests(new LevelSuggestionProvider<>(plugin, true))
                 .then(importKeyed(plugin))
                 .executes(context -> execute(context, null, null, null, plugin));
     }
@@ -49,47 +46,35 @@ class WorldImportCommand {
         });
     }
 
-    private static RequiredArgumentBuilder<CommandSourceStack, World.Environment> importDimension(WorldsPlugin plugin) {
-        return Commands.argument("dimension", new DimensionArgument(plugin))
+    private static RequiredArgumentBuilder<CommandSourceStack, LevelStem> importDimension(WorldsPlugin plugin) {
+        return Commands.argument("level-type", new LevelStemArgument(plugin))
                 .then(importGenerator(plugin))
                 .executes(context -> importWorld(plugin, context));
     }
 
     private static int importWorld(WorldsPlugin plugin, CommandContext<CommandSourceStack> context) {
-        var environment = context.getArgument("dimension", World.Environment.class);
+        var levelStem = context.getArgument("level-type", LevelStem.class);
         var key = context.getArgument("key", NamespacedKey.class);
-        return execute(context, key, environment, null, plugin);
+        return execute(context, key, levelStem, null, plugin);
     }
 
     private static RequiredArgumentBuilder<CommandSourceStack, Generator> importGenerator(WorldsPlugin plugin) {
         return generatorArgument(plugin).executes(context -> {
-            var environment = context.getArgument("dimension", World.Environment.class);
+            var levelStem = context.getArgument("level-type", LevelStem.class);
             var generator = context.getArgument("generator", Generator.class);
             var key = context.getArgument("key", NamespacedKey.class);
-            return execute(context, key, environment, generator, plugin);
+            return execute(context, key, levelStem, generator, plugin);
         });
     }
 
     private static int execute(CommandContext<CommandSourceStack> context, @Nullable NamespacedKey key,
-                               World.@Nullable Environment environment, @Nullable Generator generator, WorldsPlugin plugin) {
+                               @Nullable LevelStem levelStem, @Nullable Generator generator, WorldsPlugin plugin) {
         var name = context.getArgument("world", String.class);
         var levelFolder = plugin.getServer().getWorldContainer().toPath().resolve(name);
 
-        var build = plugin.levelView().isLevel(levelFolder)
-                ? plugin.levelBuilder(levelFolder)
-                .dimensionType(switch (environment) {
-                    case null -> DimensionType.OVERWORLD;
-                    case NORMAL -> DimensionType.OVERWORLD;
-                    case NETHER -> DimensionType.THE_NETHER;
-                    case THE_END -> DimensionType.THE_END;
-                    default -> throw new IllegalStateException("Unexpected value: " + environment);
-                })
-                .generator(generator).key(key).build() : null;
-
-        var world = Optional.ofNullable(build)
-                .filter(level -> !level.isWorldKnown())
-                .flatMap(Level::create)
-                .orElse(null);
+        var build = plugin.levelView().read(levelFolder).map(Level::toBuilder)
+                .map(level -> level.levelStem(levelStem).generator(generator).key(key).build());
+        var world = build.filter(level -> !level.isWorldKnown()).flatMap(Level::create).orElse(null);
 
         var message = world != null ? "world.import.success" : "world.import.failed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message,

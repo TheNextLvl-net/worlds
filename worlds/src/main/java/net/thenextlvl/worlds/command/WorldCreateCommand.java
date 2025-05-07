@@ -12,21 +12,18 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.generator.DimensionType;
 import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.generator.GeneratorType;
+import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.preset.Preset;
-import net.thenextlvl.worlds.command.argument.DimensionArgument;
+import net.thenextlvl.worlds.command.argument.LevelStemArgument;
 import net.thenextlvl.worlds.command.argument.SeedArgument;
 import net.thenextlvl.worlds.command.argument.WorldPresetArgument;
-import net.thenextlvl.worlds.command.argument.WorldTypeArgument;
+import net.thenextlvl.worlds.command.argument.GeneratorTypeArgument;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 import static net.thenextlvl.worlds.command.WorldCommand.generatorArgument;
 import static net.thenextlvl.worlds.command.WorldCommand.keyArgument;
@@ -49,35 +46,32 @@ class WorldCreateCommand {
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> type(WorldsPlugin plugin) {
-        return Commands.literal("type").then(Commands.argument("type", new WorldTypeArgument(plugin))
-                .executes(context -> createType(context, World.Environment.NORMAL,
-                        true, ThreadLocalRandom.current().nextLong(), plugin))
+        return Commands.literal("type").then(Commands.argument("type", new GeneratorTypeArgument(plugin))
+                .executes(context -> createType(context, LevelStem.OVERWORLD, true, null, plugin))
                 .then(tree(WorldCreateCommand::createType, plugin)));
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> preset(WorldsPlugin plugin) {
         return Commands.literal("preset").then(Commands.argument("preset", new WorldPresetArgument(plugin))
-                .executes(context -> createPreset(context, World.Environment.NORMAL,
-                        true, ThreadLocalRandom.current().nextLong(), plugin))
+                .executes(context -> createPreset(context, LevelStem.OVERWORLD, true, null, plugin))
                 .then(tree(WorldCreateCommand::createPreset, plugin)));
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> generator(WorldsPlugin plugin) {
         return Commands.literal("generator").then(generatorArgument(plugin)
-                .executes(context -> createGenerator(context, World.Environment.NORMAL,
-                        true, ThreadLocalRandom.current().nextLong(), plugin))
+                .executes(context -> createGenerator(context, LevelStem.OVERWORLD, true, null, plugin))
                 .then(tree(WorldCreateCommand::createGenerator, plugin)));
     }
 
-    private static RequiredArgumentBuilder<CommandSourceStack, World.Environment> tree(Creator<CommandSourceStack> creator, WorldsPlugin plugin) {
-        return Commands.argument("dimension", new DimensionArgument(plugin))
+    private static RequiredArgumentBuilder<CommandSourceStack, LevelStem> tree(Creator<CommandSourceStack> creator, WorldsPlugin plugin) {
+        return Commands.argument("level-type", new LevelStemArgument(plugin))
                 .then(structures(creator, plugin))
                 .executes(context -> createDimension(creator, plugin, context));
     }
 
     private static int createDimension(Creator<CommandSourceStack> creator, WorldsPlugin plugin, CommandContext<CommandSourceStack> context) {
-        var environment = context.getArgument("dimension", World.Environment.class);
-        return creator.create(context, environment, true, ThreadLocalRandom.current().nextLong(), plugin);
+        var levelStem = context.getArgument("level-type", LevelStem.class);
+        return creator.create(context, levelStem, true, null, plugin);
     }
 
     private static RequiredArgumentBuilder<CommandSourceStack, Boolean> structures(Creator<CommandSourceStack> creator, WorldsPlugin plugin) {
@@ -87,27 +81,26 @@ class WorldCreateCommand {
     }
 
     private static int createStructures(Creator<CommandSourceStack> creator, WorldsPlugin plugin, CommandContext<CommandSourceStack> context) {
-        var environment = context.getArgument("dimension", World.Environment.class);
+        var levelStem = context.getArgument("level-type", LevelStem.class);
         var structures = context.getArgument("structures", boolean.class);
-        return creator.create(context, environment, structures, ThreadLocalRandom.current().nextLong(), plugin);
+        return creator.create(context, levelStem, structures, null, plugin);
     }
 
     private static RequiredArgumentBuilder<CommandSourceStack, Long> seed(Creator<CommandSourceStack> creator, WorldsPlugin plugin) {
         return Commands.argument("seed", new SeedArgument()).executes(context -> {
-            var environment = context.getArgument("dimension", World.Environment.class);
+            var levelStem = context.getArgument("level-type", LevelStem.class);
             var structures = context.getArgument("structures", boolean.class);
             var seed = context.getArgument("seed", long.class);
-            return creator.create(context, environment, structures, seed, plugin);
+            return creator.create(context, levelStem, structures, seed, plugin);
         });
     }
 
     private static int create(WorldsPlugin plugin, CommandContext<CommandSourceStack> context) {
-        return create(context, World.Environment.NORMAL, true,
-                ThreadLocalRandom.current().nextLong(), GeneratorType.NORMAL, null, null, plugin);
+        return create(context, LevelStem.OVERWORLD, true, null, GeneratorType.NORMAL, null, null, plugin);
     }
 
-    private static int create(CommandContext<CommandSourceStack> context, World.Environment environment, boolean structures,
-                              long seed, GeneratorType type, @Nullable Preset preset, @Nullable Generator generator, WorldsPlugin plugin) {
+    private static int create(CommandContext<CommandSourceStack> context, LevelStem levelStem, boolean structures,
+                              @Nullable Long seed, GeneratorType type, @Nullable Preset preset, @Nullable Generator generator, WorldsPlugin plugin) {
         var keyInput = context.getNodes().stream()
                 .filter(node -> node.getNode().getName().equals("key"))
                 .map(ParsedCommandNode::getRange)
@@ -125,11 +118,7 @@ class WorldCreateCommand {
         var levelFolder = plugin.getServer().getWorldContainer().toPath().resolve(name);
 
         var level = plugin.levelBuilder(levelFolder)
-                .dimensionType(switch (environment) {
-                    case THE_END -> DimensionType.THE_END;
-                    case NETHER -> DimensionType.THE_NETHER;
-                    default -> DimensionType.OVERWORLD;
-                })
+                .levelStem(levelStem)
                 .generator(generator)
                 .key(key)
                 .name(name)
@@ -165,22 +154,22 @@ class WorldCreateCommand {
         return world != null ? Command.SINGLE_SUCCESS : 0;
     }
 
-    private static int createGenerator(CommandContext<CommandSourceStack> context, World.Environment environment, boolean structures, long seed, WorldsPlugin plugin) {
+    private static int createGenerator(CommandContext<CommandSourceStack> context, LevelStem levelStem, boolean structures, @Nullable Long seed, WorldsPlugin plugin) {
         var generator = context.getArgument("generator", Generator.class);
-        return create(context, environment, structures, seed, GeneratorType.NORMAL, null, generator, plugin);
+        return create(context, levelStem, structures, seed, GeneratorType.NORMAL, null, generator, plugin);
     }
 
-    private static int createPreset(CommandContext<CommandSourceStack> context, World.Environment environment, boolean structures, long seed, WorldsPlugin plugin) {
+    private static int createPreset(CommandContext<CommandSourceStack> context, LevelStem levelStem, boolean structures, @Nullable Long seed, WorldsPlugin plugin) {
         var preset = context.getArgument("preset", Preset.class);
-        return create(context, environment, structures, seed, GeneratorType.FLAT, preset, null, plugin);
+        return create(context, levelStem, structures, seed, GeneratorType.FLAT, preset, null, plugin);
     }
 
-    private static int createType(CommandContext<CommandSourceStack> context, World.Environment environment, boolean structures, long seed, WorldsPlugin plugin) {
+    private static int createType(CommandContext<CommandSourceStack> context, LevelStem levelStem, boolean structures, @Nullable Long seed, WorldsPlugin plugin) {
         var type = context.getArgument("type", GeneratorType.class);
-        return create(context, environment, structures, seed, type, null, null, plugin);
+        return create(context, levelStem, structures, seed, type, null, null, plugin);
     }
 
     private interface Creator<S> {
-        int create(CommandContext<S> context, World.Environment environment, boolean structures, long seed, WorldsPlugin plugin);
+        int create(CommandContext<S> context, LevelStem levelStem, boolean structures, @Nullable Long seed, WorldsPlugin plugin);
     }
 }

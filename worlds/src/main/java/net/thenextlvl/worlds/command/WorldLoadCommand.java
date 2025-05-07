@@ -28,7 +28,7 @@ class WorldLoadCommand {
 
     private static RequiredArgumentBuilder<CommandSourceStack, String> load(WorldsPlugin plugin) {
         return Commands.argument("world", StringArgumentType.string())
-                .suggests(new LevelSuggestionProvider<>(plugin))
+                .suggests(new LevelSuggestionProvider<>(plugin, false))
                 .executes(context -> load(context, plugin));
     }
 
@@ -36,8 +36,8 @@ class WorldLoadCommand {
         var name = context.getArgument("world", String.class);
         var level = plugin.getServer().getWorldContainer().toPath().resolve(name);
 
-        var build = plugin.levelView().isLevel(level) ? plugin.levelBuilder(level).build() : null;
-        var world = Optional.ofNullable(build).filter(Level::isWorldKnown).flatMap(Level::create).orElse(null);
+        var build = plugin.levelView().isLevel(level) ? plugin.levelView().read(level) : Optional.<Level>empty();
+        var world = build.filter(Level::isWorldKnown).flatMap(Level::create).orElse(null);
 
         var message = world != null ? "world.load.success" : "world.load.failed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message,

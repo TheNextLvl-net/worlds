@@ -1,5 +1,6 @@
 package net.thenextlvl.worlds.listener;
 
+import net.kyori.adventure.util.TriState;
 import net.minecraft.util.DirectoryLock;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.event.WorldDeleteEvent;
@@ -33,8 +34,8 @@ public class WorldListener implements Listener {
         if (!event.getWorld().key().asString().equals("minecraft:overworld")) return;
         plugin.levelView().listLevels().stream().filter(plugin.levelView()::canLoad).forEach(path -> {
             try {
-                var level = plugin.levelBuilder(path).build();
-                if (!level.isEnabled()) return;
+                var level = plugin.levelView().read(path).orElse(null);
+                if (level == null || !level.isEnabled().equals(TriState.TRUE)) return;
                 level.create().ifPresent(world -> plugin.getComponentLogger().debug(
                         "Loaded dimension {} ({}) from {}",
                         world.key().asString(), level.getGeneratorType().key().asString(),

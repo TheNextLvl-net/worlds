@@ -4,7 +4,6 @@ import core.io.IO;
 import core.nbt.file.NBTFile;
 import core.nbt.tag.CompoundTag;
 import core.nbt.tag.ListTag;
-import core.nbt.tag.StringTag;
 import core.nbt.tag.Tag;
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import net.thenextlvl.worlds.WorldsPlugin;
@@ -125,9 +124,9 @@ public class PaperLevelView implements LevelView {
         if (settings.filter(s -> s.equals(GeneratorType.AMPLIFIED.key().asString())).isPresent())
             return Optional.of(GeneratorType.AMPLIFIED);
 
-        var type = generator.<CompoundTag>optional("biome_source")
-                .flatMap(tag -> tag.<StringTag>optional("type"))
-                .map(Tag::getAsString);
+        // var type = generator.<CompoundTag>optional("biome_source")
+        //         .flatMap(tag -> tag.<StringTag>optional("type"))
+        //         .map(Tag::getAsString);
 
         // if (type.filter(s -> s.equals(BiomeSource.SINGLE_BIOME.key().asString())).isPresent())
         //     return Optional.of(GeneratorType.SINGLE_BIOME);
