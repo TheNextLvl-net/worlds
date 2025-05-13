@@ -14,7 +14,10 @@ public class MessageMigrator implements ResourceMigrator {
             new MigrationRule(Locale.GERMANY, "world.list", "<worlds>", "<worlds:'<gray>, </gray>'>"),
 
             new MigrationRule(Locale.US, "world.link.list", "<links>", "<links:'<gray>,</gray><newline>'>"),
-            new MigrationRule(Locale.GERMANY, "world.link.list", "<links>", "<links:'<gray>,</gray><newline>'>")
+            new MigrationRule(Locale.GERMANY, "world.link.list", "<links>", "<links:'<gray>,</gray><newline>'>"),
+
+            new MigrationRule(Locale.US, "world.info.type", " <dark_gray>(<green><old></green>)</dark_gray>", ""),
+            new MigrationRule(Locale.GERMANY, "world.info.type", " <dark_gray>(<green><old></green>)</dark_gray>", "")
     );
 
     @Override
