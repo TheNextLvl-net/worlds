@@ -6,11 +6,25 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.api.generator.DimensionType;
+import net.thenextlvl.worlds.api.generator.GeneratorType;
+import net.thenextlvl.worlds.api.level.Level;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
@@ -37,37 +51,55 @@ class WorldInfoCommand {
         });
     }
 
-    @SuppressWarnings("deprecation")
     private static int list(CommandSender sender, World world, WorldsPlugin plugin) {
-        // var root = plugin.levelView().getLevelDataFile(world.getWorldFolder().toPath()).getRoot();
-        // var data = root.<CompoundTag>optional("Data");
-        // var settings = data.flatMap(tag -> tag.<CompoundTag>optional("WorldGenSettings"));
-        // var dimensions = settings.flatMap(tag -> tag.<CompoundTag>optional("dimensions"));
-        // var dimension = dimensions.flatMap(tag -> tag.<CompoundTag>optional(
-        //         plugin.levelView().getDimension(tag, world.getEnvironment())));
-        // var generator = dimension.flatMap(tag -> tag.<CompoundTag>optional("generator"));
-//
-        // var environment = dimensions.map(tag -> plugin.levelView().getDimension(tag, world.getEnvironment()));
-        // var worldPreset = generator.flatMap(tag -> plugin.levelView().getWorldPreset(tag));
-//
-        // plugin.bundle().sendMessage(sender, "world.info.name",
-        //         Placeholder.parsed("world", world.key().asString()),
-        //         Placeholder.parsed("name", world.getName()));
-        // plugin.bundle().sendMessage(sender, "world.info.players",
-        //         Placeholder.parsed("players", String.valueOf(world.getPlayers().size())));
-        // plugin.bundle().sendMessage(sender, "world.info.type",
-        //         Placeholder.parsed("type", worldPreset.map(GeneratorType::key)
-        //                 .map(Key::asString).orElse("unknown")),
-        //         Placeholder.parsed("old", Optional.ofNullable(world.getWorldType())
-        //                 .orElse(WorldType.NORMAL).getName().toLowerCase()));
-        // plugin.bundle().sendMessage(sender, "world.info.dimension",
-        //         Placeholder.parsed("dimension", environment.orElse("unknown")));
-        // plugin.levelView().getGenerator(world).ifPresent(gen -> plugin.bundle().sendMessage(sender,
-        //         "world.info.generator", Placeholder.parsed("generator", gen)));
-        // plugin.bundle().sendMessage(sender, "world.info.seed",
-        //         Placeholder.parsed("seed", String.valueOf(world.getSeed())));
-//
-        // // todo: send total world size
+        var path = world.getWorldFolder().toPath();
+        var root = plugin.levelView().read(path);
+        plugin.bundle().sendMessage(sender, "world.info.name",
+                Placeholder.parsed("world", world.key().asString()),
+                Placeholder.parsed("name", world.getName()));
+        plugin.bundle().sendMessage(sender, "world.info.players",
+                Formatter.number("players", world.getPlayers().size()));
+        plugin.bundle().sendMessage(sender, "world.info.type",
+                Placeholder.parsed("type", root.map(Level::getGeneratorType)
+                        .orElse(GeneratorType.NORMAL).key().asString()));
+        plugin.bundle().sendMessage(sender, "world.info.dimension",
+                Placeholder.parsed("dimension", root.map(level -> level.getLevelStem().dimensionType())
+                        .orElse(DimensionType.OVERWORLD).key().asString()));
+        plugin.levelView().getGenerator(world).ifPresent(generator -> plugin.bundle().sendMessage(sender,
+                "world.info.generator", Placeholder.parsed("generator", generator)));
+        plugin.bundle().sendMessage(sender, "world.info.seed",
+                Placeholder.parsed("seed", String.valueOf(world.getSeed())));
+        try {
+            var size = new AtomicLong(0);
+            Files.walkFileTree(path, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                    size.addAndGet(attrs.size());
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) {
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, @Nullable IOException exc) {
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+            var bytes = size.get();
+
+            var kb = bytes / 1024d;
+            var mb = kb / 1024d;
+            var gb = mb / 1024d;
+            plugin.bundle().sendMessage(sender, "world.info.size",
+                    Formatter.number("size", gb >= 1 ? gb : mb >= 1 ? mb : kb >= 1 ? kb : bytes),
+                    Formatter.choice("unit", gb >= 1 ? 0 : mb >= 1 ? 1 : kb >= 1 ? 2 : 3));
+        } catch (IOException ignored) {
+        }
+
+        // todo: send total world size
         return Command.SINGLE_SUCCESS;
     }
 }
