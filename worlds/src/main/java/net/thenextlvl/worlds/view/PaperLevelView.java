@@ -37,15 +37,18 @@ public class PaperLevelView implements LevelView {
         this.plugin = plugin;
     }
 
-    public Optional<NBTFile<CompoundTag>> getLevelDataFile(Path level) {
+    public Optional<Path> getLevelDataPath(Path level) {
         return Optional.ofNullable(getFile(level, "level.dat"))
                 .or(() -> Optional.ofNullable(getFile(level, "level.dat_old")));
     }
 
-    private static @Nullable NBTFile<CompoundTag> getFile(Path level, String other) {
-        var old = level.resolve(other);
-        if (!Files.exists(old)) return null;
-        return new NBTFile<>(IO.of(old), new CompoundTag());
+    public Optional<NBTFile<CompoundTag>> getLevelDataFile(Path level) {
+        return getLevelDataPath(level).map(path -> new NBTFile<>(IO.of(path), new CompoundTag()));
+    }
+
+    private static @Nullable Path getFile(Path level, String other) {
+        var resolved = level.resolve(other);
+        return Files.exists(resolved) ? resolved : null;
     }
 
     @Override
