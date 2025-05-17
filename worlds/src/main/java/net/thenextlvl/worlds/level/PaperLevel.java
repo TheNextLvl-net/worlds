@@ -237,16 +237,9 @@ class PaperLevel extends LevelData {
     }
 
     private ResourceKey<LevelStem> resolveDimensionKey() {
-        ResourceKey<LevelStem> actualDimension;
-        if (getLevelStem().equals(net.thenextlvl.worlds.api.generator.LevelStem.OVERWORLD)) {
-            actualDimension = LevelStem.OVERWORLD;
-        } else if (getLevelStem().equals(net.thenextlvl.worlds.api.generator.LevelStem.NETHER)) {
-            actualDimension = LevelStem.NETHER;
-        } else if (getLevelStem().equals(net.thenextlvl.worlds.api.generator.LevelStem.END)) {
-            actualDimension = LevelStem.END;
-        } else {
-            throw new IllegalArgumentException("Illegal dimension (" + getLevelStem() + ")");
-        }
-        return actualDimension;
+        if (getLevelStem().equals(net.thenextlvl.worlds.api.generator.LevelStem.OVERWORLD)) return LevelStem.OVERWORLD;
+        if (getLevelStem().equals(net.thenextlvl.worlds.api.generator.LevelStem.NETHER)) return LevelStem.NETHER;
+        if (getLevelStem().equals(net.thenextlvl.worlds.api.generator.LevelStem.END)) return LevelStem.END;
+        throw new IllegalArgumentException("Illegal dimension (" + getLevelStem() + ")");
     }
 }
