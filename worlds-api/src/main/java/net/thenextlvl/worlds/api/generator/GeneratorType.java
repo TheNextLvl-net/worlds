@@ -20,8 +20,6 @@ public record GeneratorType(Key key) implements Keyed {
      */
     public static final GeneratorType DEBUG = new GeneratorType(Key.key("minecraft", "debug"));
 
-    public static final GeneratorType SINGLE_BIOME = new GeneratorType(Key.key("minecraft", "fixed"));
-
     /**
      * Represents the "flat" generator type.
      * <a href="https://minecraft.wiki/w/Dimension_definition#flat">Wiki</a>
@@ -39,6 +37,12 @@ public record GeneratorType(Key key) implements Keyed {
      * <a href="https://minecraft.wiki/w/Dimension_definition#noise">Wiki</a>
      */
     public static final GeneratorType NORMAL = new GeneratorType(Key.key("minecraft", "noise"));
+
+    /**
+     * Represents the "noise" generator type.
+     * <a href="https://minecraft.wiki/w/Dimension_definition#fixed">Wiki</a>
+     */
+    public static final GeneratorType SINGLE_BIOME = new GeneratorType(Key.key("minecraft", "fixed"));
 
     public Key presetName() {
         if (equals(DEBUG)) return Key.key("debug_all_block_states");
