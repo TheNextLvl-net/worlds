@@ -1,5 +1,6 @@
 package net.thenextlvl.worlds.api.exception;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -19,6 +20,7 @@ public class GeneratorException extends RuntimeException {
      * @param id      the unique identifier for the generator
      * @param message the detailed error message describing the reason for the exception
      */
+    @ApiStatus.Internal
     public GeneratorException(String plugin, @Nullable String id, String message) {
         super(message);
         this.plugin = plugin;

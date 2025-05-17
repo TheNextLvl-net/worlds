@@ -26,6 +26,8 @@ class WorldUnloadCommand {
 
     private static RequiredArgumentBuilder<CommandSourceStack, World> unload(WorldsPlugin plugin) {
         return worldArgument(plugin)
+                .suggests(new WorldSuggestionProvider<>(plugin, (context, world) ->
+                        !world.key().asString().equals("minecraft:overworld")))
                 .then(unloadFallback(plugin))
                 .executes(context -> unload(plugin, context));
     }

@@ -1,22 +1,20 @@
 package net.thenextlvl.worlds.api.view;
 
-import core.nbt.file.NBTFile;
 import core.nbt.tag.CompoundTag;
-import net.thenextlvl.worlds.api.model.LevelExtras;
-import net.thenextlvl.worlds.api.model.WorldPreset;
+import net.thenextlvl.worlds.api.generator.GeneratorType;
+import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.preset.Preset;
 import org.bukkit.World;
+import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.Set;
 
 @NullMarked
 public interface LevelView {
-    NBTFile<CompoundTag> getLevelDataFile(File level);
-
-    Optional<LevelExtras> getExtras(CompoundTag data);
+    Optional<Level> read(Path directory);
 
     Optional<Preset> getFlatPreset(CompoundTag generator);
 
@@ -26,21 +24,18 @@ public interface LevelView {
 
     Optional<String> getGeneratorType(CompoundTag generator);
 
-    Optional<WorldPreset> getWorldPreset(CompoundTag generator);
+    Optional<GeneratorType> getWorldPreset(CompoundTag generator);
 
-    Stream<File> listLevels();
+    @Unmodifiable
+    Set<Path> listLevels();
 
-    String getDimension(CompoundTag dimensions, World.Environment environment);
+    boolean canLoad(Path level);
 
-    World.Environment getEnvironment(File level);
+    boolean hasEndDimension(Path level);
 
-    boolean canLoad(File level);
+    boolean hasNetherDimension(Path level);
 
-    boolean hasEndDimension(File level);
-
-    boolean hasNetherDimension(File level);
-
-    boolean isLevel(File file);
+    boolean isLevel(Path path);
 
     boolean unloadLevel(World world, boolean save);
 
