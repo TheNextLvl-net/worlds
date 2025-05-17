@@ -17,6 +17,7 @@ import java.lang.reflect.Type;
 @ApiStatus.Internal
 public class StructureTypeAdapter implements JsonSerializer<Structure>, JsonDeserializer<Structure> {
     @Override
+    @SuppressWarnings("PatternValidation")
     public Structure deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
         return new Structure(element.getAsString());
     }
