@@ -186,7 +186,7 @@ class PaperLevel extends LevelData {
         );
         LevelStem customStem = contextLevelStemRegistry.getValue(dimensionType);
 
-        WorldInfo worldInfo = new CraftWorldInfo(primaryLevelData, levelStorageAccess, levelStem.dimensionType().toBukkit(), customStem.type().value(), customStem.generator(), server.getHandle().getServer().registryAccess()); // Paper - Expose vanilla BiomeProvider from WorldInfo
+        WorldInfo worldInfo = new CraftWorldInfo(primaryLevelData, levelStorageAccess, levelStem.dimensionType().toBukkit(), customStem.type().value(), customStem.generator(), server.getHandle().getServer().registryAccess());
         if (biomeProvider == null && chunkGenerator != null) {
             biomeProvider = chunkGenerator.getDefaultBiomeProvider(worldInfo);
         }
