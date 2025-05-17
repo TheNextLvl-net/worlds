@@ -4,6 +4,8 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.Optional;
+
 @NullMarked
 public record GeneratorType(Key key) implements Keyed {
     /**
@@ -43,5 +45,15 @@ public record GeneratorType(Key key) implements Keyed {
         if (equals(SINGLE_BIOME)) return Key.key("single_biome_surface");
         if (equals(NORMAL)) return Key.key("normal");
         return key();
+    }
+
+    public static Optional<GeneratorType> getByKey(Key key) {
+        if (key.equals(AMPLIFIED.key())) return Optional.of(AMPLIFIED);
+        if (key.equals(DEBUG.key())) return Optional.of(DEBUG);
+        if (key.equals(FLAT.key())) return Optional.of(FLAT);
+        if (key.equals(LARGE_BIOMES.key())) return Optional.of(LARGE_BIOMES);
+        if (key.equals(NORMAL.key())) return Optional.of(NORMAL);
+        if (key.equals(SINGLE_BIOME.key())) return Optional.of(SINGLE_BIOME);
+        return Optional.empty();
     }
 }
