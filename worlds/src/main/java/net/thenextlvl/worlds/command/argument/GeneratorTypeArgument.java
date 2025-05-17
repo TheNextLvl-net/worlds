@@ -13,23 +13,15 @@ import java.util.Map;
 @NullMarked
 public class GeneratorTypeArgument extends WrappedArgumentType<Key, GeneratorType> {
     public GeneratorTypeArgument(WorldsPlugin plugin) {
-        super(ArgumentTypes.key(), (reader, type) -> switch (type.asMinimalString()) {
-            case "amplified" -> GeneratorType.AMPLIFIED;
-            //case "checkerboard" -> GeneratorType.CHECKERBOARD;
-            case "debug_all_block_states", "debug_world", "debug" -> GeneratorType.DEBUG;
-            //case "fixed", "single_biome" -> GeneratorType.SINGLE_BIOME;
-            case "flat" -> GeneratorType.FLAT;
-            case "large_biomes" -> GeneratorType.LARGE_BIOMES;
-            case "noise", "normal", "default" -> GeneratorType.NORMAL;
-            default -> throw new IllegalArgumentException("Custom dimensions are not yet supported");
-        }, new DimensionSuggestionProvider(plugin, Map.of(
-                "minecraft:amplified", "world.type.amplified",
-                //"minecraft:checkerboard", "world.type.checkerboard",
-                "minecraft:debug", "world.type.debug",
-                "minecraft:flat", "world.type.flat",
-                "minecraft:large_biomes", "world.type.large_biomes",
-                "minecraft:normal", "world.type.normal"
-                //"minecraft:single_biome", "world.type.single_biome"
-        )));
+        super(ArgumentTypes.key(), (reader, type) -> GeneratorType.getByKey(type)
+                        .orElseThrow(() -> new IllegalArgumentException("Unknown dimension type")),
+                new DimensionSuggestionProvider(plugin, Map.of(
+                        GeneratorType.AMPLIFIED.key().asString(), "world.type.amplified",
+                        GeneratorType.DEBUG.key().asString(), "world.type.debug",
+                        GeneratorType.FLAT.key().asString(), "world.type.flat",
+                        GeneratorType.LARGE_BIOMES.key().asString(), "world.type.large_biomes",
+                        GeneratorType.NORMAL.key().asString(), "world.type.normal",
+                        GeneratorType.SINGLE_BIOME.key().asString(), "world.type.fixed"
+                )));
     }
 }
