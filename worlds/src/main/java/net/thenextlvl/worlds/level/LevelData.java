@@ -14,7 +14,6 @@ import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.preset.Preset;
 import org.bukkit.NamespacedKey;
-import org.bukkit.WorldType;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -151,15 +150,6 @@ public abstract class LevelData implements Level {
                 .structures(structures)
                 .bonusChest(bonusChest)
                 .seed(seed);
-    }
-
-    private WorldType typeOf(GeneratorType generatorType) {
-        if (generatorType.equals(GeneratorType.AMPLIFIED)) return WorldType.AMPLIFIED;
-        if (generatorType.equals(GeneratorType.FLAT)) return WorldType.FLAT;
-        if (generatorType.equals(GeneratorType.LARGE_BIOMES)) return WorldType.LARGE_BIOMES;
-        if (generatorType.equals(GeneratorType.NORMAL)) return WorldType.NORMAL;
-        plugin.getComponentLogger().warn("Custom world presets do not work yet, defaulting to normal");
-        return WorldType.NORMAL;
     }
 
     public static class Builder implements Level.Builder {
