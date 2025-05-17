@@ -17,6 +17,7 @@ import java.lang.reflect.Type;
 @ApiStatus.Internal
 public class BiomeTypeAdapter implements JsonSerializer<Biome>, JsonDeserializer<Biome> {
     @Override
+    @SuppressWarnings("PatternValidation")
     public Biome deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
         return Biome.literal(element.getAsString());
     }
