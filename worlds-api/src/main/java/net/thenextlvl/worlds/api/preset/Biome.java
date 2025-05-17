@@ -20,7 +20,7 @@ public record Biome(Key key) implements Keyed {
     public String namespace() {
         return key().namespace();
     }
-    
+
     @Deprecated(forRemoval = true)
     public static Biome minecraft(@KeyPattern.Value String biome) {
         return new Biome(Key.key(Key.MINECRAFT_NAMESPACE, biome));
