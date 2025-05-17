@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,7 +38,7 @@ public class Preset {
             .setPrettyPrinting()
             .create();
 
-    private Biome biome = Biome.minecraft("plains");
+    private Biome biome = Biome.literal("plains");
     private boolean lakes;
     private boolean features;
     private boolean decoration;
@@ -47,9 +48,18 @@ public class Preset {
     private LinkedHashSet<Structure> structures = new LinkedHashSet<>();
 
     // https://minecraft.wiki/w/Superflat#Preset_code_format
+    @SuppressWarnings("PatternValidation")
     public static Preset parse(String presetCode) {
-        // todo: preset code parsing
-        return new Preset();
+        var strings = presetCode.split(";", 2);
+        var layers = Arrays.stream(strings[0].split(",")).map(layer -> {
+            var parameters = layer.split("\\*", 2);
+            var material = parameters.length == 1 ? parameters[0] : parameters[1];
+            var height = parameters.length == 1 ? 1 : Integer.parseInt(parameters[0]);
+            var matched = Material.matchMaterial(material);
+            if (matched != null) return new Layer(matched, height);
+            throw new IllegalArgumentException("Invalid material: " + material);
+        }).collect(Collectors.toCollection(LinkedHashSet::new));
+        return new Preset().layers(layers).biome(Biome.literal(strings[1]));
     }
 
     /**
