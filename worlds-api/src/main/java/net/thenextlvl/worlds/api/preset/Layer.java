@@ -1,16 +1,27 @@
 package net.thenextlvl.worlds.api.preset;
 
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.key.KeyPattern;
 import org.bukkit.Material;
+import org.bukkit.block.BlockType;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public record Layer(String block, int height) {
-    Layer(Material material, int height) {
-        this(material.key().asString(), height);
+public record Layer(Key block, int height) {
+    public Layer(Material material, int height) {
+        this(material.key(), height);
+    }
+    
+    public Layer(BlockType blockType, int height) {
+        this(blockType.key(), height);
+    }
+    
+    public Layer(@KeyPattern String block, int height) {
+        this(Key.key(block), height);
     }
 
     @Override
     public String toString() {
-        return height() != 1 ? height() + "*" + block() : block();
+        return height() != 1 ? height() + "*" + block().asString() : block().asString();
     }
 }
