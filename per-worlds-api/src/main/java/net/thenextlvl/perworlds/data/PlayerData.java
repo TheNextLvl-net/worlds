@@ -1,6 +1,7 @@
 package net.thenextlvl.perworlds.data;
 
 import net.kyori.adventure.util.TriState;
+import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.statistics.Stats;
 import org.bukkit.GameMode;
@@ -193,6 +194,8 @@ public interface PlayerData {
     /**
      * Loads the player's data based on the specified group and optionally modifies the player's
      * position and related attributes according to the group's configuration.
+     * <p>
+     * The result will always complete with {@code false} if the group is not {@link GroupSettings#enabled() enabled}
      *
      * @param player   the player whose data is being loaded
      * @param group    the group containing the settings to be applied to the player
