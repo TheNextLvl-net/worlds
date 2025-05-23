@@ -41,13 +41,13 @@ public class PaperPlayerData implements PlayerData {
     private static final Set<AttributeData> DEFAULT_ATTRIBUTES = defaultAttributes();
     private static final TriState DEFAULT_FLYING = TriState.NOT_SET;
     private static final TriState DEFAULT_MAY_FLY = TriState.NOT_SET;
+    private static final TriState DEFAULT_VISUAL_FIRE = TriState.NOT_SET;
     private static final Vector DEFAULT_VELOCITY = new Vector(0, 0, 0);
     private static final WardenSpawnTracker DEFAULT_WARDEN_SPAWN_TRACKER = new PaperWardenSpawnTracker();
     private static final boolean DEFAULT_GLIDING = false;
     private static final boolean DEFAULT_INVULNERABLE = false;
     private static final boolean DEFAULT_LOCK_FREEZE_TICKS = false;
     private static final boolean DEFAULT_SEEN_CREDITS = false;
-    private static final boolean DEFAULT_VISUAL_FIRE = false;
     private static final double DEFAULT_ABSORPTION = 0;
     private static final double DEFAULT_HEALTH = 20;
     private static final float DEFAULT_EXHAUSTION = 0;
@@ -82,13 +82,13 @@ public class PaperPlayerData implements PlayerData {
     private Stats stats = new PaperStats();
     private TriState flying = DEFAULT_FLYING;
     private TriState mayFly = DEFAULT_MAY_FLY;
+    private TriState visualFire = DEFAULT_VISUAL_FIRE;
     private Vector velocity = DEFAULT_VELOCITY;
     private WardenSpawnTracker wardenSpawnTracker = DEFAULT_WARDEN_SPAWN_TRACKER;
     private boolean gliding = DEFAULT_GLIDING;
     private boolean invulnerable = DEFAULT_INVULNERABLE;
     private boolean lockFreezeTicks = DEFAULT_LOCK_FREEZE_TICKS;
     private boolean seenCredits = DEFAULT_SEEN_CREDITS;
-    private boolean visualFire = DEFAULT_VISUAL_FIRE;
     private double absorption = DEFAULT_ABSORPTION;
     private double health = DEFAULT_HEALTH;
     private float exhaustion = DEFAULT_EXHAUSTION;
@@ -134,7 +134,7 @@ public class PaperPlayerData implements PlayerData {
                 .lastLocation(player.getLocation())
                 .velocity(player.getVelocity())
                 .lockFreezeTicks(player.isFreezeTickingLocked())
-                .visualFire(player.isVisualFire())
+                .visualFire(player.getVisualFire())
                 .previousGameMode(player.getPreviousGameMode())
                 .flying(TriState.byBoolean(player.isFlying()))
                 .mayFly(TriState.byBoolean(player.getAllowFlight()))
@@ -517,7 +517,7 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public PaperPlayerData visualFire(boolean visualFire) {
+    public PaperPlayerData visualFire(TriState visualFire) {
         this.visualFire = visualFire;
         return this;
     }
@@ -625,6 +625,11 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
+    public TriState visualFire() {
+        return visualFire;
+    }
+
+    @Override
     public Vector velocity() {
         return velocity;
     }
@@ -652,11 +657,6 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public boolean seenCredits() {
         return seenCredits;
-    }
-
-    @Override
-    public boolean visualFire() {
-        return visualFire;
     }
 
     @Override

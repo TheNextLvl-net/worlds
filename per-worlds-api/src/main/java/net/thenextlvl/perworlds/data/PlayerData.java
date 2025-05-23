@@ -119,7 +119,7 @@ public interface PlayerData {
 
     PlayerData velocity(Vector velocity);
 
-    PlayerData visualFire(boolean visualFire);
+    PlayerData visualFire(TriState visualFire);
 
     PlayerData walkSpeed(float speed);
 
@@ -140,6 +140,8 @@ public interface PlayerData {
 
     TriState mayFly();
 
+    TriState visualFire();
+
     Vector velocity();
 
     WardenSpawnTracker wardenSpawnTracker();
@@ -151,8 +153,6 @@ public interface PlayerData {
     boolean lockFreezeTicks();
 
     boolean seenCredits();
-
-    boolean visualFire();
 
     double absorption();
 
