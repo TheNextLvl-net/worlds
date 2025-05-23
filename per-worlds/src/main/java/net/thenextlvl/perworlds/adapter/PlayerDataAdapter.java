@@ -67,7 +67,7 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         root.optional("flying").map(tag1 -> context.deserialize(tag1, TriState.class)).ifPresent(data::flying);
         root.optional("freezeTicks").map(Tag::getAsInt).ifPresent(data::freezeTicks);
         root.optional("lockFreezeTicks").map(Tag::getAsBoolean).ifPresent(data::lockFreezeTicks);
-        root.optional("visualFire").map(Tag::getAsBoolean).ifPresent(data::visualFire);
+        root.optional("visualFire").map(tag1 -> context.deserialize(tag1, TriState.class)).ifPresent(data::visualFire);
         root.optional("heldItemSlot").map(Tag::getAsInt).ifPresent(data::heldItemSlot);
         root.optional("level").map(Tag::getAsInt).ifPresent(data::level);
         root.optional("remainingAir").map(Tag::getAsInt).ifPresent(data::remainingAir);
@@ -122,7 +122,7 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         tag.add("health", data.health());
         tag.add("exhaustion", data.exhaustion());
         tag.add("lockFreezeTicks", data.lockFreezeTicks());
-        tag.add("visualFire", data.visualFire());
+        tag.add("visualFire", context.serialize(data.visualFire()));
         tag.add("experience", data.experience());
         tag.add("gliding", data.gliding());
         tag.add("invulnerable", data.invulnerable());
