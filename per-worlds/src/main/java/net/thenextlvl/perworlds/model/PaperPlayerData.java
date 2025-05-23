@@ -140,7 +140,7 @@ public class PaperPlayerData implements PlayerData {
                 .mayFly(TriState.byBoolean(player.getAllowFlight()))
                 .enderChest(player.getEnderChest().getContents())
                 .inventory(player.getInventory().getContents())
-                .respawnLocation(player.getPotentialRespawnLocation())
+                .respawnLocation(player.getRespawnLocation(false))
                 .potionEffects(player.getActivePotionEffects())
                 .gameMode(player.getGameMode())
                 .stats(PaperStats.of(player))
