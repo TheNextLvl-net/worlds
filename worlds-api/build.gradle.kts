@@ -26,13 +26,24 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
     
-    testImplementation("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
-    testImplementation("net.thenextlvl.core:nbt:2.3.2")
-
     compileOnlyApi(project(":per-worlds-api"))
     api("net.thenextlvl.core:adapters:2.0.2")
+
+    testImplementation("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
+    testImplementation("net.thenextlvl.core:nbt:2.3.2")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(platform("org.junit:junit-bom:5.13.0-M2"))
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+        showCauses = true
+        showExceptions = true
+    }
+}
 
 publishing {
     publications.create<MavenPublication>("maven") {
