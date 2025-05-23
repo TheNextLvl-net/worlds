@@ -4,6 +4,7 @@ import core.nbt.serialization.ParserException;
 import core.nbt.serialization.TagAdapter;
 import core.nbt.serialization.TagDeserializationContext;
 import core.nbt.serialization.TagSerializationContext;
+import core.nbt.tag.ByteTag;
 import core.nbt.tag.CompoundTag;
 import core.nbt.tag.ListTag;
 import core.nbt.tag.StringTag;
@@ -67,7 +68,9 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         root.optional("flying").map(tag1 -> context.deserialize(tag1, TriState.class)).ifPresent(data::flying);
         root.optional("freezeTicks").map(Tag::getAsInt).ifPresent(data::freezeTicks);
         root.optional("lockFreezeTicks").map(Tag::getAsBoolean).ifPresent(data::lockFreezeTicks);
-        root.optional("visualFire").map(tag1 -> context.deserialize(tag1, TriState.class)).ifPresent(data::visualFire);
+        root.optional("visualFire").map(tag1 -> tag1 instanceof ByteTag byteTag
+                ? (byteTag.getAsBoolean() ? TriState.TRUE : TriState.NOT_SET)
+                : context.deserialize(tag1, TriState.class)).ifPresent(data::visualFire);
         root.optional("heldItemSlot").map(Tag::getAsInt).ifPresent(data::heldItemSlot);
         root.optional("level").map(Tag::getAsInt).ifPresent(data::level);
         root.optional("remainingAir").map(Tag::getAsInt).ifPresent(data::remainingAir);
