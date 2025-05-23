@@ -169,7 +169,7 @@ public class PaperPlayerData implements PlayerData {
     public CompletableFuture<Boolean> load(Player player, WorldGroup group, boolean position) {
         var settings = group.getSettings();
         if (!position && group.containsWorld(player.getWorld())) {
-            load(player, group);
+            if (settings.enabled()) load(player, group);
             return CompletableFuture.completedFuture(true);
         } else if (!position) {
             var exception = new IllegalStateException("Cannot load player data while groups don't match");
@@ -180,6 +180,7 @@ public class PaperPlayerData implements PlayerData {
         if (location == null) return CompletableFuture.completedFuture(false);
         return player.teleportAsync(location).thenApply(success -> {
             if (!success) return false;
+            if (!settings.enabled()) return true;
             player.setFallDistance(settings.fallDistance() ? fallDistance : DEFAULT_FALL_DISTANCE);
             player.setVelocity(settings.velocity() ? velocity : DEFAULT_VELOCITY);
             load(player, group);
