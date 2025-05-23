@@ -5,6 +5,7 @@ plugins {
     id("idea")
     id("java")
     id("java-library")
+    id("maven-publish")
     id("com.gradleup.shadow")
     id("io.papermc.hangar-publish-plugin")
     id("de.eldoria.plugin-yml.paper")
@@ -19,7 +20,7 @@ tasks.compileJava {
 }
 
 group = "net.thenextlvl.worlds"
-version = "0.1.1"
+version = "0.2.0"
 
 repositories {
     mavenCentral()
@@ -73,23 +74,6 @@ paper {
     authors = listOf("NonSwag")
     // foliaSupported = true // way too many events still not being called on folia
     permissions {
-        register("perworlds.admin") { children = listOf("perworlds.commands.group") }
-
-        register("perworlds.commands.group") {
-            description = "Allows access to all group commands"
-            children = listOf(
-                "perworlds.command.group.add",
-                "perworlds.command.group.create",
-                "perworlds.command.group.delete",
-                "perworlds.command.group.list",
-                "perworlds.command.group.option",
-                "perworlds.command.group.remove",
-                "perworlds.command.group.spawn.set",
-                "perworlds.command.group.spawn.unset",
-                "perworlds.command.group.teleport",
-            )
-        }
-
         register("perworlds.command.group") { children = listOf("perworlds.command") }
         register("perworlds.command.group.add") { children = listOf("perworlds.command.group") }
         register("perworlds.command.group.create") { children = listOf("perworlds.command.group") }
@@ -120,6 +104,20 @@ hangarPublish { // docs - https://docs.papermc.io/misc/hangar-publishing
         platforms.register(Platforms.PAPER) {
             jar.set(tasks.shadowJar.flatMap { it.archiveFile })
             platformVersions.set(versions)
+        }
+    }
+}
+
+publishing {
+    publications.create<MavenPublication>("maven") {
+        from(components["java"])
+    }
+    repositories.maven {
+        val branch = if (version.toString().contains("-pre")) "snapshots" else "releases"
+        url = uri("https://repo.thenextlvl.net/$branch")
+        credentials {
+            username = System.getenv("REPOSITORY_USER")
+            password = System.getenv("REPOSITORY_TOKEN")
         }
     }
 }
