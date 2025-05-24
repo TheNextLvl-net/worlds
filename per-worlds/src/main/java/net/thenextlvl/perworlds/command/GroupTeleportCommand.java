@@ -9,6 +9,7 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.perworlds.WorldGroup;
@@ -52,6 +53,11 @@ class GroupTeleportCommand {
     }
 
     private static int teleport(CommandSender sender, WorldGroup group, List<Player> players, SharedWorlds commons) {
+        if (!group.getSettings().enabled()) {
+            commons.bundle().sendMessage(sender, "group.teleport.disabled",
+                    Placeholder.parsed("group", group.getName()));
+            return 0;
+        }
         var message = group.getWorlds().findAny().isEmpty() ? "group.teleport.empty"
                 : players.size() == 1 ? "group.teleport.other"
                 : players.isEmpty() ? "group.teleport.none" : "group.teleport.others";
@@ -61,7 +67,7 @@ class GroupTeleportCommand {
         if (players.size() == 1 && players.getFirst().equals(sender)) return Command.SINGLE_SUCCESS;
         commons.bundle().sendMessage(sender, message,
                 Placeholder.component("player", players.isEmpty() ? Component.empty() : players.getFirst().name()),
-                Placeholder.parsed("players", String.valueOf(players.size())),
+                Formatter.number("players", players.size()),
                 Placeholder.parsed("group", group.getName()));
         return players.isEmpty() ? 0 : Command.SINGLE_SUCCESS;
     }
