@@ -49,7 +49,7 @@ Simply pick a predefined preset—or define your own!
 
 ### Wiki
 
-For further information check out the [Wiki](https://github.com/TheNextLvl-net/worlds/wiki)
+For further information check out the [Wiki](https://thenextlvl.net/docs/worlds)
 
 ### API
 
