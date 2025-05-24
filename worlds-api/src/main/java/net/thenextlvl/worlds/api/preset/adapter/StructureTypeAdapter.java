@@ -8,13 +8,16 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import net.thenextlvl.worlds.api.preset.Structure;
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
 import java.lang.reflect.Type;
 
 @NullMarked
+@ApiStatus.Internal
 public class StructureTypeAdapter implements JsonSerializer<Structure>, JsonDeserializer<Structure> {
     @Override
+    @SuppressWarnings("PatternValidation")
     public Structure deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
         return new Structure(element.getAsString());
     }

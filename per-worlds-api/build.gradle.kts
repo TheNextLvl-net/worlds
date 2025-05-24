@@ -30,6 +30,8 @@ dependencies {
 
 publishing {
     publications.create<MavenPublication>("maven") {
+        artifactId = "per-worlds"
+        groupId = "net.thenextlvl"
         from(components["java"])
     }
     repositories.maven {
