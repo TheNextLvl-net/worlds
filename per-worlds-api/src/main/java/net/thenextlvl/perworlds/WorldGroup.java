@@ -235,6 +235,8 @@ public interface WorldGroup {
      * Loads player data for a specific player.
      * This method only functions if the player is not currently in the process of loading data.
      * Optionally, it can also load the player's position data.
+     * <p>
+     * The result will always complete with {@code false} if the group is not {@link GroupSettings#enabled() enabled}
      *
      * @param player   the player for whom data is to be loaded
      * @param position whether to load the player's position data
