@@ -55,14 +55,22 @@ paper {
     provides = listOf("PerWorlds")
 
     permissions {
+        project(":per-worlds").paper.permissions.forEach { add(it) }
+
         register("worlds.commands.admin") {
-            this.children = listOf(
+            children = listOf("worlds.admin")
+            description = "Backwards compat for the new worlds.admin permission"
+        }
+
+        register("worlds.admin") {
+            description = "Allows access to all world commands"
+            children = listOf(
+                "perworlds.admin",
                 "worlds.command.clone",
                 "worlds.command.create",
                 "worlds.command.delete",
                 "worlds.command.import",
                 "worlds.command.info",
-                "worlds.command.link",
                 "worlds.command.list",
                 "worlds.command.load",
                 "worlds.command.save",
@@ -73,22 +81,33 @@ paper {
                 "worlds.command.spawn",
                 "worlds.command.teleport",
                 "worlds.command.unload",
+                "worlds.commands.link"
             )
         }
+
         register("perworlds.command") { children = listOf("worlds.command") }
-        register("perworlds.command.group") { children = listOf("perworlds.command") }
-        register("worlds.command.group") { children = listOf("perworlds.command.group") }
 
         register("worlds.commands.link") {
-            this.children = listOf(
+            description = "Grants access to all world link commands"
+            children = listOf(
                 "worlds.command.link.create",
-                "worlds.command.link.delete",
+                "worlds.command.link.remove",
                 "worlds.command.link.list"
             )
         }
         register("worlds.command.link.create") { children = listOf("worlds.command.link") }
-        register("worlds.command.link.delete") { children = listOf("worlds.command.link") }
+        register("worlds.command.link.remove") { children = listOf("worlds.command.link") }
         register("worlds.command.link.list") { children = listOf("worlds.command.link") }
+
+        register("worlds.commands.save") {
+            description = "Grants access to all world save commands"
+            children = listOf(
+                "worlds.command.save.save",
+                "worlds.command.save.save-all",
+                "worlds.command.save.save-off",
+                "worlds.command.save.save-on"
+            )
+        }
 
         register("worlds.command.link") { children = listOf("worlds.command") }
         register("worlds.command.clone") { children = listOf("worlds.command") }

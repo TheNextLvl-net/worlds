@@ -74,6 +74,23 @@ paper {
     authors = listOf("NonSwag")
     // foliaSupported = true // way too many events still not being called on folia
     permissions {
+        register("perworlds.admin") { children = listOf("perworlds.commands.group") }
+
+        register("perworlds.commands.group") {
+            description = "Allows access to all group commands"
+            children = listOf(
+                "perworlds.command.group.add",
+                "perworlds.command.group.create",
+                "perworlds.command.group.delete",
+                "perworlds.command.group.list",
+                "perworlds.command.group.option",
+                "perworlds.command.group.remove",
+                "perworlds.command.group.spawn.set",
+                "perworlds.command.group.spawn.unset",
+                "perworlds.command.group.teleport",
+            )
+        }
+
         register("perworlds.command.group") { children = listOf("perworlds.command") }
         register("perworlds.command.group.add") { children = listOf("perworlds.command.group") }
         register("perworlds.command.group.create") { children = listOf("perworlds.command.group") }
