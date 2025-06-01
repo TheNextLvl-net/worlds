@@ -66,6 +66,7 @@ paper {
             description = "Allows access to all world commands"
             children = listOf(
                 "perworlds.admin",
+                "worlds.command.backup",
                 "worlds.command.clone",
                 "worlds.command.create",
                 "worlds.command.delete",
@@ -109,12 +110,13 @@ paper {
             )
         }
 
-        register("worlds.command.link") { children = listOf("worlds.command") }
+        register("worlds.command.backup") { children = listOf("worlds.command") }
         register("worlds.command.clone") { children = listOf("worlds.command") }
         register("worlds.command.create") { children = listOf("worlds.command") }
         register("worlds.command.delete") { children = listOf("worlds.command") }
         register("worlds.command.import") { children = listOf("worlds.command") }
         register("worlds.command.info") { children = listOf("worlds.command") }
+        register("worlds.command.link") { children = listOf("worlds.command") }
         register("worlds.command.list") { children = listOf("worlds.command") }
         register("worlds.command.load") { children = listOf("worlds.command") }
         register("worlds.command.save") { children = listOf("worlds.command") }
