@@ -8,6 +8,14 @@ import org.bukkit.plugin.Plugin;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * This record represents a generator that interacts with the Minecraft world generation system.
+ * It encapsulates a plugin responsible for providing the generator and an optional identifier
+ * for specifying a unique generator configuration.
+ * <p>
+ * The `Generator` record offers methods to serialize its state, retrieve chunk generators,
+ * and obtain biome providers for specific world names.
+ */
 @NullMarked
 public record Generator(Plugin plugin, @Nullable String id) {
     public String serialize() {
