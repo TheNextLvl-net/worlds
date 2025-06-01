@@ -88,7 +88,8 @@ public class PaperLevelView implements LevelView {
         settings.flatMap(tag -> tag.optional("structure_overrides")
                         .filter(Tag::isList).map(Tag::getAsList))
                 .map(list -> list.stream()
-                        .map(structure -> new Structure(structure.getAsString()))
+                        .map(Tag::getAsString)
+                        .map(Structure::new)
                         .collect(Collectors.toCollection(LinkedHashSet::new)))
                 .ifPresent(preset::structures);
         settings.flatMap(tag -> tag.optional("structure_overrides")
