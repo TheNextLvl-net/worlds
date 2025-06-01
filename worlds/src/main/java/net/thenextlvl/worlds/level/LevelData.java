@@ -1,6 +1,5 @@
 package net.thenextlvl.worlds.level;
 
-import com.google.common.base.Preconditions;
 import core.nbt.tag.ByteTag;
 import core.nbt.tag.CompoundTag;
 import core.nbt.tag.LongTag;
@@ -13,7 +12,7 @@ import net.thenextlvl.worlds.api.generator.GeneratorType;
 import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.preset.Preset;
-import org.bukkit.NamespacedKey;
+import org.intellij.lang.annotations.Subst;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -43,13 +42,11 @@ public abstract class LevelData implements Level {
     protected final boolean bonusChest;
     protected final long seed;
 
-    protected LevelData(WorldsPlugin plugin, Builder builder) throws IllegalStateException {
-        Preconditions.checkState(builder.key != null, "Key must be set");
-
+    protected LevelData(WorldsPlugin plugin, Builder builder) {
         this.plugin = plugin;
         this.file = builder.directory;
-        this.key = builder.key;
         this.name = builder.name != null ? builder.name : file.getFileName().toString();
+        this.key = builder.key != null ? builder.key : createKey(name);
         this.levelStem = builder.levelStem != null ? builder.levelStem : getLevelStem(plugin, file);
         this.generatorType = builder.generatorType != null ? builder.generatorType : GeneratorType.NORMAL;
         this.generator = builder.generator;
@@ -323,7 +320,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level build() throws IllegalStateException {
+        public Level build() {
             return plugin.isRunningFolia() ? new FoliaLevel(plugin, this) : new PaperLevel(plugin, this);
         }
     }
@@ -412,10 +409,10 @@ public abstract class LevelData implements Level {
         return tag.containsKey("worlds:world_key") || tag.containsKey("worlds:enabled") || tag.containsKey("worlds:generator");
     }
 
-    private static NamespacedKey createKey(String name) {
-        var namespace = name.toLowerCase()
+    private static Key createKey(String name) {
+        @Subst("pattern") var namespace = name.toLowerCase()
                 .replace("(", "").replace(")", "")
                 .replace(" ", "_");
-        return new NamespacedKey("worlds", namespace);
+        return Key.key("worlds", namespace);
     }
 }
