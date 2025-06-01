@@ -9,14 +9,13 @@ import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.worlds.api.WorldsProvider;
 import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.level.Level;
-import net.thenextlvl.worlds.api.preset.Presets;
 import net.thenextlvl.worlds.api.view.GeneratorView;
 import net.thenextlvl.worlds.command.WorldCommand;
+import net.thenextlvl.worlds.level.LevelData;
 import net.thenextlvl.worlds.link.WorldLinkProvider;
 import net.thenextlvl.worlds.listener.PortalListener;
 import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.model.MessageMigrator;
-import net.thenextlvl.worlds.level.LevelData;
 import net.thenextlvl.worlds.version.PluginVersionChecker;
 import net.thenextlvl.worlds.view.FoliaLevelView;
 import net.thenextlvl.worlds.view.PaperLevelView;
@@ -29,7 +28,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Objects;
@@ -49,7 +49,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     private final @Nullable SharedWorlds commons = runningFolia ? null : new SharedWorlds(this);
 
-    private final File presetsFolder = new File(getDataFolder(), "presets");
+    private final Path presetsFolder = getDataPath().resolve("presets");
     private final Path translations = getDataPath().resolve("translations");
     private final Key key = Key.key("worlds", "translations");
 
@@ -69,7 +69,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     @Override
     public void onLoad() {
-        if (!presetsFolder.isDirectory()) saveDefaultPresets();
+        createPresetsFolder();
         if (runningFolia) warnExperimental();
         versionChecker.checkVersion();
         registerServices();
@@ -106,7 +106,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         getComponentLogger().warn("You can do this with the command '/world create <key> preset the-void'");
     }
 
-    public File presetsFolder() {
+    public Path presetsFolder() {
         return presetsFolder;
     }
 
@@ -162,6 +162,14 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     public boolean isRunningFolia() {
         return runningFolia;
+    }
+
+    private void createPresetsFolder() {
+        try {
+            Files.createDirectories(presetsFolder);
+        } catch (IOException e) {
+            getComponentLogger().warn("Failed to create presets folder", e);
+        }
     }
 
     private void warnExperimental() {
