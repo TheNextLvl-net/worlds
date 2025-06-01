@@ -121,7 +121,6 @@ class WorldCreateCommand {
                 .levelStem(levelStem)
                 .generator(generator)
                 .key(key)
-                .name(name)
                 .preset(preset)
                 .seed(seed)
                 .structures(structures)

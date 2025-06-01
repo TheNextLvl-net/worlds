@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @NullMarked
 class FoliaLevel extends LevelData {
-    public FoliaLevel(WorldsPlugin plugin, Builder builder) {
+    public FoliaLevel(WorldsPlugin plugin, Builder builder) throws IllegalStateException {
         super(plugin, builder);
     }
 

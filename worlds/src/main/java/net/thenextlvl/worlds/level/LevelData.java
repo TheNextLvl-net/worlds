@@ -43,18 +43,15 @@ public abstract class LevelData implements Level {
     protected final boolean bonusChest;
     protected final long seed;
 
-    protected LevelData(WorldsPlugin plugin, Builder builder) {
+    protected LevelData(WorldsPlugin plugin, Builder builder) throws IllegalStateException {
         Preconditions.checkState(builder.key != null, "Key must be set");
-        Preconditions.checkState(builder.name != null, "Name must be set");
-        Preconditions.checkState(builder.levelStem != null, "Dimension type must be set");
-        Preconditions.checkState(builder.generatorType != null, "Generator type must be set");
 
         this.plugin = plugin;
         this.file = builder.directory;
         this.key = builder.key;
-        this.name = builder.name;
-        this.levelStem = builder.levelStem;
-        this.generatorType = builder.generatorType;
+        this.name = builder.name != null ? builder.name : file.getFileName().toString();
+        this.levelStem = builder.levelStem != null ? builder.levelStem : getLevelStem(plugin, file);
+        this.generatorType = builder.generatorType != null ? builder.generatorType : GeneratorType.NORMAL;
         this.generator = builder.generator;
         this.preset = builder.preset;
         this.enabled = builder.enabled;
@@ -326,7 +323,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level build() {
+        public Level build() throws IllegalStateException {
             return plugin.isRunningFolia() ? new FoliaLevel(plugin, this) : new PaperLevel(plugin, this);
         }
     }
