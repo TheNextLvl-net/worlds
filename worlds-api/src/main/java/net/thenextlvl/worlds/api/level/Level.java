@@ -7,7 +7,9 @@ import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.generator.GeneratorType;
 import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.preset.Preset;
+import org.bukkit.Server;
 import org.bukkit.World;
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -28,10 +30,10 @@ public interface Level extends Keyed {
 
     Optional<Generator> getGenerator();
 
-    TriState isKeepSpawnLoaded();
-
+    @ApiStatus.Internal
     TriState isEnabled();
 
+    @ApiStatus.Internal
     boolean isWorldKnown();
 
     boolean isHardcore();
@@ -39,6 +41,8 @@ public interface Level extends Keyed {
     boolean hasStructures();
 
     boolean hasBonusChest();
+
+    int getSpawnChunkRadius();
 
     long getSeed();
 
@@ -74,42 +78,126 @@ public interface Level extends Keyed {
 
         Builder generator(@Nullable Generator generator);
 
+        /**
+         * Retrieves the preset configuration associated with the builder.
+         * The preset determines predefined settings for world generation.
+         *
+         * @return the {@link Preset} applied to the builder, or null if no preset is set
+         */
         @Nullable
         Preset preset();
 
+        /**
+         * Sets the preset configuration for the builder.
+         * The preset determines pre-defined settings that can be applied to the world generation.
+         *
+         * @param preset the {@link Preset} to apply to the builder, or null to leave the preset undefined
+         * @return the builder instance for chaining method calls
+         */
         Builder preset(@Nullable Preset preset);
 
-        TriState keepSpawnLoaded();
-
-        Builder keepSpawnLoaded(TriState keepSpawnLoaded);
-
+        @ApiStatus.Internal
         TriState enabled();
 
+        @ApiStatus.Internal
         Builder enabled(TriState enabled);
 
+        /**
+         * Retrieves whether the world is configured to be in hardcore mode.
+         *
+         * @return a {@link Boolean} indicating whether the world is in hardcore mode,
+         * or null if the value is not explicitly set and the server default should be used.
+         */
         @Nullable
         Boolean hardcore();
 
+        /**
+         * Sets whether the world will be in hardcore mode.
+         * If the value is null, the {@link Server#isHardcore() configured value} will be used.
+         *
+         * @param hardcore a {@link Boolean} indicating whether the world should be in hardcore mode,
+         *                 or null to use the server default
+         * @return the builder instance for chaining method calls
+         */
         Builder hardcore(@Nullable Boolean hardcore);
 
+        /**
+         * Retrieves whether structures should be generated in the world.
+         *
+         * @return a {@link Boolean} indicating whether structures should be generated,
+         * or null if the server default should be used
+         */
         @Nullable
         Boolean structures();
 
+        /**
+         * Sets whether structures should be generated in the world.
+         * If the value is null, the {@link Server#getGenerateStructures() configured value} will be used.
+         *
+         * @param structures a {@link Boolean} indicating whether structures should
+         *                   be generated, or null to use the server default
+         * @return the builder instance for chaining method calls
+         */
         Builder structures(@Nullable Boolean structures);
 
+        /**
+         * Retrieves whether a bonus chest should be generated in the world.
+         *
+         * @return a {@link Boolean} indicating whether a bonus chest should be generated.
+         */
         @Nullable
         Boolean bonusChest();
 
+        /**
+         * Sets whether a bonus chest should be generated in the world.
+         * A bonus chest is a starting chest containing basic resources to help players begin their journey.
+         *
+         * @param bonusChest a {@link Boolean} specifying whether a bonus chest
+         *                   should be generated, or null to leave the value unset
+         * @return the builder instance for chaining method calls
+         */
         Builder bonusChest(@Nullable Boolean bonusChest);
 
         @Nullable
+        @ApiStatus.Internal
         Boolean worldKnown();
 
+        @ApiStatus.Internal
         Builder worldKnown(@Nullable Boolean worldKnown);
 
+        /**
+         * Retrieves the configured radius of chunks around the spawn point that should remain loaded.
+         *
+         * @return an {@link Integer} representing the radius of spawn chunks to keep loaded,
+         * or null if the default value is to be used.
+         */
+        @Nullable
+        Integer spawnChunkRadius();
+
+        /**
+         * Sets the radius of chunks around the spawn point that should remain loaded.
+         * If the value is null, the {@link Server#getSpawnRadius() configured value} will be used.
+         *
+         * @param radius an {@link Integer} representing the radius of chunks to keep loaded,
+         *               or null to use the server default
+         * @return the builder instance for chaining method calls
+         */
+        Builder spawnChunkRadius(@Nullable Integer radius);
+
+        /**
+         * Retrieves the world seed used for generation, if available.
+         *
+         * @return the seed as a {@link Long}, or null if no seed is set
+         */
         @Nullable
         Long seed();
 
+        /**
+         * Sets the world seed.
+         *
+         * @param seed the seed to use for world generation, or null to generate a random seed
+         * @return this builder instance for chaining method calls
+         */
         Builder seed(@Nullable Long seed);
 
         /**
