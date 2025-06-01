@@ -47,7 +47,20 @@ public class Preset {
     @SerializedName("structure_overrides")
     private LinkedHashSet<Structure> structures = new LinkedHashSet<>();
 
-    // https://minecraft.wiki/w/Superflat#Preset_code_format
+    /**
+     * Parses a Superflat preset code and generates a corresponding {@code Preset} object.
+     * <p>
+     * The preset code should follow the format specified in the Superflat preset code
+     * <a href="https://minecraft.wiki/w/Superflat#Preset_code_format">documentation</a>.
+     * It consists of layer definitions separated by commas and the biome definition separated by a semicolon.
+     * Each layer may specify its material and optional height.
+     * If the material is invalid or the format is incorrect,
+     * an {@code IllegalArgumentException} is thrown.
+     *
+     * @param presetCode the preset code string to parse, in the expected format
+     * @return a {@code Preset} object configured with the layers and biome described in the preset code
+     * @throws IllegalArgumentException if the preset code contains invalid materials or does not adhere to the required format
+     */
     @SuppressWarnings("PatternValidation")
     public static Preset parse(String presetCode) {
         var strings = presetCode.split(";", 2);
