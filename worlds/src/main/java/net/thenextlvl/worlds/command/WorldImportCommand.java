@@ -20,6 +20,8 @@ import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.nio.file.Path;
+
 import static net.thenextlvl.worlds.command.WorldCommand.generatorArgument;
 import static net.thenextlvl.worlds.command.WorldCommand.keyArgument;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
@@ -70,9 +72,7 @@ class WorldImportCommand {
     private static int execute(CommandContext<CommandSourceStack> context, @Nullable NamespacedKey key,
                                @Nullable LevelStem levelStem, @Nullable Generator generator, WorldsPlugin plugin) {
         var name = context.getArgument("world", String.class);
-        var levelFolder = plugin.getServer().getWorldContainer().toPath().resolve(name);
-
-        var build = plugin.levelView().read(levelFolder).map(Level::toBuilder)
+        var build = plugin.levelView().read(Path.of(name)).map(Level::toBuilder)
                 .map(level -> level.levelStem(levelStem).generator(generator).key(key).build());
         var world = build.filter(level -> !level.isWorldKnown()).flatMap(Level::create).orElse(null);
 

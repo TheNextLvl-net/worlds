@@ -172,7 +172,8 @@ public abstract class LevelData implements Level {
         private @Nullable Long seed;
 
         public Builder(WorldsPlugin plugin, Path directory) {
-            this.directory = directory;
+            var container = plugin.getServer().getWorldContainer().toPath();
+            this.directory = directory.startsWith(container) ? directory : container.resolve(directory);
             this.plugin = plugin;
         }
 
@@ -350,12 +351,15 @@ public abstract class LevelData implements Level {
     }
 
     public static Optional<Level> read(WorldsPlugin plugin, Path directory) {
-        var levelData = plugin.levelView().getLevelDataFile(directory).orElse(null);
+        var container = plugin.getServer().getWorldContainer().toPath();
+        var level = directory.startsWith(container) ? directory : container.resolve(directory);
+        
+        var levelData = plugin.levelView().getLevelDataFile(level).orElse(null);
         if (levelData == null) return Optional.empty();
 
         var data = levelData.getRoot().<CompoundTag>optional("Data");
         var name = data.flatMap(tag -> tag.optional("LevelName").map(Tag::getAsString))
-                .orElseGet(() -> directory.getFileName().toString());
+                .orElseGet(() -> level.getFileName().toString());
         var pdc = data.flatMap(tag -> tag.optional("BukkitValues").map(Tag::getAsCompound));
         var worldKnown = pdc.map(LevelData::isKnown).orElse(false);
         var key = pdc.flatMap(tag -> tag.optional("worlds:world_key")
@@ -364,7 +368,7 @@ public abstract class LevelData implements Level {
                 .map(TriState::byBoolean)).orElse(TriState.NOT_SET);
         var chunkGenerator = pdc.flatMap(tag -> tag.optional("worlds:generator").map(Tag::getAsString)).map(serialized ->
                 Generator.deserialize(plugin, serialized)).orElse(null);
-        var levelStem = getLevelStem(plugin, directory);
+        var levelStem = getLevelStem(plugin, level);
         var settings = data.flatMap(tag -> tag.<CompoundTag>optional("WorldGenSettings"));
         var dimensions = settings.flatMap(tag -> tag.<CompoundTag>optional("dimensions"));
         var dimension = dimensions.flatMap(tag -> tag.<CompoundTag>optional(levelStem.dimensionType().key().asString()));
@@ -383,7 +387,7 @@ public abstract class LevelData implements Level {
                 .orElse(null);
         var generatorType = worldPreset.orElse(GeneratorType.NORMAL);
 
-        return Optional.of(new Builder(plugin, directory)
+        return Optional.of(new Builder(plugin, level)
                 .key(key)
                 .name(name)
                 .levelStem(levelStem)
