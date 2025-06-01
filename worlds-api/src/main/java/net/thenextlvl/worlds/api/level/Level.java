@@ -112,6 +112,11 @@ public interface Level extends Keyed {
 
         Builder seed(@Nullable Long seed);
 
+        /**
+         * Constructs a new Level instance based on the current state of the builder.
+         *
+         * @return the constructed Level instance
+         */
         Level build();
     }
 }
