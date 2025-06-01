@@ -121,7 +121,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     @Override
     public Level.Builder levelBuilder(Path directory) {
-        return new LevelData.Builder(this, directory);
+        return new LevelData.Builder(this, getServer().getWorldContainer().toPath().resolve(directory));
     }
 
     @Override

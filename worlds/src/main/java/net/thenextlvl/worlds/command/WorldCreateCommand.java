@@ -16,14 +16,16 @@ import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.generator.GeneratorType;
 import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.preset.Preset;
+import net.thenextlvl.worlds.command.argument.GeneratorTypeArgument;
 import net.thenextlvl.worlds.command.argument.LevelStemArgument;
 import net.thenextlvl.worlds.command.argument.SeedArgument;
 import net.thenextlvl.worlds.command.argument.WorldPresetArgument;
-import net.thenextlvl.worlds.command.argument.GeneratorTypeArgument;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
+import java.nio.file.Path;
 
 import static net.thenextlvl.worlds.command.WorldCommand.generatorArgument;
 import static net.thenextlvl.worlds.command.WorldCommand.keyArgument;
@@ -115,9 +117,7 @@ class WorldCreateCommand {
 
         var name = key.getKey();
 
-        var levelFolder = plugin.getServer().getWorldContainer().toPath().resolve(name);
-
-        var level = plugin.levelBuilder(levelFolder)
+        var level = plugin.levelBuilder(Path.of(name))
                 .levelStem(levelStem)
                 .generator(generator)
                 .key(key)
