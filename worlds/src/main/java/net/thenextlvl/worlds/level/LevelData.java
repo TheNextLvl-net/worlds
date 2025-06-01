@@ -403,9 +403,8 @@ public abstract class LevelData implements Level {
     private static LevelStem getLevelStem(WorldsPlugin plugin, Path directory) {
         var end = plugin.levelView().hasEndDimension(directory);
         var nether = plugin.levelView().hasNetherDimension(directory);
-        if (end && nether) return LevelStem.OVERWORLD;
-        if (end) return LevelStem.END;
-        if (nether) return LevelStem.NETHER;
+        if (end && !nether) return LevelStem.END;
+        if (nether && !end) return LevelStem.NETHER;
         return LevelStem.OVERWORLD;
     }
 
