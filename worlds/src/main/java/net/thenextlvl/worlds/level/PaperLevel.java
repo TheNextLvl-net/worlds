@@ -55,7 +55,7 @@ import java.util.Optional;
 
 @NullMarked
 class PaperLevel extends LevelData {
-    public PaperLevel(WorldsPlugin plugin, Builder builder) {
+    public PaperLevel(WorldsPlugin plugin, Builder builder) throws IllegalStateException {
         super(plugin, builder);
     }
 
