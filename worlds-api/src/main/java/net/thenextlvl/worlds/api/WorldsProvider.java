@@ -6,6 +6,7 @@ import net.thenextlvl.worlds.api.link.LinkProvider;
 import net.thenextlvl.worlds.api.link.LinkTree;
 import net.thenextlvl.worlds.api.view.GeneratorView;
 import net.thenextlvl.worlds.api.view.LevelView;
+import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -31,6 +32,7 @@ public interface WorldsProvider extends Plugin {
 
     /**
      * Creates a {@link Level.Builder} instance to configure and build a level from the specified directory.
+     * The given level path will be resolved from the {@link Server#getWorldContainer() world container}.
      *
      * @param level the path representing the level to be built
      * @return a {@link Level.Builder} for configuring and creating the specified level
