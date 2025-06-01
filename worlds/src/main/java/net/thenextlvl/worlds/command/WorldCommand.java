@@ -19,6 +19,7 @@ public class WorldCommand {
     public static LiteralCommandNode<CommandSourceStack> create(WorldsPlugin plugin) {
         var command = Commands.literal("world")
                 .requires(source -> source.getSender().hasPermission("worlds.command"))
+                .then(WorldBackupCommand.create(plugin))
                 .then(WorldCloneCommand.create(plugin))
                 .then(WorldCreateCommand.create(plugin))
                 .then(WorldDeleteCommand.create(plugin))
