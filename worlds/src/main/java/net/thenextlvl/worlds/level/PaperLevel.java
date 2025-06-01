@@ -48,10 +48,9 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.generator.WorldInfo;
 import org.jspecify.annotations.NullMarked;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @NullMarked
@@ -65,20 +64,13 @@ class PaperLevel extends LevelData {
         var server = ((CraftServer) plugin.getServer());
         var console = server.getServer();
 
-        Preconditions.checkState(console.getAllLevels().iterator().hasNext(), "Cannot create additional worlds on STARTUP");
+        Preconditions.checkState(console.getAllLevels().iterator().hasNext(), "Cannot create worlds before main level is created");
+        Preconditions.checkArgument(!Files.exists(file) || Files.isDirectory(file), "File (%s) exists and isn't a folder", file);
 
-        File folder = new File(server.getWorldContainer(), name);
-
-        if (folder.exists()) {
-            Preconditions.checkArgument(folder.isDirectory(), "File (%s) exists and isn't a folder", name);
-        }
-
-        World world = server.getWorld(name);
-        World worldByKey = server.getWorld(key);
-        if (world != null || worldByKey != null) {
-            if (world == worldByKey) return Optional.of(world);
-            throw new IllegalArgumentException("Cannot create a world with key " + key + " and name " + name + " one (or both) already match a world that exists");
-        }
+        var worldByKey = server.getWorld(key);
+        var worldByName = server.getWorld(name);
+        if (worldByName != null && worldByName.equals(worldByKey)) return Optional.of(worldByName);
+        Preconditions.checkArgument(worldByKey == null && worldByName == null, "World with key %s or name %s already exists", key, name);
 
         var chunkGenerator = Optional.ofNullable(generator)
                 .map(generator -> generator.generator(name))
@@ -180,11 +172,11 @@ class PaperLevel extends LevelData {
             Main.forceUpgrade(levelStorageAccess, primaryLevelData, DataFixers.getDataFixer(), console.options.has("eraseCache"), () -> true, registryAccess, console.options.has("recreateRegionFiles"));
         }
 
-        long i = BiomeManager.obfuscateSeed(primaryLevelData.worldGenOptions().seed());
+        long seed = BiomeManager.obfuscateSeed(primaryLevelData.worldGenOptions().seed());
         List<CustomSpawner> list = ImmutableList.of(
                 new PhantomSpawner(), new PatrolSpawner(), new CatSpawner(), new VillageSiege(), new WanderingTraderSpawner(primaryLevelData)
         );
-        LevelStem customStem = contextLevelStemRegistry.getValue(dimensionType);
+        LevelStem customStem = contextLevelStemRegistry.getValueOrThrow(dimensionType);
 
         WorldInfo worldInfo = new CraftWorldInfo(primaryLevelData, levelStorageAccess, levelStem.dimensionType().toBukkit(), customStem.type().value(), customStem.generator(), server.getHandle().getServer().registryAccess());
         if (biomeProvider == null && chunkGenerator != null) {
@@ -214,7 +206,7 @@ class PaperLevel extends LevelData {
                 customStem,
                 MinecraftServer.getServer().progressListenerFactory.create(primaryLevelData.getGameRules().getInt(GameRules.RULE_SPAWN_CHUNK_RADIUS)),
                 primaryLevelData.isDebugWorld(),
-                i,
+                seed,
                 levelStem == net.thenextlvl.worlds.api.generator.LevelStem.OVERWORLD ? list : ImmutableList.of(),
                 true,
                 console.overworld().getRandomSequences(),
@@ -222,7 +214,7 @@ class PaperLevel extends LevelData {
                 chunkGenerator, biomeProvider
         );
 
-        if (server.getWorld(name.toLowerCase(Locale.ROOT)) == null) return Optional.empty();
+        if (server.getWorld(name) == null) return Optional.empty();
 
         console.addLevel(serverLevel);
         console.initWorld(serverLevel, primaryLevelData, primaryLevelData, primaryLevelData.worldGenOptions());
