@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
 import io.papermc.paper.FeatureHooks;
-import net.kyori.adventure.util.TriState;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -193,9 +192,7 @@ class PaperLevel extends LevelData {
             dimensionKey = ResourceKey.create(Registries.DIMENSION, ResourceLocation.fromNamespaceAndPath(key.namespace(), key.value()));
         }
 
-        if (keepSpawnLoaded.equals(TriState.FALSE)) {
-            primaryLevelData.getGameRules().getRule(GameRules.RULE_SPAWN_CHUNK_RADIUS).set(0, null);
-        }
+        primaryLevelData.getGameRules().getRule(GameRules.RULE_SPAWN_CHUNK_RADIUS).set(spawnChunkRadius, null);
 
         ServerLevel serverLevel = new ServerLevel(
                 console,

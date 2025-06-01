@@ -33,13 +33,12 @@ public abstract class LevelData implements Level {
     protected final @Nullable Generator generator;
     protected final @Nullable Preset preset;
 
-    protected final TriState keepSpawnLoaded = TriState.NOT_SET;
-
     protected final TriState enabled;
     protected final boolean hardcore;
     protected final boolean worldKnown;
     protected final boolean structures;
     protected final boolean bonusChest;
+    protected final int spawnChunkRadius;
     protected final long seed;
 
     protected LevelData(WorldsPlugin plugin, Builder builder) {
@@ -56,6 +55,7 @@ public abstract class LevelData implements Level {
         this.worldKnown = builder.worldKnown != null ? builder.worldKnown : false;
         this.structures = builder.structures != null ? builder.structures : plugin.getServer().getGenerateStructures();
         this.bonusChest = builder.bonusChest != null ? builder.bonusChest : false;
+        this.spawnChunkRadius = builder.spawnChunkRadius != null ? builder.spawnChunkRadius : plugin.getServer().getSpawnRadius();
         this.seed = builder.seed != null ? builder.seed : ThreadLocalRandom.current().nextLong();
     }
 
@@ -95,11 +95,6 @@ public abstract class LevelData implements Level {
     }
 
     @Override
-    public TriState isKeepSpawnLoaded() {
-        return keepSpawnLoaded;
-    }
-
-    @Override
     public TriState isEnabled() {
         return enabled;
     }
@@ -122,6 +117,11 @@ public abstract class LevelData implements Level {
     @Override
     public boolean hasBonusChest() {
         return bonusChest;
+    }
+
+    @Override
+    public int getSpawnChunkRadius() {
+        return spawnChunkRadius;
     }
 
     @Override
@@ -150,8 +150,6 @@ public abstract class LevelData implements Level {
         private final WorldsPlugin plugin;
         private final Path directory;
 
-        private TriState keepSpawnLoaded = TriState.NOT_SET;
-
         private @Nullable Key key;
         private @Nullable String name;
         private @Nullable LevelStem levelStem;
@@ -164,6 +162,7 @@ public abstract class LevelData implements Level {
         private @Nullable Boolean bonusChest;
         private @Nullable Boolean worldKnown;
         private @Nullable Long seed;
+        private @Nullable Integer spawnChunkRadius;
 
         public Builder(WorldsPlugin plugin, Path directory) {
             var container = plugin.getServer().getWorldContainer().toPath();
@@ -243,17 +242,6 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public TriState keepSpawnLoaded() {
-            return keepSpawnLoaded;
-        }
-
-        @Override
-        public Level.Builder keepSpawnLoaded(TriState keepSpawnLoaded) {
-            this.keepSpawnLoaded = keepSpawnLoaded;
-            return this;
-        }
-
-        @Override
         public TriState enabled() {
             return enabled;
         }
@@ -305,6 +293,17 @@ public abstract class LevelData implements Level {
         @Override
         public Level.Builder worldKnown(@Nullable Boolean worldKnown) {
             this.worldKnown = worldKnown;
+            return this;
+        }
+
+        @Override
+        public @Nullable Integer spawnChunkRadius() {
+            return spawnChunkRadius;
+        }
+
+        @Override
+        public Level.Builder spawnChunkRadius(@Nullable Integer radius) {
+            this.spawnChunkRadius = radius;
             return this;
         }
 
