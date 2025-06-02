@@ -23,7 +23,7 @@ Simply pick a predefined preset—or define your own!
   (Currently, Worlds can load custom dimension worlds, but in-game/API creation is coming soon.)
 
 🚀 Simplify world management & unlock new possibilities with Worlds!<br>
-🔗 [Download now on hangar](https://hangar.papermc.io/TheNextLvl/Worlds)
+🔗 [Download now on Modrinth](https://modrinth.com/plugin/worlds-1)
 
 ### Versions
 
@@ -47,10 +47,4 @@ Simply pick a predefined preset—or define your own!
 [Latest version supporting 1.19/1.20.4 (Java 19)](https://github.com/TheNextLvl-net/worlds/releases/tag/v1.1.6)<br>
 [Latest version supporting 1.19/1.20.4 (Java 17)](https://github.com/TheNextLvl-net/worlds/releases/tag/v1.1.3)<br>
 
-### Wiki
-
 For further information check out the [Wiki](https://thenextlvl.net/docs/worlds)
-
-### API
-
-https://repo.thenextlvl.net/#/releases/net/thenextlvl/worlds/api
