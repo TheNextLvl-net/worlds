@@ -18,7 +18,7 @@ import org.jspecify.annotations.Nullable;
  */
 @NullMarked
 public record Generator(Plugin plugin, @Nullable String id) {
-    public String serialize() {
+    public String asString() {
         return id != null ? plugin.getName() + ":" + id : plugin.getName();
     }
 
@@ -30,8 +30,8 @@ public record Generator(Plugin plugin, @Nullable String id) {
         return plugin().getDefaultBiomeProvider(worldName, id());
     }
 
-    public static Generator deserialize(WorldsProvider provider, String serialized) throws GeneratorException {
-        var split = serialized.split(":", 2);
+    public static Generator of(WorldsProvider provider, String string) throws GeneratorException {
+        var split = string.split(":", 2);
 
         var plugin = split[0];
         var id = split.length > 1 ? split[1] : null;
@@ -40,7 +40,7 @@ public record Generator(Plugin plugin, @Nullable String id) {
 
         if (generator == null)
             throw new GeneratorException(plugin, id, "Unknown plugin");
-        if (!provider.isEnabled())
+        if (!generator.isEnabled()) // todo: test startup
             throw new GeneratorException(plugin, id, "Plugin is not enabled");
         if (!provider.generatorView().hasGenerator(generator))
             throw new GeneratorException(plugin, id, "Plugin has no generator");

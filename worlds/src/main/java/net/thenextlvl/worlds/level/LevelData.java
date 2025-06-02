@@ -360,7 +360,7 @@ public abstract class LevelData implements Level {
         var enabled = pdc.flatMap(tag -> tag.optional("worlds:enabled").map(Tag::getAsBoolean)
                 .map(TriState::byBoolean)).orElse(TriState.NOT_SET);
         var chunkGenerator = pdc.flatMap(tag -> tag.optional("worlds:generator").map(Tag::getAsString)).map(serialized ->
-                Generator.deserialize(plugin, serialized)).orElse(null);
+                Generator.of(plugin, serialized)).orElse(null);
         var levelStem = getLevelStem(plugin, level);
         var settings = data.flatMap(tag -> tag.<CompoundTag>optional("WorldGenSettings"));
         var dimensions = settings.flatMap(tag -> tag.<CompoundTag>optional("dimensions"));
