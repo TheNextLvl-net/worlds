@@ -5,7 +5,6 @@ plugins {
     id("idea")
     id("java")
     id("java-library")
-    id("maven-publish")
     id("com.gradleup.shadow")
     id("com.modrinth.minotaur")
     id("de.eldoria.plugin-yml.paper")
@@ -118,19 +117,5 @@ modrinth {
     loaders.add("paper")
     dependencies {
         incompatible.project("worlds")
-    }
-}
-
-publishing {
-    publications.create<MavenPublication>("maven") {
-        from(components["java"])
-    }
-    repositories.maven {
-        val branch = if (version.toString().contains("-pre")) "snapshots" else "releases"
-        url = uri("https://repo.thenextlvl.net/$branch")
-        credentials {
-            username = System.getenv("REPOSITORY_USER")
-            password = System.getenv("REPOSITORY_TOKEN")
-        }
     }
 }
