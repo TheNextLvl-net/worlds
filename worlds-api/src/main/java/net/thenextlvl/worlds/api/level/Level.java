@@ -73,6 +73,12 @@ public interface Level extends Keyed {
 
         Builder generatorType(@Nullable GeneratorType type);
 
+        /**
+         * Retrieves the generator configuration if one is defined.
+         * The generator defines specific behaviors or features for customizing world generation.
+         *
+         * @return the {@link Generator} instance associated with the builder, or null if no generator is set
+         */
         @Nullable
         Generator generator();
 
