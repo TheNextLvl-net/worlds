@@ -199,16 +199,4 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS.newHandler(event ->
                 event.registrar().register(WorldCommand.create(this))));
     }
-
-    private void saveDefaultPresets() {
-        Presets.BOTTOMLESS_PIT.saveToFile(new File(presetsFolder, "bottomless-pit.json"), true);
-        Presets.CLASSIC_FLAT.saveToFile(new File(presetsFolder, "classic-flat.json"), true);
-        Presets.DESERT.saveToFile(new File(presetsFolder, "desert.json"), true);
-        Presets.OVERWORLD.saveToFile(new File(presetsFolder, "overworld.json"), true);
-        Presets.REDSTONE_READY.saveToFile(new File(presetsFolder, "redstone-ready.json"), true);
-        Presets.SNOWY_KINGDOM.saveToFile(new File(presetsFolder, "snowy-kingdom.json"), true);
-        Presets.THE_VOID.saveToFile(new File(presetsFolder, "the-void.json"), true);
-        Presets.TUNNELERS_DREAM.saveToFile(new File(presetsFolder, "tunnelers-dream.json"), true);
-        Presets.WATER_WORLD.saveToFile(new File(presetsFolder, "water-world.json"), true);
-    }
 }

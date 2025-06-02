@@ -224,6 +224,7 @@ public class Preset {
      * @param force whether to override the file if it already exists
      * @return whether the file could be saved
      */
+    @Deprecated(forRemoval = true)
     public boolean saveToFile(File file, boolean force) {
         if (!force && file.exists()) return false;
         new GsonFile<>(IO.of(file), this, gson).save();
@@ -235,6 +236,7 @@ public class Preset {
      *
      * @return the serialized preset as a JsonObject
      */
+    @Deprecated(forRemoval = true)
     public JsonObject serialize() {
         return gson.toJsonTree(this).getAsJsonObject();
     }
@@ -253,6 +255,7 @@ public class Preset {
      * @param object the object to deserialize
      * @return the deserialized preset
      */
+    @Deprecated(forRemoval = true)
     public static Preset deserialize(JsonObject object) {
         return gson.fromJson(object, Preset.class);
     }
