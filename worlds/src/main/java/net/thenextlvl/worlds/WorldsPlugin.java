@@ -157,7 +157,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     public void persistGenerator(World world, Generator generator) {
         var generatorKey = new NamespacedKey("worlds", "generator");
-        world.getPersistentDataContainer().set(generatorKey, STRING, generator.serialize());
+        world.getPersistentDataContainer().set(generatorKey, STRING, generator.asString());
     }
 
     public boolean isRunningFolia() {

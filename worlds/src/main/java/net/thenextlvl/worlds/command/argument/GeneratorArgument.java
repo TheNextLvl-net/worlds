@@ -11,7 +11,7 @@ import org.jspecify.annotations.NullMarked;
 public class GeneratorArgument extends WrappedArgumentType<String, Generator> {
     public GeneratorArgument(WorldsPlugin plugin) {
         super(StringArgumentType.string(), (reader, type) ->
-                        Generator.deserialize(plugin, type),
+                        Generator.of(plugin, type),
                 new GeneratorSuggestionProvider(plugin));
     }
 }
