@@ -158,4 +158,7 @@ modrinth {
     gameVersions.set(versions)
     loaders.add("paper")
     loaders.add("folia")
+    dependencies {
+        embedded.project("perworlds")
+    }
 }

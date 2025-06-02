@@ -7,8 +7,9 @@ plugins {
     id("java-library")
     id("maven-publish")
     id("com.gradleup.shadow")
-    id("io.papermc.hangar-publish-plugin")
+    id("com.modrinth.minotaur")
     id("de.eldoria.plugin-yml.paper")
+    id("io.papermc.hangar-publish-plugin")
 }
 
 java {
@@ -122,6 +123,18 @@ hangarPublish { // docs - https://docs.papermc.io/misc/hangar-publishing
             jar.set(tasks.shadowJar.flatMap { it.archiveFile })
             platformVersions.set(versions)
         }
+    }
+}
+
+modrinth {
+    token.set(System.getenv("MODRINTH_TOKEN"))
+    projectId.set("lpfQmSV2")
+    versionType = if (isRelease) "release" else "beta"
+    uploadFile.set(tasks.shadowJar)
+    gameVersions.set(versions)
+    loaders.add("paper")
+    dependencies {
+        incompatible.project("worlds")
     }
 }
 
