@@ -4,6 +4,7 @@ assignees:
   - NonSwag
 labels:
   - enhancement
+type: feature
 body:
   - type: markdown
     attributes:
