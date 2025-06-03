@@ -4,8 +4,7 @@ assignees:
   - NonSwag
 labels:
   - bug
-type:
-  - bug
+type: bug
 body:
   - type: markdown
     attributes:
