@@ -18,10 +18,6 @@ import org.jspecify.annotations.Nullable;
  */
 @NullMarked
 public record Generator(Plugin plugin, @Nullable String id) {
-    public String name() {
-        return plugin.getName();
-    }
-    
     public String asString() {
         return id != null ? plugin.getName() + ":" + id : plugin.getName();
     }
