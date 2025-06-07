@@ -39,6 +39,7 @@ import net.minecraft.world.level.storage.LevelSummary;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraft.world.level.validation.ContentValidationException;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.api.generator.DimensionType;
 import net.thenextlvl.worlds.api.preset.Presets;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
@@ -177,7 +178,7 @@ class PaperLevel extends LevelData {
         );
         LevelStem customStem = contextLevelStemRegistry.getValueOrThrow(dimensionType);
 
-        WorldInfo worldInfo = new CraftWorldInfo(primaryLevelData, levelStorageAccess, levelStem.dimensionType().toBukkit(), customStem.type().value(), customStem.generator(), server.getHandle().getServer().registryAccess());
+        WorldInfo worldInfo = new CraftWorldInfo(primaryLevelData, levelStorageAccess, toBukkit(levelStem.dimensionType()), customStem.type().value(), customStem.generator(), server.getHandle().getServer().registryAccess());
         if (biomeProvider == null && chunkGenerator != null) {
             biomeProvider = chunkGenerator.getDefaultBiomeProvider(worldInfo);
         }
@@ -207,7 +208,7 @@ class PaperLevel extends LevelData {
                 levelStem == net.thenextlvl.worlds.api.generator.LevelStem.OVERWORLD ? list : ImmutableList.of(),
                 true,
                 console.overworld().getRandomSequences(),
-                levelStem.dimensionType().toBukkit(),
+                toBukkit(levelStem.dimensionType()),
                 chunkGenerator, biomeProvider
         );
 
@@ -230,5 +231,11 @@ class PaperLevel extends LevelData {
         if (getLevelStem().equals(net.thenextlvl.worlds.api.generator.LevelStem.NETHER)) return LevelStem.NETHER;
         if (getLevelStem().equals(net.thenextlvl.worlds.api.generator.LevelStem.END)) return LevelStem.END;
         throw new IllegalArgumentException("Illegal dimension (" + getLevelStem() + ")");
+    }
+    
+    private World.Environment toBukkit(DimensionType type) {
+        if (type.equals(DimensionType.THE_END)) return World.Environment.THE_END;
+        if (type.equals(DimensionType.THE_NETHER)) return World.Environment.NETHER;
+        return World.Environment.NORMAL;
     }
 }
