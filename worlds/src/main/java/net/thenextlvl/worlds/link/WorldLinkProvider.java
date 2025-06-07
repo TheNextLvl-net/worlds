@@ -60,6 +60,10 @@ public class WorldLinkProvider implements LinkProvider {
         trees.add(tree);
     }
 
+    public void persistTrees() {
+        getLinkTrees().forEach(tree -> persistTree(tree.getOverworld()));
+    }
+
     public void persistTree(World world) {
         if (!world.getEnvironment().equals(World.Environment.NORMAL)) return;
         getLinkTree(world).filter(linkTree -> !linkTree.isEmpty()).ifPresent(tree -> {

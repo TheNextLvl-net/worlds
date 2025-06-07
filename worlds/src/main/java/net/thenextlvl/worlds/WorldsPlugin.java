@@ -81,8 +81,8 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     @Override
     public void onDisable() {
         if (commons != null) commons.onDisable();
+        linkProvider.persistTrees();
         metrics.shutdown();
-        unloadLevels();
     }
 
     @Override
@@ -201,10 +201,6 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         getComponentLogger().warn("Folia builds of Worlds are extremely experimental");
         getComponentLogger().warn("The PerWorlds module will NOT be enabled");
         getComponentLogger().warn("Please report any issues you encounter to {}", SharedWorlds.ISSUES);
-    }
-
-    private void unloadLevels() {
-        getServer().getWorlds().forEach(linkProvider()::persistTree);
     }
 
     private void registerServices() {
