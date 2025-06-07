@@ -61,7 +61,7 @@ tasks.shadowJar {
 }
 
 tasks.compileJava {
-    dependsOn(project(":source-generator").tasks.named("generate"))
+    dependsOn(project(":source-generator").tasks.named("generateSources"))
 }
 
 paper {
