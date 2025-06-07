@@ -104,4 +104,69 @@ public interface LevelView {
      * @param async whether the save operation should be performed asynchronously
      */
     void saveLevelData(World world, boolean async);
+
+    /**
+     * Regenerates the specified world either immediately or schedules it for regeneration based on the provided flag.
+     *
+     * @param world    the world to be regenerated
+     * @param schedule {@code true} if the regeneration should be scheduled to the shutdown process,
+     *                 {@code false} to perform the regeneration immediately
+     * @return {@code true} if the regeneration process was successfully initiated, {@code false} otherwise
+     */
+    RegenerationResult regenerate(World world, boolean schedule);
+
+    /**
+     * Cancels the regeneration process for the specified world, if scheduled.
+     *
+     * @param world the world for which the scheduled regeneration should be canceled
+     * @return true if the scheduled regeneration was successfully canceled, false if no regeneration was scheduled
+     */
+    boolean cancelScheduledRegeneration(World world);
+
+    /**
+     * Checks whether a regeneration process is scheduled for the specified world.
+     *
+     * @param world the world to check for a scheduled regeneration
+     * @return true if a regeneration process is scheduled for the world, otherwise false
+     */
+    boolean isRegenerationScheduled(World world);
+
+    /**
+     * Represents the possible outcomes of a world regeneration process.
+     */
+    enum RegenerationResult {
+        /**
+         * Indicates that the regeneration process was completed successfully.
+         */
+        SUCCESS,
+        /**
+         * Indicates that the regeneration process has been scheduled to occur during the server shutdown process.
+         */
+        SCHEDULED,
+        /**
+         * Indicates that the regeneration process requires scheduling due to certain constraints
+         * that prevent immediate execution, like on Folia servers or the {@code minecraft:overworld}
+         */
+        REQUIRES_SCHEDULING,
+        /**
+         * Indicates that the regeneration process failed due to the inability to unload the world.
+         */
+        UNLOAD_FAILED,
+        /**
+         * Indicates that the regeneration process failed due to an unspecified error or issue
+         * that prevented the operation from completing successfully.
+         */
+        FAILED;
+
+        /**
+         * Determines if the current regeneration result represents a successful operation.
+         * A regeneration result is considered successful if it is either {@code SUCCESS}
+         * or {@code SCHEDULED}.
+         *
+         * @return true if the result is either {@code SUCCESS} or {@code SCHEDULED}, otherwise false
+         */
+        public boolean isSuccess() {
+            return this == SUCCESS || this == SCHEDULED;
+        }
+    }
 }
