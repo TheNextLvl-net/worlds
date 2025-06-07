@@ -148,31 +148,42 @@ public abstract class LevelData implements Level {
 
     public static class Builder implements Level.Builder {
         private final WorldsPlugin plugin;
-        private final Path directory;
 
-        private @Nullable Key key;
-        private @Nullable String name;
-        private @Nullable LevelStem levelStem;
-        private @Nullable GeneratorType generatorType;
-        private @Nullable Generator generator;
-        private @Nullable Preset preset;
-        private TriState enabled = TriState.NOT_SET;
+        private @Nullable Boolean bonusChest;
         private @Nullable Boolean hardcore;
         private @Nullable Boolean structures;
-        private @Nullable Boolean bonusChest;
         private @Nullable Boolean worldKnown;
-        private @Nullable Long seed;
+        private @Nullable Generator generator;
+        private @Nullable GeneratorType generatorType;
         private @Nullable Integer spawnChunkRadius;
+        private @Nullable Key key;
+        private @Nullable LevelStem levelStem;
+        private @Nullable Long seed;
+        private @Nullable Preset preset;
+        private @Nullable String name;
+
+        private Path directory;
+        private TriState enabled = TriState.NOT_SET;
 
         public Builder(WorldsPlugin plugin, Path directory) {
-            var container = plugin.getServer().getWorldContainer().toPath();
-            this.directory = directory.startsWith(container) ? directory : container.resolve(directory);
             this.plugin = plugin;
+            this.directory = validate(directory);
+        }
+
+        private Path validate(Path directory) {
+            var container = plugin.getServer().getWorldContainer().toPath();
+            return directory.startsWith(container) ? directory : container.resolve(directory);
         }
 
         @Override
         public Path directory() {
             return directory;
+        }
+
+        @Override
+        public Level.Builder directory(Path directory) {
+            this.directory = validate(directory);
+            return this;
         }
 
         @Override

@@ -52,7 +52,20 @@ public interface Level extends Keyed {
 
     interface Builder {
         Path directory();
+        
+        /**
+         * Sets the directory path associated with the builder.
+         *
+         * @param directory the {@link Path} representing the directory to set
+         * @return the builder instance for chaining method calls
+         */
+        Builder directory(Path directory);
 
+        /**
+         * Retrieves the key associated with the builder, if one has been set.
+         *
+         * @return the {@link Key} instance associated with the builder, or null if no key is set
+         */
         @Nullable
         Key key();
 
