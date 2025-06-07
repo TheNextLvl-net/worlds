@@ -8,6 +8,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.command.argument.CommandFlagsArgument;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -76,7 +77,7 @@ class WorldRegenerateCommand {
         plugin.levelView().saveLevelData(world, false);
 
         var creator = new WorldCreator(world.getName(), world.getKey()).copy(world);
-        plugin.levelView().getGenerator(world).ifPresent(creator::generator);
+        plugin.levelView().getGenerator(world).map(Generator::name).ifPresent(creator::generator);
 
         if (!plugin.levelView().unload(world, false))
             return "world.unload.failed";
