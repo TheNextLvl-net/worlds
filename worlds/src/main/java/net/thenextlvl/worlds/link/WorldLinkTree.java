@@ -123,9 +123,9 @@ public class WorldLinkTree implements LinkTree {
 
     @Override
     public String toString() {
-        if (nether != null && end != null) return overworld.asString() + " -> " + nether + " & " + end;
-        else if (nether != null) return overworld.asString() + " -> " + nether;
-        else if (end != null) return overworld.asString() + " -> " + end;
-        else return overworld.asString();
+        if (nether == null && end == null) return overworld.key().asString();
+        if (nether == null) return overworld.key() + " -> " + end;
+        if (end == null) return overworld.key() + " -> " + nether;
+        return overworld.key() + " -> " + nether + " & " + end;
     }
 }
