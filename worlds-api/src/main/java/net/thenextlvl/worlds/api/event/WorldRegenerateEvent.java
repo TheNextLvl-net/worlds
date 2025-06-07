@@ -9,6 +9,8 @@ import org.jspecify.annotations.NullMarked;
  * Represents an event triggered when a {@link World} is deleted and subsequently regenerated.
  * This event signifies that a world is scheduled for regeneration following its deletion,
  * providing an opportunity for developers to listen to or modify the regeneration process.
+ *
+ * @see WorldActionScheduledEvent
  */
 @NullMarked
 public class WorldRegenerateEvent extends WorldDeleteEvent {

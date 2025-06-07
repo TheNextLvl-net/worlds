@@ -12,6 +12,7 @@ import org.jspecify.annotations.NullMarked;
  * This event allows developers to listen to or cancel the deletion of a world.
  * It also provides an option to check if the deleted world is slated for regeneration.
  *
+ * @see WorldActionScheduledEvent
  * @see WorldRegenerateEvent
  */
 @NullMarked
