@@ -182,7 +182,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         getServer().getWorlds().forEach(linkProvider()::persistTree);
         getServer().getWorlds().stream().filter(world -> !world.isAutoSave()).forEach(world -> {
             world.getPlayers().forEach(player -> player.kick(getServer().shutdownMessage()));
-            levelView().unloadLevel(world, false);
+            levelView().unload(world, false);
         });
     }
 

@@ -74,7 +74,7 @@ class WorldUnloadCommand {
 
         if (!world.isAutoSave()) plugin.levelView().saveLevelData(world, false);
 
-        return plugin.levelView().unloadLevel(world, world.isAutoSave())
+        return plugin.levelView().unload(world, world.isAutoSave())
                 ? "world.unload.success"
                 : "world.unload.failed";
     }

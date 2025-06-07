@@ -142,12 +142,12 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public boolean unloadLevel(World world, boolean save) {
+    public boolean unload(World world, boolean save) {
         return plugin.getServer().unloadWorld(world, save);
     }
 
     @Override
-    public void saveLevel(World world, boolean flush) {
+    public void save(World world, boolean flush) {
         var level = ((CraftWorld) world).getHandle();
         var oldSave = level.noSave;
         level.noSave = false;
