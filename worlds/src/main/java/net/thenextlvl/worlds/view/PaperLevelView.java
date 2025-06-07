@@ -57,6 +57,19 @@ public class PaperLevelView implements LevelView {
         return Files.exists(resolved) ? resolved : null;
     }
 
+    /**
+     * @see net.minecraft.world.level.storage.LevelStorageSource#createDefault(Path)
+     */
+    @Override
+    public Path getBackupFolder() {
+        return getWorldContainer().resolve("../backups");
+    }
+
+    @Override
+    public Path getWorldContainer() {
+        return plugin.getServer().getWorldContainer().toPath();
+    }
+
     @Override
     public Optional<Level.Builder> read(Path directory) {
         return LevelData.read(plugin, directory);

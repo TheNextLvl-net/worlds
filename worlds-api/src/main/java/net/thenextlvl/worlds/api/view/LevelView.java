@@ -18,6 +18,20 @@ import java.util.Set;
 @NullMarked
 public interface LevelView {
     /**
+     * Retrieves the path to the backup folder.
+     *
+     * @return the {@link Path} representing the backup folder
+     */
+    Path getBackupFolder();
+
+    /**
+     * Retrieves the path to the world container directory.
+     *
+     * @return the {@link Path} representing the world container directory
+     */
+    Path getWorldContainer();
+
+    /**
      * Reads a level from the specified directory path.
      *
      * @param directory the directory containing the level data to be read
