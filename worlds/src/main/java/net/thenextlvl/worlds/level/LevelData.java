@@ -401,6 +401,7 @@ public abstract class LevelData implements Level {
                ", worldKnown=" + worldKnown +
                ", structures=" + structures +
                ", bonusChest=" + bonusChest +
+               ", spawnChunkRadius=" + spawnChunkRadius +
                ", seed=" + seed +
                '}';
     }
