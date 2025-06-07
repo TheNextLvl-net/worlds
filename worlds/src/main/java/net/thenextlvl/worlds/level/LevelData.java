@@ -385,7 +385,7 @@ public abstract class LevelData implements Level {
                 .map(ByteTag::getAsBoolean).orElse(plugin.getServer().getGenerateStructures());
         var bonusChest = settings.flatMap(tag -> tag.<ByteTag>optional("bonus_chest"))
                 .map(ByteTag::getAsBoolean).orElse(false);
-        var worldPreset = generator.flatMap(plugin.levelView()::getWorldPreset);
+        var worldPreset = generator.flatMap(LevelData::getWorldPreset);
         var preset = worldPreset.filter(type -> type.equals(GeneratorType.FLAT))
                 .flatMap(worldType -> generator.flatMap(plugin.levelView()::getFlatPreset))
                 .orElse(null);
@@ -405,6 +405,33 @@ public abstract class LevelData implements Level {
                 .worldKnown(worldKnown)
                 .seed(seed)
                 .build());
+    }
+
+    private static Optional<GeneratorType> getWorldPreset(CompoundTag generator) {
+        var settings =  generator.optional("settings").filter(Tag::isString).map(Tag::getAsString);
+        if (settings.filter(s -> s.equals(GeneratorType.LARGE_BIOMES.key().asString())).isPresent())
+            return Optional.of(GeneratorType.LARGE_BIOMES);
+        if (settings.filter(s -> s.equals(GeneratorType.AMPLIFIED.key().asString())).isPresent())
+            return Optional.of(GeneratorType.AMPLIFIED);
+
+        // var type = generator.<CompoundTag>optional("biome_source")
+        //         .flatMap(tag -> tag.<StringTag>optional("type"))
+        //         .map(Tag::getAsString);
+
+        // if (type.filter(s -> s.equals(BiomeSource.SINGLE_BIOME.key().asString())).isPresent())
+        //     return Optional.of(GeneratorType.SINGLE_BIOME);
+        // if (type.filter(s -> s.equals(GeneratorType.CHECKERBOARD.key().asString())).isPresent())
+        //     return Optional.of(GeneratorType.CHECKERBOARD);
+
+        var generatorType = generator.optional("type").map(Tag::getAsString);
+        if (generatorType.filter(s -> s.equals(GeneratorType.DEBUG.key().asString())).isPresent())
+            return Optional.of(GeneratorType.DEBUG);
+        if (generatorType.filter(s -> s.equals(GeneratorType.FLAT.key().asString())).isPresent())
+            return Optional.of(GeneratorType.FLAT);
+        if (generatorType.filter(s -> s.equals(GeneratorType.NORMAL.key().asString())).isPresent())
+            return Optional.of(GeneratorType.NORMAL);
+
+        return Optional.empty();
     }
 
     private static LevelStem getLevelStem(WorldsPlugin plugin, Path directory) {

@@ -20,12 +20,6 @@ public interface LevelView {
 
     Optional<String> getGenerator(World world);
 
-    Optional<String> getGeneratorSettings(CompoundTag generator);
-
-    Optional<String> getGeneratorType(CompoundTag generator);
-
-    Optional<GeneratorType> getWorldPreset(CompoundTag generator);
-
     @Unmodifiable
     Set<Path> listLevels();
 

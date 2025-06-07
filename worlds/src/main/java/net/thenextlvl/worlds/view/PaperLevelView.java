@@ -110,45 +110,6 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public Optional<String> getGeneratorSettings(CompoundTag generator) {
-        return generator.optional("settings").filter(Tag::isString).map(Tag::getAsString);
-    }
-
-    @Override
-    public Optional<String> getGeneratorType(CompoundTag generator) {
-        return generator.optional("type").map(Tag::getAsString);
-    }
-
-    @Override
-    public Optional<GeneratorType> getWorldPreset(CompoundTag generator) {
-
-        var settings = getGeneratorSettings(generator);
-        if (settings.filter(s -> s.equals(GeneratorType.LARGE_BIOMES.key().asString())).isPresent())
-            return Optional.of(GeneratorType.LARGE_BIOMES);
-        if (settings.filter(s -> s.equals(GeneratorType.AMPLIFIED.key().asString())).isPresent())
-            return Optional.of(GeneratorType.AMPLIFIED);
-
-        // var type = generator.<CompoundTag>optional("biome_source")
-        //         .flatMap(tag -> tag.<StringTag>optional("type"))
-        //         .map(Tag::getAsString);
-
-        // if (type.filter(s -> s.equals(BiomeSource.SINGLE_BIOME.key().asString())).isPresent())
-        //     return Optional.of(GeneratorType.SINGLE_BIOME);
-        // if (type.filter(s -> s.equals(GeneratorType.CHECKERBOARD.key().asString())).isPresent())
-        //     return Optional.of(GeneratorType.CHECKERBOARD);
-
-        var generatorType = getGeneratorType(generator);
-        if (generatorType.filter(s -> s.equals(GeneratorType.DEBUG.key().asString())).isPresent())
-            return Optional.of(GeneratorType.DEBUG);
-        if (generatorType.filter(s -> s.equals(GeneratorType.FLAT.key().asString())).isPresent())
-            return Optional.of(GeneratorType.FLAT);
-        if (generatorType.filter(s -> s.equals(GeneratorType.NORMAL.key().asString())).isPresent())
-            return Optional.of(GeneratorType.NORMAL);
-
-        return Optional.empty();
-    }
-
-    @Override
     public Set<Path> listLevels() {
         try (var stream = Files.list(plugin.getServer().getWorldContainer().toPath())) {
             return stream.filter(this::isLevel).collect(Collectors.toUnmodifiableSet());
