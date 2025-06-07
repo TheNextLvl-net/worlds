@@ -20,7 +20,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
-tasks.register<JavaExec>("generate") {
+tasks.register<JavaExec>("generateSources") {
+    group = "build"
     mainClass.set("net.thenextlvl.worlds.generator.SourceGenerator")
     classpath(sourceSets.main.map { it.runtimeClasspath })
     args(rootProject.layout.projectDirectory.dir("per-worlds/src/generated/java").asFile.absolutePath)
