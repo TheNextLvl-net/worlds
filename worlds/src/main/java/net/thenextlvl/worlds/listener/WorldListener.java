@@ -24,7 +24,7 @@ public class WorldListener implements Listener {
         var provider = plugin.groupProvider();
         if (provider != null) provider.getGroup(event.getWorld()).ifPresent(group -> {
             if (group.removeWorld(event.getWorld())) return;
-            plugin.getComponentLogger().error("Failed to removed deleted world {} from group {}",
+            plugin.getComponentLogger().error("Failed to remove deleted world {} from group {}",
                     event.getWorld().getName(), group.getName());
         });
     }
