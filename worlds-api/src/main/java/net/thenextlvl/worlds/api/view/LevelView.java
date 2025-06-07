@@ -120,6 +120,13 @@ public interface LevelView {
      */
     void saveLevelData(World world, boolean async);
 
+    /**
+     * Creates a backup for the given world and returns the size of the backup in bytes.
+     *
+     * @param world the world to back up
+     * @return the size of the created backup in bytes
+     * @throws IOException if an I/O error occurs while creating the backup
+     */
     long backup(World world) throws IOException;
 
     /**
