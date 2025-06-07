@@ -1,20 +1,19 @@
-package net.thenextlvl.worlds.model;
+package net.thenextlvl.worlds.level;
 
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.model.LevelBuilder;
 import org.bukkit.World;
-import org.bukkit.WorldCreator;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
 
 @NullMarked
-public class FoliaLevel extends PaperLevel {
-    public FoliaLevel(WorldsPlugin plugin, LevelBuilder builder) {
+class FoliaLevel extends LevelData {
+    public FoliaLevel(WorldsPlugin plugin, Builder builder) {
         super(plugin, builder);
     }
 
     @Override
-    protected @Nullable World createWorld(WorldCreator creator) {
+    public Optional<World> create() {
         throw new UnsupportedOperationException("Folia 1.21.5 is not supported yet");
 //        var server = ((CraftServer) plugin.getServer());
 //        Preconditions.checkState(!server.getWorlds().isEmpty(), "Cannot create additional worlds on STARTUP");

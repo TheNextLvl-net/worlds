@@ -26,6 +26,8 @@ class WorldUnloadCommand {
 
     private static RequiredArgumentBuilder<CommandSourceStack, World> unload(WorldsPlugin plugin) {
         return worldArgument(plugin)
+                .suggests(new WorldSuggestionProvider<>(plugin, (context, world) ->
+                        !world.key().asString().equals("minecraft:overworld")))
                 .then(unloadFallback(plugin))
                 .executes(context -> unload(plugin, context));
     }
@@ -66,13 +68,9 @@ class WorldUnloadCommand {
         world.getPlayers().forEach(player -> player.teleport(fallbackSpawn));
 
         plugin.persistStatus(world, false, false);
-
-        var dragonBattle = world.getEnderDragonBattle();
-        if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
-
         if (!world.isAutoSave()) plugin.levelView().saveLevelData(world, false);
 
-        return plugin.levelView().unloadLevel(world, world.isAutoSave())
+        return plugin.levelView().unload(world, world.isAutoSave())
                 ? "world.unload.success"
                 : "world.unload.failed";
     }

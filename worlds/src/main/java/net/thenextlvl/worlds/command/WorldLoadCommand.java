@@ -9,13 +9,12 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.model.Level;
+import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 
-import java.io.File;
-import java.util.Optional;
+import java.nio.file.Path;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
@@ -29,16 +28,15 @@ class WorldLoadCommand {
 
     private static RequiredArgumentBuilder<CommandSourceStack, String> load(WorldsPlugin plugin) {
         return Commands.argument("world", StringArgumentType.string())
-                .suggests(new LevelSuggestionProvider<>(plugin))
+                .suggests(new LevelSuggestionProvider<>(plugin, false))
                 .executes(context -> load(context, plugin));
     }
 
     private static int load(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
         var name = context.getArgument("world", String.class);
-        var level = new File(plugin.getServer().getWorldContainer(), name);
 
-        var build = plugin.levelView().isLevel(level) ? plugin.levelBuilder(level).build() : null;
-        var world = Optional.ofNullable(build).filter(Level::importedBefore).flatMap(Level::create).orElse(null);
+        var build = plugin.levelView().read(Path.of(name)).map(Level.Builder::build);
+        var world = build.filter(Level::isWorldKnown).flatMap(Level::create).orElse(null);
 
         var message = world != null ? "world.load.success" : "world.load.failed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message,

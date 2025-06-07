@@ -11,7 +11,7 @@ public class FoliaLevelView extends PaperLevelView {
     }
 
     @Override
-    public boolean unloadLevel(World world, boolean save) {
+    public boolean unload(World world, boolean save) {
         return false; // todo implement
     }
 }

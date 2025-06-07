@@ -8,8 +8,7 @@ import core.paper.command.SuggestionProvider;
 import net.thenextlvl.worlds.WorldsPlugin;
 import org.jspecify.annotations.NullMarked;
 
-import java.io.File;
-import java.util.Arrays;
+import java.nio.file.Files;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
@@ -22,14 +21,17 @@ public class WorldPresetSuggestionProvider implements SuggestionProvider {
 
     @Override
     public CompletableFuture<Suggestions> suggest(CommandContext<?> context, SuggestionsBuilder builder) {
-        var files = plugin.presetsFolder().listFiles((file, name) ->
-                name.endsWith(".json"));
-        if (files != null) Arrays.stream(files)
-                .map(File::getName)
-                .map(name -> name.substring(0, name.length() - 5))
-                .map(StringArgumentType::escapeIfRequired)
-                .filter(s -> s.contains(builder.getRemaining()))
-                .forEach(builder::suggest);
-        return builder.buildFuture();
+        return CompletableFuture.runAsync(() -> {
+            try (var directoryStream = Files.newDirectoryStream(plugin.presetsFolder(), "*.json")) {
+                for (var path : directoryStream) {
+                    var fileName = path.getFileName().toString();
+                    var suggestion = fileName.substring(0, fileName.length() - 5);
+                    var escapedSuggestion = StringArgumentType.escapeIfRequired(suggestion);
+                    if (escapedSuggestion.contains(builder.getRemaining())) builder.suggest(escapedSuggestion);
+                }
+            } catch (Exception e) {
+                plugin.getComponentLogger().warn("Failed to list presets", e);
+            }
+        }).thenApply(unused -> builder.build());
     }
 }

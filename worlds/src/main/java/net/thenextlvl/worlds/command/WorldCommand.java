@@ -8,7 +8,7 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.command.GroupCommand;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.model.Generator;
+import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.command.argument.GeneratorArgument;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.World;

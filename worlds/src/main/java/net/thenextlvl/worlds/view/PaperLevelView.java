@@ -1,211 +1,134 @@
 package net.thenextlvl.worlds.view;
 
 import core.io.IO;
-import core.io.PathIO;
 import core.nbt.file.NBTFile;
 import core.nbt.tag.CompoundTag;
-import core.nbt.tag.ListTag;
-import core.nbt.tag.StringTag;
-import core.nbt.tag.Tag;
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
+import net.kyori.adventure.key.Key;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.model.Generator;
-import net.thenextlvl.worlds.api.model.LevelExtras;
-import net.thenextlvl.worlds.api.model.WorldPreset;
-import net.thenextlvl.worlds.api.preset.Biome;
-import net.thenextlvl.worlds.api.preset.Layer;
-import net.thenextlvl.worlds.api.preset.Preset;
-import net.thenextlvl.worlds.api.preset.Structure;
+import net.thenextlvl.worlds.api.event.WorldActionScheduledEvent;
+import net.thenextlvl.worlds.api.event.WorldActionScheduledEvent.ActionType;
+import net.thenextlvl.worlds.api.event.WorldBackupEvent;
+import net.thenextlvl.worlds.api.event.WorldDeleteEvent;
+import net.thenextlvl.worlds.api.event.WorldRegenerateEvent;
+import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.view.LevelView;
-import org.bukkit.NamespacedKey;
+import net.thenextlvl.worlds.level.LevelData;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 @NullMarked
 public class PaperLevelView implements LevelView {
+    private final Map<Key, Thread> regenerations = new HashMap<>();
+    private final Map<Key, Thread> deletions = new HashMap<>();
     protected final WorldsPlugin plugin;
 
     public PaperLevelView(WorldsPlugin plugin) {
         this.plugin = plugin;
     }
 
+    public Optional<Path> getLevelDataPath(Path level) {
+        return Optional.ofNullable(getFile(level, "level.dat"))
+                .or(() -> Optional.ofNullable(getFile(level, "level.dat_old")));
+    }
+
+    public Optional<NBTFile<CompoundTag>> getLevelDataFile(Path level) {
+        return getLevelDataPath(level).map(path -> new NBTFile<>(IO.of(path), new CompoundTag()));
+    }
+
+    private static @Nullable Path getFile(Path level, String other) {
+        var resolved = level.resolve(other);
+        return Files.exists(resolved) ? resolved : null;
+    }
+
+    /**
+     * @see net.minecraft.world.level.storage.LevelStorageSource#createDefault(Path)
+     */
     @Override
-    public NBTFile<CompoundTag> getLevelDataFile(File level) {
-        return new NBTFile<>(Optional.of(
-                IO.of(level, "level.dat")
-        ).filter(PathIO::exists).orElseGet(() ->
-                IO.of(level, "level.dat_old")
-        ), new CompoundTag());
+    public Path getBackupFolder() {
+        return getWorldContainer().resolve("../backups");
     }
 
     @Override
-    public Optional<LevelExtras> getExtras(CompoundTag data) {
-        return data.optional("BukkitValues").map(Tag::getAsCompound).map(values -> {
-            var key = values.optional("worlds:world_key").map(Tag::getAsString).map(NamespacedKey::fromString);
-            var generator = values.optional("worlds:generator").map(Tag::getAsString).map(serialized ->
-                    Generator.deserialize(plugin, serialized));
-            var enabled = values.optional("worlds:enabled").map(Tag::getAsBoolean);
-            if (key.isEmpty() && generator.isEmpty() && enabled.isEmpty()) return null;
-            return new LevelExtras(key.orElse(null), generator.orElse(null), enabled.orElse(false));
-        });
+    public Path getWorldContainer() {
+        return plugin.getServer().getWorldContainer().toPath();
     }
 
     @Override
-    public Optional<Preset> getFlatPreset(CompoundTag generator) {
-        var settings = generator.<CompoundTag>optional("settings");
-
-        if (settings.isEmpty()) return Optional.empty();
-
-        var preset = new Preset();
-
-        settings.flatMap(tag -> tag.<Tag>optional("biome"))
-                .map(Tag::getAsString)
-                .map(Biome::literal)
-                .ifPresent(preset::biome);
-
-        settings.flatMap(tag -> tag.<Tag>optional("features"))
-                .map(Tag::getAsBoolean)
-                .ifPresent(preset::features);
-
-        settings.flatMap(tag -> tag.<Tag>optional("lakes"))
-                .map(Tag::getAsBoolean)
-                .ifPresent(preset::lakes);
-
-        settings.flatMap(tag -> tag.<ListTag<CompoundTag>>optional("layers"))
-                .map(tag -> tag.stream().map(layer -> {
-                    var block = layer.optional("block").orElseThrow().getAsString();
-                    var height = layer.optional("height").orElseThrow().getAsInt();
-                    return new Layer(block, height);
-                }).collect(Collectors.toCollection(LinkedHashSet::new)))
-                .ifPresent(preset::layers);
-
-        settings.flatMap(tag -> tag.optional("structure_overrides")
-                        .filter(Tag::isList).map(Tag::getAsList))
-                .map(list -> list.stream()
-                        .map(structure -> new Structure(structure.getAsString()))
-                        .collect(Collectors.toCollection(LinkedHashSet::new)))
-                .ifPresent(preset::structures);
-        settings.flatMap(tag -> tag.optional("structure_overrides")
-                        .filter(Tag::isString).map(Tag::getAsString))
-                .map(Structure::new)
-                .ifPresent(preset::addStructure);
-
-        return Optional.of(preset);
+    public Optional<Level.Builder> read(Path directory) {
+        return LevelData.read(plugin, directory);
     }
 
     @Override
-    public Optional<String> getGenerator(World world) {
-        if (world.getGenerator() == null) return Optional.empty();
-        var loader = world.getGenerator().getClass().getClassLoader();
-        if (!(loader instanceof ConfiguredPluginClassLoader pluginLoader)) return Optional.empty();
-        if (pluginLoader.getPlugin() == null) return Optional.empty();
-        return Optional.of(pluginLoader.getPlugin().getName());
+    public Optional<JavaPlugin> getGenerator(World world) {
+        return Optional.ofNullable(world.getGenerator())
+                .map(chunkGenerator -> chunkGenerator.getClass().getClassLoader())
+                .filter(ConfiguredPluginClassLoader.class::isInstance)
+                .map(ConfiguredPluginClassLoader.class::cast)
+                .map(ConfiguredPluginClassLoader::getPlugin);
     }
 
     @Override
-    public Optional<String> getGeneratorSettings(CompoundTag generator) {
-        return generator.optional("settings").filter(Tag::isString).map(Tag::getAsString);
+    public Set<Path> listLevels() {
+        try (var stream = Files.list(plugin.getServer().getWorldContainer().toPath())) {
+            return stream.filter(this::isLevel).collect(Collectors.toUnmodifiableSet());
+        } catch (IOException e) {
+            return Set.of();
+        }
     }
 
     @Override
-    public Optional<String> getGeneratorType(CompoundTag generator) {
-        return generator.optional("type").map(Tag::getAsString);
-    }
-
-    @Override
-    public Optional<WorldPreset> getWorldPreset(CompoundTag generator) {
-
-        var settings = getGeneratorSettings(generator);
-        if (settings.filter(s -> s.equals(WorldPreset.LARGE_BIOMES.key().asString())).isPresent())
-            return Optional.of(WorldPreset.LARGE_BIOMES);
-        if (settings.filter(s -> s.equals(WorldPreset.AMPLIFIED.key().asString())).isPresent())
-            return Optional.of(WorldPreset.AMPLIFIED);
-
-        var type = generator.<CompoundTag>optional("biome_source")
-                .flatMap(tag -> tag.<StringTag>optional("type"))
-                .map(Tag::getAsString);
-
-        if (type.filter(s -> s.equals(WorldPreset.SINGLE_BIOME.key().asString())).isPresent())
-            return Optional.of(WorldPreset.SINGLE_BIOME);
-        if (type.filter(s -> s.equals(WorldPreset.CHECKERBOARD.key().asString())).isPresent())
-            return Optional.of(WorldPreset.CHECKERBOARD);
-
-        var generatorType = getGeneratorType(generator);
-        if (generatorType.filter(s -> s.equals(WorldPreset.DEBUG.key().asString())).isPresent())
-            return Optional.of(WorldPreset.DEBUG);
-        if (generatorType.filter(s -> s.equals(WorldPreset.FLAT.key().asString())).isPresent())
-            return Optional.of(WorldPreset.FLAT);
-        if (generatorType.filter(s -> s.equals(WorldPreset.NORMAL.key().asString())).isPresent())
-            return Optional.of(WorldPreset.NORMAL);
-
-        return Optional.empty();
-    }
-
-    @Override
-    public Stream<File> listLevels() {
-        return Optional.ofNullable(plugin.getServer().getWorldContainer()
-                        .listFiles(File::isDirectory)).stream()
-                .flatMap(files -> Arrays.stream(files).filter(this::isLevel));
-    }
-
-    @Override
-    public String getDimension(CompoundTag dimensions, World.Environment environment) {
-        return switch (environment) {
-            case NORMAL -> "minecraft:overworld";
-            case NETHER -> "minecraft:the_nether";
-            case THE_END -> "minecraft:the_end";
-            case CUSTOM -> dimensions.keySet().stream().filter(s -> !s.startsWith("minecraft")).findAny()
-                    .orElseThrow(() -> new UnsupportedOperationException("Could not find custom dimension"));
-        };
-    }
-
-    @Override
-    public World.Environment getEnvironment(File level) {
-        var end = hasEndDimension(level);
-        var nether = hasNetherDimension(level);
-        if (end && nether) return World.Environment.NORMAL;
-        if (end) return World.Environment.THE_END;
-        if (nether) return World.Environment.NETHER;
-        return World.Environment.NORMAL;
-    }
-
-    @Override
-    public boolean canLoad(File level) {
+    public boolean canLoad(Path level) {
         return plugin.getServer().getWorlds().stream()
                 .map(World::getWorldFolder)
+                .map(File::toPath)
                 .noneMatch(level::equals);
     }
 
     @Override
-    public boolean hasEndDimension(File level) {
-        return new File(level, "DIM1").isDirectory();
+    public boolean hasEndDimension(Path level) {
+        return Files.isDirectory(level.resolve("DIM1"));
     }
 
     @Override
-    public boolean hasNetherDimension(File level) {
-        return new File(level, "DIM-1").isDirectory();
+    public boolean hasNetherDimension(Path level) {
+        return Files.isDirectory(level.resolve("DIM-1"));
     }
 
     @Override
-    public boolean isLevel(File file) {
-        return file.isDirectory() && (new File(file, "level.dat").isFile() || new File(file, "level.dat_old").isFile());
+    public boolean isLevel(Path path) {
+        return Files.isRegularFile(path.resolve("level.dat")) || Files.isRegularFile(path.resolve("level.dat_old"));
     }
 
     @Override
-    public boolean unloadLevel(World world, boolean save) {
-        return plugin.getServer().unloadWorld(world, save);
+    public boolean unload(World world, boolean save) {
+        if (!plugin.getServer().unloadWorld(world, save)) return false;
+        var dragonBattle = world.getEnderDragonBattle();
+        if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
+        return true;
     }
 
+    /**
+     * @see CraftWorld#save(boolean)
+     */
     @Override
-    public void saveLevel(World world, boolean flush) {
+    public void save(World world, boolean flush) {
         var level = ((CraftWorld) world).getHandle();
         var oldSave = level.noSave;
         level.noSave = false;
@@ -213,6 +136,10 @@ public class PaperLevelView implements LevelView {
         level.noSave = oldSave;
     }
 
+    /**
+     * @see net.minecraft.server.level.ServerLevel#saveIncrementally(boolean)
+     * @see net.minecraft.server.level.ServerLevel#saveLevelData(boolean)
+     */
     @Override
     public void saveLevelData(World world, boolean async) {
         var level = ((CraftWorld) world).getHandle();
@@ -225,5 +152,142 @@ public class PaperLevelView implements LevelView {
         level.serverLevelData.setWorldBorder(level.getWorldBorder().createSettings());
         level.serverLevelData.setCustomBossEvents(level.getServer().getCustomBossEvents().save(level.registryAccess()));
         level.getChunkSource().getDataStorage().saveAndJoin();
+    }
+
+    @Override
+    public long backup(World world) throws IOException {
+        new WorldBackupEvent(world).callEvent();
+        save(world, true);
+        return ((CraftWorld) world).getHandle().levelStorageAccess.makeWorldBackup();
+    }
+
+    @Override
+    public DeletionResult delete(World world, boolean schedule) {
+        return schedule ? scheduleDeletion(world) : deleteNow(world);
+    }
+
+    @Override
+    public boolean cancelScheduledDeletion(World world) {
+        var thread = deletions.remove(world.key());
+        return thread != null && Runtime.getRuntime().removeShutdownHook(thread);
+    }
+
+    @Override
+    public boolean isDeletionScheduled(World world) {
+        return deletions.containsKey(world.getKey());
+    }
+
+    @Override
+    public DeletionResult regenerate(World world, boolean schedule) {
+        return schedule ? scheduleRegeneration(world) : regenerateNow(world);
+    }
+
+    @Override
+    public boolean cancelScheduledRegeneration(World world) {
+        var thread = regenerations.remove(world.key());
+        return thread != null && Runtime.getRuntime().removeShutdownHook(thread);
+    }
+
+    @Override
+    public boolean isRegenerationScheduled(World world) {
+        return regenerations.containsKey(world.getKey());
+    }
+
+    private DeletionResult deleteNow(World world) {
+        if (plugin.isRunningFolia() || world.getKey().asString().equals("minecraft:overworld"))
+            return DeletionResult.REQUIRES_SCHEDULING;
+
+        if (!new WorldDeleteEvent(world).callEvent()) return DeletionResult.FAILED;
+
+        var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
+        world.getPlayers().forEach(player -> player.teleport(fallback));
+
+        if (!plugin.levelView().unload(world, false))
+            return DeletionResult.UNLOAD_FAILED;
+
+        delete(world.getWorldFolder().toPath());
+        return DeletionResult.SUCCESS;
+    }
+
+    private DeletionResult scheduleDeletion(World world) {
+        if (deletions.containsKey(world.getKey())) return DeletionResult.SCHEDULED;
+
+        var event = new WorldActionScheduledEvent(world, ActionType.DELETE);
+        if (!event.callEvent()) return DeletionResult.FAILED;
+
+        var action = event.getAction() == null
+                ? (Consumer<Path>) this::delete
+                : event.getAction().andThen(this::delete);
+
+        var path = world.getWorldFolder().toPath();
+        var hook = new Thread(() -> action.accept(path), "world-deletion");
+
+        Runtime.getRuntime().addShutdownHook(hook);
+        deletions.put(world.getKey(), hook);
+        return DeletionResult.SCHEDULED;
+    }
+
+    private DeletionResult regenerateNow(World world) {
+        if (plugin.isRunningFolia() || world.getKey().asString().equals("minecraft:overworld"))
+            return DeletionResult.REQUIRES_SCHEDULING;
+
+        if (!new WorldRegenerateEvent(world).callEvent()) return DeletionResult.FAILED;
+
+        var players = world.getPlayers();
+
+        var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
+        players.forEach(player -> player.teleport(fallback, TeleportCause.PLUGIN));
+
+        plugin.levelView().saveLevelData(world, false);
+        if (!plugin.levelView().unload(world, false)) return DeletionResult.UNLOAD_FAILED;
+
+        regenerate(world.getWorldFolder().toPath());
+
+        var regenerated = plugin.levelBuilder(world).build().create().orElse(null);
+        if (regenerated != null) players.forEach(player ->
+                player.teleportAsync(regenerated.getSpawnLocation(), TeleportCause.PLUGIN));
+        return regenerated != null ? DeletionResult.SUCCESS : DeletionResult.FAILED;
+    }
+
+    private DeletionResult scheduleRegeneration(World world) {
+        if (regenerations.containsKey(world.getKey())) return DeletionResult.SCHEDULED;
+
+        var event = new WorldActionScheduledEvent(world, ActionType.REGENERATE);
+        if (!event.callEvent()) return DeletionResult.FAILED;
+
+        var action = event.getAction() == null
+                ? (Consumer<Path>) this::regenerate
+                : event.getAction().andThen(this::regenerate);
+
+        var path = world.getWorldFolder().toPath();
+        var hook = new Thread(() -> action.accept(path), "world-regeneration");
+
+        Runtime.getRuntime().addShutdownHook(hook);
+        regenerations.put(world.getKey(), hook);
+        return DeletionResult.SCHEDULED;
+    }
+
+    private void regenerate(Path level) {
+        delete(level.resolve("DIM-1"));
+        delete(level.resolve("DIM1"));
+        delete(level.resolve("advancements"));
+        delete(level.resolve("data"));
+        delete(level.resolve("entities"));
+        delete(level.resolve("playerdata"));
+        delete(level.resolve("poi"));
+        delete(level.resolve("region"));
+        delete(level.resolve("stats"));
+    }
+
+    private void delete(Path path) {
+        try {
+            if (!Files.isDirectory(path)) Files.deleteIfExists(path);
+            else try (var files = Files.list(path)) {
+                files.forEach(this::delete);
+                Files.deleteIfExists(path);
+            }
+        } catch (IOException e) {
+            plugin.getComponentLogger().warn("Failed to delete {}", path, e);
+        }
     }
 }
