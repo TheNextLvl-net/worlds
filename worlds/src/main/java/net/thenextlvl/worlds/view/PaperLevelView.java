@@ -8,6 +8,7 @@ import net.kyori.adventure.key.Key;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.event.WorldActionScheduledEvent;
 import net.thenextlvl.worlds.api.event.WorldActionScheduledEvent.ActionType;
+import net.thenextlvl.worlds.api.event.WorldBackupEvent;
 import net.thenextlvl.worlds.api.event.WorldDeleteEvent;
 import net.thenextlvl.worlds.api.event.WorldRegenerateEvent;
 import net.thenextlvl.worlds.api.level.Level;
@@ -155,6 +156,8 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public long backup(World world) throws IOException {
+        new WorldBackupEvent(world).callEvent();
+        save(world, true);
         return ((CraftWorld) world).getHandle().levelStorageAccess.makeWorldBackup();
     }
 
