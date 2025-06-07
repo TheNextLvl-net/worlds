@@ -205,6 +205,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     private void unloadLevels() {
         getServer().getWorlds().forEach(linkProvider()::persistTree);
+        // todo: remove this - always save
         getServer().getWorlds().stream().filter(world -> !world.isAutoSave()).forEach(world -> {
             world.getPlayers().forEach(player -> player.kick(getServer().shutdownMessage()));
             levelView().unload(world, false);
