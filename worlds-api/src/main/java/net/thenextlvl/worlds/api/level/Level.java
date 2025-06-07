@@ -46,11 +46,29 @@ public interface Level extends Keyed {
 
     long getSeed();
 
+    /**
+     * Converts the current Level instance into a Builder, allowing modifications
+     * to its configuration before creating or modifying a new Level instance.
+     *
+     * @return a Builder instance initialized with the current Level's configuration
+     */
     Builder toBuilder();
 
+    /**
+     * Creates and initializes a new {@link World} based on the current configuration of the {@link Level} instance.
+     * This method will return an {@code Optional} containing the created {@code World} if successful,
+     * or an empty {@code Optional} if the creation process fails.
+     *
+     * @return an {@code Optional} containing the created {@code World}, or {@link Optional#empty()} otherwise
+     */
     Optional<World> create();
 
     interface Builder {
+        /**
+         * Retrieves the directory path associated with the builder.
+         *
+         * @return the {@link Path} representing the directory, or null if no directory is set
+         */
         Path directory();
         
         /**
@@ -69,11 +87,28 @@ public interface Level extends Keyed {
         @Nullable
         Key key();
 
+        /**
+         * Sets the key associated with the builder.
+         *
+         * @param key the {@link Key} instance to associate with the builder, or null to unset the key
+         * @return the builder instance for chaining method calls
+         */
         Builder key(@Nullable Key key);
 
+        /**
+         * Retrieves the name associated with the builder.
+         *
+         * @return the name as a {@link String}, or null if no name is set
+         */
         @Nullable
         String name();
 
+        /**
+         * Sets the name associated with the builder.
+         *
+         * @param name the name to associate with the builder, or null to unset the name
+         * @return the builder instance for chaining method calls
+         */
         Builder name(@Nullable String name);
 
         @Nullable
@@ -95,6 +130,12 @@ public interface Level extends Keyed {
         @Nullable
         Generator generator();
 
+        /**
+         * Sets the generator configuration for the builder.
+         *
+         * @param generator the {@link Generator} instance to set, or null to remove the generator configuration
+         * @return the builder instance for chaining method calls
+         */
         Builder generator(@Nullable Generator generator);
 
         /**
