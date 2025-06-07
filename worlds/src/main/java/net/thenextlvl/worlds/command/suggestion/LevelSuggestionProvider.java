@@ -31,7 +31,7 @@ public class LevelSuggestionProvider<S> implements SuggestionProvider<S> {
                 .filter(Objects::nonNull)
                 .filter(level -> unknownLevels ? !level.isWorldKnown() : level.isWorldKnown() && level.isEnabled().equals(TriState.FALSE))
                 .forEach(level -> {
-                    var name = level.getFile().getFileName().toString();
+                    var name = level.getDirectory().getFileName().toString();
                     var escaped = StringArgumentType.escapeIfRequired(name);
                     if (!escaped.contains(builder.getRemaining())) return;
                     builder.suggest(escaped, () -> level.key().asString());

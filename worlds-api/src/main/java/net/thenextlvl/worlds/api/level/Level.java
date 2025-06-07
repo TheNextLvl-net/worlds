@@ -23,7 +23,7 @@ public interface Level extends Keyed {
      *
      * @return the file path as a {@code Path} object
      */
-    Path getFile();
+    Path getDirectory();
 
     /**
      * Retrieves the name of this level.

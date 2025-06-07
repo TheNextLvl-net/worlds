@@ -23,7 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @NullMarked
 public abstract class LevelData implements Level {
     protected final WorldsPlugin plugin;
-    protected final Path file;
+    protected final Path directory;
 
     protected final Key key;
     protected final String name;
@@ -43,10 +43,10 @@ public abstract class LevelData implements Level {
 
     protected LevelData(WorldsPlugin plugin, Builder builder) {
         this.plugin = plugin;
-        this.file = builder.directory;
-        this.name = builder.name != null ? builder.name : file.getFileName().toString();
+        this.directory = builder.directory;
+        this.name = builder.name != null ? builder.name : directory.getFileName().toString();
         this.key = builder.key != null ? builder.key : createKey(name);
-        this.levelStem = builder.levelStem != null ? builder.levelStem : getLevelStem(plugin, file);
+        this.levelStem = builder.levelStem != null ? builder.levelStem : getLevelStem(plugin, directory);
         this.generatorType = builder.generatorType != null ? builder.generatorType : GeneratorType.NORMAL;
         this.generator = builder.generator;
         this.preset = builder.preset;
@@ -65,8 +65,8 @@ public abstract class LevelData implements Level {
     }
 
     @Override
-    public Path getFile() {
-        return file;
+    public Path getDirectory() {
+        return directory;
     }
 
     @Override
@@ -131,7 +131,7 @@ public abstract class LevelData implements Level {
 
     @Override
     public Level.Builder toBuilder() {
-        return new Builder(plugin, file)
+        return new Builder(plugin, directory)
                 .key(key)
                 .name(name)
                 .levelStem(levelStem)
@@ -338,7 +338,7 @@ public abstract class LevelData implements Level {
     @Override
     public String toString() {
         return "PaperLevelData{" +
-               "file=" + file +
+               "directory=" + directory +
                ", key=" + key +
                ", name='" + name + '\'' +
                ", levelStem=" + levelStem +

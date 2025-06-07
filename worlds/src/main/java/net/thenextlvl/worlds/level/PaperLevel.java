@@ -64,7 +64,7 @@ class PaperLevel extends LevelData {
         var console = server.getServer();
 
         Preconditions.checkState(console.getAllLevels().iterator().hasNext(), "Cannot create worlds before main level is created");
-        Preconditions.checkArgument(!Files.exists(file) || Files.isDirectory(file), "File (%s) exists and isn't a folder", file);
+        Preconditions.checkArgument(!Files.exists(directory) || Files.isDirectory(directory), "File (%s) exists and isn't a folder", directory);
 
         var worldByKey = server.getWorld(key);
         var worldByName = server.getWorld(name);
