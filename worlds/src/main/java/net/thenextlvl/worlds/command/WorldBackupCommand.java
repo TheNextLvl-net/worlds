@@ -9,7 +9,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.CraftWorld;
 import org.jspecify.annotations.NullMarked;
 
 import java.io.IOException;
@@ -39,7 +38,7 @@ public class WorldBackupCommand {
         var placeholder = Placeholder.parsed("world", world.getName());
         try {
             plugin.bundle().sendMessage(sender, "world.backup", placeholder);
-            var bytes = ((CraftWorld) world).getHandle().levelStorageAccess.makeWorldBackup();
+            var bytes = plugin.levelView().backup(world);
             var kb = bytes / 1024d;
             var mb = kb / 1024d;
             var gb = mb / 1024d;

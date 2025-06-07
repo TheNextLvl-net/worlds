@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
@@ -118,6 +119,8 @@ public interface LevelView {
      * @param async whether the save operation should be performed asynchronously
      */
     void saveLevelData(World world, boolean async);
+
+    long backup(World world) throws IOException;
 
     /**
      * Deletes the specified world from the server and disk.
