@@ -37,7 +37,6 @@ public class WorldCommand {
                 .then(WorldSpawnCommand.create(plugin))
                 .then(WorldTeleportCommand.create(plugin))
                 .then(WorldUnloadCommand.create(plugin));
-        // todo: world setup command
         var commons = plugin.commons();
         if (commons != null) command.then(GroupCommand.create(commons));
         return command.build();
