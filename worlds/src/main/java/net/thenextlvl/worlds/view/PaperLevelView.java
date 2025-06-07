@@ -7,7 +7,6 @@ import core.nbt.tag.ListTag;
 import core.nbt.tag.Tag;
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.preset.Biome;
 import net.thenextlvl.worlds.api.preset.Layer;
@@ -101,14 +100,12 @@ public class PaperLevelView implements LevelView {
         return Optional.of(preset);
     }
 
-    @Override
-    public Optional<Generator> getGenerator(World world) {
+    public Optional<JavaPlugin> getGenerator(World world) {
         return Optional.ofNullable(world.getGenerator())
                 .map(chunkGenerator -> chunkGenerator.getClass().getClassLoader())
                 .filter(ConfiguredPluginClassLoader.class::isInstance)
                 .map(ConfiguredPluginClassLoader.class::cast)
-                .map(ConfiguredPluginClassLoader::getPlugin)
-                .map(plugin -> new Generator(plugin, null));
+                .map(ConfiguredPluginClassLoader::getPlugin);
     }
 
     @Override
