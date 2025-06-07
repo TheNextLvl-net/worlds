@@ -72,12 +72,14 @@ class PaperLevel extends LevelData {
         if (worldByName != null && worldByName.equals(worldByKey)) return Optional.of(worldByName);
         Preconditions.checkArgument(worldByKey == null && worldByName == null, "World with key %s or name %s already exists", key, name);
 
-        var chunkGenerator = Optional.ofNullable(generator)
-                .map(generator -> generator.generator(name))
-                .orElseGet(() -> server.getGenerator(name));
-        var biomeProvider = Optional.ofNullable(generator)
-                .map(generator -> generator.biomeProvider(name))
-                .orElseGet(() -> server.getBiomeProvider(name));
+        var chunkGenerator = Optional.ofNullable(super.chunkGenerator)
+                .orElseGet(() -> Optional.ofNullable(generator)
+                        .map(generator -> generator.generator(name))
+                        .orElseGet(() -> server.getGenerator(name)));
+        var biomeProvider = Optional.ofNullable(super.biomeProvider)
+                .orElseGet(() -> Optional.ofNullable(generator)
+                        .map(generator -> generator.biomeProvider(name))
+                        .orElseGet(() -> server.getBiomeProvider(name)));
 
         var dimensionType = resolveDimensionKey();
 
@@ -232,7 +234,7 @@ class PaperLevel extends LevelData {
         if (getLevelStem().equals(net.thenextlvl.worlds.api.generator.LevelStem.END)) return LevelStem.END;
         throw new IllegalArgumentException("Illegal dimension (" + getLevelStem() + ")");
     }
-    
+
     private World.Environment toBukkit(DimensionType type) {
         if (type.equals(DimensionType.THE_END)) return World.Environment.THE_END;
         if (type.equals(DimensionType.THE_NETHER)) return World.Environment.NETHER;

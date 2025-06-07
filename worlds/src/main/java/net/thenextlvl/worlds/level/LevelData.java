@@ -16,6 +16,8 @@ import net.thenextlvl.worlds.api.preset.Biome;
 import net.thenextlvl.worlds.api.preset.Layer;
 import net.thenextlvl.worlds.api.preset.Preset;
 import net.thenextlvl.worlds.api.preset.Structure;
+import org.bukkit.generator.BiomeProvider;
+import org.bukkit.generator.ChunkGenerator;
 import org.intellij.lang.annotations.Subst;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -36,6 +38,9 @@ public abstract class LevelData implements Level {
     protected final LevelStem levelStem;
     protected final GeneratorType generatorType;
 
+    protected final @Nullable ChunkGenerator chunkGenerator;
+    protected final @Nullable BiomeProvider biomeProvider;
+
     protected final @Nullable Generator generator;
     protected final @Nullable Preset preset;
 
@@ -54,6 +59,10 @@ public abstract class LevelData implements Level {
         this.key = builder.key != null ? builder.key : createKey(name);
         this.levelStem = builder.levelStem != null ? builder.levelStem : getLevelStem(plugin, directory);
         this.generatorType = builder.generatorType != null ? builder.generatorType : GeneratorType.NORMAL;
+        this.biomeProvider = builder.biomeProvider != null ? builder.biomeProvider
+                : builder.generator != null ? builder.generator.biomeProvider(name) : null;
+        this.chunkGenerator = builder.chunkGenerator != null ? builder.chunkGenerator
+                : builder.generator != null ? builder.generator.generator(name) : null;
         this.generator = builder.generator;
         this.preset = builder.preset;
         this.enabled = builder.enabled;
@@ -93,6 +102,16 @@ public abstract class LevelData implements Level {
     @Override
     public Optional<Preset> getPreset() {
         return Optional.ofNullable(preset);
+    }
+
+    @Override
+    public Optional<BiomeProvider> getBiomeProvider() {
+        return Optional.ofNullable(biomeProvider);
+    }
+
+    @Override
+    public Optional<ChunkGenerator> getChunkGenerator() {
+        return Optional.ofNullable(chunkGenerator);
     }
 
     @Override
@@ -142,6 +161,8 @@ public abstract class LevelData implements Level {
                 .name(name)
                 .levelStem(levelStem)
                 .generatorType(generatorType)
+                .biomeProvider(biomeProvider)
+                .chunkGenerator(chunkGenerator)
                 .generator(generator)
                 .preset(preset)
                 .enabled(enabled)
@@ -159,6 +180,8 @@ public abstract class LevelData implements Level {
         private @Nullable Boolean hardcore;
         private @Nullable Boolean structures;
         private @Nullable Boolean worldKnown;
+        private @Nullable BiomeProvider biomeProvider;
+        private @Nullable ChunkGenerator chunkGenerator;
         private @Nullable Generator generator;
         private @Nullable GeneratorType generatorType;
         private @Nullable Integer spawnChunkRadius;
@@ -211,6 +234,28 @@ public abstract class LevelData implements Level {
         @Override
         public Level.Builder name(@Nullable String name) {
             this.name = name;
+            return this;
+        }
+
+        @Override
+        public @Nullable BiomeProvider biomeProvider() {
+            return biomeProvider;
+        }
+
+        @Override
+        public Level.Builder biomeProvider(@Nullable BiomeProvider provider) {
+            this.biomeProvider = provider;
+            return this;
+        }
+
+        @Override
+        public @Nullable ChunkGenerator chunkGenerator() {
+            return chunkGenerator;
+        }
+
+        @Override
+        public Level.Builder chunkGenerator(@Nullable ChunkGenerator generator) {
+            this.chunkGenerator = generator;
             return this;
         }
 
