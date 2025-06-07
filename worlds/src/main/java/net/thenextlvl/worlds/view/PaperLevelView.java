@@ -93,7 +93,10 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public boolean unload(World world, boolean save) {
-        return plugin.getServer().unloadWorld(world, save);
+        if (!plugin.getServer().unloadWorld(world, save)) return false;
+        var dragonBattle = world.getEnderDragonBattle();
+        if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
+        return true;
     }
 
     /**
