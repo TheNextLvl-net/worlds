@@ -6,6 +6,7 @@ import core.nbt.tag.CompoundTag;
 import core.nbt.tag.ListTag;
 import core.nbt.tag.Tag;
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
+import net.minecraft.server.level.ServerLevel;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.preset.Biome;
@@ -145,6 +146,9 @@ public class PaperLevelView implements LevelView {
         return plugin.getServer().unloadWorld(world, save);
     }
 
+    /**
+     * @see CraftWorld#save(boolean)
+     */
     @Override
     public void save(World world, boolean flush) {
         var level = ((CraftWorld) world).getHandle();
@@ -154,6 +158,10 @@ public class PaperLevelView implements LevelView {
         level.noSave = oldSave;
     }
 
+    /**
+     * @see ServerLevel#saveIncrementally(boolean)
+     * @see ServerLevel#saveLevelData(boolean)
+     */
     @Override
     public void saveLevelData(World world, boolean async) {
         var level = ((CraftWorld) world).getHandle();
