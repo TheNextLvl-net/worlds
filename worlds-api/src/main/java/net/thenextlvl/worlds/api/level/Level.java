@@ -39,7 +39,7 @@ public interface Level extends Keyed {
      * @return true if structures are present in the level, false otherwise
      */
     boolean hasStructures();
-    
+
     /**
      * Determines whether the level has a bonus chest enabled.
      *
@@ -97,7 +97,7 @@ public interface Level extends Keyed {
          * @return the {@link Path} representing the directory, or null if no directory is set
          */
         Path directory();
-        
+
         /**
          * Sets the directory path associated with the builder.
          *
