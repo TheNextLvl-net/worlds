@@ -16,16 +16,6 @@ public record Biome(Key key) implements Keyed {
         return key().asString();
     }
 
-    @Deprecated(forRemoval = true)
-    public String namespace() {
-        return key().namespace();
-    }
-
-    @Deprecated(forRemoval = true)
-    public static Biome minecraft(@KeyPattern.Value String biome) {
-        return new Biome(Key.key(Key.MINECRAFT_NAMESPACE, biome));
-    }
-
     public static Biome literal(@KeyPattern String string) {
         return new Biome(Key.key(string));
     }
