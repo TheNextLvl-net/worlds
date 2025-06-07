@@ -2,6 +2,7 @@ package net.thenextlvl.worlds.level;
 
 import core.nbt.tag.ByteTag;
 import core.nbt.tag.CompoundTag;
+import core.nbt.tag.ListTag;
 import core.nbt.tag.LongTag;
 import core.nbt.tag.Tag;
 import net.kyori.adventure.key.Key;
@@ -11,14 +12,19 @@ import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.generator.GeneratorType;
 import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
+import net.thenextlvl.worlds.api.preset.Biome;
+import net.thenextlvl.worlds.api.preset.Layer;
 import net.thenextlvl.worlds.api.preset.Preset;
+import net.thenextlvl.worlds.api.preset.Structure;
 import org.intellij.lang.annotations.Subst;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @NullMarked
 public abstract class LevelData implements Level {
@@ -387,7 +393,7 @@ public abstract class LevelData implements Level {
                 .map(ByteTag::getAsBoolean).orElse(false);
         var worldPreset = generator.flatMap(LevelData::getWorldPreset);
         var preset = worldPreset.filter(type -> type.equals(GeneratorType.FLAT))
-                .flatMap(worldType -> generator.flatMap(plugin.levelView()::getFlatPreset))
+                .flatMap(worldType -> generator.flatMap(LevelData::getFlatPreset))
                 .orElse(null);
         var generatorType = worldPreset.orElse(GeneratorType.NORMAL);
 
@@ -407,8 +413,52 @@ public abstract class LevelData implements Level {
                 .build());
     }
 
+    @SuppressWarnings("PatternValidation")
+    private static Optional<Preset> getFlatPreset(CompoundTag generator) {
+        var settings = generator.<CompoundTag>optional("settings");
+
+        if (settings.isEmpty()) return Optional.empty();
+
+        var preset = new Preset();
+
+        settings.flatMap(tag -> tag.<Tag>optional("biome"))
+                .map(Tag::getAsString)
+                .map(Biome::literal)
+                .ifPresent(preset::biome);
+
+        settings.flatMap(tag -> tag.<Tag>optional("features"))
+                .map(Tag::getAsBoolean)
+                .ifPresent(preset::features);
+
+        settings.flatMap(tag -> tag.<Tag>optional("lakes"))
+                .map(Tag::getAsBoolean)
+                .ifPresent(preset::lakes);
+
+        settings.flatMap(tag -> tag.<ListTag<CompoundTag>>optional("layers"))
+                .map(tag -> tag.stream().map(layer -> {
+                    var block = layer.optional("block").orElseThrow().getAsString();
+                    var height = layer.optional("height").orElseThrow().getAsInt();
+                    return new Layer(block, height);
+                }).collect(Collectors.toCollection(LinkedHashSet::new)))
+                .ifPresent(preset::layers);
+
+        settings.flatMap(tag -> tag.optional("structure_overrides")
+                        .filter(Tag::isList).map(Tag::getAsList))
+                .map(list -> list.stream()
+                        .map(Tag::getAsString)
+                        .map(Structure::new)
+                        .collect(Collectors.toCollection(LinkedHashSet::new)))
+                .ifPresent(preset::structures);
+        settings.flatMap(tag -> tag.optional("structure_overrides")
+                        .filter(Tag::isString).map(Tag::getAsString))
+                .map(Structure::new)
+                .ifPresent(preset::addStructure);
+
+        return Optional.of(preset);
+    }
+
     private static Optional<GeneratorType> getWorldPreset(CompoundTag generator) {
-        var settings =  generator.optional("settings").filter(Tag::isString).map(Tag::getAsString);
+        var settings = generator.optional("settings").filter(Tag::isString).map(Tag::getAsString);
         if (settings.filter(s -> s.equals(GeneratorType.LARGE_BIOMES.key().asString())).isPresent())
             return Optional.of(GeneratorType.LARGE_BIOMES);
         if (settings.filter(s -> s.equals(GeneratorType.AMPLIFIED.key().asString())).isPresent())
