@@ -170,7 +170,8 @@ public abstract class LevelData implements Level {
                 .worldKnown(worldKnown)
                 .structures(structures)
                 .bonusChest(bonusChest)
-                .seed(seed);
+                .seed(seed)
+                .spawnChunkRadius(spawnChunkRadius);
     }
 
     public static class Builder implements Level.Builder {
