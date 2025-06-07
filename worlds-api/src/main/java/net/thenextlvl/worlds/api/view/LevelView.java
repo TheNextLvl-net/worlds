@@ -31,9 +31,9 @@ public interface LevelView {
 
     boolean isLevel(Path path);
 
-    boolean unloadLevel(World world, boolean save);
+    boolean unload(World world, boolean save);
 
-    void saveLevel(World world, boolean flush);
+    void save(World world, boolean flush);
 
     void saveLevelData(World world, boolean async);
 }

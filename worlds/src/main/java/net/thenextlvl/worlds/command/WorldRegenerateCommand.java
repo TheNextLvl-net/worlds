@@ -78,7 +78,7 @@ class WorldRegenerateCommand {
         var creator = new WorldCreator(world.getName(), world.getKey()).copy(world);
         plugin.levelView().getGenerator(world).ifPresent(creator::generator);
 
-        if (!plugin.levelView().unloadLevel(world, false))
+        if (!plugin.levelView().unload(world, false))
             return "world.unload.failed";
 
         regenerate(worldFolder);

@@ -68,7 +68,7 @@ class WorldDeleteCommand {
         var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
         world.getPlayers().forEach(player -> player.teleport(fallback));
 
-        if (!plugin.levelView().unloadLevel(world, false))
+        if (!plugin.levelView().unload(world, false))
             return "world.unload.failed";
 
         return delete(world.getWorldFolder()) ? "world.delete.success" : "world.delete.failed";
