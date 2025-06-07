@@ -21,10 +21,10 @@ public interface LevelView {
      * Reads a level from the specified directory path.
      *
      * @param directory the directory containing the level data to be read
-     * @return an {@code Optional} containing the {@code Level} if the directory represents a valid level,
+     * @return an {@code Optional} containing the {@code Level.Builder} if the directory represents a valid level,
      * or {@link Optional#empty()} if the directory is invalid
      */
-    Optional<Level> read(Path directory);
+    Optional<Level.Builder> read(Path directory);
 
     /**
      * Retrieves the plugin associated with the world generator for the given world, if it exists.

@@ -46,7 +46,7 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public Optional<Level> read(Path directory) {
+    public Optional<Level.Builder> read(Path directory) {
         return LevelData.read(plugin, directory);
     }
 

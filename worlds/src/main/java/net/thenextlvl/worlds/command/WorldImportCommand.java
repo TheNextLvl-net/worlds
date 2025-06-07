@@ -72,7 +72,7 @@ class WorldImportCommand {
     private static int execute(CommandContext<CommandSourceStack> context, @Nullable NamespacedKey key,
                                @Nullable LevelStem levelStem, @Nullable Generator generator, WorldsPlugin plugin) {
         var name = context.getArgument("world", String.class);
-        var build = plugin.levelView().read(Path.of(name)).map(Level::toBuilder)
+        var build = plugin.levelView().read(Path.of(name))
                 .map(level -> level.levelStem(levelStem).generator(generator).key(key).build());
         var world = build.filter(level -> !level.isWorldKnown()).flatMap(Level::create).orElse(null);
 
