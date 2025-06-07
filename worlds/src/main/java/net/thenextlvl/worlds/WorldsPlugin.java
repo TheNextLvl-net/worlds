@@ -8,6 +8,7 @@ import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.worlds.api.WorldsProvider;
 import net.thenextlvl.worlds.api.generator.Generator;
+import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.view.GeneratorView;
 import net.thenextlvl.worlds.command.WorldCommand;
@@ -21,6 +22,7 @@ import net.thenextlvl.worlds.view.FoliaLevelView;
 import net.thenextlvl.worlds.view.PaperLevelView;
 import net.thenextlvl.worlds.view.PluginGeneratorView;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.GameRule;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.plugin.ServicePriority;
@@ -122,6 +124,29 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     @Override
     public Level.Builder levelBuilder(Path directory) {
         return new LevelData.Builder(this, directory);
+    }
+
+    @Override
+    public Level.Builder levelBuilder(World world) {
+        return levelView().read(world.getWorldFolder().toPath())
+                .orElseGet(() -> levelBuilder(world.getWorldFolder().toPath()))
+                .bonusChest(world.hasBonusChest())
+                .hardcore(world.isHardcore())
+                .structures(world.canGenerateStructures())
+                .worldKnown(true)
+                .seed(world.getSeed())
+                .biomeProvider(world.getBiomeProvider())
+                .chunkGenerator(world.getGenerator())
+                .spawnChunkRadius(world.getGameRuleValue(GameRule.SPAWN_RADIUS))
+                .key(world.getKey())
+                .levelStem(switch (world.getEnvironment()) {
+                    case NORMAL -> LevelStem.OVERWORLD;
+                    case NETHER -> LevelStem.NETHER;
+                    case THE_END -> LevelStem.END;
+                    default -> null;
+                })
+                .seed(world.getSeed())
+                .name(world.getName());
     }
 
     @Override
