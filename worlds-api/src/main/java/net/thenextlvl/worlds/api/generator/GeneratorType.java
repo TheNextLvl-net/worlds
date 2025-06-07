@@ -2,11 +2,13 @@ package net.thenextlvl.worlds.api.generator;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.Optional;
 
 @NullMarked
+@ApiStatus.Experimental
 public record GeneratorType(Key key) implements Keyed {
     /**
      * Represents the "amplified" generator type.
