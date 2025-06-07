@@ -45,17 +45,23 @@ public class PortalListener implements Listener {
         var readyEvent = new EntityPortalReadyEvent(event.getEntity(), null, PortalType.ENDER);
         onEntityPortal(readyEvent);
 
-        if (readyEvent.getTargetWorld() == null) return;
+        var targetWorld = readyEvent.getTargetWorld();
+        if (targetWorld == null) return;
 
-        if (readyEvent.getTargetWorld().getEnvironment().equals(World.Environment.THE_END)) {
-            generateEndPlatform(readyEvent.getTargetWorld());
-            var spawn = new Location(readyEvent.getTargetWorld(), 100.5, 49, 0.5, 90, 0);
-            event.getEntity().teleportAsync(spawn, END_PORTAL);
+        if (targetWorld.getEnvironment().equals(World.Environment.THE_END)) {
+            var spawn = new Location(targetWorld, 100.5, 49, 0.5, 90, 0);
+            plugin.getServer().getRegionScheduler().run(plugin, spawn, scheduledTask -> {
+                generateEndPlatform(targetWorld);
+                event.getEntity().teleportAsync(spawn, END_PORTAL);
+            });
         } else if (event.getEntity() instanceof CraftPlayer player) {
-            if (!player.getHandle().seenCredits) player.getHandle().showEndCredits();
-            if (player.getRespawnLocation() != null) player.teleportAsync(player.getRespawnLocation(), END_PORTAL);
-            else player.teleportAsync(readyEvent.getTargetWorld().getSpawnLocation(), END_PORTAL);
-        } else event.getEntity().teleportAsync(readyEvent.getTargetWorld().getSpawnLocation(), END_PORTAL);
+            player.getScheduler().run(plugin, scheduledTask -> {
+                if (!player.getHandle().seenCredits) player.getHandle().showEndCredits();
+                if (player.getRespawnLocation() != null) player.teleportAsync(player.getRespawnLocation(), END_PORTAL);
+                else player.teleportAsync(targetWorld.getSpawnLocation(), END_PORTAL);
+            }, null);
+        } else event.getEntity().getScheduler().run(plugin, task ->
+                event.getEntity().teleportAsync(targetWorld.getSpawnLocation(), END_PORTAL), null);
     }
 
     private void generateEndPlatform(World world) {
