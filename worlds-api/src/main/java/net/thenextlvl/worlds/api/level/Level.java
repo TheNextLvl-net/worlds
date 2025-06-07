@@ -22,21 +22,9 @@ public interface Level extends Keyed {
 
     String getName();
 
-    @ApiStatus.Experimental
-    GeneratorType getGeneratorType();
-
-    @ApiStatus.Experimental
-    LevelStem getLevelStem();
-
     Optional<Preset> getPreset();
 
     Optional<Generator> getGenerator();
-
-    @ApiStatus.Internal
-    TriState isEnabled();
-
-    @ApiStatus.Internal
-    boolean isWorldKnown();
 
     /**
      * Determines whether the level is in hardcore mode.
@@ -72,6 +60,18 @@ public interface Level extends Keyed {
      * @return the seed value as a {@code long}
      */
     long getSeed();
+
+    @ApiStatus.Experimental
+    GeneratorType getGeneratorType();
+
+    @ApiStatus.Experimental
+    LevelStem getLevelStem();
+
+    @ApiStatus.Internal
+    TriState isEnabled();
+
+    @ApiStatus.Internal
+    boolean isWorldKnown();
 
     /**
      * Converts the current Level instance into a Builder, allowing modifications
