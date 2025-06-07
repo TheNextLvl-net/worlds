@@ -13,7 +13,6 @@ import org.jspecify.annotations.NullMarked;
  * It also provides an option to check if the deleted world is slated for regeneration.
  *
  * @see WorldActionScheduledEvent
- * @see WorldRegenerateEvent
  */
 @NullMarked
 public class WorldDeleteEvent extends WorldEvent implements Cancellable {
@@ -24,16 +23,6 @@ public class WorldDeleteEvent extends WorldEvent implements Cancellable {
     @ApiStatus.Internal
     public WorldDeleteEvent(World world) {
         super(world, false);
-    }
-
-    /**
-     * Gets whether this event will regenerate the world after deletion.
-     *
-     * @return whether the world is being regenerated
-     * @see WorldRegenerateEvent
-     */
-    public boolean isRegenerating() {
-        return false;
     }
 
     @Override
