@@ -57,6 +57,7 @@ class WorldCloneCommand {
         return clone != null ? Command.SINGLE_SUCCESS : 0;
     }
 
+    // todo: create public api
     private static @Nullable World clone(World world, NamespacedKey key, boolean full, WorldsPlugin plugin) {
         if (plugin.getServer().getWorld(key) != null) return null;
         if (plugin.getServer().getWorld(key.getKey()) != null) return null;
