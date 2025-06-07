@@ -15,7 +15,7 @@ public class WorldBackupEvent extends WorldEvent {
     private static final HandlerList handlerList = new HandlerList();
 
     @ApiStatus.Internal
-    public WorldBackupEvent(World world, boolean full) {
+    public WorldBackupEvent(World world) {
         super(world, false);
     }
 
