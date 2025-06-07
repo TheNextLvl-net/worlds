@@ -62,7 +62,7 @@ public class WorldLinkProvider implements LinkProvider {
 
     public void persistTree(World world) {
         if (!world.getEnvironment().equals(World.Environment.NORMAL)) return;
-        getLinkTree(world).ifPresent(tree -> {
+        getLinkTree(world).filter(linkTree -> !linkTree.isEmpty()).ifPresent(tree -> {
             var container = world.getPersistentDataContainer();
             tree.getPersistedNether().map(Key::asString).ifPresentOrElse(
                     nether -> container.set(WorldLinkTree.LINK_NETHER, PersistentDataType.STRING, nether),
