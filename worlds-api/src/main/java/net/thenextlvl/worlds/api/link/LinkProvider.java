@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * LinkProvider defines an interface for managing and retrieving associations
@@ -19,10 +19,10 @@ public interface LinkProvider {
     /**
      * Retrieves all {@link LinkTree} instances managed by the provider.
      *
-     * @return an unmodifiable set containing all {@link LinkTree} instances
+     * @return a stream of all {@link LinkTree} instances
      */
     @Unmodifiable
-    Set<LinkTree> getLinkTrees();
+    Stream<LinkTree> getLinkTrees();
 
     /**
      * Retrieves the {@link LinkTree} associated with the specified key, if available.

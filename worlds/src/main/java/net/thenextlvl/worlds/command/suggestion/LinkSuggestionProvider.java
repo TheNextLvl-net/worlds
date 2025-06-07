@@ -25,9 +25,10 @@ public class LinkSuggestionProvider<T> implements SuggestionProvider<T> {
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<T> context, SuggestionsBuilder builder) {
-        plugin.linkProvider().getLinkTrees().stream()
+        plugin.linkProvider().getLinkTrees()
                 .filter(tree -> !unlink || !tree.isEmpty())
-                .map(LinkTree::getPersistedOverworld)
+                .map(LinkTree::getOverworld)
+                .map(World::key)
                 .map(Key::asString)
                 .filter(s -> s.contains(builder.getRemaining()))
                 .forEach(builder::suggest);

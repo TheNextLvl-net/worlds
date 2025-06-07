@@ -16,22 +16,17 @@ public class WorldLinkTree implements LinkTree {
     public static final NamespacedKey LINK_END = new NamespacedKey("worlds", "link_end");
 
     private final WorldLinkProvider provider;
-    private final Key overworld;
+    private final World overworld;
     private @Nullable Key nether = null;
     private @Nullable Key end = null;
 
-    public WorldLinkTree(WorldLinkProvider provider, Key overworld) {
+    public WorldLinkTree(WorldLinkProvider provider, World overworld) {
         this.provider = provider;
         this.overworld = overworld;
     }
 
     @Override
-    public Optional<World> getOverworld() {
-        return Optional.ofNullable(provider.getServer().getWorld(overworld));
-    }
-
-    @Override
-    public Key getPersistedOverworld() {
+    public World getOverworld() {
         return overworld;
     }
 
@@ -114,7 +109,7 @@ public class WorldLinkTree implements LinkTree {
     @Override
     public Optional<World> getWorld(Environment environment) {
         return switch (environment) {
-            case NORMAL -> getOverworld();
+            case NORMAL -> Optional.of(getOverworld());
             case NETHER -> getNether();
             case THE_END -> getEnd();
             default -> Optional.empty();

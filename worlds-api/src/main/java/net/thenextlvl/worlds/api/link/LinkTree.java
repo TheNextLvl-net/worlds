@@ -17,16 +17,9 @@ public interface LinkTree {
     /**
      * Retrieves the {@code Overworld} associated with this {@link LinkTree}, if available.
      *
-     * @return an Optional containing the world, or empty if undefined or not loaded
+     * @return the {@code World} associated with this {@code LinkTree}
      */
-    Optional<World> getOverworld();
-
-    /**
-     * Retrieves the persisted key associated with the {@code Overworld} for this {@link LinkTree}.
-     *
-     * @return the key of the world
-     */
-    Key getPersistedOverworld();
+    World getOverworld();
 
     /**
      * Retrieves the {@code Nether} world associated with this {@link LinkTree}, if available.

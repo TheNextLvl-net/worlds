@@ -11,12 +11,12 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.bukkit.persistence.PersistentDataType.STRING;
 
@@ -34,16 +34,16 @@ public class WorldLinkProvider implements LinkProvider {
 
     public void unloadTree(World world) {
         if (!world.getEnvironment().equals(World.Environment.NORMAL)) return;
-        trees.removeIf(tree -> tree.getPersistedOverworld().equals(world.key()));
+        trees.removeIf(tree -> tree.getOverworld().equals(world));
     }
 
     public void loadTree(World world) {
         if (!world.getEnvironment().equals(World.Environment.NORMAL)) return;
 
-        var noneMatch = trees.stream().noneMatch(tree -> tree.getPersistedOverworld().equals(world.key()));
+        var noneMatch = trees.stream().noneMatch(tree -> tree.getOverworld().equals(world));
         Preconditions.checkState(noneMatch, "World tree is already loaded for %s", world.getName());
 
-        var tree = new WorldLinkTree(this, world.key());
+        var tree = new WorldLinkTree(this, world);
         var data = world.getPersistentDataContainer();
 
         Optional.ofNullable(data.get(OLD_LINK_NETHER, STRING)).map(Key::key).ifPresent(key -> {
@@ -74,8 +74,8 @@ public class WorldLinkProvider implements LinkProvider {
     }
 
     @Override
-    public @Unmodifiable Set<LinkTree> getLinkTrees() {
-        return Set.copyOf(trees);
+    public Stream<LinkTree> getLinkTrees() {
+        return trees.stream();
     }
 
     @Override
@@ -93,12 +93,12 @@ public class WorldLinkProvider implements LinkProvider {
         return switch (type) {
             case NETHER -> switch (world.getEnvironment()) {
                 case NORMAL, THE_END -> getLinkTree(world).flatMap(LinkTree::getNether);
-                case NETHER -> getLinkTree(world).flatMap(LinkTree::getOverworld);
+                case NETHER -> getLinkTree(world).map(LinkTree::getOverworld);
                 default -> Optional.empty();
             };
             case ENDER -> switch (world.getEnvironment()) {
                 case NORMAL, NETHER -> getLinkTree(world).flatMap(LinkTree::getEnd);
-                case THE_END -> getLinkTree(world).flatMap(LinkTree::getOverworld);
+                case THE_END -> getLinkTree(world).map(LinkTree::getOverworld);
                 default -> Optional.empty();
             };
             default -> Optional.empty();
