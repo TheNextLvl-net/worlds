@@ -9,6 +9,8 @@ import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.preset.Preset;
 import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.generator.BiomeProvider;
+import org.bukkit.generator.ChunkGenerator;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -36,9 +38,25 @@ public interface Level extends Keyed {
      * Retrieves an {@link Optional} containing a {@link Preset} associated with the level, if available.
      *
      * @return an {@code Optional} containing the {@code Preset} if one is present, or {@link Optional#empty()}
-     *         if no preset is associated with the level
+     * if no preset is associated with the level
      */
     Optional<Preset> getPreset();
+
+    /**
+     * Retrieves an {@link Optional} containing a {@link BiomeProvider} associated with the level, if available.
+     *
+     * @return an {@code Optional} containing the {@code BiomeProvider} if one is present, or {@link Optional#empty()}
+     * if no biome provider is associated with the level
+     */
+    Optional<BiomeProvider> getBiomeProvider();
+
+    /**
+     * Retrieves an {@link Optional} containing a {@link ChunkGenerator} associated with the level, if available.
+     *
+     * @return an {@code Optional} containing the {@code ChunkGenerator} if one is present, or {@link Optional#empty()}
+     * if no chunk generator is associated with the level
+     */
+    Optional<ChunkGenerator> getChunkGenerator();
 
     /**
      * Retrieves an {@link Optional} containing a {@link Generator} associated with the level, if available.
@@ -159,6 +177,45 @@ public interface Level extends Keyed {
          * @return the builder instance for chaining method calls
          */
         Builder name(@Nullable String name);
+
+        /**
+         * Retrieves the {@link BiomeProvider} associated with the builder.
+         * The biome provider is responsible for determining which biomes will be
+         * used during world generation.
+         *
+         * @return the {@link BiomeProvider} instance, or null if no biome provider is set
+         */
+        @Nullable
+        BiomeProvider biomeProvider();
+
+        /**
+         * Sets the {@link BiomeProvider} instance for the builder.
+         * The biome provider determines how biomes are assigned and distributed in the generated world.
+         *
+         * @param provider the {@link BiomeProvider} to set, or null to remove any previously set biome provider
+         * @return the builder instance for chaining method calls
+         */
+        Builder biomeProvider(@Nullable BiomeProvider provider);
+
+        /**
+         * Retrieves the {@link ChunkGenerator} instance configured for the builder.
+         * The chunk generator defines how world generation is handled, including
+         * terrain creation and feature placement.
+         *
+         * @return the {@link ChunkGenerator} instance associated with the builder,
+         * or null if no chunk generator has been set.
+         */
+        @Nullable
+        ChunkGenerator chunkGenerator();
+
+        /**
+         * Sets the {@link ChunkGenerator} instance to be used in the builder.
+         * The chunk generator defines how the world will be generated, including terrain and features.
+         *
+         * @param generator the {@link ChunkGenerator} instance to set, or null to remove the chunk generator.
+         * @return the builder instance for chaining method calls
+         */
+        Builder chunkGenerator(@Nullable ChunkGenerator generator);
 
         /**
          * Retrieves the generator configuration if one is defined.
