@@ -407,7 +407,7 @@ public abstract class LevelData implements Level {
                '}';
     }
 
-    public static Optional<Level> read(WorldsPlugin plugin, Path directory) {
+    public static Optional<Level.Builder> read(WorldsPlugin plugin, Path directory) {
         var container = plugin.getServer().getWorldContainer().toPath();
         var level = directory.startsWith(container) ? directory : container.resolve(directory);
 
@@ -456,8 +456,7 @@ public abstract class LevelData implements Level {
                 .structures(structures)
                 .bonusChest(bonusChest)
                 .worldKnown(worldKnown)
-                .seed(seed)
-                .build());
+                .seed(seed));
     }
 
     @SuppressWarnings("PatternValidation")

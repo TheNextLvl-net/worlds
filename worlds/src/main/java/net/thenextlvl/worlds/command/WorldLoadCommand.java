@@ -14,7 +14,7 @@ import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 
-import java.util.Optional;
+import java.nio.file.Path;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
@@ -34,9 +34,8 @@ class WorldLoadCommand {
 
     private static int load(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
         var name = context.getArgument("world", String.class);
-        var level = plugin.getServer().getWorldContainer().toPath().resolve(name);
 
-        var build = plugin.levelView().isLevel(level) ? plugin.levelView().read(level) : Optional.<Level>empty();
+        var build = plugin.levelView().read(Path.of(name)).map(Level.Builder::build);
         var world = build.filter(Level::isWorldKnown).flatMap(Level::create).orElse(null);
 
         var message = world != null ? "world.load.success" : "world.load.failed";

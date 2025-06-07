@@ -5,6 +5,7 @@ import net.minecraft.util.DirectoryLock;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.event.WorldDeleteEvent;
 import net.thenextlvl.worlds.api.exception.GeneratorException;
+import net.thenextlvl.worlds.api.level.Level;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -34,7 +35,7 @@ public class WorldListener implements Listener {
         if (!event.getWorld().key().asString().equals("minecraft:overworld")) return;
         plugin.levelView().listLevels().stream().filter(plugin.levelView()::canLoad).forEach(path -> {
             try {
-                var level = plugin.levelView().read(path).orElse(null);
+                var level = plugin.levelView().read(path).map(Level.Builder::build).orElse(null);
                 if (level == null || !level.isEnabled().equals(TriState.TRUE)) return;
                 level.create().ifPresent(world -> plugin.getComponentLogger().debug(
                         "Loaded dimension {} ({}) from {}",

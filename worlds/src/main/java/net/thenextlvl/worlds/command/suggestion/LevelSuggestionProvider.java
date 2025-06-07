@@ -7,6 +7,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.kyori.adventure.util.TriState;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.api.level.Level;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
@@ -27,7 +28,7 @@ public class LevelSuggestionProvider<S> implements SuggestionProvider<S> {
         return CompletableFuture.runAsync(() -> plugin.levelView().listLevels().stream()
                 .filter(plugin.levelView()::canLoad)
                 .map(plugin.levelView()::read)
-                .map(level -> level.orElse(null))
+                .map(level -> level.map(Level.Builder::build).orElse(null))
                 .filter(Objects::nonNull)
                 .filter(level -> unknownLevels ? !level.isWorldKnown() : level.isWorldKnown() && level.isEnabled().equals(TriState.FALSE))
                 .forEach(level -> {

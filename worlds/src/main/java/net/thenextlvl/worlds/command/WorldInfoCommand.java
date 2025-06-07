@@ -53,7 +53,7 @@ class WorldInfoCommand {
 
     private static int list(CommandSender sender, World world, WorldsPlugin plugin) {
         var path = world.getWorldFolder().toPath();
-        var root = plugin.levelView().read(path);
+        var root = plugin.levelView().read(path).map(Level.Builder::build);
         plugin.bundle().sendMessage(sender, "world.info.name",
                 Placeholder.parsed("world", world.key().asString()),
                 Placeholder.parsed("name", world.getName()));
