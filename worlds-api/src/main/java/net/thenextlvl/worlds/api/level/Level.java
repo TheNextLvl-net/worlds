@@ -18,12 +18,34 @@ import java.util.Optional;
 
 @NullMarked
 public interface Level extends Keyed {
+    /**
+     * Retrieves the file path associated with this level.
+     *
+     * @return the file path as a {@code Path} object
+     */
     Path getFile();
 
+    /**
+     * Retrieves the name of this level.
+     *
+     * @return the level name as a {@code String}
+     */
     String getName();
 
+    /**
+     * Retrieves an {@link Optional} containing a {@link Preset} associated with the level, if available.
+     *
+     * @return an {@code Optional} containing the {@code Preset} if one is present, or {@link Optional#empty()}
+     *         if no preset is associated with the level
+     */
     Optional<Preset> getPreset();
 
+    /**
+     * Retrieves an {@link Optional} containing a {@link Generator} associated with the level, if available.
+     *
+     * @return an {@code Optional} containing the {@code Generator} if one is present, or {@link Optional#empty()}
+     * if no generator is associated with the level
+     */
     Optional<Generator> getGenerator();
 
     /**
