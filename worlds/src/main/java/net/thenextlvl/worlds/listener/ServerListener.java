@@ -17,7 +17,7 @@ public class ServerListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onWorldLoad(WorldLoadEvent event) {
         if (!event.getWorld().key().asString().equals("minecraft:overworld")) return;
         plugin.levelView().listLevels()
