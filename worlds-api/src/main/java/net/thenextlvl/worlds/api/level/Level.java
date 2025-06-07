@@ -38,14 +38,39 @@ public interface Level extends Keyed {
     @ApiStatus.Internal
     boolean isWorldKnown();
 
+    /**
+     * Determines whether the level is in hardcore mode.
+     *
+     * @return true if the level is set to hardcore mode, false otherwise
+     */
     boolean isHardcore();
 
+    /**
+     * Determines whether the level contains structures.
+     *
+     * @return true if structures are present in the level, false otherwise
+     */
     boolean hasStructures();
-
+    
+    /**
+     * Determines whether the level has a bonus chest enabled.
+     *
+     * @return true if the bonus chest is enabled for this level, false otherwise
+     */
     boolean hasBonusChest();
 
+    /**
+     * Retrieves the spawn chunk radius for the level.
+     *
+     * @return an integer representing the spawn chunk radius
+     */
     int getSpawnChunkRadius();
 
+    /**
+     * Retrieves the seed value associated with this Level.
+     *
+     * @return the seed value as a {@code long}
+     */
     long getSeed();
 
     /**
