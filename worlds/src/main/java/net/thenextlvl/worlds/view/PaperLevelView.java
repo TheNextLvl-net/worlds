@@ -5,7 +5,6 @@ import core.nbt.file.NBTFile;
 import core.nbt.tag.CompoundTag;
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import net.kyori.adventure.key.Key;
-import net.minecraft.server.level.ServerLevel;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.event.WorldActionScheduledEvent;
 import net.thenextlvl.worlds.api.event.WorldActionScheduledEvent.ActionType;
@@ -137,8 +136,8 @@ public class PaperLevelView implements LevelView {
     }
 
     /**
-     * @see ServerLevel#saveIncrementally(boolean)
-     * @see ServerLevel#saveLevelData(boolean)
+     * @see net.minecraft.server.level.ServerLevel#saveIncrementally(boolean)
+     * @see net.minecraft.server.level.ServerLevel#saveLevelData(boolean)
      */
     @Override
     public void saveLevelData(World world, boolean async) {
