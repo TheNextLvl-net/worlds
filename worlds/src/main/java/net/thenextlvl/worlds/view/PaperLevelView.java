@@ -57,6 +57,7 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
+    @SuppressWarnings("PatternValidation")
     public Optional<Preset> getFlatPreset(CompoundTag generator) {
         var settings = generator.<CompoundTag>optional("settings");
 
