@@ -22,8 +22,10 @@ public interface Level extends Keyed {
 
     String getName();
 
+    @ApiStatus.Experimental
     GeneratorType getGeneratorType();
 
+    @ApiStatus.Experimental
     LevelStem getLevelStem();
 
     Optional<Preset> getPreset();
@@ -111,16 +113,6 @@ public interface Level extends Keyed {
          */
         Builder name(@Nullable String name);
 
-        @Nullable
-        LevelStem levelStem();
-
-        Builder levelStem(@Nullable LevelStem type);
-
-        @Nullable
-        GeneratorType generatorType();
-
-        Builder generatorType(@Nullable GeneratorType type);
-
         /**
          * Retrieves the generator configuration if one is defined.
          * The generator defines specific behaviors or features for customizing world generation.
@@ -155,12 +147,6 @@ public interface Level extends Keyed {
          * @return the builder instance for chaining method calls
          */
         Builder preset(@Nullable Preset preset);
-
-        @ApiStatus.Internal
-        TriState enabled();
-
-        @ApiStatus.Internal
-        Builder enabled(TriState enabled);
 
         /**
          * Retrieves whether the world is configured to be in hardcore mode.
@@ -218,13 +204,6 @@ public interface Level extends Keyed {
          */
         Builder bonusChest(@Nullable Boolean bonusChest);
 
-        @Nullable
-        @ApiStatus.Internal
-        Boolean worldKnown();
-
-        @ApiStatus.Internal
-        Builder worldKnown(@Nullable Boolean worldKnown);
-
         /**
          * Retrieves the configured radius of chunks around the spawn point that should remain loaded.
          *
@@ -266,5 +245,32 @@ public interface Level extends Keyed {
          * @return the constructed Level instance
          */
         Level build();
+
+        @Nullable
+        @ApiStatus.Experimental
+        LevelStem levelStem();
+
+        @ApiStatus.Experimental
+        Builder levelStem(@Nullable LevelStem type);
+
+        @Nullable
+        @ApiStatus.Experimental
+        GeneratorType generatorType();
+
+        @ApiStatus.Experimental
+        Builder generatorType(@Nullable GeneratorType type);
+
+        @Nullable
+        @ApiStatus.Internal
+        Boolean worldKnown();
+
+        @ApiStatus.Internal
+        Builder worldKnown(@Nullable Boolean worldKnown);
+
+        @ApiStatus.Internal
+        TriState enabled();
+
+        @ApiStatus.Internal
+        Builder enabled(TriState enabled);
     }
 }
