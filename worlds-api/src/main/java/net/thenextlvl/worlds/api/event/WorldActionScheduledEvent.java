@@ -32,7 +32,7 @@ public class WorldActionScheduledEvent extends WorldEvent implements Cancellable
 
     @ApiStatus.Internal
     public WorldActionScheduledEvent(World world, ActionType actionType) {
-        super(world);
+        super(world, false);
         this.actionType = actionType;
     }
 
