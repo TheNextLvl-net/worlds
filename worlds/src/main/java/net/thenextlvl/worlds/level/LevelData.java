@@ -346,7 +346,7 @@ public abstract class LevelData implements Level {
     public static Optional<Level> read(WorldsPlugin plugin, Path directory) {
         var container = plugin.getServer().getWorldContainer().toPath();
         var level = directory.startsWith(container) ? directory : container.resolve(directory);
-        
+
         var levelData = plugin.levelView().getLevelDataFile(level).orElse(null);
         if (levelData == null) return Optional.empty();
 
