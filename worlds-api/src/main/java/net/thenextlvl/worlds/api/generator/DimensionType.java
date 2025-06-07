@@ -2,8 +2,10 @@ package net.thenextlvl.worlds.api.generator;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
+import org.jetbrains.annotations.ApiStatus;
 
 // https://minecraft.wiki/w/Dimension_type
+@ApiStatus.Experimental
 public record DimensionType(Key key) implements Keyed {
     public static final DimensionType OVERWORLD = new DimensionType(Key.key("overworld"));
 

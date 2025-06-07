@@ -2,12 +2,14 @@ package net.thenextlvl.worlds.api.generator;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.Set;
 
 @NullMarked
+@ApiStatus.Experimental
 public interface BiomeSource extends Keyed {
     /**
      * Creates a CheckerboardColumnBiomeSource instance using the specified biomes.
