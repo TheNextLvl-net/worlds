@@ -21,7 +21,7 @@ class WorldLinkListCommand {
 
     private static int list(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
         var sender = context.getSource().getSender();
-        var links = plugin.linkProvider().getLinkTrees().stream()
+        var links = plugin.linkProvider().getLinkTrees()
                 .filter(tree -> !tree.isEmpty())
                 .map(LinkTree::toString)
                 .map(Component::text)
