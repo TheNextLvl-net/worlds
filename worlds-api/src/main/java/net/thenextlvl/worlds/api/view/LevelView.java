@@ -109,11 +109,11 @@ public interface LevelView {
      * Regenerates the specified world either immediately or schedules it for regeneration based on the provided flag.
      *
      * @param world    the world to be regenerated
-     * @param schedule {@code true} if the regeneration should be scheduled to the shutdown process,
-     *                 {@code false} to perform the regeneration immediately
-     * @return {@code true} if the regeneration process was successfully initiated, {@code false} otherwise
+     * @param schedule if true, the regeneration will be scheduled for later execution;
+     *                 if false, the regeneration will be attempted immediately
+     * @return a {@code DeletionResult} indicating the outcome of the regeneration process.
      */
-    RegenerationResult regenerate(World world, boolean schedule);
+    DeletionResult regenerate(World world, boolean schedule);
 
     /**
      * Cancels the regeneration process for the specified world, if scheduled.
@@ -132,35 +132,35 @@ public interface LevelView {
     boolean isRegenerationScheduled(World world);
 
     /**
-     * Represents the possible outcomes of a world regeneration process.
+     * Represents the possible outcomes of a world deletion process.
      */
-    enum RegenerationResult {
+    enum DeletionResult {
         /**
-         * Indicates that the regeneration process was completed successfully.
+         * Indicates that the deletion process was completed successfully.
          */
         SUCCESS,
         /**
-         * Indicates that the regeneration process has been scheduled to occur during the server shutdown process.
+         * Indicates that the deletion process has been scheduled to occur during the server shutdown process.
          */
         SCHEDULED,
         /**
-         * Indicates that the regeneration process requires scheduling due to certain constraints
+         * Indicates that the deletion process requires scheduling due to certain constraints
          * that prevent immediate execution, like on Folia servers or the {@code minecraft:overworld}
          */
         REQUIRES_SCHEDULING,
         /**
-         * Indicates that the regeneration process failed due to the inability to unload the world.
+         * Indicates that the deletion process failed due to the inability to unload the world.
          */
         UNLOAD_FAILED,
         /**
-         * Indicates that the regeneration process failed due to an unspecified error or issue
+         * Indicates that the deletion process failed due to an unspecified error or issue
          * that prevented the operation from completing successfully.
          */
         FAILED;
 
         /**
-         * Determines if the current regeneration result represents a successful operation.
-         * A regeneration result is considered successful if it is either {@code SUCCESS}
+         * Determines if the current deletion result represents a successful operation.
+         * A deletion result is considered successful if it is either {@code SUCCESS}
          * or {@code SCHEDULED}.
          *
          * @return true if the result is either {@code SUCCESS} or {@code SCHEDULED}, otherwise false
