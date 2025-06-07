@@ -70,36 +70,38 @@ class WorldInfoCommand {
         plugin.bundle().sendMessage(sender, "world.info.seed",
                 Placeholder.parsed("seed", String.valueOf(world.getSeed())));
         try {
-            var size = new AtomicLong(0);
-            Files.walkFileTree(path, new SimpleFileVisitor<>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                    size.addAndGet(attrs.size());
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult visitFileFailed(Path file, IOException exc) {
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, @Nullable IOException exc) {
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-            var bytes = size.get();
-
+            var bytes = getSize(path);
             var kb = bytes / 1024d;
             var mb = kb / 1024d;
             var gb = mb / 1024d;
             plugin.bundle().sendMessage(sender, "world.info.size",
                     Formatter.number("size", gb >= 1 ? gb : mb >= 1 ? mb : kb >= 1 ? kb : bytes),
                     Formatter.choice("unit", gb >= 1 ? 0 : mb >= 1 ? 1 : kb >= 1 ? 2 : 3));
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            plugin.getComponentLogger().warn("Failed to get world size for {}", world.key(), e);
         }
-
-        // todo: send total world size
         return Command.SINGLE_SUCCESS;
+    }
+
+    private static long getSize(Path path) throws IOException {
+        var size = new AtomicLong(0);
+        Files.walkFileTree(path, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                size.addAndGet(attrs.size());
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(Path file, IOException exc) {
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, @Nullable IOException exc) {
+                return FileVisitResult.CONTINUE;
+            }
+        });
+        return size.get();
     }
 }
