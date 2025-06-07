@@ -66,7 +66,7 @@ class WorldInfoCommand {
                 Placeholder.parsed("dimension", root.map(level -> level.getLevelStem().dimensionType())
                         .orElse(DimensionType.OVERWORLD).key().asString()));
         plugin.levelView().getGenerator(world).ifPresent(generator -> plugin.bundle().sendMessage(sender,
-                "world.info.generator", Placeholder.parsed("generator", generator)));
+                "world.info.generator", Placeholder.parsed("generator", generator.name())));
         plugin.bundle().sendMessage(sender, "world.info.seed",
                 Placeholder.parsed("seed", String.valueOf(world.getSeed())));
         try {

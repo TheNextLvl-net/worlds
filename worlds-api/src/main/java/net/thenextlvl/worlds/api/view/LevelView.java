@@ -1,7 +1,7 @@
 package net.thenextlvl.worlds.api.view;
 
 import core.nbt.tag.CompoundTag;
-import net.thenextlvl.worlds.api.generator.GeneratorType;
+import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.preset.Preset;
 import org.bukkit.World;
@@ -18,7 +18,7 @@ public interface LevelView {
 
     Optional<Preset> getFlatPreset(CompoundTag generator);
 
-    Optional<String> getGenerator(World world);
+    Optional<Generator> getGenerator(World world);
 
     @Unmodifiable
     Set<Path> listLevels();
