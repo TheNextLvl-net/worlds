@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Interface representing a view for managing levels in a server environment. 
+ * Interface representing a view for managing levels in a server environment.
  * It provides methods for reading, validating, and managing world directories and data.
  */
 @NullMarked
