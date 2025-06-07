@@ -51,11 +51,8 @@ class WorldDeleteCommand {
         return Command.SINGLE_SUCCESS;
     }
 
+    // todo: create public api
     private static String delete(World world, boolean schedule, WorldsPlugin plugin) {
-
-        var dragonBattle = world.getEnderDragonBattle();
-        if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
-
         return schedule ? scheduleDeletion(world, plugin) : deleteNow(world, plugin);
     }
 

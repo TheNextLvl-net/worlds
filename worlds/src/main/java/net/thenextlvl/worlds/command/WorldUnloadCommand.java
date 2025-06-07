@@ -68,10 +68,6 @@ class WorldUnloadCommand {
         world.getPlayers().forEach(player -> player.teleport(fallbackSpawn));
 
         plugin.persistStatus(world, false, false);
-
-        var dragonBattle = world.getEnderDragonBattle();
-        if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
-
         if (!world.isAutoSave()) plugin.levelView().saveLevelData(world, false);
 
         return plugin.levelView().unload(world, world.isAutoSave())
