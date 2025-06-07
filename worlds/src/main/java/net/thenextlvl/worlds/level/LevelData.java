@@ -388,7 +388,7 @@ public abstract class LevelData implements Level {
 
     @Override
     public String toString() {
-        return "PaperLevelData{" +
+        return "LevelData{" +
                "directory=" + directory +
                ", key=" + key +
                ", name='" + name + '\'' +
