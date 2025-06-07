@@ -12,7 +12,6 @@ import net.thenextlvl.worlds.command.argument.CommandFlagsArgument;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
-import java.io.File;
 import java.util.Set;
 
 import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
@@ -45,45 +44,18 @@ class WorldDeleteCommand {
         var flags = context.getArgument("flags", CommandFlagsArgument.Flags.class);
         if (!flags.contains("--confirm")) return confirmationNeeded(context, plugin);
         var world = context.getArgument("world", World.class);
-        var result = delete(world, flags.contains("--schedule"), plugin);
-        plugin.bundle().sendMessage(context.getSource().getSender(), result,
+        var result = plugin.levelView().delete(world, flags.contains("--schedule"));
+        var message = switch (result) {
+            case SUCCESS -> "world.delete.success";
+            case SCHEDULED -> "world.delete.scheduled";
+            case REQUIRES_SCHEDULING -> plugin.isRunningFolia()
+                    ? "world.delete.disallowed.folia"
+                    : "world.delete.disallowed";
+            case UNLOAD_FAILED -> "world.unload.failed";
+            case FAILED -> "world.delete.failed";
+        };
+        plugin.bundle().sendMessage(context.getSource().getSender(), message,
                 Placeholder.parsed("world", world.getName()));
-        return Command.SINGLE_SUCCESS;
-    }
-
-    // todo: create public api
-    private static String delete(World world, boolean schedule, WorldsPlugin plugin) {
-        return schedule ? scheduleDeletion(world, plugin) : deleteNow(world, plugin);
-    }
-
-    private static String deleteNow(World world, WorldsPlugin plugin) {
-        if (plugin.isRunningFolia())
-            return "world.delete.disallowed.folia";
-        if (world.getKey().toString().equals("minecraft:overworld"))
-            return "world.delete.disallowed";
-
-        var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
-        world.getPlayers().forEach(player -> player.teleport(fallback));
-
-        if (!plugin.levelView().unload(world, false))
-            return "world.unload.failed";
-
-        return delete(world.getWorldFolder()) ? "world.delete.success" : "world.delete.failed";
-    }
-
-    private static String scheduleDeletion(World world, WorldsPlugin plugin) {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (delete(world.getWorldFolder())) return;
-            plugin.getComponentLogger().error("Failed to delete world {}", world.getName());
-        }));
-        return "world.delete.scheduled";
-    }
-
-    private static boolean delete(File file) {
-        if (file.isFile()) return file.delete();
-        var files = file.listFiles();
-        if (files == null) return false;
-        for (var file1 : files) delete(file1);
-        return file.delete();
+        return result.isSuccess() ? Command.SINGLE_SUCCESS : 0;
     }
 }

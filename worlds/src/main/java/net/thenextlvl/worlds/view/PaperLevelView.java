@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.event.WorldActionScheduledEvent;
 import net.thenextlvl.worlds.api.event.WorldActionScheduledEvent.ActionType;
+import net.thenextlvl.worlds.api.event.WorldDeleteEvent;
 import net.thenextlvl.worlds.api.event.WorldRegenerateEvent;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.view.LevelView;
@@ -35,6 +36,7 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 @NullMarked
 public class PaperLevelView implements LevelView {
     private final Map<Key, Thread> regenerations = new HashMap<>();
+    private final Map<Key, Thread> deletions = new HashMap<>();
     protected final WorldsPlugin plugin;
 
     public PaperLevelView(WorldsPlugin plugin) {
@@ -140,7 +142,23 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public RegenerationResult regenerate(World world, boolean schedule) {
+    public DeletionResult delete(World world, boolean schedule) {
+        return schedule ? scheduleDeletion(world) : deleteNow(world);
+    }
+
+    @Override
+    public boolean cancelScheduledDeletion(World world) {
+        var thread = deletions.remove(world.key());
+        return thread != null && Runtime.getRuntime().removeShutdownHook(thread);
+    }
+
+    @Override
+    public boolean isDeletionScheduled(World world) {
+        return deletions.containsKey(world.getKey());
+    }
+
+    @Override
+    public DeletionResult regenerate(World world, boolean schedule) {
         return schedule ? scheduleRegeneration(world) : regenerateNow(world);
     }
 
@@ -155,11 +173,45 @@ public class PaperLevelView implements LevelView {
         return regenerations.containsKey(world.getKey());
     }
 
-    private RegenerationResult regenerateNow(World world) {
+    private DeletionResult deleteNow(World world) {
         if (plugin.isRunningFolia() || world.getKey().asString().equals("minecraft:overworld"))
-            return RegenerationResult.REQUIRES_SCHEDULING;
+            return DeletionResult.REQUIRES_SCHEDULING;
 
-        if (!new WorldRegenerateEvent(world).callEvent()) return RegenerationResult.FAILED;
+        if (!new WorldDeleteEvent(world).callEvent()) return DeletionResult.FAILED;
+
+        var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
+        world.getPlayers().forEach(player -> player.teleport(fallback));
+
+        if (!plugin.levelView().unload(world, false))
+            return DeletionResult.UNLOAD_FAILED;
+
+        delete(world.getWorldFolder().toPath());
+        return DeletionResult.SUCCESS;
+    }
+
+    private DeletionResult scheduleDeletion(World world) {
+        if (deletions.containsKey(world.getKey())) return DeletionResult.SCHEDULED;
+
+        var event = new WorldActionScheduledEvent(world, ActionType.DELETE);
+        if (!event.callEvent()) return DeletionResult.FAILED;
+
+        var action = event.getAction() == null
+                ? (Consumer<Path>) this::delete
+                : event.getAction().andThen(this::delete);
+
+        var path = world.getWorldFolder().toPath();
+        var hook = new Thread(() -> action.accept(path), "world-deletion");
+
+        Runtime.getRuntime().addShutdownHook(hook);
+        deletions.put(world.getKey(), hook);
+        return DeletionResult.SCHEDULED;
+    }
+
+    private DeletionResult regenerateNow(World world) {
+        if (plugin.isRunningFolia() || world.getKey().asString().equals("minecraft:overworld"))
+            return DeletionResult.REQUIRES_SCHEDULING;
+
+        if (!new WorldRegenerateEvent(world).callEvent()) return DeletionResult.FAILED;
 
         var players = world.getPlayers();
 
@@ -167,21 +219,21 @@ public class PaperLevelView implements LevelView {
         players.forEach(player -> player.teleport(fallback, TeleportCause.PLUGIN));
 
         plugin.levelView().saveLevelData(world, false);
-        if (!plugin.levelView().unload(world, false)) return RegenerationResult.UNLOAD_FAILED;
+        if (!plugin.levelView().unload(world, false)) return DeletionResult.UNLOAD_FAILED;
 
         regenerate(world.getWorldFolder().toPath());
 
         var regenerated = plugin.levelBuilder(world).build().create().orElse(null);
         if (regenerated != null) players.forEach(player ->
                 player.teleportAsync(regenerated.getSpawnLocation(), TeleportCause.PLUGIN));
-        return regenerated != null ? RegenerationResult.SUCCESS : RegenerationResult.FAILED;
+        return regenerated != null ? DeletionResult.SUCCESS : DeletionResult.FAILED;
     }
 
-    private RegenerationResult scheduleRegeneration(World world) {
-        if (regenerations.containsKey(world.getKey())) return RegenerationResult.SCHEDULED;
+    private DeletionResult scheduleRegeneration(World world) {
+        if (regenerations.containsKey(world.getKey())) return DeletionResult.SCHEDULED;
 
         var event = new WorldActionScheduledEvent(world, ActionType.REGENERATE);
-        if (!event.callEvent()) return RegenerationResult.FAILED;
+        if (!event.callEvent()) return DeletionResult.FAILED;
 
         var action = event.getAction() == null
                 ? (Consumer<Path>) this::regenerate
@@ -192,7 +244,7 @@ public class PaperLevelView implements LevelView {
 
         Runtime.getRuntime().addShutdownHook(hook);
         regenerations.put(world.getKey(), hook);
-        return RegenerationResult.SCHEDULED;
+        return DeletionResult.SCHEDULED;
     }
 
     private void regenerate(Path level) {
@@ -212,6 +264,7 @@ public class PaperLevelView implements LevelView {
             if (!Files.isDirectory(path)) Files.deleteIfExists(path);
             else try (var files = Files.list(path)) {
                 files.forEach(this::delete);
+                Files.deleteIfExists(path);
             }
         } catch (IOException e) {
             plugin.getComponentLogger().warn("Failed to delete {}", path, e);

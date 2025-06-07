@@ -106,7 +106,34 @@ public interface LevelView {
     void saveLevelData(World world, boolean async);
 
     /**
-     * Regenerates the specified world either immediately or schedules it for regeneration based on the provided flag.
+     * Deletes the specified world from the server and disk.
+     * The deletion can be executed immediately or scheduled for later, depending on the provided parameters.
+     *
+     * @param world    the world to be deleted
+     * @param schedule if true, the deletion process will be scheduled for a later operation
+     *                 (e.g., during server shutdown); if false, the deletion will be attempted immediately
+     * @return a {@code DeletionResult} indicating the outcome of the deletion process.
+     */
+    DeletionResult delete(World world, boolean schedule);
+
+    /**
+     * Cancels the deletion process for the specified world, if scheduled.
+     *
+     * @param world the world for which the scheduled deletion should be canceled
+     * @return true if the scheduled deletion was successfully canceled, false if no deletion was scheduled
+     */
+    boolean cancelScheduledDeletion(World world);
+
+    /**
+     * Checks whether a deletion process is scheduled for the specified world.
+     *
+     * @param world the world to check for a scheduled deletion
+     * @return true if a deletion process is scheduled for the world, otherwise false
+     */
+    boolean isDeletionScheduled(World world);
+
+    /**
+     * Regenerates the specified world, either immediately or scheduled, based on the provided parameters.
      *
      * @param world    the world to be regenerated
      * @param schedule if true, the regeneration will be scheduled for later execution;
