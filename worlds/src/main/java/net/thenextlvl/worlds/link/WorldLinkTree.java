@@ -81,7 +81,7 @@ public class WorldLinkTree implements LinkTree {
 
     @Override
     public boolean contains(Key key) {
-        return key.equals(overworld) || key.equals(nether) || key.equals(end);
+        return key.equals(overworld.key()) || key.equals(nether) || key.equals(end);
     }
 
     @Override
