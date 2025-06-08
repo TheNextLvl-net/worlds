@@ -7,7 +7,6 @@ import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.worlds.api.WorldsProvider;
-import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.view.GeneratorView;
@@ -23,7 +22,6 @@ import net.thenextlvl.worlds.view.PaperLevelView;
 import net.thenextlvl.worlds.view.PluginGeneratorView;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.GameRule;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,9 +34,6 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Stream;
-
-import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
-import static org.bukkit.persistence.PersistentDataType.STRING;
 
 @NullMarked
 public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
@@ -166,23 +161,6 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     public @Nullable SharedWorlds commons() {
         return commons;
-    }
-
-    public void persistWorld(World world, boolean enabled) {
-        var worldKey = new NamespacedKey("worlds", "world_key");
-        world.getPersistentDataContainer().set(worldKey, STRING, world.getKey().asString());
-        persistStatus(world, enabled, true);
-    }
-
-    public void persistStatus(World world, boolean enabled, boolean force) {
-        var enabledKey = new NamespacedKey("worlds", "enabled");
-        if (!force && !world.getPersistentDataContainer().has(enabledKey)) return;
-        world.getPersistentDataContainer().set(enabledKey, BOOLEAN, enabled);
-    }
-
-    public void persistGenerator(World world, Generator generator) {
-        var generatorKey = new NamespacedKey("worlds", "generator");
-        world.getPersistentDataContainer().set(generatorKey, STRING, generator.asString());
     }
 
     public boolean isRunningFolia() {
