@@ -5,6 +5,7 @@ on:
 jobs:
   build:
     env:
+      CHANGELOG: ${{ github.event.release.body }}
       MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
     runs-on: ubuntu-latest
     steps:
