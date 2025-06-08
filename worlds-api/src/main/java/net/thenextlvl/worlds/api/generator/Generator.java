@@ -40,8 +40,8 @@ public record Generator(Plugin plugin, @Nullable String id) {
 
         if (generator == null)
             throw new GeneratorException(plugin, id, "Unknown plugin");
-        if (!generator.isEnabled()) // todo: test startup
-            throw new GeneratorException(plugin, id, "Plugin is not enabled");
+        if (!generator.isEnabled())
+            throw new GeneratorException(plugin, id, "Plugin is not enabled, is it 'load: STARTUP'?");
         if (!provider.generatorView().hasGenerator(generator))
             throw new GeneratorException(plugin, id, "Plugin has no generator");
 
