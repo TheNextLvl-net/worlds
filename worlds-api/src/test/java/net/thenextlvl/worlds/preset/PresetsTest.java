@@ -19,6 +19,14 @@ public class PresetsTest {
         assertEquals(preset.toPresetCode(), unparsed, "Constant does not match unparsed preset");
         assertEquals(parsed.toPresetCode(), unparsed, "Parsed preset does not match unparsed preset");
     }
+    
+    @ParameterizedTest
+    @MethodSource("presets")
+    public void testPresetSerialization(Preset preset) {
+        var serialize = preset.serialize();
+        var deserialize = Preset.deserialize(serialize);
+        assertEquals(preset, deserialize, "Deserialized preset does not match original");
+    }
 
     public static Stream<Arguments> unparsedPresets() {
         return Stream.of(
@@ -32,5 +40,9 @@ public class PresetsTest {
                 Map.entry(Presets.REDSTONE_READY, "minecraft:bedrock,3*minecraft:stone,116*minecraft:sandstone;minecraft:desert"),
                 Map.entry(Presets.THE_VOID, "minecraft:air;minecraft:the_void")
         ).map(entry -> Arguments.argumentSet(entry.getKey().name(), entry.getKey(), entry.getValue()));
+    }
+
+    public static Stream<Arguments> presets() {
+        return Presets.presets().stream().map(preset -> Arguments.argumentSet(preset.name(), preset));
     }
 }
