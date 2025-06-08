@@ -7,52 +7,46 @@ import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.SharedWorlds;
 import net.thenextlvl.worlds.api.WorldsProvider;
-import net.thenextlvl.worlds.api.link.LinkController;
-import net.thenextlvl.worlds.api.model.Generator;
-import net.thenextlvl.worlds.api.model.LevelBuilder;
-import net.thenextlvl.worlds.api.preset.Presets;
+import net.thenextlvl.worlds.api.generator.LevelStem;
+import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.view.GeneratorView;
-import net.thenextlvl.worlds.api.view.LevelView;
 import net.thenextlvl.worlds.command.WorldCommand;
-import net.thenextlvl.worlds.controller.WorldLinkController;
+import net.thenextlvl.worlds.level.LevelData;
+import net.thenextlvl.worlds.link.WorldLinkProvider;
 import net.thenextlvl.worlds.listener.PortalListener;
-import net.thenextlvl.worlds.listener.ServerListener;
 import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.model.MessageMigrator;
-import net.thenextlvl.worlds.model.PaperLevelBuilder;
 import net.thenextlvl.worlds.version.PluginVersionChecker;
 import net.thenextlvl.worlds.view.FoliaLevelView;
 import net.thenextlvl.worlds.view.PaperLevelView;
 import net.thenextlvl.worlds.view.PluginGeneratorView;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.NamespacedKey;
+import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
-import static org.bukkit.persistence.PersistentDataType.STRING;
-
 @NullMarked
 public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
-    private final boolean runningFolia = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
+    public static final boolean RUNNING_FOLIA = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
 
     private final GeneratorView generatorView = new PluginGeneratorView();
-    private final LevelView levelView = runningFolia ? new FoliaLevelView(this) : new PaperLevelView(this);
+    private final PaperLevelView levelView = RUNNING_FOLIA ? new FoliaLevelView(this) : new PaperLevelView(this);
 
-    private final LinkController linkController = new WorldLinkController(this);
+    private final WorldLinkProvider linkProvider = new WorldLinkProvider(this);
 
-    private final @Nullable SharedWorlds commons = runningFolia ? null : new SharedWorlds(this);
+    private final @Nullable SharedWorlds commons = RUNNING_FOLIA ? null : new SharedWorlds(this);
 
-    private final File presetsFolder = new File(getDataFolder(), "presets");
+    private final Path presetsFolder = getDataPath().resolve("presets");
     private final Path translations = getDataPath().resolve("translations");
     private final Key key = Key.key("worlds", "translations");
 
@@ -72,8 +66,8 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     @Override
     public void onLoad() {
-        if (!presetsFolder.isDirectory()) saveDefaultPresets();
-        if (runningFolia) warnExperimental();
+        createPresetsFolder();
+        if (RUNNING_FOLIA) warnExperimental();
         versionChecker.checkVersion();
         registerServices();
         if (commons != null) commons.onLoad();
@@ -82,13 +76,13 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     @Override
     public void onDisable() {
         if (commons != null) commons.onDisable();
+        linkProvider.persistTrees();
         metrics.shutdown();
-        unloadLevels();
     }
 
     @Override
     public void onEnable() {
-        if (isRunningFolia()) {
+        if (RUNNING_FOLIA) {
             getComponentLogger().error("Folia 1.21.5 is not yet supported by Worlds");
             getComponentLogger().error("Disabling...");
             getServer().getPluginManager().disablePlugin(this);
@@ -109,7 +103,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         getComponentLogger().warn("You can do this with the command '/world create <key> preset the-void'");
     }
 
-    public File presetsFolder() {
+    public Path presetsFolder() {
         return presetsFolder;
     }
 
@@ -123,18 +117,41 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     }
 
     @Override
-    public LevelBuilder levelBuilder(File level) {
-        return new PaperLevelBuilder(this, level);
+    public Level.Builder levelBuilder(Path directory) {
+        return new LevelData.Builder(this, directory);
     }
 
     @Override
-    public LevelView levelView() {
+    public Level.Builder levelBuilder(World world) {
+        return levelView().read(world.getWorldFolder().toPath())
+                .orElseGet(() -> levelBuilder(world.getWorldFolder().toPath()))
+                .bonusChest(world.hasBonusChest())
+                .hardcore(world.isHardcore())
+                .structures(world.canGenerateStructures())
+                .worldKnown(true)
+                .seed(world.getSeed())
+                .biomeProvider(world.getBiomeProvider())
+                .chunkGenerator(world.getGenerator())
+                .spawnChunkRadius(world.getGameRuleValue(GameRule.SPAWN_RADIUS))
+                .key(world.getKey())
+                .levelStem(switch (world.getEnvironment()) {
+                    case NORMAL -> LevelStem.OVERWORLD;
+                    case NETHER -> LevelStem.NETHER;
+                    case THE_END -> LevelStem.END;
+                    default -> null;
+                })
+                .seed(world.getSeed())
+                .name(world.getName());
+    }
+
+    @Override
+    public PaperLevelView levelView() {
         return levelView;
     }
 
     @Override
-    public LinkController linkController() {
-        return linkController;
+    public WorldLinkProvider linkProvider() {
+        return linkProvider;
     }
 
     @Override
@@ -146,25 +163,12 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         return commons;
     }
 
-    public void persistWorld(World world, boolean enabled) {
-        var worldKey = new NamespacedKey("worlds", "world_key");
-        world.getPersistentDataContainer().set(worldKey, STRING, world.getKey().asString());
-        persistStatus(world, enabled, true);
-    }
-
-    public void persistStatus(World world, boolean enabled, boolean force) {
-        var enabledKey = new NamespacedKey("worlds", "enabled");
-        if (!force && !world.getPersistentDataContainer().has(enabledKey)) return;
-        world.getPersistentDataContainer().set(enabledKey, BOOLEAN, enabled);
-    }
-
-    public void persistGenerator(World world, Generator generator) {
-        var generatorKey = new NamespacedKey("worlds", "generator");
-        world.getPersistentDataContainer().set(generatorKey, STRING, generator.serialize());
-    }
-
-    public boolean isRunningFolia() {
-        return runningFolia;
+    private void createPresetsFolder() {
+        try {
+            Files.createDirectories(presetsFolder);
+        } catch (IOException e) {
+            getComponentLogger().warn("Failed to create presets folder", e);
+        }
     }
 
     private void warnExperimental() {
@@ -173,37 +177,17 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         getComponentLogger().warn("Please report any issues you encounter to {}", SharedWorlds.ISSUES);
     }
 
-    private void unloadLevels() {
-        getServer().getWorlds().stream().filter(world -> !world.isAutoSave()).forEach(world -> {
-            world.getPlayers().forEach(player -> player.kick(getServer().shutdownMessage()));
-            levelView().unloadLevel(world, false);
-        });
-    }
-
     private void registerServices() {
         getServer().getServicesManager().register(WorldsProvider.class, this, this, ServicePriority.Highest);
     }
 
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(new PortalListener(this), this);
-        getServer().getPluginManager().registerEvents(new ServerListener(this), this);
         getServer().getPluginManager().registerEvents(new WorldListener(this), this);
     }
 
     private void registerCommands() {
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS.newHandler(event ->
                 event.registrar().register(WorldCommand.create(this))));
-    }
-
-    private void saveDefaultPresets() {
-        Presets.BOTTOMLESS_PIT.saveToFile(new File(presetsFolder, "bottomless-pit.json"), true);
-        Presets.CLASSIC_FLAT.saveToFile(new File(presetsFolder, "classic-flat.json"), true);
-        Presets.DESERT.saveToFile(new File(presetsFolder, "desert.json"), true);
-        Presets.OVERWORLD.saveToFile(new File(presetsFolder, "overworld.json"), true);
-        Presets.REDSTONE_READY.saveToFile(new File(presetsFolder, "redstone-ready.json"), true);
-        Presets.SNOWY_KINGDOM.saveToFile(new File(presetsFolder, "snowy-kingdom.json"), true);
-        Presets.THE_VOID.saveToFile(new File(presetsFolder, "the-void.json"), true);
-        Presets.TUNNELERS_DREAM.saveToFile(new File(presetsFolder, "tunnelers-dream.json"), true);
-        Presets.WATER_WORLD.saveToFile(new File(presetsFolder, "water-world.json"), true);
     }
 }

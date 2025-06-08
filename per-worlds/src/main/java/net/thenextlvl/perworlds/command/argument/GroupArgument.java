@@ -14,6 +14,7 @@ public class GroupArgument extends WrappedArgumentType<String, WorldGroup> {
             commons.groupProvider().getGroups().stream()
                     .map(WorldGroup::getName)
                     .filter(name -> name.contains(builder.getRemaining()))
+                    .map(StringArgumentType::escapeIfRequired)
                     .forEach(builder::suggest);
             return builder.buildFuture();
         });

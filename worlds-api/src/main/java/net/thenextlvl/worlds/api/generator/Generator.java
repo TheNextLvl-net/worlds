@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.api.model;
+package net.thenextlvl.worlds.api.generator;
 
 import net.thenextlvl.worlds.api.WorldsProvider;
 import net.thenextlvl.worlds.api.exception.GeneratorException;
@@ -8,9 +8,17 @@ import org.bukkit.plugin.Plugin;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * This record represents a generator that interacts with the Minecraft world generation system.
+ * It encapsulates a plugin responsible for providing the generator and an optional identifier
+ * for specifying a unique generator configuration.
+ * <p>
+ * The `Generator` record offers methods to serialize its state, retrieve chunk generators,
+ * and obtain biome providers for specific world names.
+ */
 @NullMarked
 public record Generator(Plugin plugin, @Nullable String id) {
-    public String serialize() {
+    public String asString() {
         return id != null ? plugin.getName() + ":" + id : plugin.getName();
     }
 
@@ -22,8 +30,8 @@ public record Generator(Plugin plugin, @Nullable String id) {
         return plugin().getDefaultBiomeProvider(worldName, id());
     }
 
-    public static Generator deserialize(WorldsProvider provider, String serialized) throws GeneratorException {
-        var split = serialized.split(":", 2);
+    public static Generator of(WorldsProvider provider, String string) throws GeneratorException {
+        var split = string.split(":", 2);
 
         var plugin = split[0];
         var id = split.length > 1 ? split[1] : null;
@@ -32,8 +40,8 @@ public record Generator(Plugin plugin, @Nullable String id) {
 
         if (generator == null)
             throw new GeneratorException(plugin, id, "Unknown plugin");
-        if (!provider.isEnabled())
-            throw new GeneratorException(plugin, id, "Plugin is not enabled");
+        if (!generator.isEnabled())
+            throw new GeneratorException(plugin, id, "Plugin is not enabled, is it 'load: STARTUP'?");
         if (!provider.generatorView().hasGenerator(generator))
             throw new GeneratorException(plugin, id, "Plugin has no generator");
 
