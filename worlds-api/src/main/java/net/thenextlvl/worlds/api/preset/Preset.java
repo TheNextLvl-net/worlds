@@ -3,15 +3,12 @@ package net.thenextlvl.worlds.api.preset;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import core.file.format.JsonFile;
-import core.io.IO;
 import net.thenextlvl.worlds.api.generator.GeneratorType;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -222,20 +219,6 @@ public class Preset {
     public Preset addStructure(Structure structure) {
         structures.add(structure);
         return this;
-    }
-
-    /**
-     * Save a preset to a file
-     *
-     * @param file  the file to save the preset to
-     * @param force whether to override the file if it already exists
-     * @return whether the file could be saved
-     */
-    @Deprecated(forRemoval = true)
-    public boolean saveToFile(File file, boolean force) {
-        if (!force && file.exists()) return false;
-        new JsonFile<>(IO.of(file), serialize()).save();
-        return true;
     }
 
     /**
