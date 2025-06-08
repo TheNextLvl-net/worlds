@@ -42,7 +42,6 @@ public class PerWorldsPlugin extends JavaPlugin {
 
     private void warnWorldManager() {
         if (knownWorldManagers.stream()
-                .filter(name -> !name.equals("Worlds"))
                 .map(getServer().getPluginManager()::getPlugin)
                 .noneMatch(Objects::nonNull)) return;
         getComponentLogger().warn("It appears you are using a third party world management plugin");
@@ -61,7 +60,6 @@ public class PerWorldsPlugin extends JavaPlugin {
     }
 
     final Set<String> knownWorldManagers = Set.of( // list ordered by likelihood of a plugin being used
-            "Worlds",
             "Multiverse-Core", // https://github.com/Multiverse/Multiverse-Core/
             "MultiWorld", // https://dev.bukkit.org/projects/multiworld-v-2-0 // https://modrinth.com/plugin/multiworld-bukkit
             "PhantomWorlds", // https://github.com/TheNewEconomy/PhantomWorlds
