@@ -1,6 +1,7 @@
 package net.thenextlvl.worlds.api.event;
 
 import com.google.common.base.Preconditions;
+import net.thenextlvl.worlds.api.level.Level;
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.world.WorldEvent;
@@ -24,17 +25,28 @@ public class WorldCloneEvent extends WorldEvent {
     private static final HandlerList handlerList = new HandlerList();
 
     private @Nullable BiPredicate<Path, BasicFileAttributes> fileFilter = null;
+    private final Level clone;
     private final boolean full;
 
     @ApiStatus.Internal
-    public WorldCloneEvent(World world, boolean full) {
+    public WorldCloneEvent(World world, Level clone, boolean full) {
         super(world, false);
+        this.clone = clone;
         this.full = full;
     }
 
     @ApiStatus.Internal
     public @Nullable BiPredicate<Path, BasicFileAttributes> getFileFilter() {
         return fileFilter;
+    }
+    
+    /**
+     * Retrieves the cloned {@link Level} associated with this event.
+     *
+     * @return the clone of the level involved in the cloning process
+     */
+    public Level getClone() {
+        return clone;
     }
 
     /**
