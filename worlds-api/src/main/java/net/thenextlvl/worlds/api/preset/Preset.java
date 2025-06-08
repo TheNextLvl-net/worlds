@@ -222,6 +222,23 @@ public class Preset {
     }
 
     /**
+     * Converts the current {@code Preset} object into its corresponding preset code.
+     * The generated code represents the layers of the preset and its biome.
+     * Layers are serialized into a comma-separated string, followed by a semicolon
+     * and the biome string representation.
+     * <p>
+     * This is a lossy conversion. If you want to save this preset, use {@link #serialize()}.
+     *
+     * @return a {@code String} containing the serialized layers and biome information of the preset
+     */
+    public String toPresetCode() {
+        var layers = this.layers.stream()
+                .map(Layer::toString)
+                .collect(Collectors.joining(","));
+        return layers + ";" + biome();
+    }
+
+    /**
      * Serialize this preset into a JSON object.
      * <a href="https://minecraft.wiki/w/Superflat#Multiplayer">Wiki</a>
      *
@@ -275,13 +292,6 @@ public class Preset {
         if (object.has("structure_overrides")) object.getAsJsonArray("structure_overrides")
                 .forEach(structure -> preset.addStructure(Structure.literal(structure.getAsString())));
         return new Preset();
-    }
-
-    public String toPresetCode() {
-        var layers = this.layers.stream()
-                .map(Layer::toString)
-                .collect(Collectors.joining(","));
-        return layers + ";" + biome();
     }
 
     @Override
