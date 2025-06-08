@@ -44,7 +44,7 @@ public class WorldListener implements Listener {
                 ));
             } catch (GeneratorException e) {
                 var generator = e.getId() != null ? e.getPlugin() + e.getId() : e.getPlugin();
-                plugin.getComponentLogger().error("Skip loading dimension {}", path.getFileName());
+                plugin.getComponentLogger().error("Skip loading dimension '{}'", path.getFileName());
                 plugin.getComponentLogger().error("Cannot use generator {}: {}", generator, e.getMessage());
             } catch (Exception e) {
                 if (e.getCause() instanceof DirectoryLock.LockException lock) {
