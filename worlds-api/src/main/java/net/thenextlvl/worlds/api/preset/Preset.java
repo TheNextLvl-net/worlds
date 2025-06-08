@@ -9,6 +9,7 @@ import net.thenextlvl.worlds.api.generator.GeneratorType;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.util.Arrays;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
  */
 @NullMarked
 public class Preset {
+    private final @Nullable String name;
     private Biome biome = Biome.literal("plains");
     private boolean lakes;
     private boolean features;
@@ -34,6 +36,14 @@ public class Preset {
 
     private LinkedHashSet<Layer> layers = new LinkedHashSet<>();
     private LinkedHashSet<Structure> structures = new LinkedHashSet<>();
+
+    public Preset() {
+        this(null);
+    }
+
+    public Preset(@Nullable String name) {
+        this.name = name;
+    }
 
     /**
      * Parses a Superflat preset code and generates a corresponding {@code Preset} object.
@@ -60,7 +70,16 @@ public class Preset {
             if (matched != null) return new Layer(matched, height);
             throw new IllegalArgumentException("Invalid material: " + material);
         }).collect(Collectors.toCollection(LinkedHashSet::new));
-        return new Preset().layers(layers).biome(Biome.literal(strings[1]));
+        return new Preset(null).layers(layers).biome(Biome.literal(strings[1]));
+    }
+
+    /**
+     * Retrieves the name of the preset.
+     *
+     * @return the name of the preset as a {@code String}
+     */
+    public @Nullable String name() {
+        return name;
     }
 
     /**

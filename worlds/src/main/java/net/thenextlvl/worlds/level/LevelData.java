@@ -465,7 +465,7 @@ public abstract class LevelData implements Level {
 
         if (settings.isEmpty()) return Optional.empty();
 
-        var preset = new Preset();
+        var preset = new Preset(null);
 
         settings.flatMap(tag -> tag.<Tag>optional("biome"))
                 .map(Tag::getAsString)

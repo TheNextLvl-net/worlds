@@ -1,23 +1,26 @@
 package net.thenextlvl.worlds.api.preset;
 
 import org.bukkit.Material;
+import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
+
+import java.util.Set;
 
 @NullMarked
 public class Presets {
-    public static final Preset BOTTOMLESS_PIT = new Preset()
+    public static final Preset BOTTOMLESS_PIT = new Preset("Bottomless Pit")
             .addLayer(new Layer(Material.COBBLESTONE, 2))
             .addLayer(new Layer(Material.DIRT, 3))
             .addLayer(new Layer(Material.GRASS_BLOCK, 1))
             .addStructure(Structure.literal("villages"));
 
-    public static final Preset CLASSIC_FLAT = new Preset()
+    public static final Preset CLASSIC_FLAT = new Preset("Classic Flat")
             .addLayer(new Layer(Material.BEDROCK, 1))
             .addLayer(new Layer(Material.DIRT, 2))
             .addLayer(new Layer(Material.GRASS_BLOCK, 1))
             .addStructure(Structure.literal("villages"));
 
-    public static final Preset DESERT = new Preset()
+    public static final Preset DESERT = new Preset("Desert")
             .biome(Biome.literal("desert"))
             .features(true)
             .addLayer(new Layer(Material.BEDROCK, 1))
@@ -29,7 +32,7 @@ public class Presets {
             .addStructure(Structure.literal("strongholds"))
             .addStructure(Structure.literal("villages"));
 
-    public static final Preset OVERWORLD = new Preset()
+    public static final Preset OVERWORLD = new Preset("Overworld")
             .lakes(true)
             .features(true)
             .addLayer(new Layer(Material.BEDROCK, 1))
@@ -42,13 +45,13 @@ public class Presets {
             .addStructure(Structure.literal("strongholds"))
             .addStructure(Structure.literal("villages"));
 
-    public static final Preset REDSTONE_READY = new Preset()
+    public static final Preset REDSTONE_READY = new Preset("Redstone Ready")
             .biome(Biome.literal("desert"))
             .addLayer(new Layer(Material.BEDROCK, 1))
             .addLayer(new Layer(Material.STONE, 3))
             .addLayer(new Layer(Material.SANDSTONE, 116));
 
-    public static final Preset SNOWY_KINGDOM = new Preset()
+    public static final Preset SNOWY_KINGDOM = new Preset("Snowy Kingdom")
             .biome(Biome.literal("snowy_plains"))
             .addLayer(new Layer(Material.BEDROCK, 1))
             .addLayer(new Layer(Material.STONE, 59))
@@ -58,12 +61,12 @@ public class Presets {
             .addStructure(Structure.literal("igloos"))
             .addStructure(Structure.literal("villages"));
 
-    public static final Preset THE_VOID = new Preset()
+    public static final Preset THE_VOID = new Preset("The Void")
             .features(true)
             .biome(Biome.literal("the_void"))
             .addLayer(new Layer(Material.AIR, 1));
 
-    public static final Preset TUNNELERS_DREAM = new Preset()
+    public static final Preset TUNNELERS_DREAM = new Preset("Tunnelers' Dream")
             .features(true)
             .biome(Biome.literal("windswept_hills"))
             .addLayer(new Layer(Material.BEDROCK, 1))
@@ -73,7 +76,7 @@ public class Presets {
             .addStructure(Structure.literal("mineshafts"))
             .addStructure(Structure.literal("strongholds"));
 
-    public static final Preset WATER_WORLD = new Preset()
+    public static final Preset WATER_WORLD = new Preset("Water World")
             .biome(Biome.literal("deep_ocean"))
             .addLayer(new Layer(Material.BEDROCK, 1))
             .addLayer(new Layer(Material.DEEPSLATE, 64))
