@@ -1,15 +1,11 @@
 package net.thenextlvl.worlds.api.preset;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.common.base.Preconditions;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.annotations.SerializedName;
-import core.file.format.GsonFile;
+import core.file.format.JsonFile;
 import core.io.IO;
-import core.paper.adapters.inventory.MaterialAdapter;
 import net.thenextlvl.worlds.api.generator.GeneratorType;
-import net.thenextlvl.worlds.api.preset.adapter.BiomeTypeAdapter;
-import net.thenextlvl.worlds.api.preset.adapter.StructureTypeAdapter;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
@@ -31,20 +27,12 @@ import java.util.stream.Collectors;
  */
 @NullMarked
 public class Preset {
-    private static final Gson gson = new GsonBuilder()
-            .registerTypeAdapter(Structure.class, new StructureTypeAdapter())
-            .registerTypeAdapter(Material.class, new MaterialAdapter())
-            .registerTypeAdapter(Biome.class, new BiomeTypeAdapter())
-            .setPrettyPrinting()
-            .create();
-
     private Biome biome = Biome.literal("plains");
     private boolean lakes;
     private boolean features;
     private boolean decoration;
 
     private LinkedHashSet<Layer> layers = new LinkedHashSet<>();
-    @SerializedName("structure_overrides")
     private LinkedHashSet<Structure> structures = new LinkedHashSet<>();
 
     /**
@@ -227,7 +215,7 @@ public class Preset {
     @Deprecated(forRemoval = true)
     public boolean saveToFile(File file, boolean force) {
         if (!force && file.exists()) return false;
-        new GsonFile<>(IO.of(file), this, gson).save();
+        new JsonFile<>(IO.of(file), serialize()).save();
         return true;
     }
 
@@ -238,15 +226,23 @@ public class Preset {
      */
     @Deprecated(forRemoval = true)
     public JsonObject serialize() {
-        return gson.toJsonTree(this).getAsJsonObject();
-    }
-
-    @Override
-    public String toString() {
-        var layers = this.layers.stream()
-                .map(Layer::toString)
-                .collect(Collectors.joining(","));
-        return layers + ";" + biome();
+        var root = new JsonObject();
+        var layers = new JsonArray();
+        var structures = new JsonArray();
+        root.addProperty("biome", biome.key().asString());
+        root.addProperty("lakes", lakes);
+        root.addProperty("features", features);
+        root.addProperty("decoration", decoration);
+        this.layers.forEach(layer -> {
+            var object = new JsonObject();
+            object.addProperty("block", layer.block().key().asString());
+            object.addProperty("height", layer.height());
+            layers.add(object);
+        });
+        this.structures.forEach(structure -> structures.add(structure.key().asString()));
+        root.add("layers", layers);
+        root.add("structure_overrides", structures);
+        return root;
     }
 
     /**
@@ -256,7 +252,42 @@ public class Preset {
      * @return the deserialized preset
      */
     @Deprecated(forRemoval = true)
-    public static Preset deserialize(JsonObject object) {
-        return gson.fromJson(object, Preset.class);
+    @SuppressWarnings("PatternValidation")
+    public static Preset deserialize(JsonObject object) throws IllegalArgumentException {
+        Preconditions.checkArgument(object.has("layers"), "Missing layers");
+        var preset = new Preset(object.has("name") ? object.get("name").getAsString() : null);
+        if (object.has("biome")) preset.biome(Biome.literal(object.get("biome").getAsString()));
+        if (object.has("lakes")) preset.lakes(object.get("lakes").getAsBoolean());
+        if (object.has("features")) preset.features(object.get("features").getAsBoolean());
+        if (object.has("decoration")) preset.decoration(object.get("decoration").getAsBoolean());
+        object.getAsJsonArray("layers").forEach(layer -> {
+            var layerObject = layer.getAsJsonObject();
+            var material = Material.matchMaterial(layerObject.get("block").getAsString());
+            var height = layerObject.get("height").getAsInt();
+            if (material != null) preset.addLayer(new Layer(material, height));
+        });
+        if (object.has("structure_overrides")) object.getAsJsonArray("structure_overrides")
+                .forEach(structure -> preset.addStructure(Structure.literal(structure.getAsString())));
+        return new Preset();
+    }
+
+    public String toPresetCode() {
+        var layers = this.layers.stream()
+                .map(Layer::toString)
+                .collect(Collectors.joining(","));
+        return layers + ";" + biome();
+    }
+
+    @Override
+    public String toString() {
+        return "Preset{" +
+               "name='" + name + '\'' +
+               ", biome=" + biome +
+               ", lakes=" + lakes +
+               ", features=" + features +
+               ", decoration=" + decoration +
+               ", layers=" + layers +
+               ", structures=" + structures +
+               '}';
     }
 }

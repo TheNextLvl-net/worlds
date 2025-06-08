@@ -16,8 +16,8 @@ public class PresetsTest {
     public void testPreset(Preset preset, String unparsed) {
         var parsed = Preset.parse(unparsed);
         System.out.println(preset);
-        assertEquals(preset.toString(), unparsed, "Constant does not match unparsed preset");
-        assertEquals(parsed.toString(), unparsed, "Parsed preset does not match unparsed preset");
+        assertEquals(preset.toPresetCode(), unparsed, "Constant does not match unparsed preset");
+        assertEquals(parsed.toPresetCode(), unparsed, "Parsed preset does not match unparsed preset");
     }
 
     public static Stream<Arguments> unparsedPresets() {
