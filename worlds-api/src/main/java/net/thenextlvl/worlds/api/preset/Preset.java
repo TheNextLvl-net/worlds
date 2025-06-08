@@ -45,7 +45,7 @@ public class Preset {
      * If the material is invalid or the format is incorrect,
      * an {@code IllegalArgumentException} is thrown.
      *
-     * @param presetCode the preset code string to parse, in the expected format
+     * @param presetCode the preset code string to parse in the expected format
      * @return a {@code Preset} object configured with the layers and biome described in the preset code
      * @throws IllegalArgumentException if the preset code contains invalid materials or does not adhere to the required format
      */
