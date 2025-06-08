@@ -11,6 +11,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -305,5 +306,17 @@ public class Preset {
                ", layers=" + layers +
                ", structures=" + structures +
                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Preset preset = (Preset) o;
+        return lakes == preset.lakes && features == preset.features && decoration == preset.decoration && Objects.equals(name, preset.name) && Objects.equals(biome, preset.biome) && Objects.equals(layers, preset.layers) && Objects.equals(structures, preset.structures);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, biome, lakes, features, decoration, layers, structures);
     }
 }
