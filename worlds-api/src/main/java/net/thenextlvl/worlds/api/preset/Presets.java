@@ -87,4 +87,20 @@ public class Presets {
             .addStructure(Structure.literal("ocean_monuments"))
             .addStructure(Structure.literal("ocean_ruins"))
             .addStructure(Structure.literal("shipwrecks"));
+
+    private static final Set<Preset> presets = Set.of(
+            BOTTOMLESS_PIT,
+            CLASSIC_FLAT,
+            DESERT,
+            OVERWORLD,
+            REDSTONE_READY,
+            SNOWY_KINGDOM,
+            THE_VOID,
+            TUNNELERS_DREAM,
+            WATER_WORLD
+    );
+
+    public static @Unmodifiable Set<Preset> presets() {
+        return presets;
+    }
 }
