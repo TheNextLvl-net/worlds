@@ -145,8 +145,8 @@ class WorldCreateCommand {
         }
 
         if (world != null) {
-            plugin.persistWorld(world, true);
-            if (generator != null) plugin.persistGenerator(world, generator);
+            plugin.levelView().persistWorld(world, true);
+            if (generator != null) plugin.levelView().persistGenerator(world, generator);
             plugin.levelView().saveLevelData(world, true);
         }
 

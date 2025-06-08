@@ -52,7 +52,7 @@ class WorldLoadCommand {
         }
 
         if (world != null) {
-            plugin.persistStatus(world, true, true);
+            plugin.levelView().persistStatus(world, true, true);
             plugin.levelView().saveLevelData(world, true);
         }
 
