@@ -228,7 +228,6 @@ public class Preset {
      *
      * @return the serialized preset as a JsonObject
      */
-    @Deprecated(forRemoval = true)
     public JsonObject serialize() {
         var root = new JsonObject();
         var layers = new JsonArray();
@@ -259,7 +258,6 @@ public class Preset {
      * @return the deserialized preset
      * @throws IllegalArgumentException if no layers are provided
      */
-    @Deprecated(forRemoval = true)
     @SuppressWarnings("PatternValidation")
     public static Preset deserialize(JsonObject object) throws IllegalArgumentException {
         Preconditions.checkArgument(object.has("layers"), "Missing layers");
