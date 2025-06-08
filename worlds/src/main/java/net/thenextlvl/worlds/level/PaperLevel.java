@@ -48,6 +48,7 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.generator.WorldInfo;
 import org.jspecify.annotations.NullMarked;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
@@ -67,10 +68,14 @@ class PaperLevel extends LevelData {
         Preconditions.checkState(console.getAllLevels().iterator().hasNext(), "Cannot create worlds before main level is created");
         Preconditions.checkArgument(!Files.exists(directory) || Files.isDirectory(directory), "File (%s) exists and isn't a folder", directory);
 
-        var worldByKey = server.getWorld(key);
-        var worldByName = server.getWorld(name);
-        if (worldByName != null && worldByName.equals(worldByKey)) return Optional.of(worldByName);
-        Preconditions.checkArgument(worldByKey == null && worldByName == null, "World with key %s or name %s already exists", key, name);
+        Preconditions.checkArgument(server.getWorld(key) == null, "World with key %s already exists", key);
+        Preconditions.checkArgument(server.getWorld(name) == null, "World with name %s already exists", name);
+
+        Preconditions.checkState(plugin.getServer().getWorlds().stream()
+                        .map(World::getWorldFolder)
+                        .map(File::toPath)
+                        .noneMatch(directory::equals),
+                "World with directory %s already exists", directory);
 
         var chunkGenerator = Optional.ofNullable(super.chunkGenerator)
                 .orElseGet(() -> Optional.ofNullable(generator)
@@ -98,15 +103,14 @@ class PaperLevel extends LevelData {
                 summary = levelStorageAccess.getSummary(dataTag);
             } catch (NbtException | ReportedNbtException | IOException e) {
                 LevelStorageSource.LevelDirectory levelDirectory = levelStorageAccess.getLevelDirectory();
-                MinecraftServer.LOGGER.warn("Failed to load world data from {}", levelDirectory.dataFile(), e);
-                MinecraftServer.LOGGER.info("Attempting to use fallback");
+                plugin.getComponentLogger().warn("Failed to load world data from {}, attempting to use fallback", levelDirectory.dataFile(), e);
 
                 try {
                     dataTag = levelStorageAccess.getDataTagFallback();
                     summary = levelStorageAccess.getSummary(dataTag);
                 } catch (NbtException | ReportedNbtException | IOException e1) {
-                    MinecraftServer.LOGGER.error("Failed to load world data from {}", levelDirectory.oldDataFile(), e1);
-                    MinecraftServer.LOGGER.error(
+                    plugin.getComponentLogger().error("Failed to load world data from {}", levelDirectory.oldDataFile(), e1);
+                    plugin.getComponentLogger().error(
                             "Failed to load world data from {} and {}. World files may be corrupted. Shutting down.",
                             levelDirectory.dataFile(),
                             levelDirectory.oldDataFile()
@@ -118,12 +122,12 @@ class PaperLevel extends LevelData {
             }
 
             if (summary.requiresManualConversion()) {
-                MinecraftServer.LOGGER.info("This world must be opened in an older version (like 1.6.4) to be safely converted");
+                plugin.getComponentLogger().warn("This world must be opened in an older version (like 1.6.4) to be safely converted");
                 return Optional.empty();
             }
 
             if (!summary.isCompatible()) {
-                MinecraftServer.LOGGER.info("This world was created by an incompatible version.");
+                plugin.getComponentLogger().warn("This world was created by an incompatible version.");
                 return Optional.empty();
             }
         } else {
