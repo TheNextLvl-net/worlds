@@ -247,9 +247,12 @@ public class Preset {
 
     /**
      * Deserialize a JSON object into a preset
+     * <p>
+     * <a href="https://minecraft.wiki/w/Superflat#Multiplayer">Wiki</a>
      *
      * @param object the object to deserialize
      * @return the deserialized preset
+     * @throws IllegalArgumentException if no layers are provided
      */
     @Deprecated(forRemoval = true)
     @SuppressWarnings("PatternValidation")
