@@ -35,6 +35,18 @@ dependencies {
     implementation(project(":per-worlds"))
     implementation("net.thenextlvl.core:i18n:3.2.0")
     implementation("net.thenextlvl.core:paper:2.1.2")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(platform("org.junit:junit-bom:5.13.0-M2"))
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+        showCauses = true
+        showExceptions = true
+    }
 }
 
 tasks.shadowJar {
