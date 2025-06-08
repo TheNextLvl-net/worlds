@@ -168,8 +168,7 @@ modrinth {
     versionType = if (isRelease) "release" else "beta"
     uploadFile.set(tasks.shadowJar)
     gameVersions.set(versions)
-    loaders.add("paper")
-    loaders.add("folia")
+    loaders.addAll((property("loaders") as String).split(",").map { it.trim() })
     dependencies {
         embedded.project("perworlds")
     }
