@@ -1,30 +1,62 @@
 package net.thenextlvl.worlds.api.event;
 
+import com.google.common.base.Preconditions;
 import org.bukkit.World;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.world.WorldEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.function.BiPredicate;
 
 /**
  * Represents an event triggered when a {@link World} is cloned.
- * This event allows developers to listen to the cloning process and modify
- * or cancel it if necessary. It provides information about whether the entire
+ * This event allows developers to listen to and modify the cloning process.
+ * It provides information about whether the entire
  * world, including all data and entities, is being cloned, or if only the
- * configuration file is used for generation.
+ * {@code level.dat} is copied for generation.
  */
 @NullMarked
-public class WorldCloneEvent extends WorldEvent implements Cancellable {
+public class WorldCloneEvent extends WorldEvent {
     private static final HandlerList handlerList = new HandlerList();
 
-    private boolean cancelled = false;
+    private @Nullable BiPredicate<Path, BasicFileAttributes> fileFilter = null;
     private final boolean full;
 
     @ApiStatus.Internal
     public WorldCloneEvent(World world, boolean full) {
         super(world, false);
         this.full = full;
+    }
+
+    @ApiStatus.Internal
+    public @Nullable BiPredicate<Path, BasicFileAttributes> getFileFilter() {
+        return fileFilter;
+    }
+
+    /**
+     * Adds a predicate to filter files during the cloning process.
+     * The filter determines whether a specific file should be included in the cloning
+     * based on its path and attributes.
+     * <p>
+     * If the filter returns false, the corresponding file
+     * or directory will not be included in the cloning process.
+     * Returning false for a directory skips the entire directory.
+     * <p>
+     * If multiple filters are added, they are combined logically such that filters
+     * added later only evaluate if no earlier filter has disqualified the file for cloning.
+     *
+     * @param filter a {@link BiPredicate} that takes a {@link Path} and {@link BasicFileAttributes}
+     *               and returns {@code true} if the file should be included in the cloning process,
+     *               {@code false} otherwise
+     * @throws IllegalStateException if the event represents a non-{@link #isFullClone() full} clone operation
+     */
+    public void addFileFilter(BiPredicate<Path, BasicFileAttributes> filter) throws IllegalStateException {
+        Preconditions.checkState(full, "Cannot add file filter to non-full clone event");
+        this.fileFilter = this.fileFilter != null ? this.fileFilter.and(filter) : filter;
     }
 
     /**
@@ -35,16 +67,6 @@ public class WorldCloneEvent extends WorldEvent implements Cancellable {
      */
     public boolean isFullClone() {
         return full;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return this.cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancel) {
-        this.cancelled = cancel;
     }
 
     @Override
