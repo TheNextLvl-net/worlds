@@ -221,6 +221,8 @@ public class Preset {
 
     /**
      * Serialize this preset into a JSON object.
+     * <p>
+     * <a href="https://minecraft.wiki/w/Superflat#Multiplayer">Wiki</a>
      *
      * @return the serialized preset as a JsonObject
      */
@@ -229,6 +231,7 @@ public class Preset {
         var root = new JsonObject();
         var layers = new JsonArray();
         var structures = new JsonArray();
+        root.addProperty("name", name);
         root.addProperty("biome", biome.key().asString());
         root.addProperty("lakes", lakes);
         root.addProperty("features", features);
