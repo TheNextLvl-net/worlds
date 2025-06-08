@@ -299,7 +299,7 @@ public class PaperLevelView implements LevelView {
     }
 
     private DeletionResult deleteNow(World world) {
-        if (plugin.isRunningFolia() || world.getKey().asString().equals("minecraft:overworld"))
+        if (WorldsPlugin.RUNNING_FOLIA || world.getKey().asString().equals("minecraft:overworld"))
             return DeletionResult.REQUIRES_SCHEDULING;
 
         if (!new WorldDeleteEvent(world).callEvent()) return DeletionResult.FAILED;
@@ -333,7 +333,7 @@ public class PaperLevelView implements LevelView {
     }
 
     private DeletionResult regenerateNow(World world) {
-        if (plugin.isRunningFolia() || world.getKey().asString().equals("minecraft:overworld"))
+        if (WorldsPlugin.RUNNING_FOLIA || world.getKey().asString().equals("minecraft:overworld"))
             return DeletionResult.REQUIRES_SCHEDULING;
 
         if (!new WorldRegenerateEvent(world).callEvent()) return DeletionResult.FAILED;

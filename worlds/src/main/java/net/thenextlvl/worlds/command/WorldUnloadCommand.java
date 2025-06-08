@@ -57,7 +57,7 @@ class WorldUnloadCommand {
     }
 
     private static String unload(World world, @Nullable World fallback, WorldsPlugin plugin) {
-        if (plugin.isRunningFolia())
+        if (WorldsPlugin.RUNNING_FOLIA)
             return "world.unload.disallowed.folia";
         if (world.getKey().toString().equals("minecraft:overworld"))
             return "world.unload.disallowed";

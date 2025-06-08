@@ -48,7 +48,7 @@ class WorldDeleteCommand {
         var message = switch (result) {
             case SUCCESS -> "world.delete.success";
             case SCHEDULED -> "world.delete.scheduled";
-            case REQUIRES_SCHEDULING -> plugin.isRunningFolia()
+            case REQUIRES_SCHEDULING -> WorldsPlugin.RUNNING_FOLIA
                     ? "world.delete.disallowed.folia"
                     : "world.delete.disallowed";
             case UNLOAD_FAILED -> "world.unload.failed";

@@ -383,7 +383,7 @@ public abstract class LevelData implements Level {
 
         @Override
         public Level build() {
-            return plugin.isRunningFolia() ? new FoliaLevel(plugin, this) : new PaperLevel(plugin, this);
+            return WorldsPlugin.RUNNING_FOLIA ? new FoliaLevel(plugin, this) : new PaperLevel(plugin, this);
         }
     }
 
