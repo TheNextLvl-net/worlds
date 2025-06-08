@@ -200,14 +200,14 @@ public class PaperLevelView implements LevelView {
         return ((CraftWorld) world).getHandle().levelStorageAccess.makeWorldBackup();
     }
 
-    private String findFreeName(String name) {
+    public String findFreeName(String name) {
         var usedNames = plugin.getServer().getWorlds().stream()
                 .map(WorldInfo::getName)
                 .collect(Collectors.toSet());
         return findFreeName(usedNames, name);
     }
 
-    private Path findFreePath(String name) {
+    public Path findFreePath(String name) {
         var usedPaths = listDirectories().stream()
                 .map(Path::getFileName)
                 .map(Path::toString)
