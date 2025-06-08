@@ -291,7 +291,7 @@ public class Preset {
         });
         if (object.has("structure_overrides")) object.getAsJsonArray("structure_overrides")
                 .forEach(structure -> preset.addStructure(Structure.literal(structure.getAsString())));
-        return new Preset();
+        return preset;
     }
 
     @Override
