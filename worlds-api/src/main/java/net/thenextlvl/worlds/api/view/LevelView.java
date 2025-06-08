@@ -1,5 +1,6 @@
 package net.thenextlvl.worlds.api.view;
 
+import net.thenextlvl.worlds.api.event.WorldCloneEvent;
 import net.thenextlvl.worlds.api.level.Level;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Interface representing a view for managing levels in a server environment.
@@ -128,6 +130,30 @@ public interface LevelView {
      * @throws IOException if an I/O error occurs while creating the backup
      */
     long backup(World world) throws IOException;
+
+    /**
+     * Clones the specified world with the possibility to modify its properties through a builder.
+     * If a {@code full} clone is invoked, the entire world directory is duplicated,
+     * except for specific files and folders: {@code advancements}, {@code datapacks},
+     * {@code playerdata}, {@code stats}, {@code uid.dat}, and {@code session.lock}.
+     * <p>
+     * By default, if a name or key is not provided, they are automatically generated using the
+     * pattern {@code OriginalName (#)}, and the key is a lowercased version of the generated name,
+     * replacing spaces with underscores and removing invalid namespace characters.
+     * <p>
+     * Throws an {@code IllegalArgumentException} if the world name or key is already in use.
+     * Throws an {@code IllegalStateException} if the target directory already exists.
+     *
+     * @param world   the world to be cloned
+     * @param builder a consumer that modifies the {@link Level.Builder} properties of the cloned world
+     * @param full    whether to fully clone including regions, entities..., or only the {@code level.dat}
+     * @return an {@link Optional} containing the cloned world, or {@link Optional#empty()} if the cloning fails
+     * @throws IllegalArgumentException if the world name or key are already in use
+     * @throws IllegalStateException    if the target directory already exists
+     * @throws IOException              if an I/O error occurs during the cloning process
+     * @see WorldCloneEvent#isFullClone()
+     */
+    Optional<World> clone(World world, Consumer<Level.Builder> builder, boolean full) throws IllegalArgumentException, IllegalStateException, IOException;
 
     /**
      * Deletes the specified world from the server and disk.

@@ -1,5 +1,6 @@
 package net.thenextlvl.worlds.view;
 
+import com.google.common.base.Preconditions;
 import core.io.IO;
 import core.nbt.file.NBTFile;
 import core.nbt.tag.CompoundTag;
@@ -9,29 +10,41 @@ import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.event.WorldActionScheduledEvent;
 import net.thenextlvl.worlds.api.event.WorldActionScheduledEvent.ActionType;
 import net.thenextlvl.worlds.api.event.WorldBackupEvent;
+import net.thenextlvl.worlds.api.event.WorldCloneEvent;
 import net.thenextlvl.worlds.api.event.WorldDeleteEvent;
 import net.thenextlvl.worlds.api.event.WorldRegenerateEvent;
+import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.view.LevelView;
 import net.thenextlvl.worlds.level.LevelData;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.generator.WorldInfo;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
+import static org.bukkit.persistence.PersistentDataType.STRING;
 
 @NullMarked
 public class PaperLevelView implements LevelView {
@@ -85,9 +98,15 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public Set<Path> listLevels() {
+    public @Unmodifiable Set<Path> listLevels() {
+        return listDirectories().stream()
+                .filter(this::isLevel)
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
+    private @Unmodifiable Set<Path> listDirectories() {
         try (var stream = Files.list(plugin.getServer().getWorldContainer().toPath())) {
-            return stream.filter(this::isLevel).collect(Collectors.toUnmodifiableSet());
+            return stream.collect(Collectors.toUnmodifiableSet());
         } catch (IOException e) {
             return Set.of();
         }
@@ -146,12 +165,32 @@ public class PaperLevelView implements LevelView {
         if (level.getDragonFight() != null) {
             level.serverLevelData.setEndDragonFightData(level.getDragonFight().saveData());
         }
-        var save = level.getChunkSource().getDataStorage().scheduleSave();
-        if (!async) save.join();
 
         level.serverLevelData.setWorldBorder(level.getWorldBorder().createSettings());
         level.serverLevelData.setCustomBossEvents(level.getServer().getCustomBossEvents().save(level.registryAccess()));
-        level.getChunkSource().getDataStorage().saveAndJoin();
+
+        var save = level.getChunkSource().getDataStorage().scheduleSave();
+        if (!async) save.join();
+    }
+
+    @Deprecated(forRemoval = true)
+    public void persistWorld(World world, boolean enabled) {
+        var worldKey = new NamespacedKey("worlds", "world_key");
+        world.getPersistentDataContainer().set(worldKey, STRING, world.getKey().asString());
+        persistStatus(world, enabled, true);
+    }
+
+    @Deprecated(forRemoval = true)
+    public void persistStatus(World world, boolean enabled, boolean force) {
+        var enabledKey = new NamespacedKey("worlds", "enabled");
+        if (!force && !world.getPersistentDataContainer().has(enabledKey)) return;
+        world.getPersistentDataContainer().set(enabledKey, BOOLEAN, enabled);
+    }
+
+    @Deprecated(forRemoval = true)
+    public void persistGenerator(World world, Generator generator) {
+        var generatorKey = new NamespacedKey("worlds", "generator");
+        world.getPersistentDataContainer().set(generatorKey, STRING, generator.asString());
     }
 
     @Override
@@ -159,6 +198,72 @@ public class PaperLevelView implements LevelView {
         new WorldBackupEvent(world).callEvent();
         save(world, true);
         return ((CraftWorld) world).getHandle().levelStorageAccess.makeWorldBackup();
+    }
+
+    private String findFreeName(String name) {
+        var usedNames = plugin.getServer().getWorlds().stream()
+                .map(WorldInfo::getName)
+                .collect(Collectors.toSet());
+        return findFreeName(usedNames, name);
+    }
+
+    private Path findFreePath(String name) {
+        var usedPaths = listDirectories().stream()
+                .map(Path::getFileName)
+                .map(Path::toString)
+                .collect(Collectors.toSet());
+        return Path.of(findFreeName(usedPaths, name));
+    }
+
+    public static String findFreeName(Set<String> usedNames, String name) {
+        var baseName = name;
+        int suffix = 1;
+        String candidate = baseName + " (1)";
+
+        var pattern = Pattern.compile("^(.+) \\((\\d+)\\)$");
+        var matcher = pattern.matcher(name);
+
+        if (matcher.matches()) {
+            baseName = matcher.group(1);
+            suffix = Integer.parseInt(matcher.group(2)) + 1;
+            candidate = baseName + " (" + suffix + ")";
+            suffix++;
+        }
+
+        while (usedNames.contains(candidate)) {
+            candidate = baseName + " (" + suffix++ + ")";
+        }
+
+        return candidate;
+    }
+
+
+    @Override
+    @SuppressWarnings("PatternValidation")
+    public Optional<World> clone(World world, Consumer<Level.Builder> builder, boolean full) throws IllegalArgumentException, IllegalStateException, IOException {
+        var levelBuilder = plugin.levelBuilder(world);
+
+        var name = findFreeName(world.getName());
+        levelBuilder.name(name);
+        levelBuilder.key(Key.key(world.key().namespace(), LevelData.createKey(name)));
+        levelBuilder.directory(findFreePath(world.getWorldFolder().getName()));
+
+        builder.accept(levelBuilder);
+        var clone = levelBuilder.build();
+
+        Preconditions.checkArgument(plugin.getServer().getWorld(clone.key()) == null, "World with key %s already exists", clone.key());
+        Preconditions.checkArgument(plugin.getServer().getWorld(clone.getName()) == null, "World with name %s already exists", clone.getName());
+        Preconditions.checkState(!Files.isDirectory(clone.getDirectory()), "Target directory already exists");
+
+        var event = new WorldCloneEvent(world, clone, full);
+        event.callEvent();
+
+        if (full) {
+            save(world, true);
+            copyDirectory(world.getWorldFolder().toPath(), clone.getDirectory(), event.getFileFilter());
+        }
+
+        return clone.create();
     }
 
     @Override
@@ -289,5 +394,37 @@ public class PaperLevelView implements LevelView {
         } catch (IOException e) {
             plugin.getComponentLogger().warn("Failed to delete {}", path, e);
         }
+    }
+
+    private void copyDirectory(Path source, Path destination, @Nullable BiPredicate<Path, BasicFileAttributes> filter) throws IOException {
+        Files.walkFileTree(source, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attributes) throws IOException {
+                if (switch (path.getFileName().toString()) {
+                    case "advancements", "datapacks", "playerdata", "stats" -> true;
+                    default -> false;
+                }) return FileVisitResult.SKIP_SUBTREE;
+                if (filter != null && !filter.test(path, attributes)) return FileVisitResult.SKIP_SUBTREE;
+                Files.createDirectories(destination.resolve(source.relativize(path)));
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path path, BasicFileAttributes attributes) throws IOException {
+                if (switch (path.getFileName().toString()) {
+                    case "uid.dat", "session.lock" -> true;
+                    default -> false;
+                }) return FileVisitResult.CONTINUE;
+                if (filter != null && !filter.test(path, attributes)) return FileVisitResult.CONTINUE;
+                Files.copy(path, destination.resolve(source.relativize(path)));
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(Path path, IOException exc) {
+                plugin.getComponentLogger().error("Failed to copy file: {}", path, exc);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 }
