@@ -37,14 +37,14 @@ import java.util.stream.Stream;
 
 @NullMarked
 public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
-    private final boolean runningFolia = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
+    public static final boolean RUNNING_FOLIA = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
 
     private final GeneratorView generatorView = new PluginGeneratorView();
-    private final PaperLevelView levelView = runningFolia ? new FoliaLevelView(this) : new PaperLevelView(this);
+    private final PaperLevelView levelView = RUNNING_FOLIA ? new FoliaLevelView(this) : new PaperLevelView(this);
 
     private final WorldLinkProvider linkProvider = new WorldLinkProvider(this);
 
-    private final @Nullable SharedWorlds commons = runningFolia ? null : new SharedWorlds(this);
+    private final @Nullable SharedWorlds commons = RUNNING_FOLIA ? null : new SharedWorlds(this);
 
     private final Path presetsFolder = getDataPath().resolve("presets");
     private final Path translations = getDataPath().resolve("translations");
@@ -67,7 +67,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     @Override
     public void onLoad() {
         createPresetsFolder();
-        if (runningFolia) warnExperimental();
+        if (RUNNING_FOLIA) warnExperimental();
         versionChecker.checkVersion();
         registerServices();
         if (commons != null) commons.onLoad();
@@ -82,7 +82,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     @Override
     public void onEnable() {
-        if (isRunningFolia()) {
+        if (RUNNING_FOLIA) {
             getComponentLogger().error("Folia 1.21.5 is not yet supported by Worlds");
             getComponentLogger().error("Disabling...");
             getServer().getPluginManager().disablePlugin(this);
@@ -161,10 +161,6 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     public @Nullable SharedWorlds commons() {
         return commons;
-    }
-
-    public boolean isRunningFolia() {
-        return runningFolia;
     }
 
     private void createPresetsFolder() {

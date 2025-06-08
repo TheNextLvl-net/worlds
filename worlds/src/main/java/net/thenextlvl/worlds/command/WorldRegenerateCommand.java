@@ -48,7 +48,7 @@ class WorldRegenerateCommand {
         var message = switch (result) {
             case SUCCESS -> "world.regenerate.success";
             case SCHEDULED -> "world.regenerate.scheduled";
-            case REQUIRES_SCHEDULING -> plugin.isRunningFolia()
+            case REQUIRES_SCHEDULING -> WorldsPlugin.RUNNING_FOLIA
                     ? "world.regenerate.disallowed.folia"
                     : "world.regenerate.disallowed";
             case UNLOAD_FAILED -> "world.unload.failed";
