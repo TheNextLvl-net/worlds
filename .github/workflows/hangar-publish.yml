@@ -5,6 +5,7 @@ on:
 jobs:
   build:
     env:
+      CHANGELOG: ${{ github.event.release.body }}
       HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
     runs-on: ubuntu-latest
     steps:
