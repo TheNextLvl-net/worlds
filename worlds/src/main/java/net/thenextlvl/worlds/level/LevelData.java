@@ -56,7 +56,7 @@ public abstract class LevelData implements Level {
         this.plugin = plugin;
         this.directory = builder.directory;
         this.name = builder.name != null ? builder.name : directory.getFileName().toString();
-        this.key = builder.key != null ? builder.key : createKey(name);
+        this.key = builder.key != null ? builder.key : Key.key("worlds", createKey(name));
         this.levelStem = builder.levelStem != null ? builder.levelStem : getLevelStem(plugin, directory);
         this.generatorType = builder.generatorType != null ? builder.generatorType : GeneratorType.NORMAL;
         this.biomeProvider = builder.biomeProvider != null ? builder.biomeProvider
@@ -420,7 +420,7 @@ public abstract class LevelData implements Level {
         var pdc = data.flatMap(tag -> tag.optional("BukkitValues").map(Tag::getAsCompound));
         var worldKnown = pdc.map(LevelData::isKnown).orElse(false);
         var key = pdc.flatMap(tag -> tag.optional("worlds:world_key")
-                .map(Tag::getAsString).map(Key::key)).orElseGet(() -> createKey(name));
+                .map(Tag::getAsString).map(Key::key)).orElseGet(() -> Key.key("worlds", createKey(name)));
         var enabled = pdc.flatMap(tag -> tag.optional("worlds:enabled").map(Tag::getAsBoolean)
                 .map(TriState::byBoolean)).orElse(TriState.NOT_SET);
         var chunkGenerator = pdc.flatMap(tag -> tag.optional("worlds:generator").map(Tag::getAsString)).map(serialized ->
@@ -542,10 +542,9 @@ public abstract class LevelData implements Level {
         return tag.containsKey("worlds:world_key") || tag.containsKey("worlds:enabled") || tag.containsKey("worlds:generator");
     }
 
-    private static Key createKey(String name) {
-        @Subst("pattern") var namespace = name.toLowerCase()
-                .replace("(", "").replace(")", "")
+    public static @Subst("pattern") String createKey(String name) {
+        return name.toLowerCase()
+                .replaceAll("[^a-z0-9_\\-./ ]+", "")
                 .replace(" ", "_");
-        return Key.key("worlds", namespace);
     }
 }
