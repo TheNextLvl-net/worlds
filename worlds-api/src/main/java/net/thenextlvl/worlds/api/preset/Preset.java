@@ -223,10 +223,10 @@ public class Preset {
 
     /**
      * Serialize this preset into a JSON object.
-     * <p>
      * <a href="https://minecraft.wiki/w/Superflat#Multiplayer">Wiki</a>
      *
      * @return the serialized preset as a JsonObject
+     * @see #deserialize(JsonObject)
      */
     public JsonObject serialize() {
         var root = new JsonObject();
@@ -250,13 +250,13 @@ public class Preset {
     }
 
     /**
-     * Deserialize a JSON object into a preset
-     * <p>
+     * Deserialize a JSON object into a preset.
      * <a href="https://minecraft.wiki/w/Superflat#Multiplayer">Wiki</a>
      *
      * @param object the object to deserialize
      * @return the deserialized preset
      * @throws IllegalArgumentException if no layers are provided
+     * @see #serialize()
      */
     @SuppressWarnings("PatternValidation")
     public static Preset deserialize(JsonObject object) throws IllegalArgumentException {
