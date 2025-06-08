@@ -46,7 +46,7 @@ public class PerWorldsPlugin extends JavaPlugin {
                 .noneMatch(Objects::nonNull)) return;
         getComponentLogger().warn("It appears you are using a third party world management plugin");
         getComponentLogger().warn("Please consider switching to 'Worlds' for first hand support");
-        getComponentLogger().warn("Download at: https://hangar.papermc.io/TheNextLvl/Worlds");
+        getComponentLogger().warn("Download at: https://modrinth.com/project/gBIw3Gvy");
         getComponentLogger().warn("Since Worlds already ships with PerWorlds, you have to uninstall this plugin when switching");
     }
 
