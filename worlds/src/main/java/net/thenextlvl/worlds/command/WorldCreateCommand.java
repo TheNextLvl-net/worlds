@@ -25,8 +25,6 @@ import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.nio.file.Path;
-
 import static net.thenextlvl.worlds.command.WorldCommand.generatorArgument;
 import static net.thenextlvl.worlds.command.WorldCommand.keyArgument;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
@@ -115,9 +113,9 @@ class WorldCreateCommand {
             return new NamespacedKey(split[0], split[1]);
         }).orElseGet(() -> context.getArgument("key", NamespacedKey.class));
 
-        var name = key.getKey();
-
-        var level = plugin.levelBuilder(Path.of(name))
+        var name = plugin.levelView().findFreeName(key.getKey());
+        var level = plugin.levelBuilder(plugin.levelView().findFreePath(name))
+                .name(name)
                 .levelStem(levelStem)
                 .generator(generator)
                 .key(key)
@@ -127,24 +125,29 @@ class WorldCreateCommand {
                 .generatorType(type)
                 .build();
 
-        var world = plugin.getServer().getWorld(level.key()) == null
-                    && plugin.getServer().getWorld(level.getName()) == null
-                ? level.create().orElse(null) : null;
+        try {
+            var world = level.create().orElse(null);
 
-        var message = world != null ? "world.create.success" : "world.create.failed";
-        plugin.bundle().sendMessage(context.getSource().getSender(), message,
-                Placeholder.parsed("world", world != null ? world.getName() : key.asString()));
+            var message = world != null ? "world.create.success" : "world.create.failed";
+            plugin.bundle().sendMessage(context.getSource().getSender(), message,
+                    Placeholder.parsed("world", name));
 
-        if (world != null && context.getSource().getSender() instanceof Entity entity)
-            entity.teleportAsync(world.getSpawnLocation(), COMMAND);
+            if (world != null && context.getSource().getSender() instanceof Entity entity)
+                entity.teleportAsync(world.getSpawnLocation(), COMMAND);
 
-        if (world != null) {
-            plugin.levelView().persistWorld(world, true);
-            if (generator != null) plugin.levelView().persistGenerator(world, generator);
-            plugin.levelView().saveLevelData(world, true);
+            if (world != null) {
+                plugin.levelView().persistWorld(world, true);
+                if (generator != null) plugin.levelView().persistGenerator(world, generator);
+                plugin.levelView().saveLevelData(world, true);
+            }
+
+            return world != null ? Command.SINGLE_SUCCESS : 0;
+        } catch (Exception e) {
+            plugin.getComponentLogger().warn("Failed to create world {} ({})", key, name, e);
+            plugin.bundle().sendMessage(context.getSource().getSender(), "world.create.failed",
+                    Placeholder.parsed("world", name));
+            return 0;
         }
-
-        return world != null ? Command.SINGLE_SUCCESS : 0;
     }
 
     private static int createGenerator(CommandContext<CommandSourceStack> context, LevelStem levelStem, boolean structures, @Nullable Long seed, WorldsPlugin plugin) {
