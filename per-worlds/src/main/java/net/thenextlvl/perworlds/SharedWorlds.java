@@ -10,8 +10,6 @@ import net.thenextlvl.perworlds.listener.MessageListener;
 import net.thenextlvl.perworlds.listener.RespawnListener;
 import net.thenextlvl.perworlds.listener.TeleportListener;
 import net.thenextlvl.perworlds.listener.WorldListener;
-import org.bstats.bukkit.Metrics;
-import org.bstats.charts.SimplePie;
 import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
@@ -21,21 +19,18 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Set;
 
 @NullMarked
 public class SharedWorlds {
     public static final String ISSUES = "https://github.com/TheNextLvl-net/worlds/issues/new?template=bug_report.yml";
     private final ComponentLogger logger = ComponentLogger.logger("PerWorlds");
     private final PaperGroupProvider provider;
-    private final Metrics metrics;
     private final Plugin plugin;
     private final ComponentBundle bundle;
     private final Path dataPath = Path.of("plugins", "PerWorlds");
 
     public SharedWorlds(Plugin plugin) {
         this.plugin = plugin;
-        this.metrics = new Metrics(plugin, 25295);
         var key = Key.key("perworlds", "translations");
         var translations = dataPath.resolve("translations");
         this.bundle = ComponentBundle.builder(key, translations)
@@ -67,7 +62,6 @@ public class SharedWorlds {
 
     public void onEnable() {
         registerListeners();
-        addCustomCharts();
     }
 
     public void onDisable() {
@@ -77,7 +71,6 @@ public class SharedWorlds {
             group.persistPlayerData();
             group.persist();
         });
-        metrics.shutdown();
     }
 
     public ComponentLogger getLogger() {
@@ -115,27 +108,5 @@ public class SharedWorlds {
 
     private void registerServices() {
         plugin.getServer().getServicesManager().register(GroupProvider.class, provider, plugin, ServicePriority.Highest);
-    }
-
-    final Set<String> knownWorldManagers = Set.of( // list ordered by likelihood of a plugin being used
-            "Worlds",
-            "Multiverse-Core", // https://github.com/Multiverse/Multiverse-Core/
-            "MultiWorld", // https://dev.bukkit.org/projects/multiworld-v-2-0 // https://modrinth.com/plugin/multiworld-bukkit
-            "PhantomWorlds", // https://github.com/TheNewEconomy/PhantomWorlds
-            "Hyperverse", // https://github.com/Incendo/Hyperverse
-            "LightWorlds", // https://github.com/justin0-0/LightWorlds
-            "SolarSystem", // https://github.com/OneLiteFeatherNET/SolarSystemPlugin
-            "MoreFoWorld", // https://github.com/Folia-Inquisitors/MoreFoWorld
-            "WorldManager", // https://www.spigotmc.org/resources/worldmanager-1-8-1-18-free-download-api.101875/
-            "WorldMaster", // https://www.spigotmc.org/resources/worldmaster.101171/
-            "TheGalaxyLimits", // https://hangar.papermc.io/TheGlitchedVirus/thegalaxylimits
-            "BulMultiverse", // https://github.com/BulPlugins/BulMultiverse
-            "worldmgr" // https://dev.bukkit.org/projects/worldmgr
-    );
-
-    private void addCustomCharts() {
-        metrics.addCustomChart(new SimplePie("world_management_plugin", () -> knownWorldManagers.stream()
-                .filter(name -> plugin.getServer().getPluginManager().getPlugin(name) != null)
-                .findAny().orElse("None")));
     }
 }
