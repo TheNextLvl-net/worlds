@@ -216,6 +216,8 @@ public class PaperLevelView implements LevelView {
     }
 
     public static String findFreeName(Set<String> usedNames, String name) {
+        if (!usedNames.contains(name)) return name;
+
         var baseName = name;
         int suffix = 1;
         String candidate = baseName + " (1)";
