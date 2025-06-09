@@ -17,7 +17,6 @@ import net.thenextlvl.worlds.listener.PortalListener;
 import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.model.MessageMigrator;
 import net.thenextlvl.worlds.version.PluginVersionChecker;
-import net.thenextlvl.worlds.view.FoliaLevelView;
 import net.thenextlvl.worlds.view.PaperLevelView;
 import net.thenextlvl.worlds.view.PluginGeneratorView;
 import org.bstats.bukkit.Metrics;
@@ -40,7 +39,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     public static final boolean RUNNING_FOLIA = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
 
     private final GeneratorView generatorView = new PluginGeneratorView();
-    private final PaperLevelView levelView = RUNNING_FOLIA ? new FoliaLevelView(this) : new PaperLevelView(this);
+    private final PaperLevelView levelView = new PaperLevelView(this);
 
     private final WorldLinkProvider linkProvider = new WorldLinkProvider(this);
 
