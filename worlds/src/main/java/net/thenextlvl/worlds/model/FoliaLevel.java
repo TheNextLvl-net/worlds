@@ -235,6 +235,7 @@ public class FoliaLevel extends PaperLevel {
         // Paper - Put world into worldlist before initing the world; move up
 
         console.prepareLevels(internal.getChunkSource().chunkMap.progressListener, internal);
+        io.papermc.paper.threadedregions.RegionizedServer.getInstance().addWorld(internal);
         // Paper - rewrite chunk system
 
         server.paperPluginManager.callEvent(new WorldLoadEvent(internal.getWorld()));
