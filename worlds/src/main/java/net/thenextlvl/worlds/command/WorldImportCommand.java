@@ -82,7 +82,7 @@ class WorldImportCommand {
 
         // todo: extract duplicate, make it look less sketchy
         if (world != null && context.getSource().getSender() instanceof Entity entity) {
-            if (plugin.isRunningFolia()) {
+            if (WorldsPlugin.RUNNING_FOLIA) {
                 plugin.getServer().getRegionScheduler().run(plugin, world, 0, 0, scheduledTask -> {
                     entity.teleportAsync(world.getSpawnLocation(), COMMAND);
                 });
