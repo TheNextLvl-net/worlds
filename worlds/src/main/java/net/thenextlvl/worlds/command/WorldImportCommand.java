@@ -80,8 +80,14 @@ class WorldImportCommand {
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
                 Placeholder.parsed("world", world != null ? world.getName() : name));
 
-        if (world != null && context.getSource().getSender() instanceof Entity entity)
-            entity.teleportAsync(world.getSpawnLocation(), COMMAND);
+        // todo: extract duplicate, make it look less sketchy
+        if (world != null && context.getSource().getSender() instanceof Entity entity) {
+            if (WorldsPlugin.RUNNING_FOLIA) {
+                plugin.getServer().getRegionScheduler().run(plugin, world, 0, 0, scheduledTask -> {
+                    entity.teleportAsync(world.getSpawnLocation(), COMMAND);
+                });
+            } else entity.teleportAsync(world.getSpawnLocation(), COMMAND);
+        }
 
         if (world != null) {
             plugin.levelView().persistWorld(world, true);
