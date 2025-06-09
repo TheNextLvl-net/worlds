@@ -34,7 +34,7 @@ dependencies {
     implementation(project(":worlds-api"))
     implementation(project(":per-worlds"))
     implementation("net.thenextlvl.core:i18n:3.2.0")
-    implementation("net.thenextlvl.core:paper:2.2.0")
+    implementation("net.thenextlvl.core:paper:2.2.1")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation(platform("org.junit:junit-bom:5.13.1"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
