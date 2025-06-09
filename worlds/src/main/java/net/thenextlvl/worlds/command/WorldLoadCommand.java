@@ -42,8 +42,14 @@ class WorldLoadCommand {
             plugin.bundle().sendMessage(context.getSource().getSender(), message,
                     Placeholder.parsed("world", world != null ? world.getName() : name));
 
-            if (world != null && context.getSource().getSender() instanceof Entity entity)
-                entity.teleportAsync(world.getSpawnLocation(), COMMAND);
+            // todo: extract duplicate, make it look less sketchy
+            if (world != null && context.getSource().getSender() instanceof Entity entity) {
+                if (WorldsPlugin.RUNNING_FOLIA) {
+                    plugin.getServer().getRegionScheduler().run(plugin, world, 0, 0, scheduledTask -> {
+                        entity.teleportAsync(world.getSpawnLocation(), COMMAND);
+                    });
+                } else entity.teleportAsync(world.getSpawnLocation(), COMMAND);
+            }
 
             if (world != null) {
                 plugin.levelView().persistStatus(world, true, true);
@@ -53,7 +59,7 @@ class WorldLoadCommand {
             return world != null ? Command.SINGLE_SUCCESS : 0;
         } catch (Exception e) {
             plugin.getComponentLogger().warn("Failed to load world {}", name, e);
-            plugin.bundle().sendMessage(context.getSource().getSender(), "world.load.failed", 
+            plugin.bundle().sendMessage(context.getSource().getSender(), "world.load.failed",
                     Placeholder.parsed("world", name));
             return 0;
         }

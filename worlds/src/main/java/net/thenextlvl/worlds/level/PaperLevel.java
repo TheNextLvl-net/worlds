@@ -22,6 +22,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.ai.village.VillageSiege;
 import net.minecraft.world.entity.npc.CatSpawner;
 import net.minecraft.world.entity.npc.WanderingTraderSpawner;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
@@ -221,11 +222,23 @@ class PaperLevel extends LevelData {
         if (server.getWorld(name) == null) return Optional.empty();
 
         console.addLevel(serverLevel);
-        console.initWorld(serverLevel, primaryLevelData, primaryLevelData, primaryLevelData.worldGenOptions());
+
+        if (WorldsPlugin.RUNNING_FOLIA) {
+            serverLevel.randomSpawnSelection = new ChunkPos(serverLevel.getChunkSource().randomState().sampler().findSpawnPosition());
+
+            var x = serverLevel.randomSpawnSelection.x;
+            var z = serverLevel.randomSpawnSelection.z;
+
+            plugin.getServer().getRegionScheduler().run(plugin, serverLevel.getWorld(), x, z, scheduledTask ->
+                    console.initWorld(serverLevel, primaryLevelData, primaryLevelData, primaryLevelData.worldGenOptions()));
+        } else {
+            console.initWorld(serverLevel, primaryLevelData, primaryLevelData, primaryLevelData.worldGenOptions());
+        }
 
         serverLevel.setSpawnSettings(true);
 
-        MinecraftServer.getServer().prepareLevels(serverLevel.getChunkSource().chunkMap.progressListener, serverLevel);
+        console.prepareLevels(serverLevel.getChunkSource().chunkMap.progressListener, serverLevel);
+        io.papermc.paper.threadedregions.RegionizedServer.getInstance().addWorld(serverLevel);
         FeatureHooks.tickEntityManager(serverLevel);
 
         new WorldLoadEvent(serverLevel.getWorld()).callEvent();
