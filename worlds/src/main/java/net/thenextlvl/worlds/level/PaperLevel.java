@@ -228,7 +228,7 @@ class PaperLevel extends LevelData {
 
             var x = serverLevel.randomSpawnSelection.x;
             var z = serverLevel.randomSpawnSelection.z;
-            
+
             plugin.getServer().getRegionScheduler().run(plugin, serverLevel.getWorld(), x, z, scheduledTask ->
                     console.initWorld(serverLevel, primaryLevelData, primaryLevelData, primaryLevelData.worldGenOptions()));
         } else {
@@ -237,7 +237,8 @@ class PaperLevel extends LevelData {
 
         serverLevel.setSpawnSettings(true);
 
-        MinecraftServer.getServer().prepareLevels(serverLevel.getChunkSource().chunkMap.progressListener, serverLevel);
+        console.prepareLevels(serverLevel.getChunkSource().chunkMap.progressListener, serverLevel);
+        io.papermc.paper.threadedregions.RegionizedServer.getInstance().addWorld(serverLevel);
         FeatureHooks.tickEntityManager(serverLevel);
 
         new WorldLoadEvent(serverLevel.getWorld()).callEvent();
