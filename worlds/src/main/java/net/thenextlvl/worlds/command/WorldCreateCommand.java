@@ -143,8 +143,14 @@ class WorldCreateCommand {
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
                 Placeholder.parsed("world", world != null ? world.getName() : key.asString()));
 
-        if (world != null && context.getSource().getSender() instanceof Entity entity)
-            entity.teleportAsync(world.getSpawnLocation(), COMMAND);
+        // todo: extract duplicate, make it look less sketchy
+        if (world != null && context.getSource().getSender() instanceof Entity entity) {
+            if (plugin.isRunningFolia()) {
+                plugin.getServer().getRegionScheduler().run(plugin, world, 0, 0, scheduledTask -> {
+                    entity.teleportAsync(world.getSpawnLocation(), COMMAND);
+                });
+            } else entity.teleportAsync(world.getSpawnLocation(), COMMAND);
+        }
 
         if (world != null) {
             plugin.persistWorld(world, true);
