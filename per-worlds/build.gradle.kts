@@ -35,7 +35,7 @@ dependencies {
 
     api("net.thenextlvl.core:adapters:2.0.2")
     api("net.thenextlvl.core:i18n:3.2.0")
-    api("net.thenextlvl.core:paper:2.2.0")
+    api("net.thenextlvl.core:paper:2.2.1")
 
     api(project(":per-worlds-api"))
 
