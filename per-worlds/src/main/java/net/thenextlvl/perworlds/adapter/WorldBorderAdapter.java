@@ -16,8 +16,12 @@ public class WorldBorderAdapter implements TagAdapter<WorldBorderData> {
     public WorldBorderData deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
         var data = new PaperWorldBorderData();
         var root = tag.getAsCompound();
-        root.optional("x").map(Tag::getAsDouble).ifPresent(data::centerX);
-        root.optional("z").map(Tag::getAsDouble).ifPresent(data::centerZ);
+        root.optional("x").map(Tag::getAsDouble)
+                .map(value -> Math.clamp(value, -data.getMaxCenterCoordinate(), data.getMaxCenterCoordinate()))
+                .ifPresent(data::centerX);
+        root.optional("z").map(Tag::getAsDouble)
+                .map(value -> Math.clamp(value, -data.getMaxCenterCoordinate(), data.getMaxCenterCoordinate()))
+                .ifPresent(data::centerZ);
         root.optional("size").map(Tag::getAsDouble)
                 .map(value -> Math.clamp(value, data.getMinSize(), data.getMaxSize()))
                 .ifPresent(data::size);
