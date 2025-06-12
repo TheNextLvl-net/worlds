@@ -398,7 +398,7 @@ public class PaperWorldGroup implements WorldGroup {
             return Optional.of(inputStream.readTag()).map(tag -> provider.nbt().fromTag(tag, type));
         } catch (Exception e) {
             if (!backup.exists()) throw e;
-            provider.getLogger().warn("Failed to load player data from {}", file.getPath(), e);
+            provider.getLogger().warn("Failed to load data from {}", file.getPath(), e);
             provider.getLogger().warn("Falling back to {}", backup.getPath());
             try (var inputStream = stream(IO.of(backup))) {
                 return Optional.of(inputStream.readTag()).map(tag -> provider.nbt().fromTag(tag, type));
