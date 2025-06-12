@@ -46,7 +46,6 @@ public interface WorldBorderData {
      *
      * @param x The new X-coordinate of the border center.
      * @param z The new Z-coordinate of the border center.
-     *
      * @throws IllegalArgumentException if the absolute value of {@code x} or {@code z}
      *                                  is higher than {@link #getMaxCenterCoordinate()}
      */
@@ -56,7 +55,6 @@ public interface WorldBorderData {
      * Sets the new border center.
      *
      * @param position The new position of the border center.
-     *
      * @throws IllegalArgumentException if the absolute value of {@link Position#x()} or {@link Position#z()}
      *                                  is higher than {@link #getMaxCenterCoordinate()}
      */
