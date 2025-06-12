@@ -1,5 +1,6 @@
 package net.thenextlvl.perworlds.model;
 
+import com.google.common.base.Preconditions;
 import io.papermc.paper.math.Position;
 import net.thenextlvl.perworlds.data.WorldBorderData;
 import org.jspecify.annotations.NullMarked;
@@ -32,6 +33,7 @@ public class PaperWorldBorderData implements WorldBorderData {
 
     @Override
     public void duration(long duration) {
+        Preconditions.checkArgument(duration >= 0, "time cannot be lower than 0 but got %s", duration);
         this.duration = duration;
     }
 
@@ -45,6 +47,8 @@ public class PaperWorldBorderData implements WorldBorderData {
 
     @Override
     public void center(double x, double z) {
+        Preconditions.checkArgument(Math.abs(x) <= getMaxCenterCoordinate(), "x coordinate cannot be outside +- %s but got %s", getMaxCenterCoordinate(), x);
+        Preconditions.checkArgument(Math.abs(z) <= getMaxCenterCoordinate(), "z coordinate cannot be outside +- %s but got %s", getMaxCenterCoordinate(), z);
         this.x = x;
         this.z = z;
     }
@@ -81,6 +85,7 @@ public class PaperWorldBorderData implements WorldBorderData {
 
     @Override
     public void size(double size) {
+        Preconditions.checkArgument(size >= getMinSize() && size <= getMaxSize(), "size must be between %s and %s but got %s", getMinSize(), getMaxSize(), size);
         this.size = size;
     }
 
@@ -102,5 +107,28 @@ public class PaperWorldBorderData implements WorldBorderData {
     @Override
     public void warningTime(int seconds) {
         this.warningTime = seconds;
+    }
+
+    /**
+     * @see net.minecraft.world.level.border.WorldBorder#MAX_SIZE
+     */
+    @Override
+    @SuppressWarnings("JavadocReference")
+    public double getMaxSize() {
+        return 5.999997E7F;
+    }
+
+    @Override
+    public double getMinSize() {
+        return 1;
+    }
+
+    /**
+     * @see net.minecraft.world.level.border.WorldBorder#MAX_CENTER_COORDINATE
+     */
+    @Override
+    @SuppressWarnings("JavadocReference")
+    public double getMaxCenterCoordinate() {
+        return 2.9999984E7;
     }
 }
