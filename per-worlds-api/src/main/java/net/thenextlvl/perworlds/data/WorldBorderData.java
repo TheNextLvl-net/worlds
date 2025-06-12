@@ -36,6 +36,7 @@ public interface WorldBorderData {
      * Sets the transition duration in milliseconds.
      *
      * @param duration the duration to be set, in milliseconds
+     * @throws IllegalArgumentException if the duration is less than 0
      * @see WorldBorder#setSize(double, TimeUnit, long)
      */
     void duration(long duration);
@@ -47,7 +48,7 @@ public interface WorldBorderData {
      * @param z The new Z-coordinate of the border center.
      *
      * @throws IllegalArgumentException if the absolute value of {@code x} or {@code z}
-     * is higher than {@link WorldBorder#getMaxCenterCoordinate()}
+     *                                  is higher than {@link #getMaxCenterCoordinate()}
      */
     void center(double x, double z);
 
@@ -57,7 +58,7 @@ public interface WorldBorderData {
      * @param position The new position of the border center.
      *
      * @throws IllegalArgumentException if the absolute value of {@link Position#x()} or {@link Position#z()}
-     * is higher than {@link WorldBorder#getMaxCenterCoordinate()}
+     *                                  is higher than {@link #getMaxCenterCoordinate()}
      */
     void center(Position position);
 
@@ -105,8 +106,7 @@ public interface WorldBorderData {
      * Sets the border to a square region with the specified side length in blocks.
      *
      * @param size The new size of the border.
-     *
-     * @throws IllegalArgumentException if {@code size} is less than 1.0D or greater than {@link WorldBorder#getMaxSize()}
+     * @throws IllegalArgumentException if {@code size} is less than {@link #getMinSize()} or greater than {@link #getMaxSize()}
      * @see WorldBorder#setSize(double)
      */
     void size(double size);
@@ -142,4 +142,27 @@ public interface WorldBorderData {
      * @see WorldBorder#setWarningTime(int)
      */
     void warningTime(int seconds);
+
+    /**
+     * Retrieves the maximum allowed size of the border.
+     *
+     * @return the maximum size of the border
+     * @see WorldBorder#getMaxSize()
+     */
+    double getMaxSize();
+
+    /**
+     * Retrieves the minimum allowed size of the border.
+     *
+     * @return the minimum size of the border
+     */
+    double getMinSize();
+
+    /**
+     * Retrieves the maximum allowed absolute value for the center coordinates of the border.
+     *
+     * @return the maximum center coordinate value that can be set for the border
+     * @see WorldBorder#getMaxCenterCoordinate()
+     */
+    double getMaxCenterCoordinate();
 }
