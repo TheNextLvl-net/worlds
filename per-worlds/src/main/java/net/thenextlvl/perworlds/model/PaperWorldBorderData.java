@@ -33,7 +33,7 @@ public class PaperWorldBorderData implements WorldBorderData {
 
     @Override
     public void duration(long duration) {
-        Preconditions.checkArgument(duration >= 0, "time cannot be lower than 0");
+        Preconditions.checkArgument(duration >= 0, "time cannot be lower than 0 but got %s", duration);
         this.duration = duration;
     }
 
@@ -47,8 +47,8 @@ public class PaperWorldBorderData implements WorldBorderData {
 
     @Override
     public void center(double x, double z) {
-        Preconditions.checkArgument(Math.abs(x) <= getMaxCenterCoordinate(), "x coordinate cannot be outside +- %s", getMaxCenterCoordinate());
-        Preconditions.checkArgument(Math.abs(z) <= getMaxCenterCoordinate(), "z coordinate cannot be outside +- %s", getMaxCenterCoordinate());
+        Preconditions.checkArgument(Math.abs(x) <= getMaxCenterCoordinate(), "x coordinate cannot be outside +- %s but got %s", getMaxCenterCoordinate(), x);
+        Preconditions.checkArgument(Math.abs(z) <= getMaxCenterCoordinate(), "z coordinate cannot be outside +- %s but got %s", getMaxCenterCoordinate(), z);
         this.x = x;
         this.z = z;
     }
@@ -85,7 +85,7 @@ public class PaperWorldBorderData implements WorldBorderData {
 
     @Override
     public void size(double size) {
-        Preconditions.checkArgument(size >= getMinSize() && size <= getMaxSize(), "size must be between %s and %s", getMinSize(), getMaxSize());
+        Preconditions.checkArgument(size >= getMinSize() && size <= getMaxSize(), "size must be between %s and %s but got %s", getMinSize(), getMaxSize(), size);
         this.size = size;
     }
 
