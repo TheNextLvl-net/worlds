@@ -327,7 +327,8 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     private boolean isEnabled(GroupData.Type type) {
-        return switch (type) {
+        // fix enabled option not being respected
+        return getSettings().enabled() && switch (type) {
             case DEFAULT_GAME_MODE -> getSettings().gameMode();
             case DIFFICULTY, HARDCORE -> getSettings().difficulty();
             case GAME_RULE -> getSettings().gameRules();
