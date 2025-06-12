@@ -238,7 +238,9 @@ class PaperLevel extends LevelData {
         serverLevel.setSpawnSettings(true);
 
         console.prepareLevels(serverLevel.getChunkSource().chunkMap.progressListener, serverLevel);
-        io.papermc.paper.threadedregions.RegionizedServer.getInstance().addWorld(serverLevel);
+        // fix noclassdeffound error if not running folia
+        if (WorldsPlugin.RUNNING_FOLIA)
+            io.papermc.paper.threadedregions.RegionizedServer.getInstance().addWorld(serverLevel);
         FeatureHooks.tickEntityManager(serverLevel);
 
         new WorldLoadEvent(serverLevel.getWorld()).callEvent();
