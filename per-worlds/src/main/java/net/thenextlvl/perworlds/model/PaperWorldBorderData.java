@@ -1,11 +1,23 @@
 package net.thenextlvl.perworlds.model;
 
+import com.google.common.base.Preconditions;
 import io.papermc.paper.math.Position;
 import net.thenextlvl.perworlds.data.WorldBorderData;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class PaperWorldBorderData implements WorldBorderData {
+    /**
+     * @see net.minecraft.world.level.border.WorldBorder#MAX_SIZE
+     */
+    @SuppressWarnings("JavadocReference")
+    private static final double MAX_SIZE = 5.999997E7F;
+    /**
+     * @see net.minecraft.world.level.border.WorldBorder#MAX_CENTER_COORDINATE
+     */
+    @SuppressWarnings("JavadocReference")
+    private static final double MAX_CENTER_COORDINATE = 2.9999984E7;
+
     private double x = 0D;
     private double z = 0D;
     private double size = 5.9999968E7;
@@ -32,6 +44,7 @@ public class PaperWorldBorderData implements WorldBorderData {
 
     @Override
     public void duration(long duration) {
+        Preconditions.checkArgument(duration >= 0, "time cannot be lower than 0");
         this.duration = duration;
     }
 
@@ -45,6 +58,8 @@ public class PaperWorldBorderData implements WorldBorderData {
 
     @Override
     public void center(double x, double z) {
+        Preconditions.checkArgument(Math.abs(x) <= MAX_CENTER_COORDINATE, "x coordinate cannot be outside +- %s", MAX_CENTER_COORDINATE);
+        Preconditions.checkArgument(Math.abs(z) <= MAX_CENTER_COORDINATE, "z coordinate cannot be outside +- %s", MAX_CENTER_COORDINATE);
         this.x = x;
         this.z = z;
     }
@@ -81,6 +96,7 @@ public class PaperWorldBorderData implements WorldBorderData {
 
     @Override
     public void size(double size) {
+        Preconditions.checkArgument(size >= 1.0D && size <= MAX_SIZE, "size must be between 1.0D and %s", MAX_SIZE);
         this.size = size;
     }
 
