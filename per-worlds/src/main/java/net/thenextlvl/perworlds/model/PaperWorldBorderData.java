@@ -7,17 +7,6 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class PaperWorldBorderData implements WorldBorderData {
-    /**
-     * @see net.minecraft.world.level.border.WorldBorder#MAX_SIZE
-     */
-    @SuppressWarnings("JavadocReference")
-    private static final double MAX_SIZE = 5.999997E7F;
-    /**
-     * @see net.minecraft.world.level.border.WorldBorder#MAX_CENTER_COORDINATE
-     */
-    @SuppressWarnings("JavadocReference")
-    private static final double MAX_CENTER_COORDINATE = 2.9999984E7;
-
     private double x = 0D;
     private double z = 0D;
     private double size = 5.9999968E7;
@@ -58,8 +47,8 @@ public class PaperWorldBorderData implements WorldBorderData {
 
     @Override
     public void center(double x, double z) {
-        Preconditions.checkArgument(Math.abs(x) <= MAX_CENTER_COORDINATE, "x coordinate cannot be outside +- %s", MAX_CENTER_COORDINATE);
-        Preconditions.checkArgument(Math.abs(z) <= MAX_CENTER_COORDINATE, "z coordinate cannot be outside +- %s", MAX_CENTER_COORDINATE);
+        Preconditions.checkArgument(Math.abs(x) <= getMaxCenterCoordinate(), "x coordinate cannot be outside +- %s", getMaxCenterCoordinate());
+        Preconditions.checkArgument(Math.abs(z) <= getMaxCenterCoordinate(), "z coordinate cannot be outside +- %s", getMaxCenterCoordinate());
         this.x = x;
         this.z = z;
     }
@@ -96,7 +85,7 @@ public class PaperWorldBorderData implements WorldBorderData {
 
     @Override
     public void size(double size) {
-        Preconditions.checkArgument(size >= 1.0D && size <= MAX_SIZE, "size must be between 1.0D and %s", MAX_SIZE);
+        Preconditions.checkArgument(size >= getMinSize() && size <= getMaxSize(), "size must be between %s and %s", getMinSize(), getMaxSize());
         this.size = size;
     }
 
@@ -118,5 +107,28 @@ public class PaperWorldBorderData implements WorldBorderData {
     @Override
     public void warningTime(int seconds) {
         this.warningTime = seconds;
+    }
+
+    /**
+     * @see net.minecraft.world.level.border.WorldBorder#MAX_SIZE
+     */
+    @Override
+    @SuppressWarnings("JavadocReference")
+    public double getMaxSize() {
+        return 5.999997E7F;
+    }
+
+    @Override
+    public double getMinSize() {
+        return 1;
+    }
+
+    /**
+     * @see net.minecraft.world.level.border.WorldBorder#MAX_CENTER_COORDINATE
+     */
+    @Override
+    @SuppressWarnings("JavadocReference")
+    public double getMaxCenterCoordinate() {
+        return 2.9999984E7;
     }
 }
