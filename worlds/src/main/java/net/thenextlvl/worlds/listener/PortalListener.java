@@ -14,7 +14,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.END_PORTAL;
@@ -55,11 +58,15 @@ public class PortalListener implements Listener {
                 event.getEntity().teleportAsync(spawn, END_PORTAL);
             });
         } else if (event.getEntity() instanceof CraftPlayer player) {
-            player.getScheduler().run(plugin, scheduledTask -> {
+            Consumer<@Nullable Location> teleport = location -> player.getScheduler().run(plugin, scheduledTask -> {
                 if (!player.getHandle().seenCredits) player.getHandle().showEndCredits();
-                if (player.getRespawnLocation() != null) player.teleportAsync(player.getRespawnLocation(), END_PORTAL);
-                else player.teleportAsync(targetWorld.getSpawnLocation(), END_PORTAL);
+                player.teleportAsync(Objects.requireNonNullElseGet(location, targetWorld::getSpawnLocation), END_PORTAL);
             }, null);
+            var potentialLocation = player.getPotentialRespawnLocation();
+            if (WorldsPlugin.RUNNING_FOLIA && potentialLocation != null) {
+                plugin.getServer().getRegionScheduler().run(plugin, potentialLocation, task ->
+                        teleport.accept(player.getRespawnLocation(true)));
+            } else teleport.accept(player.getRespawnLocation(true));
         } else event.getEntity().getScheduler().run(plugin, task ->
                 event.getEntity().teleportAsync(targetWorld.getSpawnLocation(), END_PORTAL), null);
     }
