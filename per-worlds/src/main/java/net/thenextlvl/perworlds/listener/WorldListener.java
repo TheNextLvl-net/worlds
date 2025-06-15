@@ -50,7 +50,7 @@ public class WorldListener implements Listener {
         processWorldDataUpdate(event.getWorld(), Type.GAME_RULE, data -> {
             var gameRule = (GameRule<Object>) event.getGameRule();
             var value = parseValue(gameRule, event.getValue());
-            data.gameRule(gameRule, value);
+            data.setGameRule(gameRule, value);
         });
     }
 
@@ -79,15 +79,15 @@ public class WorldListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWorldBorderChange(WorldBorderBoundsChangeEvent event) {
         processWorldDataUpdate(event.getWorld(), Type.WORLD_BORDER, data -> {
-            data.worldBorder().size(event.getNewSize());
-            data.worldBorder().duration(event.getDuration());
+            data.getWorldBorder().size(event.getNewSize());
+            data.getWorldBorder().duration(event.getDuration());
         });
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWorldBorderChange(WorldBorderCenterChangeEvent event) {
         processWorldDataUpdate(event.getWorld(), Type.WORLD_BORDER, data ->
-                data.worldBorder().center(event.getNewCenter()));
+                data.getWorldBorder().center(event.getNewCenter()));
     }
 
     private void processWorldDataUpdate(World world, Type type, Consumer<GroupData> process) {

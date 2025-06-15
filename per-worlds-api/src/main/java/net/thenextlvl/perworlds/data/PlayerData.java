@@ -1,6 +1,7 @@
 package net.thenextlvl.perworlds.data;
 
 import net.kyori.adventure.util.TriState;
+import net.thenextlvl.perworlds.GroupData;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.statistics.Stats;
@@ -29,7 +30,13 @@ public interface PlayerData {
     @Unmodifiable
     List<PotionEffect> potionEffects();
 
-    GameMode defaultGameMode();
+    /**
+     * @deprecated not player-bound anymore, use {@link GroupData#getDefaultGameMode()}
+     */
+    @Deprecated(forRemoval = true, since = "3.1.0")
+    default GameMode defaultGameMode() {
+        return GameMode.SURVIVAL;
+    }
 
     @Nullable
     GameMode gameMode();
@@ -56,7 +63,13 @@ public interface PlayerData {
 
     PlayerData beeStingersInBody(int beeStingers);
 
-    PlayerData defaultGameMode(GameMode gameMode);
+    /**
+     * @deprecated not player-bound anymore, use {@link GroupData#setDefaultGameMode(GameMode)}
+     */
+    @Deprecated(forRemoval = true, since = "3.1.0")
+    default PlayerData defaultGameMode(GameMode gameMode) {
+        return this;
+    }
 
     PlayerData discoveredRecipes(Collection<NamespacedKey> recipes);
 

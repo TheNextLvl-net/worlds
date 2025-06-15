@@ -9,7 +9,7 @@ import org.jspecify.annotations.NullMarked;
 public class PaperWorldBorderData implements WorldBorderData {
     private double x = 0D;
     private double z = 0D;
-    private double size = 5.9999968E7;
+    private double size = getMaxSize();
     private double damageAmount = 0.2D;
     private double damageBuffer = 5.0D;
     private int warningDistance = 5;
@@ -32,30 +32,34 @@ public class PaperWorldBorderData implements WorldBorderData {
     }
 
     @Override
-    public void duration(long duration) {
+    public PaperWorldBorderData duration(long duration) {
         Preconditions.checkArgument(duration >= 0, "time cannot be lower than 0 but got %s", duration);
         this.duration = duration;
+        return this;
     }
 
-    public void centerX(double x) {
-        this.x = x;
-    }
-
-    public void centerZ(double z) {
-        this.z = z;
-    }
-
-    @Override
-    public void center(double x, double z) {
+    public PaperWorldBorderData centerX(double x) {
         Preconditions.checkArgument(Math.abs(x) <= getMaxCenterCoordinate(), "x coordinate cannot be outside +- %s but got %s", getMaxCenterCoordinate(), x);
-        Preconditions.checkArgument(Math.abs(z) <= getMaxCenterCoordinate(), "z coordinate cannot be outside +- %s but got %s", getMaxCenterCoordinate(), z);
         this.x = x;
+        return this;
+    }
+
+    public PaperWorldBorderData centerZ(double z) {
+        Preconditions.checkArgument(Math.abs(z) <= getMaxCenterCoordinate(), "z coordinate cannot be outside +- %s but got %s", getMaxCenterCoordinate(), z);
         this.z = z;
+        return this;
     }
 
     @Override
-    public void center(Position position) {
-        center(position.x(), position.z());
+    public PaperWorldBorderData center(double x, double z) {
+        centerX(x);
+        centerZ(z);
+        return this;
+    }
+
+    @Override
+    public PaperWorldBorderData center(Position position) {
+        return center(position.x(), position.z());
     }
 
     @Override
@@ -64,8 +68,9 @@ public class PaperWorldBorderData implements WorldBorderData {
     }
 
     @Override
-    public void damageAmount(double damage) {
+    public PaperWorldBorderData damageAmount(double damage) {
         this.damageAmount = damage;
+        return this;
     }
 
     @Override
@@ -74,8 +79,9 @@ public class PaperWorldBorderData implements WorldBorderData {
     }
 
     @Override
-    public void damageBuffer(double blocks) {
+    public PaperWorldBorderData damageBuffer(double blocks) {
         this.damageBuffer = blocks;
+        return this;
     }
 
     @Override
@@ -84,9 +90,10 @@ public class PaperWorldBorderData implements WorldBorderData {
     }
 
     @Override
-    public void size(double size) {
+    public PaperWorldBorderData size(double size) {
         Preconditions.checkArgument(size >= getMinSize() && size <= getMaxSize(), "size must be between %s and %s but got %s", getMinSize(), getMaxSize(), size);
         this.size = size;
+        return this;
     }
 
     @Override
@@ -95,8 +102,9 @@ public class PaperWorldBorderData implements WorldBorderData {
     }
 
     @Override
-    public void warningDistance(int blocks) {
+    public PaperWorldBorderData warningDistance(int blocks) {
         this.warningDistance = blocks;
+        return this;
     }
 
     @Override
@@ -105,8 +113,20 @@ public class PaperWorldBorderData implements WorldBorderData {
     }
 
     @Override
-    public void warningTime(int seconds) {
+    public PaperWorldBorderData warningTime(int seconds) {
         this.warningTime = seconds;
+        return this;
+    }
+
+    @Override
+    public WorldBorderData reset() {
+        return center(0, 0)
+                .size(getMaxSize())
+                .damageAmount(0.2D)
+                .damageBuffer(5.0D)
+                .warningDistance(5)
+                .warningTime(15)
+                .duration(0);
     }
 
     /**
