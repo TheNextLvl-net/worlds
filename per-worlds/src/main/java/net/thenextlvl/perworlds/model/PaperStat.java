@@ -5,7 +5,6 @@ import core.nbt.tag.CompoundTag;
 import core.nbt.tag.Tag;
 import net.kyori.adventure.key.Keyed;
 import net.thenextlvl.perworlds.statistics.Stat;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
@@ -23,7 +22,7 @@ public abstract class PaperStat<T extends Keyed> implements Stat<T> {
     }
 
     @Override
-    public int getValue(@NotNull T type) {
+    public int getValue(@NonNull T type) {
         return values.getOrDefault(type, 0);
     }
 
