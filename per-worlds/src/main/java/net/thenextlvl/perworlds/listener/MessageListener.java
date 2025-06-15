@@ -20,7 +20,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -81,7 +80,7 @@ public class MessageListener implements Listener {
     }
 
     private boolean canReceive(@Nullable GameRule<Boolean> gameRule, WorldGroup group) {
-        return gameRule == null || Optional.ofNullable(group.getGroupData().gameRule(gameRule))
+        return gameRule == null || group.getGroupData().getGameRule(gameRule)
                 .or(() -> group.getWorlds().findAny().map(world -> canReceive(gameRule, world)))
                 .orElse(true);
     }

@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 @NullMarked
 public class PaperUnownedWorldGroup extends PaperWorldGroup implements UnownedWorldGroup {
     public PaperUnownedWorldGroup(PaperGroupProvider provider) {
-        super(provider, "unowned", new PaperGroupData(provider.getServer()), new PaperGroupSettings(), Set.of());
+        super(provider, "unowned", new PaperGroupData(provider), new PaperGroupSettings(), Set.of());
     }
 
     @Override
