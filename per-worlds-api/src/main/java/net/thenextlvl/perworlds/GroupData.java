@@ -32,7 +32,7 @@ public interface GroupData {
      * @deprecated use {@link #getGameRule(GameRule)}
      */
     @Nullable
-    @Deprecated(forRemoval = true, since = "3.1.0")
+    @Deprecated(forRemoval = true, since = "0.2.2")
     default <T> T gameRule(@NonNull GameRule<T> rule) {
         return getGameRule(rule).orElse(null);
     }
@@ -57,7 +57,7 @@ public interface GroupData {
      * @see World#setGameRule(GameRule, Object)
      * @deprecated use {@link #setGameRule(GameRule, Object)}
      */
-    @Deprecated(forRemoval = true, since = "3.1.0")
+    @Deprecated(forRemoval = true, since = "0.2.2")
     default <T> boolean gameRule(@NonNull GameRule<T> rule, @Nullable T value) {
         return setGameRule(rule, value);
     }
@@ -80,7 +80,7 @@ public interface GroupData {
      * @deprecated use {@link #getDifficulty}
      */
     @NonNull
-    @Deprecated(forRemoval = true, since = "3.1.0")
+    @Deprecated(forRemoval = true, since = "0.2.2")
     default Difficulty difficulty() {
         return getDifficulty();
     }
@@ -103,7 +103,7 @@ public interface GroupData {
      * @see World#setDifficulty(Difficulty)
      * @deprecated use {@link #setDifficulty(Difficulty)}
      */
-    @Deprecated(forRemoval = true, since = "3.1.0")
+    @Deprecated(forRemoval = true, since = "0.2.2")
     default void difficulty(@NonNull Difficulty difficulty) {
         setDifficulty(difficulty);
     }
@@ -126,7 +126,7 @@ public interface GroupData {
      * @deprecated use {@link #getDefaultGameMode()}
      */
     @NonNull
-    @Deprecated(forRemoval = true, since = "3.1.0")
+    @Deprecated(forRemoval = true, since = "0.2.2")
     default GameMode defaultGameMode() {
         return getDefaultGameMode().orElse(getGroupProvider().getServer().getDefaultGameMode());
     }
@@ -145,7 +145,7 @@ public interface GroupData {
      * @param gameMode the {@link GameMode} to be set as the default for the group
      * @see #getDefaultGameMode()
      */
-    @Deprecated(forRemoval = true, since = "3.1.0")
+    @Deprecated(forRemoval = true, since = "0.2.2")
     default void defaultGameMode(@Nullable GameMode gameMode) {
         setDefaultGameMode(gameMode);
     }
@@ -167,7 +167,7 @@ public interface GroupData {
      * @deprecated use {@link #getWorldBorder()}
      */
     @NonNull
-    @Deprecated(forRemoval = true, since = "3.1.0")
+    @Deprecated(forRemoval = true, since = "0.2.2")
     default WorldBorderData worldBorder() {
         return getWorldBorder();
     }
@@ -191,7 +191,7 @@ public interface GroupData {
      * @see World#getWorldBorder()
      * @deprecated use {@link #getWorldBorder()}
      */
-    @Deprecated(forRemoval = true, since = "3.1.0")
+    @Deprecated(forRemoval = true, since = "0.2.2")
     default void worldBorder(@Nullable WorldBorderData worldBorder) {
         if (worldBorder != null) getWorldBorder()
                 .centerX(worldBorder.centerX())
@@ -214,7 +214,7 @@ public interface GroupData {
      * @deprecated use {@link #getSpawnLocation()}
      */
     @Nullable
-    @Deprecated(forRemoval = true, since = "3.1.0")
+    @Deprecated(forRemoval = true, since = "0.2.2")
     default Location spawnLocation() {
         return getSpawnLocation().orElse(null);
     }
@@ -239,7 +239,7 @@ public interface GroupData {
      * @see #getSpawnLocation()
      * @deprecated use {@link #setSpawnLocation(Location)}
      */
-    @Deprecated(forRemoval = true, since = "3.1.0")
+    @Deprecated(forRemoval = true, since = "0.2.2")
     default void spawnLocation(@Nullable Location location) {
         setSpawnLocation(location);
     }
@@ -262,7 +262,7 @@ public interface GroupData {
      * @see World#isHardcore()
      * @deprecated use {@link #getHardcore()}
      */
-    @Deprecated(forRemoval = true, since = "3.1.0")
+    @Deprecated(forRemoval = true, since = "0.2.2")
     default boolean hardcore() {
         return getHardcore().toBooleanOrElse(getGroupProvider().getServer().isHardcore());
     }
@@ -282,7 +282,7 @@ public interface GroupData {
      * @see World#setHardcore(boolean)
      * @deprecated use {@link #setHardcore(TriState)}
      */
-    @Deprecated(forRemoval = true, since = "3.1.0")
+    @Deprecated(forRemoval = true, since = "0.2.2")
     default void hardcore(boolean hardcore) {
         setHardcore(TriState.byBoolean(hardcore));
     }

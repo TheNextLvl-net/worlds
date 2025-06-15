@@ -33,7 +33,7 @@ public interface PlayerData {
     /**
      * @deprecated not player-bound anymore, use {@link GroupData#getDefaultGameMode()}
      */
-    @Deprecated(forRemoval = true, since = "3.1.0")
+    @Deprecated(forRemoval = true, since = "0.2.2")
     default GameMode defaultGameMode() {
         return GameMode.SURVIVAL;
     }
@@ -66,7 +66,7 @@ public interface PlayerData {
     /**
      * @deprecated not player-bound anymore, use {@link GroupData#setDefaultGameMode(GameMode)}
      */
-    @Deprecated(forRemoval = true, since = "3.1.0")
+    @Deprecated(forRemoval = true, since = "0.2.2")
     default PlayerData defaultGameMode(GameMode gameMode) {
         return this;
     }
