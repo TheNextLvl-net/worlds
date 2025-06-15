@@ -160,7 +160,6 @@ public class PaperLevelView implements LevelView {
      * @see net.minecraft.server.level.ServerLevel#saveLevelData(boolean)
      */
     @Override
-    @SuppressWarnings("JavadocReference")
     public void saveLevelData(World world, boolean async) {
         var level = ((CraftWorld) world).getHandle();
         if (level.getDragonFight() != null) {
