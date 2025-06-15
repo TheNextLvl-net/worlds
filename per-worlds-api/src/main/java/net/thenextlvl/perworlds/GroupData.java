@@ -1,14 +1,17 @@
 package net.thenextlvl.perworlds;
 
+import net.kyori.adventure.util.TriState;
 import net.thenextlvl.perworlds.data.WorldBorderData;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
+import org.bukkit.Server;
 import org.bukkit.World;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 public interface GroupData {
@@ -23,22 +26,64 @@ public interface GroupData {
      * Get the current value for a given {@link GameRule}.
      *
      * @param rule the GameRule to check
-     * @param <T> the GameRule's type
+     * @param <T>  the GameRule's type
      * @return the current value
      * @see World#getGameRuleValue(GameRule)
+     * @deprecated use {@link #getGameRule(GameRule)}
      */
     @Nullable
-    <T> T gameRule(@NonNull GameRule<T> rule);
+    @Deprecated(forRemoval = true, since = "3.1.0")
+    default <T> T gameRule(@NonNull GameRule<T> rule) {
+        return getGameRule(rule).orElse(null);
+    }
+
+    /**
+     * Get the current value for a given {@link GameRule}.
+     *
+     * @param rule the GameRule to check
+     * @param <T>  the GameRule's type
+     * @return an {@link Optional} containing the current gamerule value
+     * @see World#getGameRuleValue(GameRule)
+     */
+    @NonNull
+    <T> Optional<T> getGameRule(@NonNull GameRule<T> rule);
 
     /**
      * Set the given {@link GameRule}'s new value.
      *
      * @param rule the GameRule to update
-     * @param <T> the value type of the GameRule
+     * @param <T>  the value type of the GameRule
+     * @return true if the value was successfully set
+     * @see World#setGameRule(GameRule, Object)
+     * @deprecated use {@link #setGameRule(GameRule, Object)}
+     */
+    @Deprecated(forRemoval = true, since = "3.1.0")
+    default <T> boolean gameRule(@NonNull GameRule<T> rule, @Nullable T value) {
+        return setGameRule(rule, value);
+    }
+
+    /**
+     * Set the given {@link GameRule}'s new value.
+     *
+     * @param rule the GameRule to update
+     * @param <T>  the value type of the GameRule
      * @return true if the value was successfully set
      * @see World#setGameRule(GameRule, Object)
      */
-    <T> boolean gameRule(@NonNull GameRule<T> rule, @NonNull T value);
+    <T> boolean setGameRule(@NonNull GameRule<T> rule, @Nullable T value);
+
+    /**
+     * Retrieves the current difficulty level applied to the group.
+     *
+     * @return the current {@link Difficulty} of the group
+     * @see World#getDifficulty()
+     * @deprecated use {@link #getDifficulty}
+     */
+    @NonNull
+    @Deprecated(forRemoval = true, since = "3.1.0")
+    default Difficulty difficulty() {
+        return getDifficulty();
+    }
 
     /**
      * Retrieves the current difficulty level applied to the group.
@@ -47,7 +92,21 @@ public interface GroupData {
      * @see World#getDifficulty()
      */
     @NonNull
-    Difficulty difficulty();
+    Difficulty getDifficulty();
+
+    /**
+     * Sets the difficulty level for the group.
+     * The difficulty level dictates the gameplay challenges, such as
+     * mob behavior and damage levels, associated with the group.
+     *
+     * @param difficulty the new {@link Difficulty} to be set
+     * @see World#setDifficulty(Difficulty)
+     * @deprecated use {@link #setDifficulty(Difficulty)}
+     */
+    @Deprecated(forRemoval = true, since = "3.1.0")
+    default void difficulty(@NonNull Difficulty difficulty) {
+        setDifficulty(difficulty);
+    }
 
     /**
      * Sets the difficulty level for the group.
@@ -57,24 +116,61 @@ public interface GroupData {
      * @param difficulty the new {@link Difficulty} to be set
      * @see World#setDifficulty(Difficulty)
      */
-    void difficulty(@NonNull Difficulty difficulty);
+    void setDifficulty(@NonNull Difficulty difficulty);
 
     /**
      * Retrieves the default {@link GameMode} for the group.
      *
      * @return the default {@link GameMode} for the group, never null
-     * @see #defaultGameMode(GameMode)
+     * @see #setDefaultGameMode(GameMode)
+     * @deprecated use {@link #getDefaultGameMode()}
      */
     @NonNull
-    GameMode defaultGameMode();
+    @Deprecated(forRemoval = true, since = "3.1.0")
+    default GameMode defaultGameMode() {
+        return getDefaultGameMode().orElse(getGroupProvider().getServer().getDefaultGameMode());
+    }
+
+    /**
+     * Retrieves the default {@link GameMode} for the group.
+     *
+     * @return an {@link Optional} containing the default {@link GameMode} for the group
+     * @see #setDefaultGameMode(GameMode)
+     */
+    Optional<GameMode> getDefaultGameMode();
 
     /**
      * Sets the default {@link GameMode} for the group.
      *
      * @param gameMode the {@link GameMode} to be set as the default for the group
-     * @see #defaultGameMode()
+     * @see #getDefaultGameMode()
      */
-    void defaultGameMode(@NonNull GameMode gameMode);
+    @Deprecated(forRemoval = true, since = "3.1.0")
+    default void defaultGameMode(@Nullable GameMode gameMode) {
+        setDefaultGameMode(gameMode);
+    }
+
+    /**
+     * Sets the default {@link GameMode} for the group.
+     *
+     * @param gameMode the {@link GameMode} to be set as the default for the group,
+     *                 {@code null} to delegate to {@link Server#getDefaultGameMode()}
+     * @see #getDefaultGameMode()
+     */
+    void setDefaultGameMode(@Nullable GameMode gameMode);
+
+    /**
+     * Retrieves the {@link WorldBorderData} associated with the group.
+     *
+     * @return the {@link WorldBorderData} instance representing the world's border configuration
+     * @see World#getWorldBorder()
+     * @deprecated use {@link #getWorldBorder()}
+     */
+    @NonNull
+    @Deprecated(forRemoval = true, since = "3.1.0")
+    default WorldBorderData worldBorder() {
+        return getWorldBorder();
+    }
 
     /**
      * Retrieves the {@link WorldBorderData} associated with the group.
@@ -82,7 +178,8 @@ public interface GroupData {
      * @return the {@link WorldBorderData} instance representing the world's border configuration
      * @see World#getWorldBorder()
      */
-    WorldBorderData worldBorder();
+    @NonNull
+    WorldBorderData getWorldBorder();
 
     /**
      * Sets the {@link WorldBorderData} configuration for the group.
@@ -92,18 +189,45 @@ public interface GroupData {
      * @param worldBorder the {@link WorldBorderData} instance to set, or {@code null}
      *                    to remove any existing world border configuration
      * @see World#getWorldBorder()
+     * @deprecated use {@link #getWorldBorder()}
      */
-    void worldBorder(WorldBorderData worldBorder);
+    @Deprecated(forRemoval = true, since = "3.1.0")
+    default void worldBorder(@Nullable WorldBorderData worldBorder) {
+        if (worldBorder != null) getWorldBorder()
+                .centerX(worldBorder.centerX())
+                .centerZ(worldBorder.centerZ())
+                .size(worldBorder.size())
+                .damageAmount(worldBorder.damageAmount())
+                .damageBuffer(worldBorder.damageBuffer())
+                .warningDistance(worldBorder.warningDistance())
+                .warningTime(worldBorder.warningTime())
+                .duration(worldBorder.duration());
+        else getWorldBorder().reset();
+    }
 
     /**
      * Retrieves the spawn location associated with the group.
      *
      * @return the {@link Location} representing the group's spawn location,
-     *         or {@code null} if no spawn location is defined
-     * @see #spawnLocation(Location)
+     * or {@code null} if no spawn location is defined
+     * @see #setSpawnLocation(Location)
+     * @deprecated use {@link #getSpawnLocation()}
      */
     @Nullable
-    Location spawnLocation();
+    @Deprecated(forRemoval = true, since = "3.1.0")
+    default Location spawnLocation() {
+        return getSpawnLocation().orElse(null);
+    }
+
+    /**
+     * Retrieves the spawn location associated with the group.
+     *
+     * @return the {@link Location} representing the group's spawn location,
+     * or {@code null} if no spawn location is defined
+     * @see #setSpawnLocation(Location)
+     */
+    @NonNull
+    Optional<Location> getSpawnLocation();
 
     /**
      * Sets the spawn location for the group.
@@ -112,25 +236,65 @@ public interface GroupData {
      *
      * @param location the {@link Location} to set as the group's spawn location.
      *                 Can be {@code null} to unset or clear the spawn location.
-     * @see #spawnLocation()
+     * @see #getSpawnLocation()
+     * @deprecated use {@link #setSpawnLocation(Location)}
      */
-    void spawnLocation(@Nullable Location location);
+    @Deprecated(forRemoval = true, since = "3.1.0")
+    default void spawnLocation(@Nullable Location location) {
+        setSpawnLocation(location);
+    }
+
+    /**
+     * Sets the spawn location for the group.
+     * The spawn location is typically the default location where players appear
+     * when spawning within the group.
+     *
+     * @param location the {@link Location} to set as the group's spawn location.
+     *                 Can be {@code null} to unset or clear the spawn location.
+     * @see #getSpawnLocation()
+     */
+    void setSpawnLocation(@Nullable Location location);
 
     /**
      * Checks whether the group is in hardcore mode.
      *
      * @return true if the group is in hardcore mode, false otherwise
      * @see World#isHardcore()
+     * @deprecated use {@link #getHardcore()}
      */
-    boolean hardcore();
+    @Deprecated(forRemoval = true, since = "3.1.0")
+    default boolean hardcore() {
+        return getHardcore().toBooleanOrElse(getGroupProvider().getServer().isHardcore());
+    }
+
+    /**
+     * Checks whether the group is in hardcore mode.
+     *
+     * @return a {@link TriState} indicating whether the group is in hardcore mode
+     * @see World#isHardcore()
+     */
+    TriState getHardcore();
 
     /**
      * Sets the hardcore mode for the group.
      *
      * @param hardcore true to enable hardcore mode, false to disable it
      * @see World#setHardcore(boolean)
+     * @deprecated use {@link #setHardcore(TriState)}
      */
-    void hardcore(boolean hardcore);
+    @Deprecated(forRemoval = true, since = "3.1.0")
+    default void hardcore(boolean hardcore) {
+        setHardcore(TriState.byBoolean(hardcore));
+    }
+
+    /**
+     * Sets the hardcore mode for the group.
+     *
+     * @param hardcore {@link TriState#TRUE} to enable hardcore mode, {@link TriState#FALSE} to disable it,
+     *                 and {@link TriState#NOT_SET} to delegate to {@link Server#isHardcore()}
+     * @see World#setHardcore(boolean)
+     */
+    void setHardcore(TriState hardcore);
 
     /**
      * Retrieves the current rain state for the group.
@@ -240,6 +404,13 @@ public interface GroupData {
      * @see World#setFullTime(long)
      */
     void time(long time);
+
+    /**
+     * Retrieves the current instance of the GroupProvider.
+     *
+     * @return the GroupProvider associated with this object
+     */
+    GroupProvider getGroupProvider();
 
     /**
      * Represents various types of group data that can be manipulated within the game.

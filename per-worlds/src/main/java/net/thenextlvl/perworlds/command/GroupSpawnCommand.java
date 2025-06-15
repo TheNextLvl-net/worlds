@@ -75,7 +75,7 @@ class GroupSpawnCommand {
 
     private static int unsetSpawn(CommandContext<CommandSourceStack> context, WorldGroup group, SharedWorlds commons) {
         var sender = context.getSource().getSender();
-        group.getGroupData().spawnLocation(null);
+        group.getGroupData().setSpawnLocation(null);
         commons.bundle().sendMessage(sender, "group.spawn.unset",
                 Placeholder.parsed("group", group.getName()));
         return Command.SINGLE_SUCCESS;
@@ -118,7 +118,7 @@ class GroupSpawnCommand {
 
     private static int setSpawn(CommandContext<CommandSourceStack> context, SharedWorlds commons, WorldGroup group, Location location) {
         var sender = context.getSource().getSender();
-        group.getGroupData().spawnLocation(location);
+        group.getGroupData().setSpawnLocation(location);
         commons.bundle().sendMessage(sender, "group.spawn.set",
                 Placeholder.parsed("group", group.getName()),
                 Placeholder.parsed("world", location.getWorld().getName()),

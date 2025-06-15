@@ -77,7 +77,6 @@ public class PaperPlayerData implements PlayerData {
     private @Nullable Location lastDeathLocation = DEFAULT_LAST_DEATH_LOCATION;
     private @Nullable Location lastLocation = DEFAULT_LAST_LOCATION;
     private @Nullable Location respawnLocation = DEFAULT_RESPAWN_LOCATION;
-    private GameMode defaultGameMode = GameMode.SURVIVAL;
     private List<PotionEffect> potionEffects = List.of();
     private Set<AdvancementData> advancements = Set.of();
     private Set<AttributeData> attributes = DEFAULT_ATTRIBUTES;
@@ -111,15 +110,8 @@ public class PaperPlayerData implements PlayerData {
     private int remainingAir = DEFAULT_REMAINING_AIR;
     private int score = DEFAULT_SCORE;
 
-    public PaperPlayerData(WorldGroup group) {
-        this.defaultGameMode = group.getGroupData().defaultGameMode();
-    }
-
-    public PaperPlayerData() {
-    }
-
     public static PaperPlayerData of(Player player, WorldGroup group) {
-        return new PaperPlayerData(group)
+        return new PaperPlayerData()
                 .attributes(Registry.ATTRIBUTE.stream()
                         .map(player::getAttribute)
                         .filter(Objects::nonNull)
@@ -194,6 +186,7 @@ public class PaperPlayerData implements PlayerData {
     private void load(Player player, WorldGroup group) {
         var settings = group.getSettings();
 
+        var defaultGameMode = group.getGroupData().getDefaultGameMode().orElseGet(() -> player.getServer().getDefaultGameMode());
         player.setGameMode(settings.gameMode() && previousGameMode != null ? previousGameMode : defaultGameMode);
         player.setGameMode(settings.gameMode() && gameMode != null ? gameMode : defaultGameMode);
 
@@ -333,11 +326,6 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public GameMode defaultGameMode() {
-        return defaultGameMode;
-    }
-
-    @Override
     public @Nullable GameMode gameMode() {
         return gameMode;
     }
@@ -389,12 +377,6 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public PaperPlayerData beeStingersInBody(int beeStingersInBody) {
         this.beeStingersInBody = beeStingersInBody;
-        return this;
-    }
-
-    @Override
-    public PaperPlayerData defaultGameMode(GameMode gameMode) {
-        this.defaultGameMode = gameMode;
         return this;
     }
 

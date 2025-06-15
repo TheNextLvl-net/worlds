@@ -21,9 +21,8 @@ public class RespawnListener implements Listener {
         if (event.isBedSpawn() || event.isAnchorSpawn()) return;
         var group = provider.getGroup(event.getPlayer().getWorld())
                 .orElse(provider.getUnownedWorldGroup());
-        var location = group.getGroupData().spawnLocation();
-        if (location != null) event.setRespawnLocation(location);
-        else group.getSpawnLocation().ifPresent(event::setRespawnLocation);
+        group.getGroupData().getSpawnLocation().ifPresentOrElse(event::setRespawnLocation,
+                () -> group.getSpawnLocation().ifPresent(event::setRespawnLocation));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

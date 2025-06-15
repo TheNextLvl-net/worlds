@@ -1,28 +1,31 @@
 package net.thenextlvl.perworlds.group;
 
+import net.kyori.adventure.util.TriState;
 import net.thenextlvl.perworlds.GroupData;
+import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.data.WorldBorderData;
 import net.thenextlvl.perworlds.model.PaperWorldBorderData;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
-import org.bukkit.Server;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 @NullMarked
 public class PaperGroupData implements GroupData {
     private final Map<GameRule<?>, Object> gameRules = new HashMap<>();
+    private @Nullable GameMode defaultGameMode = null;
     private @Nullable Location spawnLocation = null;
     private WorldBorderData worldBorder = new PaperWorldBorderData();
     private Difficulty difficulty = Difficulty.NORMAL;
-    private GameMode defaultGameMode;
-    private boolean hardcore;
+    private TriState hardcore = TriState.NOT_SET;
     private boolean raining = false;
     private boolean thundering = false;
     private int clearWeatherDuration;
@@ -30,9 +33,10 @@ public class PaperGroupData implements GroupData {
     private int thunderDuration;
     private long time = 0;
 
-    public PaperGroupData(Server server) {
-        this.defaultGameMode = server.getDefaultGameMode();
-        this.hardcore = server.isHardcore();
+    private final GroupProvider provider;
+
+    public PaperGroupData(GroupProvider provider) {
+        this.provider = provider;
     }
 
     @Override
@@ -42,63 +46,62 @@ public class PaperGroupData implements GroupData {
     }
 
     @Override
-    public <T> @Nullable T gameRule(GameRule<T> rule) {
-        return rule.getType().cast(gameRules.get(rule));
+    public <T> Optional<T> getGameRule(GameRule<T> rule) {
+        return Optional.of(rule.getType().cast(gameRules.get(rule)));
     }
 
     @Override
-    public <T> boolean gameRule(GameRule<T> rule, @Nullable T value) {
+    public <T> boolean setGameRule(GameRule<T> rule, @Nullable T value) {
         if (value == null) return gameRules.remove(rule) != null;
         return !value.equals(gameRules.put(rule, value));
     }
 
     @Override
-    public Difficulty difficulty() {
-        return hardcore ? Difficulty.HARD : difficulty;
+    public Difficulty getDifficulty() {
+        return difficulty;
     }
 
     @Override
-    public void difficulty(Difficulty difficulty) {
+    public void setDifficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
     }
 
     @Override
-    public GameMode defaultGameMode() {
-        return defaultGameMode;
+    public Optional<GameMode> getDefaultGameMode() {
+        return Optional.ofNullable(defaultGameMode);
     }
 
     @Override
-    public void defaultGameMode(GameMode gameMode) {
-        this.defaultGameMode = gameMode;
+    public void setDefaultGameMode(@Nullable GameMode defaultGameMode) {
+        this.defaultGameMode = defaultGameMode;
     }
 
     @Override
-    public WorldBorderData worldBorder() {
+    public WorldBorderData getWorldBorder() {
         return worldBorder;
     }
 
-    @Override
-    public void worldBorder(WorldBorderData worldBorder) {
+    public void setWorldBorder(WorldBorderData worldBorder) {
         this.worldBorder = worldBorder;
     }
 
     @Override
-    public @Nullable Location spawnLocation() {
-        return spawnLocation;
+    public @NonNull Optional<Location> getSpawnLocation() {
+        return Optional.ofNullable(spawnLocation);
     }
 
     @Override
-    public void spawnLocation(@Nullable Location location) {
+    public void setSpawnLocation(@Nullable Location location) {
         this.spawnLocation = location;
     }
 
     @Override
-    public boolean hardcore() {
+    public TriState getHardcore() {
         return hardcore;
     }
 
     @Override
-    public void hardcore(boolean hardcore) {
+    public void setHardcore(TriState hardcore) {
         this.hardcore = hardcore;
     }
 
@@ -160,5 +163,10 @@ public class PaperGroupData implements GroupData {
     @Override
     public void time(long time) {
         this.time = time;
+    }
+
+    @Override
+    public GroupProvider getGroupProvider() {
+        return provider;
     }
 }

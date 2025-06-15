@@ -9,11 +9,11 @@ import core.nbt.tag.ListTag;
 import core.nbt.tag.Tag;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.perworlds.GroupData;
+import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.group.PaperGroupData;
 import net.thenextlvl.perworlds.group.PaperGroupSettings;
 import net.thenextlvl.perworlds.model.config.GroupConfig;
-import org.bukkit.Server;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.HashSet;
@@ -21,10 +21,10 @@ import java.util.stream.Collectors;
 
 @NullMarked
 public class GroupConfigAdapter implements TagAdapter<GroupConfig> {
-    private final Server server;
+    private final GroupProvider provider;
 
-    public GroupConfigAdapter(Server server) {
-        this.server = server;
+    public GroupConfigAdapter(GroupProvider provider) {
+        this.provider = provider;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class GroupConfigAdapter implements TagAdapter<GroupConfig> {
         var root = tag.getAsCompound();
         var data = root.optional("data")
                 .map(tag1 -> context.deserialize(tag1, GroupData.class))
-                .orElseGet(() -> new PaperGroupData(server));
+                .orElseGet(() -> new PaperGroupData(provider));
         var settings = root.optional("settings")
                 .map(tag1 -> context.deserialize(tag1, GroupSettings.class))
                 .orElseGet(PaperGroupSettings::new);
