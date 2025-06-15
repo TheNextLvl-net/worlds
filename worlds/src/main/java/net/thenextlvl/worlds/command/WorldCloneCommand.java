@@ -32,23 +32,25 @@ class WorldCloneCommand {
     }
 
     private static int clone(CommandContext<CommandSourceStack> context, boolean full, WorldsPlugin plugin) {
+        var sender = context.getSource().getSender();
+        var world = context.getArgument("world", World.class);
+        var placeholder = Placeholder.parsed("world", world.getName());
         try {
-            var world = context.getArgument("world", World.class);
             var key = context.getArgument("key", Key.class);
             var clone = plugin.levelView().clone(world, builder -> builder.key(key), full).orElse(null);
 
             if (clone != null) plugin.levelView().persistWorld(clone, true);
 
-            var placeholder = Placeholder.parsed("world", world.getName());
             var message = clone != null ? "world.clone.success" : "world.clone.failed";
 
-            if (clone != null && context.getSource().getSender() instanceof Player player)
+            if (clone != null && sender instanceof Player player)
                 player.teleportAsync(clone.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
 
-            plugin.bundle().sendMessage(context.getSource().getSender(), message, placeholder);
+            plugin.bundle().sendMessage(sender, message, placeholder);
             return clone != null ? Command.SINGLE_SUCCESS : 0;
         } catch (Exception e) {
-            // todo: send error message
+            plugin.getComponentLogger().warn("Failed to clone world {}", world.getName(), e);
+            plugin.bundle().sendMessage(sender, "world.clone.failed", placeholder);
             return 0;
         }
     }
