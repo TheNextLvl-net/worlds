@@ -90,6 +90,7 @@ paper {
                 "worlds.command.save-all",
                 "worlds.command.save-off",
                 "worlds.command.save-on",
+                "worlds.command.seed",
                 "worlds.command.setspawn",
                 "worlds.command.spawn",
                 "worlds.command.teleport",
@@ -135,6 +136,7 @@ paper {
         register("worlds.command.save-all") { children = listOf("worlds.command") }
         register("worlds.command.save-off") { children = listOf("worlds.command") }
         register("worlds.command.save-on") { children = listOf("worlds.command") }
+        register("worlds.command.seed") { children = listOf("minecraft.command.seed") }
         register("worlds.command.setspawn") { children = listOf("worlds.command") }
         register("worlds.command.spawn") { children = listOf("worlds.command") }
         register("worlds.command.teleport") { children = listOf("worlds.command") }
