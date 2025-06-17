@@ -89,7 +89,7 @@ public class PaperGroupProvider implements GroupProvider {
                 .registerTypeHierarchyAdapter(Key.class, new KeyAdapter())
                 .registerTypeHierarchyAdapter(Location.class, new LocationAdapter())
                 .registerTypeHierarchyAdapter(NamespacedKey.class, new NamespacedKeyAdapter())
-                .registerTypeHierarchyAdapter(PaperPlayerData.class, new PlayerDataAdapter())
+                .registerTypeHierarchyAdapter(PaperPlayerData.class, new PlayerDataAdapter(this))
                 .registerTypeHierarchyAdapter(PotionEffect.class, new PotionEffectAdapter())
                 .registerTypeHierarchyAdapter(PotionEffectType.class, new PotionEffectTypeAdapter())
                 .registerTypeHierarchyAdapter(Stats.class, new StatisticsAdapter())

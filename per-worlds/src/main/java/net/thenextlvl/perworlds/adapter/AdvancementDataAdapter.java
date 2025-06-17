@@ -32,7 +32,9 @@ public class AdvancementDataAdapter implements TagAdapter<PaperAdvancementData> 
         server.advancementIterator().forEachRemaining(advancement -> lookup.put(advancement.key(), advancement));
 
         var root = tag.getAsCompound();
-        var advancement = lookup.get(context.deserialize(root.get("advancement"), Key.class));
+        var key = context.deserialize(root.get("advancement"), Key.class);
+        var advancement = lookup.get(key);
+        if (advancement == null) throw new ParserException("Encountered unknown advancement: " + key);
         var awarded = new HashMap<String, Date>();
         root.getAsCompound("awarded").forEach((criteria, date) -> awarded.put(criteria, context.deserialize(date, Date.class)));
         var remaining = root.getAsList("remaining").stream().map(Tag::getAsString).collect(Collectors.toSet());

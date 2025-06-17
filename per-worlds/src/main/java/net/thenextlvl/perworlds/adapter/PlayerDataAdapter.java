@@ -14,6 +14,7 @@ import net.thenextlvl.perworlds.data.AdvancementData;
 import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.data.WardenSpawnTracker;
+import net.thenextlvl.perworlds.group.PaperGroupProvider;
 import net.thenextlvl.perworlds.model.PaperPlayerData;
 import net.thenextlvl.perworlds.statistics.Stats;
 import org.bukkit.GameMode;
@@ -24,14 +25,29 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.Objects;
+
 @NullMarked
 public class PlayerDataAdapter implements TagAdapter<PlayerData> {
+    private final PaperGroupProvider provider;
+    
+    public PlayerDataAdapter(PaperGroupProvider provider) {
+        this.provider = provider;
+    }
+
     @Override
     public PlayerData deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
         var data = new PaperPlayerData();
         var root = tag.getAsCompound();
         root.optional("advancements").map(Tag::getAsList).map(list ->
-                list.stream().map(advancement -> context.deserialize(advancement, AdvancementData.class)).toList()
+                list.stream().map(advancement -> {
+                    try {
+                        return context.deserialize(advancement, AdvancementData.class);
+                    } catch (ParserException e) {
+                        provider.getLogger().warn(e.getMessage());
+                        return null;
+                    }
+                }).filter(Objects::nonNull).toList()
         ).ifPresent(data::advancements);
         root.optional("attributes").map(Tag::getAsList).map(list ->
                 list.stream().map(attribute -> context.deserialize(attribute, AttributeData.class)).toList()
