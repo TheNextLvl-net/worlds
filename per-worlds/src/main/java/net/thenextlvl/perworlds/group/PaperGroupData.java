@@ -47,7 +47,9 @@ public class PaperGroupData implements GroupData {
 
     @Override
     public <T> Optional<T> getGameRule(GameRule<T> rule) {
-        return Optional.of(rule.getType().cast(gameRules.get(rule)));
+        var object = gameRules.get(rule);
+        if (object == null) return Optional.empty();
+        return Optional.of(rule.getType().cast(object));
     }
 
     @Override
