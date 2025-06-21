@@ -70,6 +70,7 @@ public class PerWorldsPlugin extends JavaPlugin {
             "WorldManager", // https://www.spigotmc.org/resources/worldmanager-1-8-1-18-free-download-api.101875/
             "WorldMaster", // https://www.spigotmc.org/resources/worldmaster.101171/
             "TheGalaxyLimits", // https://hangar.papermc.io/TheGlitchedVirus/thegalaxylimits
+            "WorldMagic", // https://github.com/hotwopik/WorldMagic
             "BulMultiverse", // https://github.com/BulPlugins/BulMultiverse
             "worldmgr" // https://dev.bukkit.org/projects/worldmgr
     );
