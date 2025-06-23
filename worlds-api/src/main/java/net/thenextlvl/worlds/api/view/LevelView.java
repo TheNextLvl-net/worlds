@@ -113,7 +113,9 @@ public interface LevelView {
      *
      * @param world the world to be saved
      * @param flush whether to flush pending changes to disk immediately
+     * @deprecated use {@link #saveAsync(World, boolean)}
      */
+    @Deprecated(forRemoval = true, since = "3.2.0")
     default void save(World world, boolean flush) {
         try {
             saveAsync(world, flush).get();
