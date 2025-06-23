@@ -34,6 +34,7 @@ public class WorldBackupCommand {
     private static int backup(CommandContext<CommandSourceStack> context, World world, WorldsPlugin plugin) {
         var sender = context.getSource().getSender();
         var placeholder = Placeholder.parsed("world", world.getName());
+        plugin.bundle().sendMessage(sender, "world.backup", placeholder);
         plugin.levelView().backupAsync(world).thenAccept(bytes -> {
             var kb = bytes / 1024d;
             var mb = kb / 1024d;
