@@ -34,29 +34,28 @@ public class WorldListener implements Listener {
     public void onOverworldLoad(WorldLoadEvent event) {
         if (!event.getWorld().key().asString().equals("minecraft:overworld")) return;
         plugin.levelView().listLevels().stream().filter(plugin.levelView()::canLoad).forEach(path -> {
-            try {
-                var level = plugin.levelView().read(path).map(Level.Builder::build).orElse(null);
-                if (level == null || !level.isEnabled().equals(TriState.TRUE)) return;
-                level.create().ifPresent(world -> plugin.getComponentLogger().debug(
-                        "Loaded dimension {} ({}) from {}",
-                        world.key().asString(), level.getGeneratorType().key().asString(),
-                        world.getWorldFolder().getPath()
-                ));
-            } catch (GeneratorException e) {
-                var generator = e.getId() != null ? e.getPlugin() + e.getId() : e.getPlugin();
-                plugin.getComponentLogger().error("Skip loading dimension '{}'", path.getFileName());
-                plugin.getComponentLogger().error("Cannot use generator {}: {}", generator, e.getMessage());
-            } catch (Exception e) {
-                if (e.getCause() instanceof DirectoryLock.LockException lock) {
+            var level = plugin.levelView().read(path).map(Level.Builder::build).orElse(null);
+            if (level == null || !level.isEnabled().equals(TriState.TRUE)) return;
+            level.createAsync().thenAccept(world -> plugin.getComponentLogger().debug(
+                    "Loaded dimension {} ({}) from {}",
+                    world.key().asString(), level.getGeneratorType().key().asString(),
+                    world.getWorldFolder().getPath()
+            )).exceptionally(throwable -> {
+                if (throwable instanceof GeneratorException e) {
+                    var generator = e.getId() != null ? e.getPlugin() + e.getId() : e.getPlugin();
+                    plugin.getComponentLogger().error("Skip loading dimension '{}'", path.getFileName());
+                    plugin.getComponentLogger().error("Cannot use generator {}: {}", generator, e.getMessage());
+                } else if (throwable.getCause() instanceof DirectoryLock.LockException lock) {
                     plugin.getComponentLogger().error("Failed to start the minecraft server", lock);
                     plugin.getServer().shutdown();
-                    return;
+                } else {
+                    plugin.getComponentLogger().error("An unexpected error occurred while loading the level {}",
+                            path.getFileName(), throwable);
+                    plugin.getComponentLogger().error("Please report the error above on GitHub: {}",
+                            "https://github.com/TheNextLvl-net/worlds/issues/new/choose");
                 }
-                plugin.getComponentLogger().error("An unexpected error occurred while loading the level {}",
-                        path.getFileName(), e);
-                plugin.getComponentLogger().error("Please report the error above on GitHub: {}",
-                        "https://github.com/TheNextLvl-net/worlds/issues/new/choose");
-            }
+                return null;
+            });
         });
     }
 
