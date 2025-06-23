@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -147,12 +148,17 @@ public class PaperLevelView implements LevelView {
      * @see CraftWorld#save(boolean)
      */
     @Override
-    public void save(World world, boolean flush) {
-        var level = ((CraftWorld) world).getHandle();
-        var oldSave = level.noSave;
-        level.noSave = false;
-        level.save(null, flush, false);
-        level.noSave = oldSave;
+    public CompletableFuture<Void> saveAsync(World world, boolean flush) {
+        try {
+            var level = ((CraftWorld) world).getHandle();
+            var oldSave = level.noSave;
+            level.noSave = false;
+            level.save(null, flush, false);
+            level.noSave = oldSave;
+            return CompletableFuture.completedFuture(null);
+        } catch (Throwable t) {
+            return CompletableFuture.failedFuture(t);
+        }
     }
 
     /**
@@ -194,10 +200,16 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public long backup(World world) throws IOException {
+    public CompletableFuture<Long> backupAsync(World world) {
         new WorldBackupEvent(world).callEvent();
-        save(world, true);
-        return ((CraftWorld) world).getHandle().levelStorageAccess.makeWorldBackup();
+        return saveAsync(world, true).thenCompose(unused -> {
+            try {
+                var size = ((CraftWorld) world).getHandle().levelStorageAccess.makeWorldBackup();
+                return CompletableFuture.completedFuture(size);
+            } catch (Throwable t) {
+                return CompletableFuture.failedFuture(t);
+            }
+        });
     }
 
     public String findFreeName(String name) {
@@ -242,7 +254,7 @@ public class PaperLevelView implements LevelView {
 
     @Override
     @SuppressWarnings("PatternValidation")
-    public Optional<World> clone(World world, Consumer<Level.Builder> builder, boolean full) throws IllegalArgumentException, IllegalStateException, IOException {
+    public CompletableFuture<World> cloneAsync(World world, Consumer<Level.Builder> builder, boolean full) {
         var levelBuilder = plugin.levelBuilder(world);
 
         var name = findFreeName(world.getName());
@@ -260,12 +272,14 @@ public class PaperLevelView implements LevelView {
         var event = new WorldCloneEvent(world, clone, full);
         event.callEvent();
 
-        if (full) {
-            save(world, true);
-            copyDirectory(world.getWorldFolder().toPath(), clone.getDirectory(), event.getFileFilter());
-        }
-
-        return clone.create();
+        return full ? saveAsync(world, true).thenCompose(ignored -> {
+            try {
+                copyDirectory(world.getWorldFolder().toPath(), clone.getDirectory(), event.getFileFilter());
+                return clone.createAsync();
+            } catch (IOException e) {
+                return CompletableFuture.failedFuture(e);
+            }
+        }) : clone.createAsync();
     }
 
     @Override

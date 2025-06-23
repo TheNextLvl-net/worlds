@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 /**
@@ -112,7 +114,22 @@ public interface LevelView {
      * @param world the world to be saved
      * @param flush whether to flush pending changes to disk immediately
      */
-    void save(World world, boolean flush);
+    default void save(World world, boolean flush) {
+        try {
+            saveAsync(world, flush).get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Saves the specified world, with an option to flush pending changes immediately.
+     *
+     * @param world the world to be saved
+     * @param flush whether to flush pending changes to disk immediately
+     * @return A {@code CompletableFuture} that might complete exceptionally
+     */
+    CompletableFuture<Void> saveAsync(World world, boolean flush);
 
     /**
      * Saves the {@code level.dat} of the specified world to disk.
@@ -129,7 +146,24 @@ public interface LevelView {
      * @return the size of the created backup in bytes
      * @throws IOException if an I/O error occurs while creating the backup
      */
-    long backup(World world) throws IOException;
+    @SuppressWarnings("RedundantThrows")
+    default long backup(World world) throws IOException {
+        try {
+            return backupAsync(world).get();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Creates a backup for the given world and returns the size of the backup in bytes.
+     * <p>
+     * Completes with an {@link IOException} if an I/O error occurs while creating the backup
+     *
+     * @param world the world to back up
+     * @return A {@code CompletableFuture} completing with the size of the created backup in bytes
+     */
+    CompletableFuture<Long> backupAsync(World world);
 
     /**
      * Clones the specified world with the possibility to modify its properties through a builder.
@@ -152,8 +186,39 @@ public interface LevelView {
      * @throws IllegalStateException    if the target directory already exists
      * @throws IOException              if an I/O error occurs during the cloning process
      * @see WorldCloneEvent#isFullClone()
+     * @deprecated use {@link #cloneAsync(World, Consumer, boolean)}
      */
-    Optional<World> clone(World world, Consumer<Level.Builder> builder, boolean full) throws IllegalArgumentException, IllegalStateException, IOException;
+    @SuppressWarnings("RedundantThrows")
+    @Deprecated(forRemoval = true, since = "3.2.0")
+    default Optional<World> clone(World world, Consumer<Level.Builder> builder, boolean full) throws IllegalArgumentException, IllegalStateException, IOException {
+        try {
+            return Optional.of(cloneAsync(world, builder, full).get());
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Clones the specified world with the possibility to modify its properties through a builder.
+     * If a {@code full} clone is invoked, the entire world directory is duplicated,
+     * except for specific files and folders: {@code advancements}, {@code datapacks},
+     * {@code playerdata}, {@code stats}, {@code uid.dat}, and {@code session.lock}.
+     * <p>
+     * By default, if a name or key is not provided, they are automatically generated using the
+     * pattern {@code OriginalName (#)}, and the key is a lowercased version of the generated name,
+     * replacing spaces with underscores and removing invalid namespace characters.
+     * <p>
+     * Completes with an {@link IllegalArgumentException} if the world name or key is already in use.<br>
+     * Completes with an {@link IllegalStateException} if the target directory already exists.<br>
+     * Completes with an {@link IOException} if an I/O error occurs during the cloning process.
+     *
+     * @param world   the world to be cloned
+     * @param builder a consumer that modifies the {@link Level.Builder} properties of the cloned world
+     * @param full    whether to fully clone including regions, entities..., or only the {@code level.dat}
+     * @return A {@code CompletableFuture} completing with the cloned world
+     * @see WorldCloneEvent#isFullClone()
+     */
+    CompletableFuture<World> cloneAsync(World world, Consumer<Level.Builder> builder, boolean full);
 
     /**
      * Deletes the specified world from the server and disk.
