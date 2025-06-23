@@ -17,6 +17,8 @@ import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @NullMarked
 public interface Level extends Keyed {
@@ -127,8 +129,26 @@ public interface Level extends Keyed {
      * or an empty {@code Optional} if the creation process fails.
      *
      * @return an {@code Optional} containing the created {@code World}, or {@link Optional#empty()} otherwise
+     * @deprecated use {@link #createAsync()}
      */
-    Optional<World> create();
+    @Deprecated(forRemoval = true, since = "3.2.0")
+    default Optional<World> create() {
+        try {
+            return Optional.of(createAsync().get());
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Creates and initializes a new {@link World} based on the current configuration of the {@link Level} instance.
+     * <p>
+     * Completes exceptionally if:
+     * 
+     *
+     * @return a {@code CompletableFuture} completing with the created {@link World}
+     */
+    CompletableFuture<World> createAsync();
 
     interface Builder {
         /**
