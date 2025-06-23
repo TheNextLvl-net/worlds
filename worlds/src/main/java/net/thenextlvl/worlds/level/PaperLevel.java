@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @NullMarked
 class PaperLevel extends LevelData {
@@ -62,7 +63,8 @@ class PaperLevel extends LevelData {
     }
 
     @Override
-    public Optional<World> create() {
+    public CompletableFuture<World> createAsync() {
+        var future = new CompletableFuture<World>();
         var server = ((CraftServer) plugin.getServer());
         var console = server.getServer();
 
@@ -116,7 +118,7 @@ class PaperLevel extends LevelData {
                             levelDirectory.dataFile(),
                             levelDirectory.oldDataFile()
                     );
-                    return Optional.empty();
+                    return CompletableFuture.failedFuture(e1);
                 }
 
                 levelStorageAccess.restoreLevelDataFromOld();
@@ -124,12 +126,12 @@ class PaperLevel extends LevelData {
 
             if (summary.requiresManualConversion()) {
                 plugin.getComponentLogger().warn("This world must be opened in an older version (like 1.6.4) to be safely converted");
-                return Optional.empty();
+                return CompletableFuture.failedFuture(new IllegalStateException("World requires manual conversion"));
             }
 
             if (!summary.isCompatible()) {
                 plugin.getComponentLogger().warn("This world was created by an incompatible version.");
-                return Optional.empty();
+                return CompletableFuture.failedFuture(new IllegalStateException("World is incompatible"));
             }
         } else {
             dataTag = null;
@@ -219,8 +221,10 @@ class PaperLevel extends LevelData {
                 chunkGenerator, biomeProvider
         );
 
-        if (server.getWorld(name) == null) return Optional.empty();
+        // todo: do we still need this check? 
+        //Preconditions.checkState(server.getWorld(key) != null, "World with key %s was not properly memoized", key);
 
+        // todo: do we have to move this past initWorld?
         console.addLevel(serverLevel);
 
         if (WorldsPlugin.RUNNING_FOLIA) {
@@ -229,10 +233,13 @@ class PaperLevel extends LevelData {
             var x = serverLevel.randomSpawnSelection.x;
             var z = serverLevel.randomSpawnSelection.z;
 
-            plugin.getServer().getRegionScheduler().run(plugin, serverLevel.getWorld(), x, z, scheduledTask ->
-                    console.initWorld(serverLevel, primaryLevelData, primaryLevelData, primaryLevelData.worldGenOptions()));
+            plugin.getServer().getRegionScheduler().run(plugin, serverLevel.getWorld(), x, z, scheduledTask -> {
+                console.initWorld(serverLevel, primaryLevelData, primaryLevelData, primaryLevelData.worldGenOptions());
+                future.complete(serverLevel.getWorld());
+            });
         } else {
             console.initWorld(serverLevel, primaryLevelData, primaryLevelData, primaryLevelData.worldGenOptions());
+            future.complete(serverLevel.getWorld());
         }
 
         serverLevel.setSpawnSettings(true);
@@ -243,7 +250,7 @@ class PaperLevel extends LevelData {
         FeatureHooks.tickEntityManager(serverLevel);
 
         new WorldLoadEvent(serverLevel.getWorld()).callEvent();
-        return Optional.of(serverLevel.getWorld());
+        return future;
     }
 
     private ResourceKey<LevelStem> resolveDimensionKey() {
