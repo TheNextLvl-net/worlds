@@ -36,6 +36,7 @@ class WorldCloneCommand {
         var world = context.getArgument("world", World.class);
         var placeholder = Placeholder.parsed("world", world.getName());
         var key = context.getArgument("key", Key.class);
+        plugin.bundle().sendMessage(sender, "world.clone", placeholder);
         plugin.levelView().cloneAsync(world, builder -> builder.key(key), full).thenAccept(clone -> {
             plugin.levelView().persistWorld(clone, true);
             if (sender instanceof Player player) player.teleportAsync(clone.getSpawnLocation(), COMMAND);
