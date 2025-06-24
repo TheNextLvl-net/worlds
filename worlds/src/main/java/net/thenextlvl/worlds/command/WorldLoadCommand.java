@@ -34,34 +34,30 @@ class WorldLoadCommand {
 
     private static int load(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
         var name = context.getArgument("world", String.class);
-        try {
-            var build = plugin.levelView().read(Path.of(name)).map(Level.Builder::build);
-            var world = build.filter(Level::isWorldKnown).flatMap(Level::create).orElse(null);
+        var build = plugin.levelView().read(Path.of(name)).map(Level.Builder::build);
+        var future = build.filter(Level::isWorldKnown).map(Level::createAsync).orElse(null);
 
-            var message = world != null ? "world.load.success" : "world.load.failed";
-            plugin.bundle().sendMessage(context.getSource().getSender(), message,
-                    Placeholder.parsed("world", world != null ? world.getName() : name));
-
-            // todo: extract duplicate, make it look less sketchy
-            if (world != null && context.getSource().getSender() instanceof Entity entity) {
-                if (WorldsPlugin.RUNNING_FOLIA) {
-                    plugin.getServer().getRegionScheduler().run(plugin, world, 0, 0, scheduledTask -> {
-                        entity.teleportAsync(world.getSpawnLocation(), COMMAND);
-                    });
-                } else entity.teleportAsync(world.getSpawnLocation(), COMMAND);
-            }
-
-            if (world != null) {
-                plugin.levelView().persistStatus(world, true, true);
-                plugin.levelView().saveLevelData(world, true);
-            }
-
-            return world != null ? Command.SINGLE_SUCCESS : 0;
-        } catch (Exception e) {
-            plugin.getComponentLogger().warn("Failed to load world {}", name, e);
+        if (future == null) {
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.load.failed",
                     Placeholder.parsed("world", name));
             return 0;
         }
+
+        future.thenAccept(level -> {
+            plugin.bundle().sendMessage(context.getSource().getSender(), "world.load.success",
+                    Placeholder.parsed("world", level.getName()));
+
+            plugin.levelView().persistStatus(level, true, true);
+            plugin.levelView().saveLevelData(level, true);
+
+            if (!(context.getSource().getSender() instanceof Entity entity)) return;
+            entity.teleportAsync(level.getSpawnLocation(), COMMAND);
+        }).exceptionally(throwable -> {
+            plugin.getComponentLogger().warn("Failed to load world {}", name, throwable);
+            plugin.bundle().sendMessage(context.getSource().getSender(), "world.load.failed",
+                    Placeholder.parsed("world", name));
+            return null;
+        });
+        return Command.SINGLE_SUCCESS;
     }
 }
