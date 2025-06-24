@@ -166,7 +166,7 @@ public class PaperLevelView implements LevelView {
      * @see net.minecraft.server.level.ServerLevel#saveLevelData(boolean)
      */
     @Override
-    public void saveLevelData(World world, boolean async) {
+    public CompletableFuture<Void> saveLevelDataAsync(World world) {
         var level = ((CraftWorld) world).getHandle();
         if (level.getDragonFight() != null) {
             level.serverLevelData.setEndDragonFightData(level.getDragonFight().saveData());
@@ -175,8 +175,7 @@ public class PaperLevelView implements LevelView {
         level.serverLevelData.setWorldBorder(level.getWorldBorder().createSettings());
         level.serverLevelData.setCustomBossEvents(level.getServer().getCustomBossEvents().save(level.registryAccess()));
 
-        var save = level.getChunkSource().getDataStorage().scheduleSave();
-        if (!async) save.join();
+        return level.getChunkSource().getDataStorage().scheduleSave().thenCompose(object -> null);
     }
 
     @Deprecated(forRemoval = true)
