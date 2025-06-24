@@ -241,8 +241,24 @@ public interface LevelView {
      * @param schedule if true, the deletion process will be scheduled for a later operation
      *                 (e.g., during server shutdown); if false, the deletion will be attempted immediately
      * @return a {@code DeletionResult} indicating the outcome of the deletion process.
+     * @deprecated use {@link #deleteAsync(World, boolean)}
      */
-    DeletionResult delete(World world, boolean schedule);
+    @Deprecated(forRemoval = true, since = "3.2.0")
+    default DeletionResult delete(World world, boolean schedule) {
+        return deleteAsync(world, schedule).join();
+    }
+
+    /**
+     * Deletes the specified world from the server and disk.
+     * The deletion can be executed immediately or scheduled for later, depending on the provided parameters.
+     *
+     * @param world    the world to be deleted
+     * @param schedule if true, the deletion process will be scheduled for a later operation
+     *                 (e.g., during server shutdown); if false, the deletion will be attempted immediately
+     * @return A {@code CompletableFuture} completing with a {@code DeletionResult}
+     * indicating the outcome of the deletion process.
+     */
+    CompletableFuture<DeletionResult> deleteAsync(World world, boolean schedule);
 
     /**
      * Cancels the deletion process for the specified world, if scheduled.
@@ -315,7 +331,7 @@ public interface LevelView {
         SCHEDULED,
         /**
          * Indicates that the deletion process requires scheduling due to certain constraints
-         * that prevent immediate execution, like on Folia servers or the {@code minecraft:overworld}
+         * that prevent immediate execution, like the {@code minecraft:overworld}
          */
         REQUIRES_SCHEDULING,
         /**
