@@ -1,9 +1,9 @@
 package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.thenextlvl.worlds.WorldsPlugin;
@@ -14,12 +14,13 @@ import org.jspecify.annotations.NullMarked;
 import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
-class WorldSaveOnCommand {
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
+public class SaveOnCommand {
+    public static LiteralCommandNode<CommandSourceStack> create(WorldsPlugin plugin) {
         return Commands.literal("save-on")
-                .requires(source -> source.getSender().hasPermission("worlds.command.save-on"))
+                .requires(source -> source.getSender().hasPermission("minecraft.command.save-on"))
                 .then(saveOn(plugin))
-                .executes(context -> saveOn(plugin, context));
+                .executes(context -> saveOn(plugin, context))
+                .build();
     }
 
     private static int saveOn(WorldsPlugin plugin, CommandContext<CommandSourceStack> context) {
