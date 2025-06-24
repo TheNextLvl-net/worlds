@@ -132,7 +132,7 @@ class WorldCreateCommand {
 
             plugin.levelView().persistWorld(world, true);
             if (generator != null) plugin.levelView().persistGenerator(world, generator);
-            plugin.levelView().saveLevelData(world, true);
+            plugin.levelView().saveLevelDataAsync(world);
 
             if (!(context.getSource().getSender() instanceof Entity entity)) return;
             entity.teleportAsync(world.getSpawnLocation(), COMMAND);
