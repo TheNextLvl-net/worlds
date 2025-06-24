@@ -138,8 +138,24 @@ public interface LevelView {
      *
      * @param world the world whose level data should be saved
      * @param async whether the save operation should be performed asynchronously
+     * @deprecated use {@link #saveLevelDataAsync(World)}
      */
-    void saveLevelData(World world, boolean async);
+    @Deprecated(forRemoval = true, since = "3.2.0")
+    default void saveLevelData(World world, boolean async) {
+        try {
+            var future = saveLevelDataAsync(world);
+            if (!async) future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Saves the {@code level.dat} of the specified world to disk.
+     *
+     * @param world the world whose level data should be saved
+     */
+    CompletableFuture<Void> saveLevelDataAsync(World world);
 
     /**
      * Creates a backup for the given world and returns the size of the backup in bytes.
