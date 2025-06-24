@@ -106,6 +106,7 @@ public interface LevelView {
      * @return true if the world was successfully unloaded, otherwise false
      * @deprecated use {@link #unloadAsync(World, boolean)}
      */
+    @Deprecated(forRemoval = true, since = "3.2.0")
     default boolean unload(World world, boolean save) {
         return unloadAsync(world, save).join();
     }
