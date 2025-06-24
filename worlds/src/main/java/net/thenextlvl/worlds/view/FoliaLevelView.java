@@ -32,8 +32,7 @@ public class FoliaLevelView extends PaperLevelView {
             var location = region.getCenterChunk();
             plugin.getServer().getRegionScheduler().run(plugin, world, location.x, location.z, task -> {
                 try {
-                    var chunkCache = level.getChunkSource();
-                    chunkCache.save(flush);
+                    level.getChunkSource().save(flush);
                     future.complete(null);
                 } catch (Exception e) {
                     future.completeExceptionally(e);
