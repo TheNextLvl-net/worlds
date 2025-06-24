@@ -62,6 +62,9 @@ class PaperLevel extends LevelData {
         super(plugin, builder);
     }
 
+    /**
+     * @see CraftServer#createWorld(org.bukkit.WorldCreator)
+     */
     @Override
     public CompletableFuture<World> createAsync() {
         var server = ((CraftServer) plugin.getServer());
