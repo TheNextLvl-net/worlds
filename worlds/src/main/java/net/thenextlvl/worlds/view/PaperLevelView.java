@@ -174,6 +174,7 @@ public class PaperLevelView implements LevelView {
 
         level.serverLevelData.setWorldBorder(level.getWorldBorder().createSettings());
         level.serverLevelData.setCustomBossEvents(level.getServer().getCustomBossEvents().save(level.registryAccess()));
+        level.levelStorageAccess.saveDataTag(level.getServer().registryAccess(), level.serverLevelData, null);
 
         return level.getChunkSource().getDataStorage().scheduleSave().thenApply(ignored -> null);
     }
