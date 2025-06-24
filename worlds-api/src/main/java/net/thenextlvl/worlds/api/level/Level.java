@@ -138,8 +138,12 @@ public interface Level extends Keyed {
     /**
      * Creates and initializes a new {@link World} based on the current configuration of the {@link Level} instance.
      * <p>
-     * Completes exceptionally if:
-     * // todo: document
+     * Completes exceptionally with:
+     * <ul>
+     * <li>IllegalStateException: If the overworld hasn't been initialized yet,
+     * or another world with the same {@link #getDirectory() directory} already exists</li>
+     * <li>IllegalArgumentException: If the world {@link #key() key} or {@link #getName() name} is already in use</li>
+     * </ul>
      *
      * @return a {@code CompletableFuture} completing with the created {@link World}
      */
