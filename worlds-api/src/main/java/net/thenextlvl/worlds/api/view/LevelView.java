@@ -13,7 +13,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 /**
@@ -108,11 +107,7 @@ public interface LevelView {
      * @deprecated use {@link #unloadAsync(World, boolean)}
      */
     default boolean unload(World world, boolean save) {
-        try {
-            return unloadAsync(world, save).get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        return unloadAsync(world, save).join();
     }
 
     /**
@@ -133,11 +128,7 @@ public interface LevelView {
      */
     @Deprecated(forRemoval = true, since = "3.2.0")
     default void save(World world, boolean flush) {
-        try {
-            saveAsync(world, flush).get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        saveAsync(world, flush).join();
     }
 
     /**
@@ -158,12 +149,8 @@ public interface LevelView {
      */
     @Deprecated(forRemoval = true, since = "3.2.0")
     default void saveLevelData(World world, boolean async) {
-        try {
-            var future = saveLevelDataAsync(world);
-            if (!async) future.get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        var future = saveLevelDataAsync(world);
+        if (!async) future.join();
     }
 
     /**
@@ -182,11 +169,7 @@ public interface LevelView {
      */
     @SuppressWarnings("RedundantThrows")
     default long backup(World world) throws IOException {
-        try {
-            return backupAsync(world).get();
-        } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        return backupAsync(world).join();
     }
 
     /**
@@ -225,11 +208,7 @@ public interface LevelView {
     @SuppressWarnings("RedundantThrows")
     @Deprecated(forRemoval = true, since = "3.2.0")
     default Optional<World> clone(World world, Consumer<Level.Builder> builder, boolean full) throws IllegalArgumentException, IllegalStateException, IOException {
-        try {
-            return Optional.of(cloneAsync(world, builder, full).get());
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        return Optional.of(cloneAsync(world, builder, full).join());
     }
 
     /**
@@ -292,11 +271,7 @@ public interface LevelView {
      */
     @Deprecated(forRemoval = true, since = "3.2.0")
     default DeletionResult regenerate(World world, boolean schedule) {
-        try {
-            return regenerateAsync(world, schedule).get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        return regenerateAsync(world, schedule).join();
     }
 
     /**
