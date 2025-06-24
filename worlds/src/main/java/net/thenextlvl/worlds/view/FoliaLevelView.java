@@ -35,8 +35,8 @@ public class FoliaLevelView extends PaperLevelView {
                     var chunkCache = level.getChunkSource();
                     chunkCache.save(flush);
                     future.complete(null);
-                } catch (Throwable t) {
-                    future.completeExceptionally(t);
+                } catch (Exception e) {
+                    future.completeExceptionally(e);
                 }
             });
         });
