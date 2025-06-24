@@ -19,10 +19,10 @@ class WorldSaveAllCommand {
     }
 
     private static int saveAll(CommandSourceStack source, boolean flush, WorldsPlugin plugin) {
-        plugin.bundle().sendMessage(source.getSender(), "world.save.saving");
+        plugin.bundle().sendMessage(source.getSender(), "world.save.all");
         var server = ((CraftServer) plugin.getServer()).getServer();
         var saved = server.saveEverything(!(source.getSender() instanceof ConsoleCommandSender), flush, true);
-        var message = saved ? "world.save.success" : "world.save.failed";
+        var message = saved ? "world.save.all.success" : "world.save.all.failed";
         plugin.bundle().sendMessage(source.getSender(), message);
         return saved ? Command.SINGLE_SUCCESS : 0;
     }
