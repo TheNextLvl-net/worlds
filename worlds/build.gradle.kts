@@ -133,7 +133,7 @@ paper {
         register("worlds.command.list") { children = listOf("worlds.command") }
         register("worlds.command.load") { children = listOf("worlds.command") }
         register("worlds.command.save") { children = listOf("worlds.command") }
-        register("worlds.command.save-all") { children = listOf("worlds.command") }
+        register("worlds.command.save-all") { children = listOf("worlds.command", "minecraft.command.save-all") }
         register("worlds.command.save-off") { children = listOf("worlds.command") }
         register("worlds.command.save-on") { children = listOf("worlds.command") }
         register("worlds.command.seed") { children = listOf("minecraft.command.seed") }
