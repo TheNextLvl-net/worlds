@@ -360,7 +360,7 @@ public class PaperLevelView implements LevelView {
         var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
         players.forEach(player -> player.teleport(fallback, TeleportCause.PLUGIN));
 
-        plugin.levelView().saveLevelData(world, false);
+        plugin.levelView().saveLevelDataAsync(world).join(); // todo: maybe not join?
         if (!plugin.levelView().unload(world, false))
             return CompletableFuture.completedFuture(DeletionResult.UNLOAD_FAILED);
 

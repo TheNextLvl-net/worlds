@@ -68,7 +68,7 @@ class WorldUnloadCommand {
         world.getPlayers().forEach(player -> player.teleport(fallbackSpawn));
 
         plugin.levelView().persistStatus(world, false, false);
-        if (!world.isAutoSave()) plugin.levelView().saveLevelData(world, false);
+        if (!world.isAutoSave()) plugin.levelView().saveLevelDataAsync(world).join();
 
         return plugin.levelView().unload(world, world.isAutoSave())
                 ? "world.unload.success"

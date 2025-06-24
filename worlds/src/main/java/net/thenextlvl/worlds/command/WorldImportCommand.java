@@ -89,7 +89,7 @@ class WorldImportCommand {
 
             plugin.levelView().persistWorld(level, true);
             if (generator != null) plugin.levelView().persistGenerator(level, generator);
-            plugin.levelView().saveLevelData(level, true);
+            plugin.levelView().saveLevelDataAsync(level);
 
             if (!(context.getSource().getSender() instanceof Entity entity)) return;
             entity.teleportAsync(level.getSpawnLocation(), COMMAND);

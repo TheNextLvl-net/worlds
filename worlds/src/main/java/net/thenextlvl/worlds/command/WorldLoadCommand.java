@@ -48,7 +48,7 @@ class WorldLoadCommand {
                     Placeholder.parsed("world", level.getName()));
 
             plugin.levelView().persistStatus(level, true, true);
-            plugin.levelView().saveLevelData(level, true);
+            plugin.levelView().saveLevelDataAsync(level);
 
             if (!(context.getSource().getSender() instanceof Entity entity)) return;
             entity.teleportAsync(level.getSpawnLocation(), COMMAND);
