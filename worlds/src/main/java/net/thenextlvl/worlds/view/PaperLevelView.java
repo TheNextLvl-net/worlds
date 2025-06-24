@@ -282,8 +282,8 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public DeletionResult delete(World world, boolean schedule) {
-        return schedule ? scheduleDeletion(world) : deleteNow(world);
+    public CompletableFuture<DeletionResult> deleteAsync(World world, boolean schedule) {
+        return schedule ? CompletableFuture.completedFuture(scheduleDeletion(world)) : deleteNow(world);
     }
 
     @Override
@@ -299,8 +299,7 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public CompletableFuture<DeletionResult> regenerateAsync(World world, boolean schedule) {
-        return schedule ? CompletableFuture.completedFuture(scheduleRegeneration(world))
-                : regenerateNow(world);
+        return schedule ? CompletableFuture.completedFuture(scheduleRegeneration(world)) : regenerateNow(world);
     }
 
     @Override
@@ -314,20 +313,24 @@ public class PaperLevelView implements LevelView {
         return regenerations.containsKey(world.getKey());
     }
 
-    private DeletionResult deleteNow(World world) {
-        if (WorldsPlugin.RUNNING_FOLIA || world.getKey().asString().equals("minecraft:overworld"))
-            return DeletionResult.REQUIRES_SCHEDULING;
+    private CompletableFuture<DeletionResult> deleteNow(World world) {
+        if (world.getKey().asString().equals("minecraft:overworld"))
+            return CompletableFuture.completedFuture(DeletionResult.REQUIRES_SCHEDULING);
 
-        if (!new WorldDeleteEvent(world).callEvent()) return DeletionResult.FAILED;
+        if (!new WorldDeleteEvent(world).callEvent())
+            return CompletableFuture.completedFuture(DeletionResult.FAILED);
 
         var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
-        world.getPlayers().forEach(player -> player.teleport(fallback));
+        
+        var futures = world.getPlayers().stream()
+                .map(player -> player.teleportAsync(fallback))
+                .toList().toArray(new CompletableFuture[0]);
+        
 
-        if (!plugin.levelView().unload(world, false))
-            return DeletionResult.UNLOAD_FAILED;
-
-        delete(world.getWorldFolder().toPath());
-        return DeletionResult.SUCCESS;
+        return unloadAsync(world, false).thenApply(success -> {
+            if (success) delete(world.getWorldFolder().toPath());
+            return success ? DeletionResult.SUCCESS : DeletionResult.UNLOAD_FAILED;
+        });
     }
 
     private DeletionResult scheduleDeletion(World world) {
@@ -360,15 +363,15 @@ public class PaperLevelView implements LevelView {
         var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
         players.forEach(player -> player.teleport(fallback, TeleportCause.PLUGIN));
 
-        plugin.levelView().saveLevelDataAsync(world).join(); // todo: maybe not join?
-        if (!plugin.levelView().unload(world, false))
-            return CompletableFuture.completedFuture(DeletionResult.UNLOAD_FAILED);
+        saveLevelDataAsync(world).join(); // todo: maybe not join?
+        return unloadAsync(world, false).thenCompose(success -> {
+            if (!success) return CompletableFuture.completedFuture(DeletionResult.UNLOAD_FAILED);
 
-        regenerate(world.getWorldFolder().toPath());
-
-        return plugin.levelBuilder(world).build().createAsync().thenAccept(regenerated -> {
-            players.forEach(player -> player.teleportAsync(regenerated.getSpawnLocation(), TeleportCause.PLUGIN));
-        }).thenApply(ignored -> DeletionResult.SUCCESS);
+            regenerate(world.getWorldFolder().toPath());
+            return plugin.levelBuilder(world).build().createAsync().thenAccept(regenerated -> {
+                players.forEach(player -> player.teleportAsync(regenerated.getSpawnLocation(), TeleportCause.PLUGIN));
+            }).thenApply(ignored -> DeletionResult.SUCCESS);
+        });
     }
 
     private DeletionResult scheduleRegeneration(World world) {
