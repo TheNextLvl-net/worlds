@@ -10,6 +10,7 @@ import net.thenextlvl.worlds.api.WorldsProvider;
 import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.view.GeneratorView;
+import net.thenextlvl.worlds.command.SaveAllCommand;
 import net.thenextlvl.worlds.command.SeedCommand;
 import net.thenextlvl.worlds.command.WorldCommand;
 import net.thenextlvl.worlds.level.LevelData;
@@ -185,6 +186,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS.newHandler(event -> {
             event.registrar().register(WorldCommand.create(this));
             event.registrar().register(SeedCommand.create(this));
+            event.registrar().register(SaveAllCommand.create(this));
         }));
     }
 }

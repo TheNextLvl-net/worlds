@@ -1,7 +1,7 @@
 package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.thenextlvl.worlds.WorldsPlugin;
@@ -10,12 +10,13 @@ import org.jspecify.annotations.NullMarked;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
-class WorldSaveAllCommand {
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
+public class SaveAllCommand {
+    public static LiteralCommandNode<CommandSourceStack> create(WorldsPlugin plugin) {
         return Commands.literal("save-all")
-                .requires(source -> source.getSender().hasPermission("worlds.command.save-all"))
+                .requires(source -> source.getSender().hasPermission("minecraft.command.save-all"))
                 .then(Commands.literal("flush").executes(context -> saveAll(context.getSource(), true, plugin)))
-                .executes(context -> saveAll(context.getSource(), false, plugin));
+                .executes(context -> saveAll(context.getSource(), false, plugin))
+                .build();
     }
 
     private static int saveAll(CommandSourceStack source, boolean flush, WorldsPlugin plugin) {
