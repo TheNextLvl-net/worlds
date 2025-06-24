@@ -18,7 +18,6 @@ import org.jspecify.annotations.Nullable;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @NullMarked
 public interface Level extends Keyed {
@@ -133,11 +132,7 @@ public interface Level extends Keyed {
      */
     @Deprecated(forRemoval = true, since = "3.2.0")
     default Optional<World> create() {
-        try {
-            return Optional.of(createAsync().get());
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        return Optional.of(createAsync().join());
     }
 
     /**
