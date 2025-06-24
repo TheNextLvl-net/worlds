@@ -67,7 +67,7 @@ public class FoliaLevelView extends PaperLevelView {
             if (save) saveAsync(world, true).get(); // todo: maybe not join?
 
             handle.getChunkSource().close(false);
-            FeatureHooks.closeEntityManager(handle, save); // SPIGOT-6722: close entityManager // Paper - chunk system
+            FeatureHooks.closeEntityManager(handle, save);
             handle.levelStorageAccess.close();
         } catch (Exception ex) {
             plugin.getLogger().log(Level.SEVERE, null, ex);
