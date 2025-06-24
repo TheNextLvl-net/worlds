@@ -224,10 +224,10 @@ class PaperLevel extends LevelData {
                 chunkGenerator, biomeProvider
         );
 
-        // todo: do we still need this check? 
-        //Preconditions.checkState(server.getWorld(key) != null, "World with key %s was not properly memoized", key);
+        if (server.getWorld(name) == null) return CompletableFuture.failedFuture(
+                new IllegalStateException("World with name " + name + " was not properly memoized")
+        );
 
-        // todo: do we have to move this past initWorld?
         console.addLevel(serverLevel);
 
         var future = new CompletableFuture<World>();
