@@ -322,16 +322,14 @@ public class PaperLevelView implements LevelView {
             return CompletableFuture.completedFuture(DeletionResult.FAILED);
 
         var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
-        
-        var futures = world.getPlayers().stream()
-                .map(player -> player.teleportAsync(fallback))
-                .toList().toArray(new CompletableFuture[0]);
-        
 
-        return unloadAsync(world, false).thenApply(success -> {
+        return CompletableFuture.allOf(world.getPlayers().stream()
+                .map(player -> player.teleportAsync(fallback))
+                .toList().toArray(new CompletableFuture[0])
+        ).thenCompose(unused -> unloadAsync(world, false).thenApply(success -> {
             if (success) delete(world.getWorldFolder().toPath());
             return success ? DeletionResult.SUCCESS : DeletionResult.UNLOAD_FAILED;
-        });
+        }));
     }
 
     private DeletionResult scheduleDeletion(World world) {
