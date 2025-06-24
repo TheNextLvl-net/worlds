@@ -5,9 +5,9 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.thenextlvl.worlds.WorldsPlugin;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.craftbukkit.CraftServer;
 import org.jspecify.annotations.NullMarked;
+
+import java.util.concurrent.CompletableFuture;
 
 @NullMarked
 class WorldSaveAllCommand {
@@ -20,10 +20,15 @@ class WorldSaveAllCommand {
 
     private static int saveAll(CommandSourceStack source, boolean flush, WorldsPlugin plugin) {
         plugin.bundle().sendMessage(source.getSender(), "world.save.all");
-        var server = ((CraftServer) plugin.getServer()).getServer();
-        var saved = server.saveEverything(!(source.getSender() instanceof ConsoleCommandSender), flush, true);
-        var message = saved ? "world.save.all.success" : "world.save.all.failed";
-        plugin.bundle().sendMessage(source.getSender(), message);
-        return saved ? Command.SINGLE_SUCCESS : 0;
+        CompletableFuture.allOf(plugin.getServer().getWorlds().stream().map(world -> {
+            return plugin.levelView().saveAsync(world, flush);
+        }).toList().toArray(new CompletableFuture[]{})).thenAccept(ignored -> {
+            plugin.bundle().sendMessage(source.getSender(), "world.save.all.success");
+        }).exceptionally(throwable -> {
+            plugin.bundle().sendMessage(source.getSender(), "world.save.all.failed");
+            plugin.getComponentLogger().warn("Failed to save all worlds", throwable);
+            return null;
+        });
+        return Command.SINGLE_SUCCESS;
     }
 }
