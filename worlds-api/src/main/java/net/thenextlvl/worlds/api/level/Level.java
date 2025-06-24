@@ -144,7 +144,7 @@ public interface Level extends Keyed {
      * Creates and initializes a new {@link World} based on the current configuration of the {@link Level} instance.
      * <p>
      * Completes exceptionally if:
-     * 
+     * // todo: document
      *
      * @return a {@code CompletableFuture} completing with the created {@link World}
      */
