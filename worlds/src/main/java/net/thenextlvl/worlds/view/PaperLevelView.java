@@ -299,8 +299,9 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public DeletionResult regenerate(World world, boolean schedule) {
-        return schedule ? scheduleRegeneration(world) : regenerateNow(world);
+    public CompletableFuture<DeletionResult> regenerateAsync(World world, boolean schedule) {
+        return schedule ? CompletableFuture.completedFuture(scheduleRegeneration(world))
+                : regenerateNow(world);
     }
 
     @Override
@@ -348,11 +349,12 @@ public class PaperLevelView implements LevelView {
         return DeletionResult.SCHEDULED;
     }
 
-    private DeletionResult regenerateNow(World world) {
+    private CompletableFuture<DeletionResult> regenerateNow(World world) {
         if (WorldsPlugin.RUNNING_FOLIA || world.getKey().asString().equals("minecraft:overworld"))
-            return DeletionResult.REQUIRES_SCHEDULING;
+            return CompletableFuture.completedFuture(DeletionResult.REQUIRES_SCHEDULING);
 
-        if (!new WorldRegenerateEvent(world).callEvent()) return DeletionResult.FAILED;
+        if (!new WorldRegenerateEvent(world).callEvent())
+            return CompletableFuture.completedFuture(DeletionResult.FAILED);
 
         var players = world.getPlayers();
 
@@ -360,14 +362,14 @@ public class PaperLevelView implements LevelView {
         players.forEach(player -> player.teleport(fallback, TeleportCause.PLUGIN));
 
         plugin.levelView().saveLevelData(world, false);
-        if (!plugin.levelView().unload(world, false)) return DeletionResult.UNLOAD_FAILED;
+        if (!plugin.levelView().unload(world, false))
+            return CompletableFuture.completedFuture(DeletionResult.UNLOAD_FAILED);
 
         regenerate(world.getWorldFolder().toPath());
 
-        var regenerated = plugin.levelBuilder(world).build().create().orElse(null);
-        if (regenerated != null) players.forEach(player ->
-                player.teleportAsync(regenerated.getSpawnLocation(), TeleportCause.PLUGIN));
-        return regenerated != null ? DeletionResult.SUCCESS : DeletionResult.FAILED;
+        return plugin.levelBuilder(world).build().createAsync().thenAccept(regenerated -> {
+            players.forEach(player -> player.teleportAsync(regenerated.getSpawnLocation(), TeleportCause.PLUGIN));
+        }).thenApply(ignored -> DeletionResult.SUCCESS);
     }
 
     private DeletionResult scheduleRegeneration(World world) {

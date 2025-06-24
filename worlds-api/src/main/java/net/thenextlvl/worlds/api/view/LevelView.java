@@ -256,8 +256,27 @@ public interface LevelView {
      * @param schedule if true, the regeneration will be scheduled for later execution;
      *                 if false, the regeneration will be attempted immediately
      * @return a {@code DeletionResult} indicating the outcome of the regeneration process.
+     * @deprecated use {@link #regenerateAsync(World, boolean)}
      */
-    DeletionResult regenerate(World world, boolean schedule);
+    @Deprecated(forRemoval = true, since = "3.2.0")
+    default DeletionResult regenerate(World world, boolean schedule) {
+        try {
+            return regenerateAsync(world, schedule).get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Regenerates the specified world, either immediately or scheduled, based on the provided parameters.
+     *
+     * @param world    the world to be regenerated
+     * @param schedule if true, the regeneration will be scheduled for later execution;
+     *                 if false, the regeneration will be attempted immediately
+     * @return a {@code CompletableFuture} completing with a
+     * {@code DeletionResult} indicating the outcome of the regeneration process.
+     */
+    CompletableFuture<DeletionResult> regenerateAsync(World world, boolean schedule);
 
     /**
      * Cancels the regeneration process for the specified world, if scheduled.
