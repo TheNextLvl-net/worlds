@@ -64,21 +64,24 @@ class PaperLevel extends LevelData {
 
     @Override
     public CompletableFuture<World> createAsync() {
-        var future = new CompletableFuture<World>();
         var server = ((CraftServer) plugin.getServer());
         var console = server.getServer();
 
-        Preconditions.checkState(console.getAllLevels().iterator().hasNext(), "Cannot create worlds before main level is created");
-        Preconditions.checkArgument(!Files.exists(directory) || Files.isDirectory(directory), "File (%s) exists and isn't a folder", directory);
+        try {
+            Preconditions.checkState(console.getAllLevels().iterator().hasNext(), "Cannot create worlds before main level is created");
+            Preconditions.checkArgument(!Files.exists(directory) || Files.isDirectory(directory), "File (%s) exists and isn't a folder", directory);
 
-        Preconditions.checkArgument(server.getWorld(key) == null, "World with key %s already exists", key);
-        Preconditions.checkArgument(server.getWorld(name) == null, "World with name %s already exists", name);
+            Preconditions.checkArgument(server.getWorld(key) == null, "World with key %s already exists", key);
+            Preconditions.checkArgument(server.getWorld(name) == null, "World with name %s already exists", name);
 
-        Preconditions.checkState(plugin.getServer().getWorlds().stream()
-                        .map(World::getWorldFolder)
-                        .map(File::toPath)
-                        .noneMatch(directory::equals),
-                "World with directory %s already exists", directory);
+            Preconditions.checkState(plugin.getServer().getWorlds().stream()
+                            .map(World::getWorldFolder)
+                            .map(File::toPath)
+                            .noneMatch(directory::equals),
+                    "World with directory %s already exists", directory);
+        } catch (RuntimeException e) {
+            return CompletableFuture.failedFuture(e);
+        }
 
         var chunkGenerator = Optional.ofNullable(super.chunkGenerator)
                 .orElseGet(() -> Optional.ofNullable(generator)
@@ -95,7 +98,7 @@ class PaperLevel extends LevelData {
         try {
             levelStorageAccess = LevelStorageSource.createDefault(server.getWorldContainer().toPath()).validateAndCreateAccess(name, dimensionType);
         } catch (IOException | ContentValidationException ex) {
-            throw new RuntimeException(ex);
+            return CompletableFuture.failedFuture(ex);
         }
 
         Dynamic<?> dataTag;
@@ -227,6 +230,7 @@ class PaperLevel extends LevelData {
         // todo: do we have to move this past initWorld?
         console.addLevel(serverLevel);
 
+        var future = new CompletableFuture<World>();
         if (WorldsPlugin.RUNNING_FOLIA) {
             serverLevel.randomSpawnSelection = new ChunkPos(serverLevel.getChunkSource().randomState().sampler().findSpawnPosition());
 
