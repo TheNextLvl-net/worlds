@@ -105,8 +105,24 @@ public interface LevelView {
      * @param world the world to be unloaded
      * @param save  whether changes to the world should be saved before unloading
      * @return true if the world was successfully unloaded, otherwise false
+     * @deprecated use {@link #unloadAsync(World, boolean)}
      */
-    boolean unload(World world, boolean save);
+    default boolean unload(World world, boolean save) {
+        try {
+            return unloadAsync(world, save).get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Unloads the specified world from the server.
+     *
+     * @param world the world to be unloaded
+     * @param save  whether changes to the world should be saved before unloading
+     * @return A {@code CompletableFuture} completing with true if the world was successfully unloaded, otherwise false
+     */
+    CompletableFuture<Boolean> unloadAsync(World world, boolean save);
 
     /**
      * Saves the specified world, with an option to flush pending changes immediately.
