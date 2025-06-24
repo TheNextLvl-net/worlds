@@ -125,6 +125,7 @@ class WorldCreateCommand {
                 .generatorType(type)
                 .build();
 
+        // todo: add creating message
         level.createAsync().thenAccept(world -> {
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.create.success",
                     Placeholder.parsed("world", name));
