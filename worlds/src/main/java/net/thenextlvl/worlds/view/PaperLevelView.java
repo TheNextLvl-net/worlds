@@ -156,8 +156,8 @@ public class PaperLevelView implements LevelView {
             level.save(null, flush, false);
             level.noSave = oldSave;
             return CompletableFuture.completedFuture(null);
-        } catch (Throwable t) {
-            return CompletableFuture.failedFuture(t);
+        } catch (Exception e) {
+            return CompletableFuture.failedFuture(e);
         }
     }
 
@@ -206,8 +206,8 @@ public class PaperLevelView implements LevelView {
             try {
                 var size = ((CraftWorld) world).getHandle().levelStorageAccess.makeWorldBackup();
                 return CompletableFuture.completedFuture(size);
-            } catch (Throwable t) {
-                return CompletableFuture.failedFuture(t);
+            } catch (Exception e) {
+                return CompletableFuture.failedFuture(e);
             }
         });
     }
