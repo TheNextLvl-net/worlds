@@ -125,10 +125,11 @@ class WorldCreateCommand {
                 .generatorType(type)
                 .build();
 
-        // todo: add creating message
+        plugin.bundle().sendMessage(context.getSource().getSender(), "world.create", 
+                Placeholder.parsed("world", name));
         level.createAsync().thenAccept(world -> {
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.create.success",
-                    Placeholder.parsed("world", name));
+                    Placeholder.parsed("world", world.getName()));
 
             plugin.levelView().persistWorld(world, true);
             if (generator != null) plugin.levelView().persistGenerator(world, generator);
