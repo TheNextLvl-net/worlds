@@ -65,12 +65,10 @@ class WorldUnloadCommand {
                 .map(player -> player.teleportAsync(fallbackSpawn))
                 .toList().toArray(new CompletableFuture[0])
         ).thenCompose(unused -> {
-            plugin.levelView().persistStatus(world, false, false);
-            plugin.levelView().saveLevelDataAsync(world).join();
-
-            return plugin.levelView().unloadAsync(world, true).thenApply(success -> {
-                return success ? "world.unload.success" : "world.unload.failed";
-            });
+            plugin.levelView().setEnabled(world, false);
+            return plugin.levelView().unloadAsync(world, true);
+        }).thenApply(success -> {
+            return success ? "world.unload.success" : "world.unload.failed";
         });
     }
 }

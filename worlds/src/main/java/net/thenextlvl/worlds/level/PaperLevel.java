@@ -41,7 +41,9 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraft.world.level.validation.ContentValidationException;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.generator.DimensionType;
+import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.preset.Presets;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.generator.CraftWorldInfo;
@@ -55,6 +57,8 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+
+import static org.bukkit.persistence.PersistentDataType.STRING;
 
 @NullMarked
 class PaperLevel extends LevelData {
@@ -256,8 +260,22 @@ class PaperLevel extends LevelData {
             io.papermc.paper.threadedregions.RegionizedServer.getInstance().addWorld(serverLevel);
         FeatureHooks.tickEntityManager(serverLevel);
 
+        persistWorld(serverLevel.getWorld(), enabled.toBooleanOrElse(true));
+        if (generator != null) persistGenerator(serverLevel.getWorld(), generator);
+
         new WorldLoadEvent(serverLevel.getWorld()).callEvent();
         return future;
+    }
+
+    public void persistWorld(World world, boolean enabled) {
+        var worldKey = new NamespacedKey("worlds", "world_key");
+        world.getPersistentDataContainer().set(worldKey, STRING, world.getKey().asString());
+        plugin.levelView().setEnabled(world, enabled);
+    }
+
+    public void persistGenerator(World world, Generator generator) {
+        var generatorKey = new NamespacedKey("worlds", "generator");
+        world.getPersistentDataContainer().set(generatorKey, STRING, generator.asString());
     }
 
     private ResourceKey<LevelStem> resolveDimensionKey() {

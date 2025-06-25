@@ -162,6 +162,22 @@ public interface LevelView {
     CompletableFuture<Void> saveLevelDataAsync(World world);
 
     /**
+     * Determines if the specified world is enabled and will be loaded on startup.
+     *
+     * @param world the world to check
+     * @return true if the world is enabled, false otherwise
+     */
+    boolean isEnabled(World world);
+
+    /**
+     * Sets whether the specified world is enabled and will be loaded on startup.
+     *
+     * @param world   the world to enable or disable
+     * @param enabled true to enable the world, false to disable it
+     */
+    void setEnabled(World world, boolean enabled);
+
+    /**
      * Creates a backup for the given world and returns the size of the backup in bytes.
      *
      * @param world the world to back up

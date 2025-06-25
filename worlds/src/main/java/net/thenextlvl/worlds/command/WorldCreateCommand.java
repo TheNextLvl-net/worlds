@@ -130,11 +130,6 @@ class WorldCreateCommand {
         level.createAsync().thenAccept(world -> {
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.create.success",
                     Placeholder.parsed("world", world.getName()));
-
-            plugin.levelView().persistWorld(world, true);
-            if (generator != null) plugin.levelView().persistGenerator(world, generator);
-            plugin.levelView().saveLevelDataAsync(world);
-
             if (!(context.getSource().getSender() instanceof Entity entity)) return;
             entity.teleportAsync(world.getSpawnLocation(), COMMAND);
         }).exceptionally(throwable -> {
