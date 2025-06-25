@@ -38,6 +38,7 @@ public class FoliaLevelView extends PaperLevelView {
                 }
             });
         });
+        futures.add(saveLevelDataAsync(world));
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
 

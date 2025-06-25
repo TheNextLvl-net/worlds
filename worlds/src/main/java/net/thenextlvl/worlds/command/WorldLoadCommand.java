@@ -44,12 +44,9 @@ class WorldLoadCommand {
         }
 
         future.thenAccept(level -> {
+            plugin.levelView().setEnabled(level, true);
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.load.success",
                     Placeholder.parsed("world", level.getName()));
-
-            plugin.levelView().persistStatus(level, true, true);
-            plugin.levelView().saveLevelDataAsync(level);
-
             if (!(context.getSource().getSender() instanceof Entity entity)) return;
             entity.teleportAsync(level.getSpawnLocation(), COMMAND);
         }).exceptionally(throwable -> {

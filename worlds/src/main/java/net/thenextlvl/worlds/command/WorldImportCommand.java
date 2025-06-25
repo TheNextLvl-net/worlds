@@ -87,11 +87,6 @@ class WorldImportCommand {
         world.thenAccept(level -> {
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.import.success",
                     Placeholder.parsed("world", level.getName()));
-
-            plugin.levelView().persistWorld(level, true);
-            if (generator != null) plugin.levelView().persistGenerator(level, generator);
-            plugin.levelView().saveLevelDataAsync(level);
-
             if (!(context.getSource().getSender() instanceof Entity entity)) return;
             entity.teleportAsync(level.getSpawnLocation(), COMMAND);
         }).exceptionally(throwable -> {

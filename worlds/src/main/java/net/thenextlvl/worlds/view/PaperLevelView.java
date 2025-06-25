@@ -13,7 +13,6 @@ import net.thenextlvl.worlds.api.event.WorldBackupEvent;
 import net.thenextlvl.worlds.api.event.WorldCloneEvent;
 import net.thenextlvl.worlds.api.event.WorldDeleteEvent;
 import net.thenextlvl.worlds.api.event.WorldRegenerateEvent;
-import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.view.LevelView;
 import net.thenextlvl.worlds.level.LevelData;
@@ -45,10 +44,11 @@ import java.util.stream.Collectors;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
-import static org.bukkit.persistence.PersistentDataType.STRING;
 
 @NullMarked
 public class PaperLevelView implements LevelView {
+    private static final NamespacedKey ENABLED_KEY = new NamespacedKey("worlds", "enabled");
+    
     private final Map<Key, Thread> regenerations = new HashMap<>();
     private final Map<Key, Thread> deletions = new HashMap<>();
     protected final WorldsPlugin plugin;
@@ -138,24 +138,34 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public CompletableFuture<Boolean> unloadAsync(World world, boolean save) {
-        if (!plugin.getServer().unloadWorld(world, save)) return CompletableFuture.completedFuture(false);
-        var dragonBattle = world.getEnderDragonBattle();
-        if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
-        return CompletableFuture.completedFuture(true);
+        return saveLevelDataAsync(world).thenCompose(unused -> {
+            var future = new CompletableFuture<Boolean>();
+            plugin.getServer().getGlobalRegionScheduler().run(plugin, scheduledTask -> {
+                if (plugin.getServer().unloadWorld(world, save)) {
+                    var dragonBattle = world.getEnderDragonBattle();
+                    if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
+                    future.complete(true);
+                } else future.complete(false);
+            });
+            return future;
+        }).exceptionally(throwable -> {
+            plugin.getComponentLogger().warn("Failed to save level data before unloading", throwable);
+            return false;
+        });
     }
 
     /**
      * @see CraftWorld#save(boolean)
      */
     @Override
-    public CompletableFuture<Void> saveAsync(World world, boolean flush) {
+    public CompletableFuture<@Nullable Void> saveAsync(World world, boolean flush) {
         try {
             var level = ((CraftWorld) world).getHandle();
             var oldSave = level.noSave;
             level.noSave = false;
             level.save(null, flush, false);
             level.noSave = oldSave;
-            return CompletableFuture.completedFuture(null);
+            return saveLevelDataAsync(world);
         } catch (Exception e) {
             return CompletableFuture.failedFuture(e);
         }
@@ -179,24 +189,14 @@ public class PaperLevelView implements LevelView {
         return level.getChunkSource().getDataStorage().scheduleSave().thenApply(ignored -> null);
     }
 
-    @Deprecated(forRemoval = true)
-    public void persistWorld(World world, boolean enabled) {
-        var worldKey = new NamespacedKey("worlds", "world_key");
-        world.getPersistentDataContainer().set(worldKey, STRING, world.getKey().asString());
-        persistStatus(world, enabled, true);
+    @Override
+    public boolean isEnabled(World world) {
+        return Boolean.TRUE.equals(world.getPersistentDataContainer().get(ENABLED_KEY, BOOLEAN));
     }
 
-    @Deprecated(forRemoval = true)
-    public void persistStatus(World world, boolean enabled, boolean force) {
-        var enabledKey = new NamespacedKey("worlds", "enabled");
-        if (!force && !world.getPersistentDataContainer().has(enabledKey)) return;
-        world.getPersistentDataContainer().set(enabledKey, BOOLEAN, enabled);
-    }
-
-    @Deprecated(forRemoval = true)
-    public void persistGenerator(World world, Generator generator) {
-        var generatorKey = new NamespacedKey("worlds", "generator");
-        world.getPersistentDataContainer().set(generatorKey, STRING, generator.asString());
+    @Override
+    public void setEnabled(World world, boolean enabled) {
+        world.getPersistentDataContainer().set(ENABLED_KEY, BOOLEAN, enabled);
     }
 
     @Override
