@@ -362,14 +362,16 @@ public class PaperLevelView implements LevelView {
         var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
         players.forEach(player -> player.teleport(fallback, TeleportCause.PLUGIN));
 
-        saveLevelDataAsync(world).join(); // todo: maybe not join?
-        return unloadAsync(world, false).thenCompose(success -> {
+        return saveLevelDataAsync(world).thenCompose(unused -> unloadAsync(world, false).thenCompose(success -> {
             if (!success) return CompletableFuture.completedFuture(DeletionResult.UNLOAD_FAILED);
 
             regenerate(world.getWorldFolder().toPath());
             return plugin.levelBuilder(world).build().createAsync().thenAccept(regenerated -> {
                 players.forEach(player -> player.teleportAsync(regenerated.getSpawnLocation(), TeleportCause.PLUGIN));
             }).thenApply(ignored -> DeletionResult.SUCCESS);
+        })).exceptionally(throwable -> {
+            plugin.getComponentLogger().warn("Failed to save level data before regeneration", throwable);
+            return DeletionResult.FAILED;
         });
     }
 
