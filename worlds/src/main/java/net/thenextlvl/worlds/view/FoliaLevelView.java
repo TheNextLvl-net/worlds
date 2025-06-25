@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.logging.Level;
 
 @NullMarked
 public class FoliaLevelView extends PaperLevelView {
@@ -63,25 +62,33 @@ public class FoliaLevelView extends PaperLevelView {
         var event = new WorldUnloadEvent(handle.getWorld());
         if (!event.callEvent()) return CompletableFuture.completedFuture(false);
 
-        try {
-            if (save) saveAsync(world, true).get(); // todo: maybe not join?
+        var future = save ? saveAsync(world, true) : CompletableFuture.completedFuture(null);
 
-            handle.getChunkSource().close(false);
-            FeatureHooks.closeEntityManager(handle, save);
-            handle.levelStorageAccess.close();
-        } catch (Exception ex) {
-            plugin.getLogger().log(Level.SEVERE, null, ex);
-        }
+        return future.handle((result, throwable) -> {
+            if (throwable != null) {
+                plugin.getComponentLogger().error("Error during world save", throwable);
+            }
 
-        try {
-            var field = server.getClass().getDeclaredField("worlds");
-            field.trySetAccessible();
-            @SuppressWarnings("unchecked") var worlds = (Map<String, World>) field.get(server);
-            worlds.remove(world.getName().toLowerCase(Locale.ROOT));
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            return CompletableFuture.failedFuture(e);
-        }
-        server.getServer().removeLevel(handle);
-        return CompletableFuture.completedFuture(true);
+            try {
+                handle.getChunkSource().close(false);
+                FeatureHooks.closeEntityManager(handle, save);
+                handle.levelStorageAccess.close();
+            } catch (Exception ex) {
+                plugin.getComponentLogger().error("Failed to properly close world after saving", ex);
+            }
+
+            try {
+                var field = server.getClass().getDeclaredField("worlds");
+                field.trySetAccessible();
+                @SuppressWarnings("unchecked") var worlds = (Map<String, World>) field.get(server);
+                worlds.remove(world.getName().toLowerCase(Locale.ROOT));
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                plugin.getComponentLogger().error("Failed to remove world from memory", throwable);
+                return false;
+            }
+
+            server.getServer().removeLevel(handle);
+            return true;
+        });
     }
 }
