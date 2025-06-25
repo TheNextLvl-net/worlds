@@ -87,24 +87,14 @@ public class FoliaLevelView extends PaperLevelView {
                 return false;
             }
 
-        server.getServer().removeLevel(handle);
+            server.getServer().removeLevel(handle);
 
-        CompletableFuture
-                .supplyAsync(() -> {
-                    handle.regioniser.computeForAllRegions(regionThread -> {
-                        if (regionThread.getData().world == handle) {
-                            regionThread.getData().getRegionSchedulingHandle().markNonSchedulable();
-                        }
-                    });
-                    return true;
-                })
-                .whenComplete((val, e) -> {
-                    if (e != null) {
-                        plugin.getSLF4JLogger().error("Terminate region thread fail for {}", world.getName());
-                    }
-                });
+            handle.regioniser.computeForAllRegionsUnsynchronised(regionThread -> {
+                if (regionThread.getData().world != handle) return;
+                regionThread.getData().getRegionSchedulingHandle().markNonSchedulable();
+            });
 
-        return true;
+            return true;
         });
     }
 }
