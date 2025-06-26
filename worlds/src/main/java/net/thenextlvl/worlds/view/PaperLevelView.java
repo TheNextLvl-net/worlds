@@ -50,9 +50,12 @@ import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
 @NullMarked
 public class PaperLevelView implements LevelView {
     private static final NamespacedKey ENABLED_KEY = new NamespacedKey("worlds", "enabled");
-    
     private final Map<Key, Thread> regenerations = new HashMap<>();
     private final Map<Key, Thread> deletions = new HashMap<>();
+
+    private static final Set<String> SKIP_DIRECTORIES = Set.of("advancements", "datapacks", "playerdata", "stats");
+    private static final Set<String> SKIP_FILES = Set.of("uid.dat", "session.lock");
+
     protected final WorldsPlugin plugin;
 
     public PaperLevelView(WorldsPlugin plugin) {
@@ -434,10 +437,7 @@ public class PaperLevelView implements LevelView {
         Files.walkFileTree(source, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attributes) throws IOException {
-                if (switch (path.getFileName().toString()) {
-                    case "advancements", "datapacks", "playerdata", "stats" -> true;
-                    default -> false;
-                }) return FileVisitResult.SKIP_SUBTREE;
+                if (SKIP_DIRECTORIES.contains(path.getFileName().toString())) return FileVisitResult.SKIP_SUBTREE;
                 if (filter != null && !filter.test(path, attributes)) return FileVisitResult.SKIP_SUBTREE;
                 Files.createDirectories(destination.resolve(source.relativize(path)));
                 return FileVisitResult.CONTINUE;
@@ -445,10 +445,7 @@ public class PaperLevelView implements LevelView {
 
             @Override
             public FileVisitResult visitFile(Path path, BasicFileAttributes attributes) throws IOException {
-                if (switch (path.getFileName().toString()) {
-                    case "uid.dat", "session.lock" -> true;
-                    default -> false;
-                }) return FileVisitResult.CONTINUE;
+                if (SKIP_FILES.contains(path.getFileName().toString())) return FileVisitResult.CONTINUE;
                 if (filter != null && !filter.test(path, attributes)) return FileVisitResult.CONTINUE;
                 Files.copy(path, destination.resolve(source.relativize(path)));
                 return FileVisitResult.CONTINUE;
