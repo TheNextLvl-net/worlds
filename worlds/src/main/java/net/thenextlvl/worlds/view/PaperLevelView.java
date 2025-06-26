@@ -311,7 +311,7 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public boolean isDeletionScheduled(World world) {
-        return deletions.containsKey(world.getKey());
+        return deletions.containsKey(world.key());
     }
 
     @Override
@@ -328,7 +328,7 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public boolean isRegenerationScheduled(World world) {
-        return regenerations.containsKey(world.getKey());
+        return regenerations.containsKey(world.key());
     }
 
     private CompletableFuture<DeletionResult> deleteNow(World world) {

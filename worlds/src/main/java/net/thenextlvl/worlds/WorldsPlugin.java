@@ -131,7 +131,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
                 .biomeProvider(world.getBiomeProvider())
                 .chunkGenerator(world.getGenerator())
                 .spawnChunkRadius(world.getGameRuleValue(GameRule.SPAWN_RADIUS))
-                .key(world.getKey())
+                .key(world.key())
                 .levelStem(switch (world.getEnvironment()) {
                     case NORMAL -> LevelStem.OVERWORLD;
                     case NETHER -> LevelStem.NETHER;
