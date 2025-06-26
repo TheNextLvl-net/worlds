@@ -350,9 +350,14 @@ public class PaperLevelView implements LevelView {
         return CompletableFuture.allOf(world.getPlayers().stream()
                 .map(player -> player.teleportAsync(fallback))
                 .toList().toArray(new CompletableFuture[0])
-        ).thenCompose(unused -> unloadAsync(world, false).thenApply(success -> {
-            if (success) delete(world.getWorldFolder().toPath());
-            return success ? DeletionResult.SUCCESS : DeletionResult.UNLOAD_FAILED;
+        ).thenCompose(ignored -> unloadAsync(world, false).thenApplyAsync(success -> {
+            if (!success) return DeletionResult.UNLOAD_FAILED;
+            delete(world.getWorldFolder().toPath());
+            deletions.remove(world.key());
+            return DeletionResult.SUCCESS;
+        }).exceptionally(throwable -> {
+            plugin.getComponentLogger().warn("Failed to delete world", throwable);
+            return DeletionResult.FAILED;
         }));
     }
 
