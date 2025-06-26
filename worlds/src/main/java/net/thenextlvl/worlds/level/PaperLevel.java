@@ -272,7 +272,7 @@ class PaperLevel extends LevelData {
 
     public void persistWorld(World world, boolean enabled) {
         var worldKey = new NamespacedKey("worlds", "world_key");
-        world.getPersistentDataContainer().set(worldKey, STRING, world.getKey().asString());
+        world.getPersistentDataContainer().set(worldKey, STRING, world.key().asString());
         plugin.levelView().setEnabled(world, enabled);
     }
 
