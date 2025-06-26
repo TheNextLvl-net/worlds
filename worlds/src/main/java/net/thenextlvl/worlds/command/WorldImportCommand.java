@@ -74,27 +74,28 @@ class WorldImportCommand {
         var name = context.getArgument("world", String.class);
         var build = plugin.levelView().read(Path.of(name))
                 .map(level -> level.levelStem(levelStem).generator(generator).key(key).build());
-        var world = build.filter(level -> !level.isWorldKnown()).flatMap(Level::create).orElse(null);
+        var world = build.filter(level -> !level.isWorldKnown()).map(Level::createAsync).orElse(null);
 
-        var message = world != null ? "world.import.success" : "world.import.failed";
-        plugin.bundle().sendMessage(context.getSource().getSender(), message,
-                Placeholder.parsed("world", world != null ? world.getName() : name));
-
-        // todo: extract duplicate, make it look less sketchy
-        if (world != null && context.getSource().getSender() instanceof Entity entity) {
-            if (WorldsPlugin.RUNNING_FOLIA) {
-                plugin.getServer().getRegionScheduler().run(plugin, world, 0, 0, scheduledTask -> {
-                    entity.teleportAsync(world.getSpawnLocation(), COMMAND);
-                });
-            } else entity.teleportAsync(world.getSpawnLocation(), COMMAND);
+        if (world == null) {
+            plugin.bundle().sendMessage(context.getSource().getSender(), "world.import.failed",
+                    Placeholder.parsed("world", name));
+            return 0;
         }
 
-        if (world != null) {
-            plugin.levelView().persistWorld(world, true);
-            if (generator != null) plugin.levelView().persistGenerator(world, generator);
-            plugin.levelView().saveLevelData(world, true);
-        }
+        plugin.bundle().sendMessage(context.getSource().getSender(), "world.import",
+                Placeholder.parsed("world", name));
+        world.thenAccept(level -> {
+            plugin.bundle().sendMessage(context.getSource().getSender(), "world.import.success",
+                    Placeholder.parsed("world", level.getName()));
+            if (!(context.getSource().getSender() instanceof Entity entity)) return;
+            entity.teleportAsync(level.getSpawnLocation(), COMMAND);
+        }).exceptionally(throwable -> {
+            plugin.bundle().sendMessage(context.getSource().getSender(), "world.import.failed",
+                    Placeholder.parsed("world", name));
+            plugin.getComponentLogger().warn("Failed to import world {}", name, throwable);
+            return null;
+        });
 
-        return world != null ? Command.SINGLE_SUCCESS : 0;
+        return Command.SINGLE_SUCCESS;
     }
 }

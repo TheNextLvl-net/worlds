@@ -34,20 +34,19 @@ public class WorldBackupCommand {
     private static int backup(CommandContext<CommandSourceStack> context, World world, WorldsPlugin plugin) {
         var sender = context.getSource().getSender();
         var placeholder = Placeholder.parsed("world", world.getName());
-        try {
-            plugin.bundle().sendMessage(sender, "world.backup", placeholder);
-            var bytes = plugin.levelView().backup(world);
+        plugin.bundle().sendMessage(sender, "world.backup", placeholder);
+        plugin.levelView().backupAsync(world).thenAccept(bytes -> {
             var kb = bytes / 1024d;
             var mb = kb / 1024d;
             var gb = mb / 1024d;
             plugin.bundle().sendMessage(sender, "world.backup.success", placeholder,
                     Formatter.number("size", gb >= 1 ? gb : mb >= 1 ? mb : kb >= 1 ? kb : bytes),
                     Formatter.choice("unit", gb >= 1 ? 0 : mb >= 1 ? 1 : kb >= 1 ? 2 : 3));
-            return Command.SINGLE_SUCCESS;
-        } catch (Exception e) {
-            plugin.getComponentLogger().warn("Failed to backup world {}", world.getName(), e);
+        }).exceptionally(throwable -> {
+            plugin.getComponentLogger().warn("Failed to backup world {}", world.getName(), throwable);
             plugin.bundle().sendMessage(sender, "world.backup.failed", placeholder);
-            return 0;
-        }
+            return null;
+        });
+        return Command.SINGLE_SUCCESS;
     }
 }

@@ -44,18 +44,24 @@ class WorldRegenerateCommand {
         var flags = context.getArgument("flags", CommandFlagsArgument.Flags.class);
         if (!flags.contains("--confirm")) return confirmationNeeded(context, plugin);
         var world = context.getArgument("world", World.class);
-        var result = plugin.levelView().regenerate(world, flags.contains("--schedule"));
-        var message = switch (result) {
-            case SUCCESS -> "world.regenerate.success";
-            case SCHEDULED -> "world.regenerate.scheduled";
-            case REQUIRES_SCHEDULING -> WorldsPlugin.RUNNING_FOLIA
-                    ? "world.regenerate.disallowed.folia"
-                    : "world.regenerate.disallowed";
-            case UNLOAD_FAILED -> "world.unload.failed";
-            case FAILED -> "world.regenerate.failed";
-        };
-        plugin.bundle().sendMessage(context.getSource().getSender(), message,
+        plugin.bundle().sendMessage(context.getSource().getSender(), "world.regenerate",
                 Placeholder.parsed("world", world.getName()));
-        return result.isSuccess() ? Command.SINGLE_SUCCESS : 0;
+        plugin.levelView().regenerateAsync(world, flags.contains("--schedule")).thenAccept(result -> {
+            var message = switch (result) {
+                case SUCCESS -> "world.regenerate.success";
+                case SCHEDULED -> "world.regenerate.scheduled";
+                case REQUIRES_SCHEDULING -> "world.regenerate.disallowed";
+                case UNLOAD_FAILED -> "world.unload.failed";
+                case FAILED -> "world.regenerate.failed";
+            };
+            plugin.bundle().sendMessage(context.getSource().getSender(), message,
+                    Placeholder.parsed("world", world.getName()));
+        }).exceptionally(throwable -> {
+            plugin.bundle().sendMessage(context.getSource().getSender(), "world.regenerate.failed",
+                    Placeholder.parsed("world", world.getName()));
+            plugin.getComponentLogger().warn("Failed to regenerate world {}", world.getName(), throwable);
+            return null;
+        });
+        return Command.SINGLE_SUCCESS;
     }
 }

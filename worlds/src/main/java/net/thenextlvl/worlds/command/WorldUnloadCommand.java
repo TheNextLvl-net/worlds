@@ -11,8 +11,11 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
+import java.util.concurrent.CompletableFuture;
 
 import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
@@ -27,51 +30,45 @@ class WorldUnloadCommand {
     private static RequiredArgumentBuilder<CommandSourceStack, World> unload(WorldsPlugin plugin) {
         return worldArgument(plugin)
                 .suggests(new WorldSuggestionProvider<>(plugin, (context, world) ->
-                        !world.key().asString().equals("minecraft:overworld")))
+                        !plugin.levelView().isOverworld(world)))
                 .then(unloadFallback(plugin))
-                .executes(context -> unload(plugin, context));
-    }
-
-    private static int unload(WorldsPlugin plugin, CommandContext<CommandSourceStack> context) {
-        var world = context.getArgument("world", World.class);
-        var message = unload(world, null, plugin);
-        plugin.bundle().sendMessage(context.getSource().getSender(), message,
-                Placeholder.parsed("world", world.getName()));
-        return Command.SINGLE_SUCCESS;
+                .executes(context -> unload(plugin, null, context));
     }
 
     private static RequiredArgumentBuilder<CommandSourceStack, World> unloadFallback(WorldsPlugin plugin) {
         return Commands.argument("fallback", ArgumentTypes.world())
                 .suggests(new WorldSuggestionProvider<>(plugin, (context, world) ->
                         !world.equals(context.getLastChild().getArgument("world", World.class))))
-                .executes(context -> unloadFallback(plugin, context));
+                .executes(context -> unload(plugin, context.getArgument("fallback", World.class), context));
     }
 
-    private static int unloadFallback(WorldsPlugin plugin, CommandContext<CommandSourceStack> context) {
+    private static int unload(WorldsPlugin plugin, @Nullable World fallback, CommandContext<CommandSourceStack> context) {
         var world = context.getArgument("world", World.class);
-        var fallback = context.getArgument("fallback", World.class);
-        var message = unload(world, fallback, plugin);
-        plugin.bundle().sendMessage(context.getSource().getSender(), message,
-                Placeholder.parsed("world", world.getName()));
+        unload(context.getSource().getSender(), world, fallback, plugin).thenAccept(message -> {
+            plugin.bundle().sendMessage(context.getSource().getSender(), message,
+                    Placeholder.parsed("world", world.getName()));
+        });
         return Command.SINGLE_SUCCESS;
     }
 
-    private static String unload(World world, @Nullable World fallback, WorldsPlugin plugin) {
-        if (WorldsPlugin.RUNNING_FOLIA)
-            return "world.unload.disallowed.folia";
-        if (world.getKey().toString().equals("minecraft:overworld"))
-            return "world.unload.disallowed";
-        if (world.equals(fallback)) return "world.unload.fallback";
+    private static CompletableFuture<String> unload(CommandSender sender, World world, @Nullable World fallback, WorldsPlugin plugin) {
+        if (plugin.levelView().isOverworld(world))
+            return CompletableFuture.completedFuture("world.unload.disallowed");
+        if (world.equals(fallback))
+            return CompletableFuture.completedFuture("world.unload.fallback");
 
         var fallbackSpawn = fallback != null ? fallback.getSpawnLocation()
-                : plugin.getServer().getWorlds().getFirst().getSpawnLocation();
-        world.getPlayers().forEach(player -> player.teleport(fallbackSpawn));
+                : plugin.levelView().getOverworld().getSpawnLocation();
 
-        plugin.levelView().persistStatus(world, false, false);
-        if (!world.isAutoSave()) plugin.levelView().saveLevelData(world, false);
-
-        return plugin.levelView().unload(world, world.isAutoSave())
-                ? "world.unload.success"
-                : "world.unload.failed";
+        plugin.bundle().sendMessage(sender, "world.unload", Placeholder.parsed("world", world.getName()));
+        return CompletableFuture.allOf(world.getPlayers().stream()
+                .map(player -> player.teleportAsync(fallbackSpawn))
+                .toList().toArray(new CompletableFuture[0])
+        ).thenCompose(ignored -> {
+            plugin.levelView().setEnabled(world, false);
+            return plugin.levelView().unloadAsync(world, true);
+        }).thenApply(success -> {
+            return success ? "world.unload.success" : "world.unload.failed";
+        });
     }
 }

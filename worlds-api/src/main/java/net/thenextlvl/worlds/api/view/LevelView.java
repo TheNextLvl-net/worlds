@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 /**
@@ -103,24 +104,78 @@ public interface LevelView {
      * @param world the world to be unloaded
      * @param save  whether changes to the world should be saved before unloading
      * @return true if the world was successfully unloaded, otherwise false
+     * @deprecated use {@link #unloadAsync(World, boolean)}
      */
-    boolean unload(World world, boolean save);
+    @Deprecated(forRemoval = true, since = "3.2.0")
+    default boolean unload(World world, boolean save) {
+        return unloadAsync(world, save).join();
+    }
+
+    /**
+     * Unloads the specified world from the server.
+     *
+     * @param world the world to be unloaded
+     * @param save  whether changes to the world should be saved before unloading
+     * @return A {@code CompletableFuture} completing with true if the world was successfully unloaded, otherwise false
+     */
+    CompletableFuture<Boolean> unloadAsync(World world, boolean save);
 
     /**
      * Saves the specified world, with an option to flush pending changes immediately.
      *
      * @param world the world to be saved
      * @param flush whether to flush pending changes to disk immediately
+     * @deprecated use {@link #saveAsync(World, boolean)}
      */
-    void save(World world, boolean flush);
+    @Deprecated(forRemoval = true, since = "3.2.0")
+    default void save(World world, boolean flush) {
+        saveAsync(world, flush).join();
+    }
+
+    /**
+     * Saves the specified world, with an option to flush pending changes immediately.
+     *
+     * @param world the world to be saved
+     * @param flush whether to flush pending changes to disk immediately
+     * @return A {@code CompletableFuture} that might complete exceptionally
+     */
+    CompletableFuture<Void> saveAsync(World world, boolean flush);
 
     /**
      * Saves the {@code level.dat} of the specified world to disk.
      *
      * @param world the world whose level data should be saved
      * @param async whether the save operation should be performed asynchronously
+     * @deprecated use {@link #saveLevelDataAsync(World)}
      */
-    void saveLevelData(World world, boolean async);
+    @Deprecated(forRemoval = true, since = "3.2.0")
+    default void saveLevelData(World world, boolean async) {
+        var future = saveLevelDataAsync(world);
+        if (!async) future.join();
+    }
+
+    /**
+     * Saves the {@code level.dat} of the specified world to disk.
+     *
+     * @param world the world whose level data should be saved
+     */
+    CompletableFuture<Void> saveLevelDataAsync(World world);
+
+    /**
+     * Determines if the specified world is enabled and will be loaded on startup.
+     *
+     * @param world the world to check
+     * @return true if the world is enabled, false otherwise
+     */
+    boolean isEnabled(World world);
+
+    /**
+     * Sets whether the specified world is enabled and will be loaded on startup.
+     *
+     * @param world   the world to enable or disable
+     * @param enabled true to enable the world, false to disable it
+     */
+    void setEnabled(World world, boolean enabled);
 
     /**
      * Creates a backup for the given world and returns the size of the backup in bytes.
@@ -129,7 +184,20 @@ public interface LevelView {
      * @return the size of the created backup in bytes
      * @throws IOException if an I/O error occurs while creating the backup
      */
-    long backup(World world) throws IOException;
+    @SuppressWarnings("RedundantThrows")
+    default long backup(World world) throws IOException {
+        return backupAsync(world).join();
+    }
+
+    /**
+     * Creates a backup for the given world and returns the size of the backup in bytes.
+     * <p>
+     * Completes with an {@link IOException} if an I/O error occurs while creating the backup
+     *
+     * @param world the world to back up
+     * @return A {@code CompletableFuture} completing with the size of the created backup in bytes
+     */
+    CompletableFuture<Long> backupAsync(World world);
 
     /**
      * Clones the specified world with the possibility to modify its properties through a builder.
@@ -152,8 +220,35 @@ public interface LevelView {
      * @throws IllegalStateException    if the target directory already exists
      * @throws IOException              if an I/O error occurs during the cloning process
      * @see WorldCloneEvent#isFullClone()
+     * @deprecated use {@link #cloneAsync(World, Consumer, boolean)}
      */
-    Optional<World> clone(World world, Consumer<Level.Builder> builder, boolean full) throws IllegalArgumentException, IllegalStateException, IOException;
+    @SuppressWarnings("RedundantThrows")
+    @Deprecated(forRemoval = true, since = "3.2.0")
+    default Optional<World> clone(World world, Consumer<Level.Builder> builder, boolean full) throws IllegalArgumentException, IllegalStateException, IOException {
+        return Optional.of(cloneAsync(world, builder, full).join());
+    }
+
+    /**
+     * Clones the specified world with the possibility to modify its properties through a builder.
+     * If a {@code full} clone is invoked, the entire world directory is duplicated,
+     * except for specific files and folders: {@code advancements}, {@code datapacks},
+     * {@code playerdata}, {@code stats}, {@code uid.dat}, and {@code session.lock}.
+     * <p>
+     * By default, if a name or key is not provided, they are automatically generated using the
+     * pattern {@code OriginalName (#)}, and the key is a lowercased version of the generated name,
+     * replacing spaces with underscores and removing invalid namespace characters.
+     * <p>
+     * Completes with an {@link IllegalArgumentException} if the world name or key is already in use.<br>
+     * Completes with an {@link IllegalStateException} if the target directory already exists.<br>
+     * Completes with an {@link IOException} if an I/O error occurs during the cloning process.
+     *
+     * @param world   the world to be cloned
+     * @param builder a consumer that modifies the {@link Level.Builder} properties of the cloned world
+     * @param full    whether to fully clone including regions, entities..., or only the {@code level.dat}
+     * @return A {@code CompletableFuture} completing with the cloned world
+     * @see WorldCloneEvent#isFullClone()
+     */
+    CompletableFuture<World> cloneAsync(World world, Consumer<Level.Builder> builder, boolean full);
 
     /**
      * Deletes the specified world from the server and disk.
@@ -163,8 +258,24 @@ public interface LevelView {
      * @param schedule if true, the deletion process will be scheduled for a later operation
      *                 (e.g., during server shutdown); if false, the deletion will be attempted immediately
      * @return a {@code DeletionResult} indicating the outcome of the deletion process.
+     * @deprecated use {@link #deleteAsync(World, boolean)}
      */
-    DeletionResult delete(World world, boolean schedule);
+    @Deprecated(forRemoval = true, since = "3.2.0")
+    default DeletionResult delete(World world, boolean schedule) {
+        return deleteAsync(world, schedule).join();
+    }
+
+    /**
+     * Deletes the specified world from the server and disk.
+     * The deletion can be executed immediately or scheduled for later, depending on the provided parameters.
+     *
+     * @param world    the world to be deleted
+     * @param schedule if true, the deletion process will be scheduled for a later operation
+     *                 (e.g., during server shutdown); if false, the deletion will be attempted immediately
+     * @return A {@code CompletableFuture} completing with a {@code DeletionResult}
+     * indicating the outcome of the deletion process.
+     */
+    CompletableFuture<DeletionResult> deleteAsync(World world, boolean schedule);
 
     /**
      * Cancels the deletion process for the specified world, if scheduled.
@@ -189,8 +300,23 @@ public interface LevelView {
      * @param schedule if true, the regeneration will be scheduled for later execution;
      *                 if false, the regeneration will be attempted immediately
      * @return a {@code DeletionResult} indicating the outcome of the regeneration process.
+     * @deprecated use {@link #regenerateAsync(World, boolean)}
      */
-    DeletionResult regenerate(World world, boolean schedule);
+    @Deprecated(forRemoval = true, since = "3.2.0")
+    default DeletionResult regenerate(World world, boolean schedule) {
+        return regenerateAsync(world, schedule).join();
+    }
+
+    /**
+     * Regenerates the specified world, either immediately or scheduled, based on the provided parameters.
+     *
+     * @param world    the world to be regenerated
+     * @param schedule if true, the regeneration will be scheduled for later execution;
+     *                 if false, the regeneration will be attempted immediately
+     * @return a {@code CompletableFuture} completing with a
+     * {@code DeletionResult} indicating the outcome of the regeneration process.
+     */
+    CompletableFuture<DeletionResult> regenerateAsync(World world, boolean schedule);
 
     /**
      * Cancels the regeneration process for the specified world, if scheduled.
@@ -222,7 +348,7 @@ public interface LevelView {
         SCHEDULED,
         /**
          * Indicates that the deletion process requires scheduling due to certain constraints
-         * that prevent immediate execution, like on Folia servers or the {@code minecraft:overworld}
+         * that prevent immediate execution, like the {@code minecraft:overworld}
          */
         REQUIRES_SCHEDULING,
         /**

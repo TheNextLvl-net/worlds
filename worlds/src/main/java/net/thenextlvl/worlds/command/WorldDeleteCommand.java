@@ -44,18 +44,19 @@ class WorldDeleteCommand {
         var flags = context.getArgument("flags", CommandFlagsArgument.Flags.class);
         if (!flags.contains("--confirm")) return confirmationNeeded(context, plugin);
         var world = context.getArgument("world", World.class);
-        var result = plugin.levelView().delete(world, flags.contains("--schedule"));
-        var message = switch (result) {
-            case SUCCESS -> "world.delete.success";
-            case SCHEDULED -> "world.delete.scheduled";
-            case REQUIRES_SCHEDULING -> WorldsPlugin.RUNNING_FOLIA
-                    ? "world.delete.disallowed.folia"
-                    : "world.delete.disallowed";
-            case UNLOAD_FAILED -> "world.unload.failed";
-            case FAILED -> "world.delete.failed";
-        };
-        plugin.bundle().sendMessage(context.getSource().getSender(), message,
+        plugin.bundle().sendMessage(context.getSource().getSender(), "world.delete",
                 Placeholder.parsed("world", world.getName()));
-        return result.isSuccess() ? Command.SINGLE_SUCCESS : 0;
+        plugin.levelView().deleteAsync(world, flags.contains("--schedule")).thenAccept(result -> {
+            var message = switch (result) {
+                case SUCCESS -> "world.delete.success";
+                case SCHEDULED -> "world.delete.scheduled";
+                case REQUIRES_SCHEDULING -> "world.delete.disallowed";
+                case UNLOAD_FAILED -> "world.unload.failed";
+                case FAILED -> "world.delete.failed";
+            };
+            plugin.bundle().sendMessage(context.getSource().getSender(), message,
+                    Placeholder.parsed("world", world.getName()));
+        });
+        return Command.SINGLE_SUCCESS;
     }
 }

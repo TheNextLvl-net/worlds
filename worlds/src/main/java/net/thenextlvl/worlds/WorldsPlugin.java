@@ -10,6 +10,9 @@ import net.thenextlvl.worlds.api.WorldsProvider;
 import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.view.GeneratorView;
+import net.thenextlvl.worlds.command.SaveAllCommand;
+import net.thenextlvl.worlds.command.SaveOffCommand;
+import net.thenextlvl.worlds.command.SaveOnCommand;
 import net.thenextlvl.worlds.command.SeedCommand;
 import net.thenextlvl.worlds.command.WorldCommand;
 import net.thenextlvl.worlds.level.LevelData;
@@ -18,6 +21,7 @@ import net.thenextlvl.worlds.listener.PortalListener;
 import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.model.MessageMigrator;
 import net.thenextlvl.worlds.version.PluginVersionChecker;
+import net.thenextlvl.worlds.view.FoliaLevelView;
 import net.thenextlvl.worlds.view.PaperLevelView;
 import net.thenextlvl.worlds.view.PluginGeneratorView;
 import org.bstats.bukkit.Metrics;
@@ -40,7 +44,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     public static final boolean RUNNING_FOLIA = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
 
     private final GeneratorView generatorView = new PluginGeneratorView();
-    private final PaperLevelView levelView = new PaperLevelView(this);
+    private final PaperLevelView levelView = RUNNING_FOLIA ? new FoliaLevelView(this) : new PaperLevelView(this);
 
     private final WorldLinkProvider linkProvider = new WorldLinkProvider(this);
 
@@ -127,7 +131,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
                 .biomeProvider(world.getBiomeProvider())
                 .chunkGenerator(world.getGenerator())
                 .spawnChunkRadius(world.getGameRuleValue(GameRule.SPAWN_RADIUS))
-                .key(world.getKey())
+                .key(world.key())
                 .levelStem(switch (world.getEnvironment()) {
                     case NORMAL -> LevelStem.OVERWORLD;
                     case NETHER -> LevelStem.NETHER;
@@ -182,8 +186,11 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     private void registerCommands() {
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS.newHandler(event -> {
-            event.registrar().register(WorldCommand.create(this));
+            event.registrar().register(SaveAllCommand.create(this));
+            event.registrar().register(SaveOffCommand.create(this));
+            event.registrar().register(SaveOnCommand.create(this));
             event.registrar().register(SeedCommand.create(this));
+            event.registrar().register(WorldCommand.create(this));
         }));
     }
 }

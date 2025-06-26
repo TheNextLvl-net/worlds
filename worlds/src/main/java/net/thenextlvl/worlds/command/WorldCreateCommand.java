@@ -125,35 +125,20 @@ class WorldCreateCommand {
                 .generatorType(type)
                 .build();
 
-        try {
-            var world = level.create().orElse(null);
-
-            var message = world != null ? "world.create.success" : "world.create.failed";
-            plugin.bundle().sendMessage(context.getSource().getSender(), message,
-                    Placeholder.parsed("world", name));
-
-            // todo: extract duplicate, make it look less sketchy
-            if (world != null && context.getSource().getSender() instanceof Entity entity) {
-                if (WorldsPlugin.RUNNING_FOLIA) {
-                    plugin.getServer().getRegionScheduler().run(plugin, world, 0, 0, scheduledTask -> {
-                        entity.teleportAsync(world.getSpawnLocation(), COMMAND);
-                    });
-                } else entity.teleportAsync(world.getSpawnLocation(), COMMAND);
-            }
-
-            if (world != null) {
-                plugin.levelView().persistWorld(world, true);
-                if (generator != null) plugin.levelView().persistGenerator(world, generator);
-                plugin.levelView().saveLevelData(world, true);
-            }
-
-            return world != null ? Command.SINGLE_SUCCESS : 0;
-        } catch (Exception e) {
-            plugin.getComponentLogger().warn("Failed to create world {} ({})", key, name, e);
+        plugin.bundle().sendMessage(context.getSource().getSender(), "world.create", 
+                Placeholder.parsed("world", name));
+        level.createAsync().thenAccept(world -> {
+            plugin.bundle().sendMessage(context.getSource().getSender(), "world.create.success",
+                    Placeholder.parsed("world", world.getName()));
+            if (!(context.getSource().getSender() instanceof Entity entity)) return;
+            entity.teleportAsync(world.getSpawnLocation(), COMMAND);
+        }).exceptionally(throwable -> {
+            plugin.getComponentLogger().warn("Failed to create world {} ({})", key, name, throwable);
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.create.failed",
                     Placeholder.parsed("world", name));
-            return 0;
-        }
+            return null;
+        });
+        return Command.SINGLE_SUCCESS;
     }
 
     private static int createGenerator(CommandContext<CommandSourceStack> context, LevelStem levelStem, boolean structures, @Nullable Long seed, WorldsPlugin plugin) {

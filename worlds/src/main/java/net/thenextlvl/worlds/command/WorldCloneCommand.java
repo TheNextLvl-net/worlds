@@ -11,11 +11,11 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.jspecify.annotations.NullMarked;
 
 import static net.thenextlvl.worlds.command.WorldCommand.keyArgument;
 import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
+import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
 class WorldCloneCommand {
@@ -35,23 +35,16 @@ class WorldCloneCommand {
         var sender = context.getSource().getSender();
         var world = context.getArgument("world", World.class);
         var placeholder = Placeholder.parsed("world", world.getName());
-        try {
-            var key = context.getArgument("key", Key.class);
-            var clone = plugin.levelView().clone(world, builder -> builder.key(key), full).orElse(null);
-
-            if (clone != null) plugin.levelView().persistWorld(clone, true);
-
-            var message = clone != null ? "world.clone.success" : "world.clone.failed";
-
-            if (clone != null && sender instanceof Player player)
-                player.teleportAsync(clone.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
-
-            plugin.bundle().sendMessage(sender, message, placeholder);
-            return clone != null ? Command.SINGLE_SUCCESS : 0;
-        } catch (Exception e) {
-            plugin.getComponentLogger().warn("Failed to clone world {}", world.getName(), e);
+        var key = context.getArgument("key", Key.class);
+        plugin.bundle().sendMessage(sender, "world.clone", placeholder);
+        plugin.levelView().cloneAsync(world, builder -> builder.key(key), full).thenAccept(clone -> {
+            if (sender instanceof Player player) player.teleportAsync(clone.getSpawnLocation(), COMMAND);
+            plugin.bundle().sendMessage(sender, "world.clone.success", placeholder);
+        }).exceptionally(throwable -> {
+            plugin.getComponentLogger().warn("Failed to clone world {}", world.getName(), throwable);
             plugin.bundle().sendMessage(sender, "world.clone.failed", placeholder);
-            return 0;
-        }
+            return null;
+        });
+        return Command.SINGLE_SUCCESS;
     }
 }

@@ -41,19 +41,25 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraft.world.level.validation.ContentValidationException;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.generator.DimensionType;
+import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.preset.Presets;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.generator.CraftWorldInfo;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.generator.WorldInfo;
 import org.jspecify.annotations.NullMarked;
+import org.spigotmc.AsyncCatcher;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
+import static org.bukkit.persistence.PersistentDataType.STRING;
 
 @NullMarked
 class PaperLevel extends LevelData {
@@ -61,22 +67,31 @@ class PaperLevel extends LevelData {
         super(plugin, builder);
     }
 
+    /**
+     * @see CraftServer#createWorld(org.bukkit.WorldCreator)
+     */
     @Override
-    public Optional<World> create() {
+    public CompletableFuture<World> createAsync() {
+        AsyncCatcher.catchOp("world creation");
+
         var server = ((CraftServer) plugin.getServer());
         var console = server.getServer();
 
-        Preconditions.checkState(console.getAllLevels().iterator().hasNext(), "Cannot create worlds before main level is created");
-        Preconditions.checkArgument(!Files.exists(directory) || Files.isDirectory(directory), "File (%s) exists and isn't a folder", directory);
+        try {
+            Preconditions.checkState(console.getAllLevels().iterator().hasNext(), "Cannot create worlds before main level is created");
+            Preconditions.checkArgument(!Files.exists(directory) || Files.isDirectory(directory), "File (%s) exists and isn't a folder", directory);
 
-        Preconditions.checkArgument(server.getWorld(key) == null, "World with key %s already exists", key);
-        Preconditions.checkArgument(server.getWorld(name) == null, "World with name %s already exists", name);
+            Preconditions.checkArgument(server.getWorld(key) == null, "World with key %s already exists", key);
+            Preconditions.checkArgument(server.getWorld(name) == null, "World with name %s already exists", name);
 
-        Preconditions.checkState(plugin.getServer().getWorlds().stream()
-                        .map(World::getWorldFolder)
-                        .map(File::toPath)
-                        .noneMatch(directory::equals),
-                "World with directory %s already exists", directory);
+            Preconditions.checkState(plugin.getServer().getWorlds().stream()
+                            .map(World::getWorldFolder)
+                            .map(File::toPath)
+                            .noneMatch(directory::equals),
+                    "World with directory %s already exists", directory);
+        } catch (RuntimeException e) {
+            return CompletableFuture.failedFuture(e);
+        }
 
         var chunkGenerator = Optional.ofNullable(super.chunkGenerator)
                 .orElseGet(() -> Optional.ofNullable(generator)
@@ -93,7 +108,7 @@ class PaperLevel extends LevelData {
         try {
             levelStorageAccess = LevelStorageSource.createDefault(server.getWorldContainer().toPath()).validateAndCreateAccess(name, dimensionType);
         } catch (IOException | ContentValidationException ex) {
-            throw new RuntimeException(ex);
+            return CompletableFuture.failedFuture(ex);
         }
 
         Dynamic<?> dataTag;
@@ -112,11 +127,11 @@ class PaperLevel extends LevelData {
                 } catch (NbtException | ReportedNbtException | IOException e1) {
                     plugin.getComponentLogger().error("Failed to load world data from {}", levelDirectory.oldDataFile(), e1);
                     plugin.getComponentLogger().error(
-                            "Failed to load world data from {} and {}. World files may be corrupted. Shutting down.",
+                            "Failed to load world data from {} and {}. World files may be corrupted.",
                             levelDirectory.dataFile(),
                             levelDirectory.oldDataFile()
                     );
-                    return Optional.empty();
+                    return CompletableFuture.failedFuture(e1);
                 }
 
                 levelStorageAccess.restoreLevelDataFromOld();
@@ -124,12 +139,12 @@ class PaperLevel extends LevelData {
 
             if (summary.requiresManualConversion()) {
                 plugin.getComponentLogger().warn("This world must be opened in an older version (like 1.6.4) to be safely converted");
-                return Optional.empty();
+                return CompletableFuture.failedFuture(new IllegalStateException("World requires manual conversion"));
             }
 
             if (!summary.isCompatible()) {
                 plugin.getComponentLogger().warn("This world was created by an incompatible version.");
-                return Optional.empty();
+                return CompletableFuture.failedFuture(new IllegalStateException("World is incompatible"));
             }
         } else {
             dataTag = null;
@@ -219,20 +234,26 @@ class PaperLevel extends LevelData {
                 chunkGenerator, biomeProvider
         );
 
-        if (server.getWorld(name) == null) return Optional.empty();
+        if (server.getWorld(name) == null) return CompletableFuture.failedFuture(
+                new IllegalStateException("World with name " + name + " was not properly memoized")
+        );
 
         console.addLevel(serverLevel);
 
+        var future = new CompletableFuture<World>();
         if (WorldsPlugin.RUNNING_FOLIA) {
             serverLevel.randomSpawnSelection = new ChunkPos(serverLevel.getChunkSource().randomState().sampler().findSpawnPosition());
 
             var x = serverLevel.randomSpawnSelection.x;
             var z = serverLevel.randomSpawnSelection.z;
 
-            plugin.getServer().getRegionScheduler().run(plugin, serverLevel.getWorld(), x, z, scheduledTask ->
-                    console.initWorld(serverLevel, primaryLevelData, primaryLevelData, primaryLevelData.worldGenOptions()));
+            plugin.getServer().getRegionScheduler().run(plugin, serverLevel.getWorld(), x, z, scheduledTask -> {
+                console.initWorld(serverLevel, primaryLevelData, primaryLevelData, primaryLevelData.worldGenOptions());
+                future.complete(serverLevel.getWorld());
+            });
         } else {
             console.initWorld(serverLevel, primaryLevelData, primaryLevelData, primaryLevelData.worldGenOptions());
+            future.complete(serverLevel.getWorld());
         }
 
         serverLevel.setSpawnSettings(true);
@@ -242,8 +263,22 @@ class PaperLevel extends LevelData {
             io.papermc.paper.threadedregions.RegionizedServer.getInstance().addWorld(serverLevel);
         FeatureHooks.tickEntityManager(serverLevel);
 
+        persistWorld(serverLevel.getWorld(), enabled.toBooleanOrElse(true));
+        if (generator != null) persistGenerator(serverLevel.getWorld(), generator);
+
         new WorldLoadEvent(serverLevel.getWorld()).callEvent();
-        return Optional.of(serverLevel.getWorld());
+        return future;
+    }
+
+    public void persistWorld(World world, boolean enabled) {
+        var worldKey = new NamespacedKey("worlds", "world_key");
+        world.getPersistentDataContainer().set(worldKey, STRING, world.key().asString());
+        plugin.levelView().setEnabled(world, enabled);
+    }
+
+    public void persistGenerator(World world, Generator generator) {
+        var generatorKey = new NamespacedKey("worlds", "generator");
+        world.getPersistentDataContainer().set(generatorKey, STRING, generator.asString());
     }
 
     private ResourceKey<LevelStem> resolveDimensionKey() {
