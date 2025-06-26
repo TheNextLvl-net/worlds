@@ -50,6 +50,7 @@ import org.bukkit.craftbukkit.generator.CraftWorldInfo;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.generator.WorldInfo;
 import org.jspecify.annotations.NullMarked;
+import org.spigotmc.AsyncCatcher;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,6 +72,8 @@ class PaperLevel extends LevelData {
      */
     @Override
     public CompletableFuture<World> createAsync() {
+        AsyncCatcher.catchOp("world creation");
+
         var server = ((CraftServer) plugin.getServer());
         var console = server.getServer();
 

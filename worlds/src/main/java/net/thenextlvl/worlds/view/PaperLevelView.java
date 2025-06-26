@@ -25,6 +25,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.spigotmc.AsyncCatcher;
 
 import java.io.File;
 import java.io.IOException;
@@ -170,6 +171,7 @@ public class PaperLevelView implements LevelView {
      */
     @Override
     public CompletableFuture<@Nullable Void> saveAsync(World world, boolean flush) {
+        AsyncCatcher.catchOp("level data saving");
         try {
             var level = ((CraftWorld) world).getHandle();
             var oldSave = level.noSave;
@@ -212,6 +214,7 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public CompletableFuture<Long> backupAsync(World world) {
+        AsyncCatcher.catchOp("world backup");
         new WorldBackupEvent(world).callEvent();
         return saveAsync(world, true).thenCompose(unused -> {
             try {
@@ -266,6 +269,7 @@ public class PaperLevelView implements LevelView {
     @Override
     @SuppressWarnings("PatternValidation")
     public CompletableFuture<World> cloneAsync(World world, Consumer<Level.Builder> builder, boolean full) {
+        AsyncCatcher.catchOp("world cloning");
         var levelBuilder = plugin.levelBuilder(world);
 
         var name = findFreeName(world.getName());
@@ -295,6 +299,7 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public CompletableFuture<DeletionResult> deleteAsync(World world, boolean schedule) {
+        AsyncCatcher.catchOp("world deletion");
         return schedule ? CompletableFuture.completedFuture(scheduleDeletion(world)) : deleteNow(world);
     }
 
@@ -311,6 +316,7 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public CompletableFuture<DeletionResult> regenerateAsync(World world, boolean schedule) {
+        AsyncCatcher.catchOp("world regeneration");
         return schedule ? CompletableFuture.completedFuture(scheduleRegeneration(world)) : regenerateNow(world);
     }
 
