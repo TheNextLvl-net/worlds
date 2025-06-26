@@ -50,52 +50,59 @@ public class FoliaLevelView extends PaperLevelView {
         var handle = ((CraftWorld) world).getHandle();
         var server = ((CraftServer) plugin.getServer());
 
-        if (server.getServer().getLevel(handle.dimension()) == null) {
+        if (server.getServer().getLevel(handle.dimension()) == null)
             return CompletableFuture.completedFuture(false);
-        }
-        if (handle.dimension() == net.minecraft.world.level.Level.OVERWORLD) {
+
+        if (handle.dimension() == net.minecraft.world.level.Level.OVERWORLD)
             return CompletableFuture.completedFuture(false);
-        }
-        if (!handle.players().isEmpty()) {
+
+        if (!handle.players().isEmpty())
             return CompletableFuture.completedFuture(false);
-        }
 
-        var event = new WorldUnloadEvent(handle.getWorld());
-        if (!event.callEvent()) return CompletableFuture.completedFuture(false);
 
-        var future = save ? saveAsync(world, true) : CompletableFuture.completedFuture(null);
+        var future = new CompletableFuture<Boolean>();
 
-        return future.handle((result, throwable) -> {
-            if (throwable != null) {
-                plugin.getComponentLogger().error("Error during world save", throwable);
-            }
+        plugin.getServer().getGlobalRegionScheduler().execute(plugin, () -> {
+            future.complete(new WorldUnloadEvent(handle.getWorld()).callEvent());
+        });
 
-            try {
-                handle.getChunkSource().close(false);
-                FeatureHooks.closeEntityManager(handle, save);
-                handle.levelStorageAccess.close();
-            } catch (Exception ex) {
-                plugin.getComponentLogger().error("Failed to properly close world after saving", ex);
-            }
+        return future.thenCompose(success -> {
+            if (!success) return CompletableFuture.completedFuture(false);
 
-            try {
-                var field = server.getClass().getDeclaredField("worlds");
-                field.trySetAccessible();
-                @SuppressWarnings("unchecked") var worlds = (Map<String, World>) field.get(server);
-                worlds.remove(world.getName().toLowerCase(Locale.ROOT));
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                plugin.getComponentLogger().error("Failed to remove world from memory", throwable);
-                return false;
-            }
+            var saving = save ? saveAsync(world, true) : CompletableFuture.completedFuture(null);
 
-            server.getServer().removeLevel(handle);
+            return saving.handle((result, throwable) -> {
+                if (throwable != null) {
+                    plugin.getComponentLogger().error("Error during world save", throwable);
+                }
 
-            handle.regioniser.computeForAllRegionsUnsynchronised(regionThread -> {
-                if (regionThread.getData().world != handle) return;
-                regionThread.getData().getRegionSchedulingHandle().markNonSchedulable();
+                try {
+                    handle.getChunkSource().close(false);
+                    FeatureHooks.closeEntityManager(handle, save);
+                    handle.levelStorageAccess.close();
+                } catch (Exception ex) {
+                    plugin.getComponentLogger().error("Failed to properly close world after saving", ex);
+                }
+
+                try {
+                    var field = server.getClass().getDeclaredField("worlds");
+                    field.trySetAccessible();
+                    @SuppressWarnings("unchecked") var worlds = (Map<String, World>) field.get(server);
+                    worlds.remove(world.getName().toLowerCase(Locale.ROOT));
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    plugin.getComponentLogger().error("Failed to remove world from memory", throwable);
+                    return false;
+                }
+
+                server.getServer().removeLevel(handle);
+
+                handle.regioniser.computeForAllRegionsUnsynchronised(regionThread -> {
+                    if (regionThread.getData().world != handle) return;
+                    regionThread.getData().getRegionSchedulingHandle().markNonSchedulable();
+                });
+
+                return true;
             });
-
-            return true;
         });
     }
 }
