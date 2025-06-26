@@ -193,7 +193,7 @@ public class PaperLevelView implements LevelView {
                 future.completeExceptionally(e);
             }
         });
-        return future.thenRunAsync(() -> saveLevelDataAsync(world));
+        return future.thenRun(() -> saveLevelDataAsync(world));
     }
 
     /**
