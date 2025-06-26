@@ -61,6 +61,6 @@ public class WorldPresetArgument extends WrappedArgumentType<String, Preset> {
         }).exceptionally(throwable -> {
             plugin.getComponentLogger().error("Failed to list presets", throwable);
             return null;
-        }).thenApply(unused -> builder.build()));
+        }).thenApply(ignored -> builder.build()));
     }
 }

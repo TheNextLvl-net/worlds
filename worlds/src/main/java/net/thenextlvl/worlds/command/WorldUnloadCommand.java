@@ -64,7 +64,7 @@ class WorldUnloadCommand {
         return CompletableFuture.allOf(world.getPlayers().stream()
                 .map(player -> player.teleportAsync(fallbackSpawn))
                 .toList().toArray(new CompletableFuture[0])
-        ).thenCompose(unused -> {
+        ).thenCompose(ignored -> {
             plugin.levelView().setEnabled(world, false);
             return plugin.levelView().unloadAsync(world, true);
         }).thenApply(success -> {
