@@ -44,6 +44,8 @@ class WorldRegenerateCommand {
         var flags = context.getArgument("flags", CommandFlagsArgument.Flags.class);
         if (!flags.contains("--confirm")) return confirmationNeeded(context, plugin);
         var world = context.getArgument("world", World.class);
+        plugin.bundle().sendMessage(context.getSource().getSender(), "world.regenerate",
+                Placeholder.parsed("world", world.getName()));
         plugin.levelView().regenerateAsync(world, flags.contains("--schedule")).thenAccept(result -> {
             var message = switch (result) {
                 case SUCCESS -> "world.regenerate.success";
