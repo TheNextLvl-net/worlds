@@ -223,7 +223,7 @@ public class PaperLevelView implements LevelView {
     public CompletableFuture<Long> backupAsync(World world) {
         AsyncCatcher.catchOp("world backup");
         new WorldBackupEvent(world).callEvent();
-        return saveAsync(world, true).thenCompose(unused -> {
+        return saveAsync(world, true).thenComposeAsync(ignored -> {
             try {
                 var size = ((CraftWorld) world).getHandle().levelStorageAccess.makeWorldBackup();
                 return CompletableFuture.completedFuture(size);
