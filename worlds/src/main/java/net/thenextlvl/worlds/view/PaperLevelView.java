@@ -6,6 +6,8 @@ import core.nbt.file.NBTFile;
 import core.nbt.tag.CompoundTag;
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import net.kyori.adventure.key.Key;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.LevelStorageSource;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.event.WorldActionScheduledEvent;
 import net.thenextlvl.worlds.api.event.WorldActionScheduledEvent.ActionType;
@@ -34,11 +36,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -91,7 +93,7 @@ public class PaperLevelView implements LevelView {
     }
 
     /**
-     * @see net.minecraft.world.level.storage.LevelStorageSource#createDefault(Path)
+     * @see LevelStorageSource#createDefault(Path)
      */
     @Override
     public Path getBackupFolder() {
@@ -157,7 +159,7 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public CompletableFuture<Boolean> unloadAsync(World world, boolean save) {
-        return saveLevelDataAsync(world).thenCompose(unused -> {
+        return saveLevelDataAsync(world).thenCompose(ignored -> {
             var future = new CompletableFuture<Boolean>();
             plugin.getServer().getGlobalRegionScheduler().run(plugin, scheduledTask -> {
                 var dragonBattle = world.getEnderDragonBattle();
@@ -192,8 +194,8 @@ public class PaperLevelView implements LevelView {
     }
 
     /**
-     * @see net.minecraft.server.level.ServerLevel#saveIncrementally(boolean)
-     * @see net.minecraft.server.level.ServerLevel#saveLevelData(boolean)
+     * @see ServerLevel#saveIncrementally(boolean)
+     * @see ServerLevel#saveLevelData(boolean)
      */
     @Override
     public CompletableFuture<@Nullable Void> saveLevelDataAsync(World world) {
