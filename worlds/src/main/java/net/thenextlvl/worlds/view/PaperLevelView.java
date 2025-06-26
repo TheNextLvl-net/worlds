@@ -180,17 +180,20 @@ public class PaperLevelView implements LevelView {
      */
     @Override
     public CompletableFuture<@Nullable Void> saveAsync(World world, boolean flush) {
-        AsyncCatcher.catchOp("level data saving");
-        try {
-            var level = ((CraftWorld) world).getHandle();
-            var oldSave = level.noSave;
-            level.noSave = false;
-            level.save(null, flush, false);
-            level.noSave = oldSave;
-            return saveLevelDataAsync(world);
-        } catch (Exception e) {
-            return CompletableFuture.failedFuture(e);
-        }
+        var future = new CompletableFuture<@Nullable Void>();
+        plugin.getServer().getGlobalRegionScheduler().execute(plugin, () -> {
+            try {
+                var level = ((CraftWorld) world).getHandle();
+                var oldSave = level.noSave;
+                level.noSave = false;
+                level.save(null, flush, false);
+                level.noSave = oldSave;
+                future.complete(null);
+            } catch (Exception e) {
+                future.completeExceptionally(e);
+            }
+        });
+        return future.thenRunAsync(() -> saveLevelDataAsync(world));
     }
 
     /**
