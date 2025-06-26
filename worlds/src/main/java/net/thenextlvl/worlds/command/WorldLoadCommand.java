@@ -34,6 +34,10 @@ class WorldLoadCommand {
 
     private static int load(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
         var name = context.getArgument("world", String.class);
+
+        plugin.bundle().sendMessage(context.getSource().getSender(), "world.load",
+                Placeholder.parsed("world", name));
+
         var build = plugin.levelView().read(Path.of(name)).map(Level.Builder::build);
         var future = build.filter(Level::isWorldKnown).map(Level::createAsync).orElse(null);
 
