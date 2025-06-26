@@ -287,9 +287,13 @@ public class PaperLevelView implements LevelView {
         builder.accept(levelBuilder);
         var clone = levelBuilder.build();
 
-        Preconditions.checkArgument(plugin.getServer().getWorld(clone.key()) == null, "World with key %s already exists", clone.key());
-        Preconditions.checkArgument(plugin.getServer().getWorld(clone.getName()) == null, "World with name %s already exists", clone.getName());
-        Preconditions.checkState(!Files.isDirectory(clone.getDirectory()), "Target directory already exists");
+        try {
+            Preconditions.checkArgument(plugin.getServer().getWorld(clone.key()) == null, "World with key %s already exists", clone.key());
+            Preconditions.checkArgument(plugin.getServer().getWorld(clone.getName()) == null, "World with name %s already exists", clone.getName());
+            Preconditions.checkState(!Files.isDirectory(clone.getDirectory()), "Target directory already exists");
+        } catch (RuntimeException e) {
+            return CompletableFuture.failedFuture(e);
+        }
 
         var event = new WorldCloneEvent(world, clone, full);
         event.callEvent();
