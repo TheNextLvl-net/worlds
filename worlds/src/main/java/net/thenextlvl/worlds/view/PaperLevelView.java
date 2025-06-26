@@ -160,8 +160,8 @@ public class PaperLevelView implements LevelView {
         return saveLevelDataAsync(world).thenCompose(unused -> {
             var future = new CompletableFuture<Boolean>();
             plugin.getServer().getGlobalRegionScheduler().run(plugin, scheduledTask -> {
+                var dragonBattle = world.getEnderDragonBattle();
                 if (plugin.getServer().unloadWorld(world, save)) {
-                    var dragonBattle = world.getEnderDragonBattle();
                     if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
                     future.complete(true);
                 } else future.complete(false);
