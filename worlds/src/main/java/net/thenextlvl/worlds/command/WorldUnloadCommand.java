@@ -30,7 +30,7 @@ class WorldUnloadCommand {
     private static RequiredArgumentBuilder<CommandSourceStack, World> unload(WorldsPlugin plugin) {
         return worldArgument(plugin)
                 .suggests(new WorldSuggestionProvider<>(plugin, (context, world) ->
-                        !world.key().asString().equals("minecraft:overworld")))
+                        !plugin.levelView().isOverworld(world)))
                 .then(unloadFallback(plugin))
                 .executes(context -> unload(plugin, null, context));
     }
@@ -52,13 +52,13 @@ class WorldUnloadCommand {
     }
 
     private static CompletableFuture<String> unload(CommandSender sender, World world, @Nullable World fallback, WorldsPlugin plugin) {
-        if (world.getKey().toString().equals("minecraft:overworld"))
+        if (plugin.levelView().isOverworld(world))
             return CompletableFuture.completedFuture("world.unload.disallowed");
         if (world.equals(fallback))
             return CompletableFuture.completedFuture("world.unload.fallback");
 
         var fallbackSpawn = fallback != null ? fallback.getSpawnLocation()
-                : plugin.getServer().getWorlds().getFirst().getSpawnLocation();
+                : plugin.levelView().getOverworld().getSpawnLocation();
 
         plugin.bundle().sendMessage(sender, "world.unload", Placeholder.parsed("world", world.getName()));
         return CompletableFuture.allOf(world.getPlayers().stream()

@@ -18,6 +18,7 @@ import net.thenextlvl.worlds.api.view.LevelView;
 import net.thenextlvl.worlds.level.LevelData;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.generator.WorldInfo;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -55,6 +56,16 @@ public class PaperLevelView implements LevelView {
 
     public PaperLevelView(WorldsPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @SuppressWarnings("resource")
+    public World getOverworld() {
+        var handle = ((CraftServer) plugin.getServer()).getHandle();
+        return handle.getServer().overworld().getWorld();
+    }
+
+    public boolean isOverworld(World world) {
+        return world.equals(getOverworld());
     }
 
     public Optional<Path> getLevelDataPath(Path level) {
@@ -315,14 +326,12 @@ public class PaperLevelView implements LevelView {
     }
 
     private CompletableFuture<DeletionResult> deleteNow(World world) {
-        if (world.getKey().asString().equals("minecraft:overworld"))
-            return CompletableFuture.completedFuture(DeletionResult.REQUIRES_SCHEDULING);
+        if (isOverworld(world)) return CompletableFuture.completedFuture(DeletionResult.REQUIRES_SCHEDULING);
 
         if (!new WorldDeleteEvent(world).callEvent())
             return CompletableFuture.completedFuture(DeletionResult.FAILED);
 
-        var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
-
+        var fallback = getOverworld().getSpawnLocation();
         return CompletableFuture.allOf(world.getPlayers().stream()
                 .map(player -> player.teleportAsync(fallback))
                 .toList().toArray(new CompletableFuture[0])
@@ -351,19 +360,17 @@ public class PaperLevelView implements LevelView {
     }
 
     private CompletableFuture<DeletionResult> regenerateNow(World world) {
-        if (WorldsPlugin.RUNNING_FOLIA || world.getKey().asString().equals("minecraft:overworld"))
-            return CompletableFuture.completedFuture(DeletionResult.REQUIRES_SCHEDULING);
+        if (isOverworld(world)) return CompletableFuture.completedFuture(DeletionResult.REQUIRES_SCHEDULING);
 
         if (!new WorldRegenerateEvent(world).callEvent())
             return CompletableFuture.completedFuture(DeletionResult.FAILED);
 
         var players = world.getPlayers();
-
-        var fallback = plugin.getServer().getWorlds().getFirst().getSpawnLocation();
         players.forEach(player -> player.teleport(fallback, TeleportCause.PLUGIN));
 
         return saveLevelDataAsync(world).thenCompose(unused -> unloadAsync(world, false).thenCompose(success -> {
             if (!success) return CompletableFuture.completedFuture(DeletionResult.UNLOAD_FAILED);
+        var fallback = getOverworld().getSpawnLocation();
 
             regenerate(world.getWorldFolder().toPath());
             return plugin.levelBuilder(world).build().createAsync().thenAccept(regenerated -> {

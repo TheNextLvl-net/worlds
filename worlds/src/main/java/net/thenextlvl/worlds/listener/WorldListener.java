@@ -32,7 +32,7 @@ public class WorldListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onOverworldLoad(WorldLoadEvent event) {
-        if (!event.getWorld().key().asString().equals("minecraft:overworld")) return;
+        if (!plugin.levelView().isOverworld(event.getWorld())) return;
         plugin.levelView().listLevels().stream().filter(plugin.levelView()::canLoad).forEach(path -> {
             var level = plugin.levelView().read(path).map(Level.Builder::build).orElse(null);
             if (level == null || !level.isEnabled().equals(TriState.TRUE)) return;
