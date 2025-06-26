@@ -456,7 +456,7 @@ public class PaperLevelView implements LevelView {
 
             @Override
             public FileVisitResult visitFileFailed(Path path, IOException exc) {
-                plugin.getComponentLogger().error("Failed to copy file: {}", path, exc);
+                plugin.getComponentLogger().warn("Failed to copy file: {}", path, exc);
                 return FileVisitResult.CONTINUE;
             }
         });
