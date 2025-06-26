@@ -50,15 +50,19 @@ import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
 @NullMarked
 public class PaperLevelView implements LevelView {
     private static final NamespacedKey ENABLED_KEY = new NamespacedKey("worlds", "enabled");
-    private final Map<Key, Thread> regenerations = new HashMap<>();
-    private final Map<Key, Thread> deletions = new HashMap<>();
 
     private static final Set<String> SKIP_DIRECTORIES = Set.of("advancements", "datapacks", "playerdata", "stats");
     private static final Set<String> SKIP_FILES = Set.of("uid.dat", "session.lock");
 
+    private final Map<Key, Runnable> deletions = new ConcurrentHashMap<>();
+    private final Map<Key, Runnable> regenerations = new ConcurrentHashMap<>();
     protected final WorldsPlugin plugin;
 
     public PaperLevelView(WorldsPlugin plugin) {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            deletions.values().forEach(Runnable::run);
+            regenerations.values().forEach(Runnable::run);
+        }, "Worlds Shutdown Hook"));
         this.plugin = plugin;
     }
 
@@ -308,8 +312,7 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public boolean cancelScheduledDeletion(World world) {
-        var thread = deletions.remove(world.key());
-        return thread != null && Runtime.getRuntime().removeShutdownHook(thread);
+        return deletions.remove(world.key()) != null;
     }
 
     @Override
@@ -325,8 +328,7 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public boolean cancelScheduledRegeneration(World world) {
-        var thread = regenerations.remove(world.key());
-        return thread != null && Runtime.getRuntime().removeShutdownHook(thread);
+        return regenerations.remove(world.key()) != null;
     }
 
     @Override
@@ -351,20 +353,19 @@ public class PaperLevelView implements LevelView {
     }
 
     private DeletionResult scheduleDeletion(World world) {
-        if (deletions.containsKey(world.getKey())) return DeletionResult.SCHEDULED;
+        return scheduleAction(world, ActionType.DELETE, deletions, this::delete);
+    }
 
-        var event = new WorldActionScheduledEvent(world, ActionType.DELETE);
+    private DeletionResult scheduleAction(World world, ActionType type, Map<Key, Runnable> map, Consumer<Path> consumer) {
+        if (map.containsKey(world.key())) return DeletionResult.SCHEDULED;
+
+        var event = new WorldActionScheduledEvent(world, type);
         if (!event.callEvent()) return DeletionResult.FAILED;
 
-        var action = event.getAction() == null
-                ? (Consumer<Path>) this::delete
-                : event.getAction().andThen(this::delete);
+        var action = event.getAction() == null ? consumer : event.getAction().andThen(consumer);
 
         var path = world.getWorldFolder().toPath();
-        var hook = new Thread(() -> action.accept(path), "world-deletion");
-
-        Runtime.getRuntime().addShutdownHook(hook);
-        deletions.put(world.getKey(), hook);
+        map.put(world.key(), () -> action.accept(path));
         return DeletionResult.SCHEDULED;
     }
 
@@ -392,21 +393,7 @@ public class PaperLevelView implements LevelView {
     }
 
     private DeletionResult scheduleRegeneration(World world) {
-        if (regenerations.containsKey(world.getKey())) return DeletionResult.SCHEDULED;
-
-        var event = new WorldActionScheduledEvent(world, ActionType.REGENERATE);
-        if (!event.callEvent()) return DeletionResult.FAILED;
-
-        var action = event.getAction() == null
-                ? (Consumer<Path>) this::regenerate
-                : event.getAction().andThen(this::regenerate);
-
-        var path = world.getWorldFolder().toPath();
-        var hook = new Thread(() -> action.accept(path), "world-regeneration");
-
-        Runtime.getRuntime().addShutdownHook(hook);
-        regenerations.put(world.getKey(), hook);
-        return DeletionResult.SCHEDULED;
+        return scheduleAction(world, ActionType.REGENERATE, regenerations, this::regenerate);
     }
 
     private void regenerate(Path level) {
