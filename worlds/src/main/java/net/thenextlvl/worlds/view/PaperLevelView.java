@@ -95,7 +95,7 @@ public class PaperLevelView implements LevelView {
      */
     @Override
     public Path getBackupFolder() {
-        return getWorldContainer().resolve("../backups");
+        return getWorldContainer().getParent().resolve("backups");
     }
 
     @Override
@@ -126,7 +126,7 @@ public class PaperLevelView implements LevelView {
 
     private @Unmodifiable Set<Path> listDirectories() {
         try (var stream = Files.list(plugin.getServer().getWorldContainer().toPath())) {
-            return stream.collect(Collectors.toUnmodifiableSet());
+            return stream.filter(Files::isDirectory).collect(Collectors.toUnmodifiableSet());
         } catch (IOException e) {
             return Set.of();
         }
