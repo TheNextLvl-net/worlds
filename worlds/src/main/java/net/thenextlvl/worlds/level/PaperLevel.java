@@ -127,7 +127,7 @@ class PaperLevel extends LevelData {
                 } catch (NbtException | ReportedNbtException | IOException e1) {
                     plugin.getComponentLogger().error("Failed to load world data from {}", levelDirectory.oldDataFile(), e1);
                     plugin.getComponentLogger().error(
-                            "Failed to load world data from {} and {}. World files may be corrupted. Shutting down.",
+                            "Failed to load world data from {} and {}. World files may be corrupted.",
                             levelDirectory.dataFile(),
                             levelDirectory.oldDataFile()
                     );
