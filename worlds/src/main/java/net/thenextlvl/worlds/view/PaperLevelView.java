@@ -380,20 +380,27 @@ public class PaperLevelView implements LevelView {
             return CompletableFuture.completedFuture(DeletionResult.FAILED);
 
         var players = world.getPlayers();
-        players.forEach(player -> player.teleport(fallback, TeleportCause.PLUGIN));
-
-        return saveLevelDataAsync(world).thenCompose(unused -> unloadAsync(world, false).thenCompose(success -> {
-            if (!success) return CompletableFuture.completedFuture(DeletionResult.UNLOAD_FAILED);
         var fallback = getOverworld().getSpawnLocation();
+        return CompletableFuture.allOf(players.stream()
+                .map(player -> player.teleportAsync(fallback, TeleportCause.PLUGIN))
+                .toList().toArray(new CompletableFuture[0])
+        ).thenCompose(ignored -> saveLevelDataAsync(world).thenCompose(ignored1 -> {
+            return unloadAsync(world, false).thenCompose(success -> {
+                if (!success) return CompletableFuture.completedFuture(DeletionResult.UNLOAD_FAILED);
 
-            regenerate(world.getWorldFolder().toPath());
-            return plugin.levelBuilder(world).build().createAsync().thenAccept(regenerated -> {
-                players.forEach(player -> player.teleportAsync(regenerated.getSpawnLocation(), TeleportCause.PLUGIN));
-            }).thenApply(ignored -> DeletionResult.SUCCESS);
-        })).exceptionally(throwable -> {
+                regenerate(world.getWorldFolder().toPath());
+                regenerations.remove(world.key());
+                return plugin.levelBuilder(world).build().createAsync().thenAccept(regenerated -> {
+                    players.forEach(player -> player.teleportAsync(regenerated.getSpawnLocation(), TeleportCause.PLUGIN));
+                }).thenApply(ignored2 -> DeletionResult.SUCCESS);
+            }).exceptionally(throwable -> {
+                plugin.getComponentLogger().warn("Failed to regenerate world", throwable);
+                return DeletionResult.FAILED;
+            });
+        }).exceptionally(throwable -> {
             plugin.getComponentLogger().warn("Failed to save level data before regeneration", throwable);
             return DeletionResult.FAILED;
-        });
+        }));
     }
 
     private DeletionResult scheduleRegeneration(World world) {
