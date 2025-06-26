@@ -51,6 +51,6 @@ public class LevelSuggestionProvider<S> implements SuggestionProvider<S> {
                     if (!escaped.contains(builder.getRemaining())) return;
                     builder.suggest(escaped, () -> level.key().asString());
                 })
-        ).thenApply(unused -> builder.build());
+        ).thenApply(ignored -> builder.build());
     }
 }
