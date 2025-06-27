@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.PortalType;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -59,7 +60,10 @@ public class PortalListener implements Listener {
             });
         } else if (event.getEntity() instanceof CraftPlayer player) {
             Consumer<@Nullable Location> teleport = location -> player.getScheduler().run(plugin, scheduledTask -> {
-                if (!player.getHandle().seenCredits) player.getHandle().showEndCredits();
+                var level = ((CraftWorld) player.getWorld()).getHandle();
+                if (WorldsPlugin.RUNNING_FOLIA || level.paperConfig().misc.disableEndCredits)
+                    player.getHandle().seenCredits = true;
+                else if (!player.getHandle().seenCredits) player.getHandle().showEndCredits();
                 player.teleportAsync(Objects.requireNonNullElseGet(location, targetWorld::getSpawnLocation), END_PORTAL);
             }, null);
             var potentialLocation = player.getPotentialRespawnLocation();
