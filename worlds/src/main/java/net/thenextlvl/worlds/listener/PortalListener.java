@@ -33,6 +33,13 @@ public class PortalListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPortalEnter(EntityPortalEnterEvent event) {
+        if (!WorldsPlugin.RUNNING_FOLIA) return;
+        if (!event.getPortalType().equals(PortalType.NETHER)) return;
+        System.out.println(event.getEntity().getName() + " entered " + event.getPortalType() + " portal");
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityPortal(EntityPortalReadyEvent event) {
         plugin.linkProvider().getTarget(event.getEntity().getWorld(), event.getPortalType())
                 .ifPresentOrElse(event::setTargetWorld, () -> event.setTargetWorld(null));
