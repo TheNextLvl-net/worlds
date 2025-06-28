@@ -45,6 +45,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.zip.ZipException;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
