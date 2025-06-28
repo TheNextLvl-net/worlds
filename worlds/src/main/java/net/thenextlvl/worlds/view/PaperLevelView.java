@@ -45,6 +45,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.zip.ZipException;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
@@ -107,7 +108,15 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public Optional<Level.Builder> read(Path directory) {
-        return LevelData.read(plugin, directory);
+        try {
+            return LevelData.read(plugin, directory);
+        } catch (Exception e) {
+            if (e.getCause() instanceof ZipException) {
+                plugin.getComponentLogger().warn("Failed to read level data from {}", directory);
+                plugin.getComponentLogger().warn("Your level.dat is irrecoverably corrupted. Please delete it and recreate the world.");
+            } else plugin.getComponentLogger().warn("Failed to read level data from {}", directory, e);
+            return Optional.empty();
+        }
     }
 
     @Override

@@ -171,8 +171,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     private void warnExperimental() {
         getComponentLogger().warn("Folia builds of Worlds are extremely experimental");
-        getComponentLogger().warn("The PerWorlds module will NOT be enabled");
-        getComponentLogger().warn("Please report any issues you encounter to {}", SharedWorlds.ISSUES);
+        getComponentLogger().warn("Please report any issues you encounter to {}", SharedWorlds.ISSUES); 
     }
 
     private void registerServices() {
