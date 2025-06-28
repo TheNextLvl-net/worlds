@@ -36,8 +36,16 @@ public class WorldListener implements Listener {
         plugin.levelView().listLevels().stream().filter(plugin.levelView()::canLoad).forEach(path -> {
             var level = plugin.levelView().read(path).map(Level.Builder::build).orElse(null);
             if (level == null || !level.isEnabled().equals(TriState.TRUE)) return;
-            if (plugin.getServer().getWorld(level.key()) != null) return;
-            if (plugin.getServer().getWorld(level.getName()) != null) return;
+            
+            if (plugin.getServer().getWorld(level.key()) != null) {
+                plugin.getComponentLogger().warn("Skip loading dimension '{}' because another world with the same key ({}) is already loaded", path.getFileName(), level.key());
+                return;
+            }
+            if (plugin.getServer().getWorld(level.getName()) != null) {
+                plugin.getComponentLogger().warn("Skip loading dimension '{}' because another world with the same name ({}) is already loaded", path.getFileName(), level.getName());
+                return;
+            }
+            
             level.createAsync().thenAccept(world -> plugin.getComponentLogger().debug(
                     "Loaded dimension {} ({}) from {}",
                     world.key().asString(), level.getGeneratorType().key().asString(),
