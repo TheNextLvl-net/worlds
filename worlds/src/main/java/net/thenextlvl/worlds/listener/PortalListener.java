@@ -79,8 +79,9 @@ public class PortalListener implements Listener {
                 plugin.getServer().getRegionScheduler().run(plugin, potentialLocation, task ->
                         teleport.accept(player.getRespawnLocation(true)));
             } else teleport.accept(player.getRespawnLocation(true));
-        } else event.getEntity().getScheduler().run(plugin, task ->
-                event.getEntity().teleportAsync(targetWorld.getSpawnLocation(), END_PORTAL), null);
+        } else event.getEntity().getScheduler().run(plugin, task -> {
+            event.getEntity().teleportAsync(targetWorld.getSpawnLocation(), END_PORTAL);
+        }, null);
     }
 
     private void generateEndPlatform(World world) {
