@@ -13,6 +13,8 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
+import java.nio.file.Path;
+
 public class WorldListener implements Listener {
     private final WorldsPlugin plugin;
 
@@ -33,29 +35,43 @@ public class WorldListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onOverworldLoad(WorldLoadEvent event) {
         if (!plugin.levelView().isOverworld(event.getWorld())) return;
-        plugin.levelView().listLevels().stream().filter(plugin.levelView()::canLoad).forEach(path -> {
-            var level = plugin.levelView().read(path).map(Level.Builder::build).orElse(null);
-            if (level == null || !level.isEnabled().equals(TriState.TRUE)) return;
-            level.createAsync().thenAccept(world -> plugin.getComponentLogger().debug(
-                    "Loaded dimension {} ({}) from {}",
-                    world.key().asString(), level.getGeneratorType().key().asString(),
-                    world.getWorldFolder().getPath()
-            )).exceptionally(throwable -> {
-                if (throwable instanceof GeneratorException e) {
-                    var generator = e.getId() != null ? e.getPlugin() + e.getId() : e.getPlugin();
-                    plugin.getComponentLogger().error("Skip loading dimension '{}'", path.getFileName());
-                    plugin.getComponentLogger().error("Cannot use generator {}: {}", generator, e.getMessage());
-                } else if (throwable.getCause() instanceof DirectoryLock.LockException lock) {
-                    plugin.getComponentLogger().error("Failed to start the minecraft server", lock);
-                    plugin.getServer().shutdown();
-                } else {
-                    plugin.getComponentLogger().error("An unexpected error occurred while loading the level {}",
-                            path.getFileName(), throwable);
-                    plugin.getComponentLogger().error("Please report the error above on GitHub: {}",
-                            "https://github.com/TheNextLvl-net/worlds/issues/new/choose");
-                }
-                return null;
-            });
+        plugin.levelView().listLevels().stream()
+                .filter(plugin.levelView()::canLoad)
+                .forEach(this::loadLevel);
+    }
+
+    private void loadLevel(Path path) {
+        var level = plugin.levelView().read(path).map(Level.Builder::build).orElse(null);
+        if (level == null || !level.isEnabled().equals(TriState.TRUE)) return;
+
+        if (plugin.getServer().getWorld(level.key()) != null) {
+            plugin.getComponentLogger().warn("Skip loading dimension '{}' because another world with the same key ({}) is already loaded", path.getFileName(), level.key());
+            return;
+        }
+        if (plugin.getServer().getWorld(level.getName()) != null) {
+            plugin.getComponentLogger().warn("Skip loading dimension '{}' because another world with the same name ({}) is already loaded", path.getFileName(), level.getName());
+            return;
+        }
+
+        level.createAsync().thenAccept(world -> plugin.getComponentLogger().debug(
+                "Loaded dimension {} ({}) from {}",
+                world.key().asString(), level.getGeneratorType().key().asString(),
+                world.getWorldFolder().getPath()
+        )).exceptionally(throwable -> {
+            if (throwable instanceof GeneratorException e) {
+                var generator = e.getId() != null ? e.getPlugin() + e.getId() : e.getPlugin();
+                plugin.getComponentLogger().error("Skip loading dimension '{}'", path.getFileName());
+                plugin.getComponentLogger().error("Cannot use generator {}: {}", generator, e.getMessage());
+            } else if (throwable.getCause() instanceof DirectoryLock.LockException lock) {
+                plugin.getComponentLogger().error("Failed to start the minecraft server", lock);
+                plugin.getServer().shutdown();
+            } else {
+                plugin.getComponentLogger().error("An unexpected error occurred while loading the level {}",
+                        path.getFileName(), throwable);
+                plugin.getComponentLogger().error("Please report the error above on GitHub: {}",
+                        "https://github.com/TheNextLvl-net/worlds/issues/new/choose");
+            }
+            return null;
         });
     }
 
