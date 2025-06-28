@@ -107,7 +107,15 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public Optional<Level.Builder> read(Path directory) {
-        return LevelData.read(plugin, directory);
+        try {
+            return LevelData.read(plugin, directory);
+        } catch (Exception e) {
+            if (e.getCause() instanceof ZipException) {
+                plugin.getComponentLogger().warn("Failed to read level data from {}", directory);
+                plugin.getComponentLogger().warn("Your level.dat is irrecoverably corrupted. Please delete it and recreate the world.");
+            } else plugin.getComponentLogger().warn("Failed to read level data from {}", directory, e);
+            return Optional.empty();
+        }
     }
 
     @Override
