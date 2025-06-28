@@ -35,9 +35,19 @@ public class PortalListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPortalEnter(EntityPortalEnterEvent event) {
         if (!WorldsPlugin.RUNNING_FOLIA) return;
+
         if (!event.getPortalType().equals(PortalType.NETHER)) return;
+
+        event.setCancelled(true);
+
         if (event.getEntity().getPortalCooldown() != 0) return;
-        System.out.println(event.getEntity().getName() + " entered " + event.getPortalType() + " portal");
+        if (!cooldown.start(plugin, event.getEntity())) return;
+
+        var handle = ((CraftEntity) event.getEntity()).getHandle();
+
+        onEntityPortal(new EntityPortalReadyEvent(event.getEntity(), null, PortalType.NETHER));
+
+        // todo: handle portal create logic
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
