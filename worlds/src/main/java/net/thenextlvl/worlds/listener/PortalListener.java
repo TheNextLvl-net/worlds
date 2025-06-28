@@ -36,6 +36,7 @@ public class PortalListener implements Listener {
     public void onPortalEnter(EntityPortalEnterEvent event) {
         if (!WorldsPlugin.RUNNING_FOLIA) return;
         if (!event.getPortalType().equals(PortalType.NETHER)) return;
+        if (event.getEntity().getPortalCooldown() != 0) return;
         System.out.println(event.getEntity().getName() + " entered " + event.getPortalType() + " portal");
     }
 
