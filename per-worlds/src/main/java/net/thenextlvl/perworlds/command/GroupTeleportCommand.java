@@ -66,7 +66,7 @@ class GroupTeleportCommand {
                         Placeholder.parsed("group", group.getName()))));
         if (players.size() == 1 && players.getFirst().equals(sender)) return Command.SINGLE_SUCCESS;
         commons.bundle().sendMessage(sender, message,
-                Placeholder.component("player", players.isEmpty() ? Component.empty() : players.getFirst().name()),
+                Placeholder.component("player", players.isEmpty() ? Component.empty() : players.getFirst().teamDisplayName()),
                 Formatter.number("players", players.size()),
                 Placeholder.parsed("group", group.getName()));
         return players.isEmpty() ? 0 : Command.SINGLE_SUCCESS;
