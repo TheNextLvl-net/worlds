@@ -16,7 +16,7 @@ dependencies {
     implementation("com.palantir.javapoet:javapoet:0.7.0")
     implementation(project(":per-worlds-api"))
 
-    testImplementation(platform("org.junit:junit-bom:5.13.2"))
+    testImplementation(platform("org.junit:junit-bom:6.0.0-SNAPSHOT"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
