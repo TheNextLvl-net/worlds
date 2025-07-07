@@ -6,9 +6,11 @@ import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.event.WorldDeleteEvent;
 import net.thenextlvl.worlds.api.exception.GeneratorException;
 import net.thenextlvl.worlds.api.level.Level;
+import net.thenextlvl.worlds.dialog.WorldSetupDialog;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
@@ -88,5 +90,11 @@ public class WorldListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onWorldSave(WorldSaveEvent event) {
         plugin.linkProvider().persistTree(event.getWorld());
+    }
+    
+    @EventHandler
+    public void onSneak(PlayerToggleSneakEvent event) {
+        if (event.isSneaking()) return;
+        event.getPlayer().showDialog(WorldSetupDialog.INSTANCE);
     }
 }
