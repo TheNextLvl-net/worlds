@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Range;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.Nullable;
 
@@ -83,7 +84,7 @@ public interface PlayerData {
 
     PlayerData fireTicks(int fireTicks);
 
-    PlayerData flySpeed(float speed);
+    PlayerData flySpeed(@Range(from = -1, to = 1) float speed);
 
     PlayerData flying(TriState flying);
 
@@ -135,7 +136,7 @@ public interface PlayerData {
 
     PlayerData visualFire(TriState visualFire);
 
-    PlayerData walkSpeed(float speed);
+    PlayerData walkSpeed(@Range(from = -1, to = 1) float speed);
 
     PlayerData wardenSpawnTracker(WardenSpawnTracker tracker);
 
