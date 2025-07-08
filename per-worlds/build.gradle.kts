@@ -136,6 +136,6 @@ modrinth {
     gameVersions.set(versions)
     loaders.add("paper")
     dependencies {
-        incompatible.project("worlds")
+        incompatible.project("worlds-1")
     }
 }
