@@ -22,6 +22,7 @@ import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.argument.SeedArgument;
 import net.thenextlvl.worlds.command.argument.WorldPresetArgument;
 import net.thenextlvl.worlds.command.brigadier.BrigadierCommand;
+import net.thenextlvl.worlds.dialog.WorldSetupDialog;
 import net.thenextlvl.worlds.generator.Generator;
 import net.thenextlvl.worlds.generator.GeneratorType;
 import net.thenextlvl.worlds.preset.Preset;
@@ -41,7 +42,10 @@ final class WorldCreateCommand extends BrigadierCommand {
 
     public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
         final var command = new WorldCreateCommand(plugin);
-        return command.create().then(command.createCommand());
+        return command.create().then(command.createCommand()).executes(context -> {
+            context.getSource().getSender().showDialog(WorldSetupDialog.INSTANCE);
+            return Command.SINGLE_SUCCESS;
+        });
     }
 
     private RequiredArgumentBuilder<CommandSourceStack, ?> createCommand() {
