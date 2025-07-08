@@ -45,7 +45,6 @@ public class WorldSetupDialog {
                     ActionButton.builder(Component.text("Cancel")).build()
             )).base(DialogBase.builder(Component.text("Create a new world"))
                     .canCloseWithEscape(true)
-                    .externalTitle(Component.text("external?"))
                     .inputs(List.of(
                             DialogInput.text("name", 200, Component.text("World name"), true, "New World", 32, null),
                             DialogInput.singleOption("game_mode", 200, List.of(
