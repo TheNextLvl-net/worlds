@@ -9,12 +9,15 @@ import io.papermc.paper.registry.data.dialog.input.SingleOptionDialogInput;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
+import org.bukkit.Difficulty;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 
 public class WorldSetupDialog {
     public static final Dialog INSTANCE = Dialog.create(builder -> builder.empty()
@@ -23,22 +26,34 @@ public class WorldSetupDialog {
                             .action(DialogAction.customClick((response, audience) -> {
                                 var name = response.getText("name");
                                 var validatedName = name != null && !name.isBlank() ? name : "New World";
-                                
+
                                 var gameMode = response.getText("game_mode");
                                 var hardcore = gameMode != null && gameMode.equals("hardcore");
 
+                                var difficultyId = response.getText("difficulty");
+                                var difficulty = difficultyId != null ? Difficulty.valueOf(difficultyId.toUpperCase(Locale.ROOT)) : Difficulty.NORMAL;
+
                                 var plugin = JavaPlugin.getPlugin(WorldsPlugin.class);
-                                
+
+                                plugin.bundle().sendMessage(audience, "world.create",
+                                        Placeholder.parsed("world", validatedName));
                                 plugin.levelBuilder(Path.of(validatedName))
                                         .name(validatedName)
                                         .hardcore(hardcore)
-                                        // .difficulty(difficulty)
                                         // .cheats(cheats)
                                         .build()
                                         .createAsync()
                                         .thenAccept(world -> {
+                                            world.setDifficulty(difficulty);
+                                            plugin.bundle().sendMessage(audience, "world.create.success",
+                                                    Placeholder.parsed("world", world.getName()));
                                             if (!(audience instanceof Player player)) return;
                                             player.teleportAsync(world.getSpawnLocation());
+                                        }).exceptionally(throwable -> {
+                                            plugin.getComponentLogger().warn("Failed to create world {}", validatedName, throwable);
+                                            plugin.bundle().sendMessage(audience, "world.create.failed",
+                                                    Placeholder.parsed("world", validatedName));
+                                            return null;
                                         });
 
                             }, ClickCallback.Options.builder().uses(ClickCallback.UNLIMITED_USES).build())).build(),
