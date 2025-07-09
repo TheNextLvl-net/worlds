@@ -48,7 +48,7 @@ public class GroupSettingsAdapterGenerator extends Generator {
         Arrays.stream(GroupSettings.class.getDeclaredMethods())
                 .map(Method::getName)
                 .distinct()
-                .forEach(s -> builder.addStatement("root.optional($S).map($T::getAsBoolean).ifPresent(settings::$L);", s, Tag.class, s));
+                .forEach(s -> builder.addStatement("root.optional($S).map($T::getAsBoolean).ifPresent(settings::$L)", s, Tag.class, s));
         return builder
                 .addStatement("return settings")
                 .build();
