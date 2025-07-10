@@ -22,6 +22,8 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public interface PlayerData {
+    WorldGroup group();
+    
     @Nullable
     ItemStack[] enderChest();
 
@@ -212,8 +214,7 @@ public interface PlayerData {
      * The result will always complete with {@code false} if the group is not {@link GroupSettings#enabled() enabled}
      *
      * @param player   the player whose data is being loaded
-     * @param group    the group containing the settings to be applied to the player
      * @param position defines whether position-related settings should be applied
      */
-    CompletableFuture<Boolean> load(Player player, WorldGroup group, boolean position);
+    CompletableFuture<Boolean> load(Player player, boolean position);
 }

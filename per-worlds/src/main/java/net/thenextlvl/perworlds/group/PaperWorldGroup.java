@@ -1,5 +1,6 @@
 package net.thenextlvl.perworlds.group;
 
+import com.google.common.base.Preconditions;
 import core.io.IO;
 import core.nbt.NBTInputStream;
 import core.nbt.NBTOutputStream;
@@ -263,8 +264,12 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public boolean writePlayerData(OfflinePlayer player, PlayerData data) {
-        var file = IO.of(new File(getDataFolder(), player.getUniqueId() + ".dat"));
-        var backup = IO.of(new File(getDataFolder(), player.getUniqueId() + ".dat_old"));
+        if (player instanceof Player online) Preconditions.checkState(containsWorld(online.getWorld()),
+                "Failed to persist player data: World mismatch between group '%s' and player '%s'. Expected any of %s but got %s",
+                getName(), player.getName(), getPersistedWorlds(), online.getWorld().getKey());
+
+        var file = IO.of(getDataFolder(), player.getUniqueId() + ".dat");
+        var backup = IO.of(getDataFolder(), player.getUniqueId() + ".dat_old");
         try {
             if (file.exists()) Files.move(file.getPath(), backup.getPath(), REPLACE_EXISTING);
             else file.createParents();
@@ -295,9 +300,10 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public CompletableFuture<Boolean> loadPlayerData(Player player, boolean position) {
+        if (!getSettings().enabled()) return CompletableFuture.completedFuture(false);
         if (isLoadingData(player)) return CompletableFuture.completedFuture(false);
         player.setMetadata(LOADING_METADATA_KEY, new FixedMetadataValue(provider.getPlugin(), null));
-        return readPlayerData(player).orElseGet(PaperPlayerData::new).load(player, this, position)
+        return readPlayerData(player).orElseGet(() -> new PaperPlayerData(this)).load(player, position)
                 .whenComplete((success, throwable) -> player.removeMetadata(LOADING_METADATA_KEY, provider.getPlugin()))
                 .exceptionally(throwable -> {
                     provider.getLogger().error("Failed to load group data for player {}", player.getName(), throwable);
@@ -392,7 +398,8 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     private Optional<PaperPlayerData> readPlayerData(File file) throws IOException {
-        return readFile(file, new File(file.getPath() + "_old"), PaperPlayerData.class);
+        return readFile(file, new File(file.getPath() + "_old"), PaperPlayerData.class)
+                .map(paperPlayerData -> paperPlayerData.group(this));
     }
 
     private <T> Optional<T> readFile(File file, File backup, Class<T> type) throws IOException {
