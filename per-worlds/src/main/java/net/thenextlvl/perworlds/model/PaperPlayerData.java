@@ -110,8 +110,14 @@ public class PaperPlayerData implements PlayerData {
     private int remainingAir = DEFAULT_REMAINING_AIR;
     private int score = DEFAULT_SCORE;
 
+    private @Nullable WorldGroup group;
+
+    public PaperPlayerData(@Nullable WorldGroup group) {
+        this.group = group;
+    }
+
     public static PaperPlayerData of(Player player, WorldGroup group) {
-        return new PaperPlayerData()
+        return new PaperPlayerData(group)
                 .attributes(Registry.ATTRIBUTE.stream()
                         .map(player::getAttribute)
                         .filter(Objects::nonNull)
@@ -161,7 +167,11 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public CompletableFuture<Boolean> load(Player player, WorldGroup group, boolean position) {
+    public CompletableFuture<Boolean> load(Player player, boolean position) {
+        if (group == null) return CompletableFuture.failedFuture(new IllegalStateException(
+                "Player data has not been finalized yet"
+        ));
+
         var settings = group.getSettings();
         if (!settings.enabled()) return CompletableFuture.completedFuture(false);
         if (!position && group.containsWorld(player.getWorld())) {
@@ -307,6 +317,21 @@ public class PaperPlayerData implements PlayerData {
             data.getAwardedCriteria().forEach(progress::awardCriteria);
             data.getRemainingCriteria().forEach(progress::revokeCriteria);
         });
+    }
+
+    public PaperPlayerData group(WorldGroup group) {
+        Preconditions.checkState(this.group == null, "Player data has already been finalized");
+        if (respawnLocation != null && !group.containsWorld(respawnLocation.getWorld())) respawnLocation = null;
+        if (lastDeathLocation != null && !group.containsWorld(lastDeathLocation.getWorld())) lastDeathLocation = null;
+        if (lastLocation != null && !group.containsWorld(lastLocation.getWorld())) lastLocation = null;
+        this.group = group;
+        return this;
+    }
+
+    @Override
+    public WorldGroup group() {
+        Preconditions.checkState(group != null, "Player data has not been finalized yet");
+        return group;
     }
 
     @Override
@@ -479,13 +504,13 @@ public class PaperPlayerData implements PlayerData {
 
     @Override
     public PaperPlayerData lastDeathLocation(@Nullable Location location) {
-        this.lastDeathLocation = location;
+        this.lastDeathLocation = location == null || group == null || group.containsWorld(location.getWorld()) ? location : null;
         return this;
     }
 
     @Override
     public PaperPlayerData lastLocation(@Nullable Location location) {
-        this.lastLocation = location;
+        this.lastLocation = location == null || group == null || group.containsWorld(location.getWorld()) ? location : null;
         return this;
     }
 
@@ -575,7 +600,7 @@ public class PaperPlayerData implements PlayerData {
 
     @Override
     public PaperPlayerData respawnLocation(@Nullable Location location) {
-        this.respawnLocation = location;
+        this.respawnLocation = location == null || group == null || group.containsWorld(location.getWorld()) ? location : null;
         return this;
     }
 
