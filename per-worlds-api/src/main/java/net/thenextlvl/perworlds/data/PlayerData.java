@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Range;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.Nullable;
 
@@ -21,6 +22,8 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public interface PlayerData {
+    WorldGroup group();
+    
     @Nullable
     ItemStack[] enderChest();
 
@@ -83,7 +86,7 @@ public interface PlayerData {
 
     PlayerData fireTicks(int fireTicks);
 
-    PlayerData flySpeed(float speed);
+    PlayerData flySpeed(@Range(from = -1, to = 1) float speed);
 
     PlayerData flying(TriState flying);
 
@@ -135,7 +138,7 @@ public interface PlayerData {
 
     PlayerData visualFire(TriState visualFire);
 
-    PlayerData walkSpeed(float speed);
+    PlayerData walkSpeed(@Range(from = -1, to = 1) float speed);
 
     PlayerData wardenSpawnTracker(WardenSpawnTracker tracker);
 
@@ -211,8 +214,7 @@ public interface PlayerData {
      * The result will always complete with {@code false} if the group is not {@link GroupSettings#enabled() enabled}
      *
      * @param player   the player whose data is being loaded
-     * @param group    the group containing the settings to be applied to the player
      * @param position defines whether position-related settings should be applied
      */
-    CompletableFuture<Boolean> load(Player player, WorldGroup group, boolean position);
+    CompletableFuture<Boolean> load(Player player, boolean position);
 }

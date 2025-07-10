@@ -1,5 +1,6 @@
 package net.thenextlvl.perworlds.model;
 
+import com.google.common.base.Preconditions;
 import net.kyori.adventure.util.TriState;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
@@ -12,11 +13,14 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Range;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -107,8 +111,14 @@ public class PaperPlayerData implements PlayerData {
     private int remainingAir = DEFAULT_REMAINING_AIR;
     private int score = DEFAULT_SCORE;
 
+    private @Nullable WorldGroup group;
+
+    public PaperPlayerData(@Nullable WorldGroup group) {
+        this.group = group;
+    }
+
     public static PaperPlayerData of(Player player, WorldGroup group) {
-        return new PaperPlayerData()
+        return new PaperPlayerData(group)
                 .attributes(Registry.ATTRIBUTE.stream()
                         .map(player::getAttribute)
                         .filter(Objects::nonNull)
@@ -118,7 +128,8 @@ public class PaperPlayerData implements PlayerData {
                         .map(advancement -> new PaperAdvancementData(player.getAdvancementProgress(advancement)))
                         .filter(AdvancementData::shouldSerialize)
                         .collect(Collectors.toSet()))
-                .invulnerable(player.isInvulnerable())
+                // todo: replace - https://github.com/PaperMC/Paper/pull/12826
+                .invulnerable(((CraftPlayer) player).getHandle().isInvulnerable())
                 .portalCooldown(player.getPortalCooldown())
                 .gliding(player.isGliding())
                 .wardenSpawnTracker(PaperWardenSpawnTracker.of(player))
@@ -158,19 +169,28 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public CompletableFuture<Boolean> load(Player player, WorldGroup group, boolean position) {
+    public CompletableFuture<Boolean> load(Player player, boolean position) {
+        if (group == null) return CompletableFuture.failedFuture(new IllegalStateException(
+                "Player data has not been finalized yet"
+        ));
+
         var settings = group.getSettings();
         if (!settings.enabled()) return CompletableFuture.completedFuture(false);
         if (!position && group.containsWorld(player.getWorld())) {
             load(player, group);
             return CompletableFuture.completedFuture(true);
-        } else if (!position) {
-            var exception = new IllegalStateException("Cannot load player data while groups don't match");
-            return CompletableFuture.failedFuture(exception);
-        }
-
+        } else if (!position) return CompletableFuture.failedFuture(new IllegalStateException(
+                "Failed to load player data: World mismatch between group '%s' and player '%s'. Expected any of %s but got %s"
+                        .formatted(group.getName(), player.getName(), group.getPersistedWorlds(), player.getWorld().key())
+        ));
         var location = group.getSpawnLocation(this).orElse(null);
         if (location == null) return CompletableFuture.completedFuture(false);
+        if (player.isDead()) {
+            // this partly prevents a dupe exploit :)
+            // Players can't be teleported while dead, so we have to revive them to be able to load the data
+            var attribute = player.getAttribute(Attribute.MAX_HEALTH);
+            player.setHealth(attribute != null ? attribute.getValue() : 20);
+        }
         return player.teleportAsync(location).thenApply(success -> {
             if (!success) return false;
             player.setFallDistance(settings.fallDistance() ? fallDistance : DEFAULT_FALL_DISTANCE);
@@ -192,6 +212,8 @@ public class PaperPlayerData implements PlayerData {
         player.setFlying((settings.flyState() ? flying : DEFAULT_FLYING)
                 .toBooleanOrElseGet(() -> player.getGameMode().equals(GameMode.SPECTATOR)));
 
+        applyAttributes(player, settings);
+
         player.setGliding(settings.gliding() ? gliding : DEFAULT_GLIDING);
 
         player.setPortalCooldown(settings.portalCooldown() ? portalCooldown : DEFAULT_PORTAL_COOLDOWN);
@@ -210,7 +232,10 @@ public class PaperPlayerData implements PlayerData {
         player.setLevel(settings.experience() ? level : DEFAULT_LEVEL);
 
         player.setInvulnerable(settings.invulnerable() ? invulnerable : DEFAULT_INVULNERABLE);
-        player.setHealth(settings.health() ? health : DEFAULT_HEALTH);
+
+        var attribute = player.getAttribute(Attribute.MAX_HEALTH);
+        var maxHealth = attribute != null ? attribute.getValue() : 20;
+        player.setHealth(Math.clamp(settings.health() ? health : DEFAULT_HEALTH, 0, maxHealth));
 
         player.setAbsorptionAmount(settings.absorption() ? absorption : DEFAULT_ABSORPTION);
         player.setExhaustion(settings.exhaustion() ? exhaustion : DEFAULT_EXHAUSTION);
@@ -227,8 +252,8 @@ public class PaperPlayerData implements PlayerData {
         player.setLastDeathLocation(settings.lastDeathLocation() ? lastDeathLocation : DEFAULT_LAST_DEATH_LOCATION);
         player.setRespawnLocation(settings.respawnLocation() ? respawnLocation : DEFAULT_RESPAWN_LOCATION, false);
 
-        player.setFlySpeed(settings.flySpeed() ? flySpeed : DEFAULT_FLY_SPEED);
-        player.setWalkSpeed(settings.walkSpeed() ? walkSpeed : DEFAULT_WALK_SPEED);
+        player.setFlySpeed(Math.clamp(settings.flySpeed() ? flySpeed : DEFAULT_FLY_SPEED, -1, 1));
+        player.setWalkSpeed(Math.clamp(settings.walkSpeed() ? walkSpeed : DEFAULT_WALK_SPEED, -1, 1));
 
         player.clearActivePotionEffects();
         if (settings.potionEffects()) player.addPotionEffects(potionEffects);
@@ -243,7 +268,6 @@ public class PaperPlayerData implements PlayerData {
 
         updateTablistVisibility(player, group);
 
-        applyAttributes(player, settings);
         applyAdvancements(player, settings);
         applyRecipes(player, settings);
     }
@@ -301,6 +325,21 @@ public class PaperPlayerData implements PlayerData {
             data.getAwardedCriteria().forEach(progress::awardCriteria);
             data.getRemainingCriteria().forEach(progress::revokeCriteria);
         });
+    }
+
+    public PaperPlayerData group(WorldGroup group) {
+        Preconditions.checkState(this.group == null, "Player data has already been finalized");
+        if (respawnLocation != null && !group.containsWorld(respawnLocation.getWorld())) respawnLocation = null;
+        if (lastDeathLocation != null && !group.containsWorld(lastDeathLocation.getWorld())) lastDeathLocation = null;
+        if (lastLocation != null && !group.containsWorld(lastLocation.getWorld())) lastLocation = null;
+        this.group = group;
+        return this;
+    }
+
+    @Override
+    public WorldGroup group() {
+        Preconditions.checkState(group != null, "Player data has not been finalized yet");
+        return group;
     }
 
     @Override
@@ -410,7 +449,8 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public PaperPlayerData flySpeed(float speed) {
+    public PaperPlayerData flySpeed(@Range(from = -1, to = 1) float speed) {
+        Preconditions.checkArgument(speed >= -1 && speed <= 1, "Speed must be between -1 and 1");
         this.flySpeed = speed;
         return this;
     }
@@ -447,6 +487,7 @@ public class PaperPlayerData implements PlayerData {
 
     @Override
     public PaperPlayerData health(double health) {
+        Preconditions.checkArgument(health >= 0, "Health must be greater than or equal to 0");
         this.health = health;
         return this;
     }
@@ -471,13 +512,13 @@ public class PaperPlayerData implements PlayerData {
 
     @Override
     public PaperPlayerData lastDeathLocation(@Nullable Location location) {
-        this.lastDeathLocation = location;
+        this.lastDeathLocation = location == null || group == null || group.containsWorld(location.getWorld()) ? location : null;
         return this;
     }
 
     @Override
     public PaperPlayerData lastLocation(@Nullable Location location) {
-        this.lastLocation = location;
+        this.lastLocation = location == null || group == null || group.containsWorld(location.getWorld()) ? location : null;
         return this;
     }
 
@@ -506,7 +547,8 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public PaperPlayerData walkSpeed(float speed) {
+    public PaperPlayerData walkSpeed(@Range(from = -1, to = 1) float speed) {
+        Preconditions.checkArgument(speed >= -1 && speed <= 1, "Speed must be between -1 and 1");
         this.walkSpeed = speed;
         return this;
     }
@@ -566,7 +608,7 @@ public class PaperPlayerData implements PlayerData {
 
     @Override
     public PaperPlayerData respawnLocation(@Nullable Location location) {
-        this.respawnLocation = location;
+        this.respawnLocation = location == null || group == null || group.containsWorld(location.getWorld()) ? location : null;
         return this;
     }
 

@@ -21,7 +21,7 @@ tasks.compileJava {
 }
 
 group = "net.thenextlvl.worlds"
-version = "0.2.3"
+version = "0.2.4"
 
 repositories {
     mavenCentral()
@@ -136,6 +136,6 @@ modrinth {
     gameVersions.set(versions)
     loaders.add("paper")
     dependencies {
-        incompatible.project("worlds")
+        incompatible.project("worlds-1")
     }
 }
