@@ -167,11 +167,10 @@ public class PaperPlayerData implements PlayerData {
         if (!position && group.containsWorld(player.getWorld())) {
             load(player, group);
             return CompletableFuture.completedFuture(true);
-        } else if (!position) {
-            var exception = new IllegalStateException("Cannot load player data while groups don't match");
-            return CompletableFuture.failedFuture(exception);
-        }
-
+        } else if (!position) return CompletableFuture.failedFuture(new IllegalStateException(
+                "Failed to load player data: World mismatch between group '%s' and player '%s'. Expected any of %s but got %s"
+                        .formatted(group.getName(), player.getName(), group.getPersistedWorlds(), player.getWorld().key())
+        ));
         var location = group.getSpawnLocation(this).orElse(null);
         if (location == null) return CompletableFuture.completedFuture(false);
         return player.teleportAsync(location).thenApply(success -> {
