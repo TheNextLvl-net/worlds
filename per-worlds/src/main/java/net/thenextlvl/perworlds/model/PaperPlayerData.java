@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -127,7 +128,8 @@ public class PaperPlayerData implements PlayerData {
                         .map(advancement -> new PaperAdvancementData(player.getAdvancementProgress(advancement)))
                         .filter(AdvancementData::shouldSerialize)
                         .collect(Collectors.toSet()))
-                .invulnerable(player.isInvulnerable())
+                // todo: replace - https://github.com/PaperMC/Paper/pull/12826
+                .invulnerable(((CraftPlayer) player).getHandle().isInvulnerable())
                 .portalCooldown(player.getPortalCooldown())
                 .gliding(player.isGliding())
                 .wardenSpawnTracker(PaperWardenSpawnTracker.of(player))
