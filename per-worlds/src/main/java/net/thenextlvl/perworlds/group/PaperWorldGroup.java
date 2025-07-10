@@ -1,5 +1,6 @@
 package net.thenextlvl.perworlds.group;
 
+import com.google.common.base.Preconditions;
 import core.io.IO;
 import core.nbt.NBTInputStream;
 import core.nbt.NBTOutputStream;
@@ -263,8 +264,12 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public boolean writePlayerData(OfflinePlayer player, PlayerData data) {
-        var file = IO.of(new File(getDataFolder(), player.getUniqueId() + ".dat"));
-        var backup = IO.of(new File(getDataFolder(), player.getUniqueId() + ".dat_old"));
+        if (player instanceof Player online) Preconditions.checkState(containsWorld(online.getWorld()),
+                "Failed to persist player data: World mismatch between group '%s' and player '%s'. Expected any of %s but got %s",
+                getName(), player.getName(), getPersistedWorlds(), online.getWorld().getKey());
+
+        var file = IO.of(getDataFolder(), player.getUniqueId() + ".dat");
+        var backup = IO.of(getDataFolder(), player.getUniqueId() + ".dat_old");
         try {
             if (file.exists()) Files.move(file.getPath(), backup.getPath(), REPLACE_EXISTING);
             else file.createParents();
