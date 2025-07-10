@@ -300,6 +300,7 @@ public class PaperWorldGroup implements WorldGroup {
 
     @Override
     public CompletableFuture<Boolean> loadPlayerData(Player player, boolean position) {
+        if (!getSettings().enabled()) return CompletableFuture.completedFuture(false);
         if (isLoadingData(player)) return CompletableFuture.completedFuture(false);
         player.setMetadata(LOADING_METADATA_KEY, new FixedMetadataValue(provider.getPlugin(), null));
         return readPlayerData(player).orElseGet(() -> new PaperPlayerData(this)).load(player, position)
