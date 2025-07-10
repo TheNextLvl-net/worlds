@@ -185,6 +185,12 @@ public class PaperPlayerData implements PlayerData {
         ));
         var location = group.getSpawnLocation(this).orElse(null);
         if (location == null) return CompletableFuture.completedFuture(false);
+        if (player.isDead()) {
+            // this partly prevents a dupe exploit :)
+            // Players can't be teleported while dead, so we have to revive them to be able to load the data
+            var attribute = player.getAttribute(Attribute.MAX_HEALTH);
+            player.setHealth(attribute != null ? attribute.getValue() : 20);
+        }
         return player.teleportAsync(location).thenApply(success -> {
             if (!success) return false;
             player.setFallDistance(settings.fallDistance() ? fallDistance : DEFAULT_FALL_DISTANCE);
