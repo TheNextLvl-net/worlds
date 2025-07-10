@@ -263,6 +263,14 @@ public class PaperWorldGroup implements WorldGroup {
     }
 
     @Override
+    public boolean editPlayerData(OfflinePlayer player, Consumer<PlayerData> data) {
+        return readPlayerData(player).map(paperPlayerData -> {
+            data.accept(paperPlayerData);
+            return writePlayerData(player, paperPlayerData);
+        }).orElse(false);
+    }
+
+    @Override
     public boolean writePlayerData(OfflinePlayer player, PlayerData data) {
         if (player instanceof Player online) Preconditions.checkState(containsWorld(online.getWorld()),
                 "Failed to persist player data: World mismatch between group '%s' and player '%s'. Expected any of %s but got %s",
