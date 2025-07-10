@@ -126,6 +126,15 @@ public interface WorldGroup {
     Optional<? extends PlayerData> readPlayerData(OfflinePlayer player);
 
     /**
+     * Edits the data associated with a given player by applying the specified consumer function to the player's data.
+     *
+     * @param player the player whose data is to be edited.
+     * @param data   the consumer function that will be applied to the player's data.
+     * @return whether any changes were applied and persisted.
+     */
+    boolean editPlayerData(OfflinePlayer player, Consumer<PlayerData> data);
+
+    /**
      * Retrieves all persisted keys of the worlds that are members of this group.
      * This method supplements {@link #getWorlds} to account for worlds that are
      * members of the group but may not currently be loaded.
