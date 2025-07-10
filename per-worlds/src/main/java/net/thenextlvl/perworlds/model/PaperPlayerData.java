@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -110,8 +111,14 @@ public class PaperPlayerData implements PlayerData {
     private int remainingAir = DEFAULT_REMAINING_AIR;
     private int score = DEFAULT_SCORE;
 
+    private @Nullable WorldGroup group;
+
+    public PaperPlayerData(@Nullable WorldGroup group) {
+        this.group = group;
+    }
+
     public static PaperPlayerData of(Player player, WorldGroup group) {
-        return new PaperPlayerData()
+        return new PaperPlayerData(group)
                 .attributes(Registry.ATTRIBUTE.stream()
                         .map(player::getAttribute)
                         .filter(Objects::nonNull)
@@ -121,7 +128,8 @@ public class PaperPlayerData implements PlayerData {
                         .map(advancement -> new PaperAdvancementData(player.getAdvancementProgress(advancement)))
                         .filter(AdvancementData::shouldSerialize)
                         .collect(Collectors.toSet()))
-                .invulnerable(player.isInvulnerable())
+                // todo: replace - https://github.com/PaperMC/Paper/pull/12826
+                .invulnerable(((CraftPlayer) player).getHandle().isInvulnerable())
                 .portalCooldown(player.getPortalCooldown())
                 .gliding(player.isGliding())
                 .wardenSpawnTracker(PaperWardenSpawnTracker.of(player))
@@ -161,19 +169,28 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public CompletableFuture<Boolean> load(Player player, WorldGroup group, boolean position) {
+    public CompletableFuture<Boolean> load(Player player, boolean position) {
+        if (group == null) return CompletableFuture.failedFuture(new IllegalStateException(
+                "Player data has not been finalized yet"
+        ));
+
         var settings = group.getSettings();
         if (!settings.enabled()) return CompletableFuture.completedFuture(false);
         if (!position && group.containsWorld(player.getWorld())) {
             load(player, group);
             return CompletableFuture.completedFuture(true);
-        } else if (!position) {
-            var exception = new IllegalStateException("Cannot load player data while groups don't match");
-            return CompletableFuture.failedFuture(exception);
-        }
-
+        } else if (!position) return CompletableFuture.failedFuture(new IllegalStateException(
+                "Failed to load player data: World mismatch between group '%s' and player '%s'. Expected any of %s but got %s"
+                        .formatted(group.getName(), player.getName(), group.getPersistedWorlds(), player.getWorld().key())
+        ));
         var location = group.getSpawnLocation(this).orElse(null);
         if (location == null) return CompletableFuture.completedFuture(false);
+        if (player.isDead()) {
+            // this partly prevents a dupe exploit :)
+            // Players can't be teleported while dead, so we have to revive them to be able to load the data
+            var attribute = player.getAttribute(Attribute.MAX_HEALTH);
+            player.setHealth(attribute != null ? attribute.getValue() : 20);
+        }
         return player.teleportAsync(location).thenApply(success -> {
             if (!success) return false;
             player.setFallDistance(settings.fallDistance() ? fallDistance : DEFAULT_FALL_DISTANCE);
@@ -308,6 +325,21 @@ public class PaperPlayerData implements PlayerData {
             data.getAwardedCriteria().forEach(progress::awardCriteria);
             data.getRemainingCriteria().forEach(progress::revokeCriteria);
         });
+    }
+
+    public PaperPlayerData group(WorldGroup group) {
+        Preconditions.checkState(this.group == null, "Player data has already been finalized");
+        if (respawnLocation != null && !group.containsWorld(respawnLocation.getWorld())) respawnLocation = null;
+        if (lastDeathLocation != null && !group.containsWorld(lastDeathLocation.getWorld())) lastDeathLocation = null;
+        if (lastLocation != null && !group.containsWorld(lastLocation.getWorld())) lastLocation = null;
+        this.group = group;
+        return this;
+    }
+
+    @Override
+    public WorldGroup group() {
+        Preconditions.checkState(group != null, "Player data has not been finalized yet");
+        return group;
     }
 
     @Override
@@ -480,13 +512,13 @@ public class PaperPlayerData implements PlayerData {
 
     @Override
     public PaperPlayerData lastDeathLocation(@Nullable Location location) {
-        this.lastDeathLocation = location;
+        this.lastDeathLocation = location == null || group == null || group.containsWorld(location.getWorld()) ? location : null;
         return this;
     }
 
     @Override
     public PaperPlayerData lastLocation(@Nullable Location location) {
-        this.lastLocation = location;
+        this.lastLocation = location == null || group == null || group.containsWorld(location.getWorld()) ? location : null;
         return this;
     }
 
@@ -576,7 +608,7 @@ public class PaperPlayerData implements PlayerData {
 
     @Override
     public PaperPlayerData respawnLocation(@Nullable Location location) {
-        this.respawnLocation = location;
+        this.respawnLocation = location == null || group == null || group.containsWorld(location.getWorld()) ? location : null;
         return this;
     }
 
