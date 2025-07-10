@@ -1,6 +1,8 @@
 package net.thenextlvl.worlds.listener;
 
 import io.papermc.paper.event.entity.EntityPortalReadyEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundLevelEventPacket;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.model.PortalCooldown;
 import org.bukkit.Location;
@@ -9,6 +11,7 @@ import org.bukkit.PortalType;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,6 +33,24 @@ public class PortalListener implements Listener {
 
     public PortalListener(WorldsPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPortalEnter(EntityPortalEnterEvent event) {
+        if (!WorldsPlugin.RUNNING_FOLIA) return;
+
+        if (!event.getPortalType().equals(PortalType.NETHER)) return;
+
+        event.setCancelled(true);
+
+        if (event.getEntity().getPortalCooldown() != 0) return;
+        if (!cooldown.start(plugin, event.getEntity())) return;
+
+        var handle = ((CraftEntity) event.getEntity()).getHandle();
+
+        onEntityPortal(new EntityPortalReadyEvent(event.getEntity(), null, PortalType.NETHER));
+
+        // todo: handle portal create logic
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -56,7 +77,12 @@ public class PortalListener implements Listener {
             var spawn = new Location(targetWorld, 100.5, 49, 0.5, 90, 0);
             plugin.getServer().getRegionScheduler().run(plugin, spawn, scheduledTask -> {
                 generateEndPlatform(targetWorld);
-                event.getEntity().teleportAsync(spawn, END_PORTAL);
+                event.getEntity().teleportAsync(spawn, END_PORTAL).thenAccept(success -> {
+                    if (event.getEntity() instanceof CraftPlayer craftPlayer) {
+                        // TeleportTransition#playPortalSound(Entity)
+                        craftPlayer.getHandle().connection.send(new ClientboundLevelEventPacket(1032, BlockPos.ZERO, 0, false));
+                    }
+                });
             });
         } else if (event.getEntity() instanceof CraftPlayer player) {
             Consumer<@Nullable Location> teleport = location -> player.getScheduler().run(plugin, scheduledTask -> {
@@ -71,8 +97,9 @@ public class PortalListener implements Listener {
                 plugin.getServer().getRegionScheduler().run(plugin, potentialLocation, task ->
                         teleport.accept(player.getRespawnLocation(true)));
             } else teleport.accept(player.getRespawnLocation(true));
-        } else event.getEntity().getScheduler().run(plugin, task ->
-                event.getEntity().teleportAsync(targetWorld.getSpawnLocation(), END_PORTAL), null);
+        } else event.getEntity().getScheduler().run(plugin, task -> {
+            event.getEntity().teleportAsync(targetWorld.getSpawnLocation(), END_PORTAL);
+        }, null);
     }
 
     private void generateEndPlatform(World world) {
