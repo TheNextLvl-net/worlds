@@ -20,6 +20,7 @@ import net.thenextlvl.worlds.command.argument.GeneratorTypeArgument;
 import net.thenextlvl.worlds.command.argument.LevelStemArgument;
 import net.thenextlvl.worlds.command.argument.SeedArgument;
 import net.thenextlvl.worlds.command.argument.WorldPresetArgument;
+import net.thenextlvl.worlds.dialog.WorldSetupDialog;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
@@ -34,7 +35,11 @@ class WorldCreateCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         return Commands.literal("create")
                 .requires(source -> source.getSender().hasPermission("worlds.command.create"))
-                .then(createCommand(plugin));
+                .then(createCommand(plugin))
+                .executes(context -> {
+                    context.getSource().getSender().showDialog(WorldSetupDialog.INSTANCE);
+                    return Command.SINGLE_SUCCESS;
+                });
     }
 
     private static RequiredArgumentBuilder<CommandSourceStack, Key> createCommand(WorldsPlugin plugin) {

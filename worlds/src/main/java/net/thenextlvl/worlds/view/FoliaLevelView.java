@@ -7,7 +7,6 @@ import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -24,20 +23,21 @@ public class FoliaLevelView extends PaperLevelView {
     public CompletableFuture<Void> saveAsync(World world, boolean flush) {
         var futures = new ArrayList<CompletableFuture<Void>>();
         var level = ((CraftWorld) world).getHandle();
-        level.regioniser.computeForAllRegionsUnsynchronised(region -> {
-            var future = new CompletableFuture<@Nullable Void>();
-            futures.add(future);
+        // todo: uncomment for folia
+        // level.regioniser.computeForAllRegionsUnsynchronised(region -> {
+        //     var future = new CompletableFuture<@Nullable Void>();
+        //     futures.add(future);
 
-            var location = region.getCenterChunk();
-            plugin.getServer().getRegionScheduler().run(plugin, world, location.x, location.z, task -> {
-                try {
-                    level.getChunkSource().save(flush);
-                    future.complete(null);
-                } catch (Exception e) {
-                    future.completeExceptionally(e);
-                }
-            });
-        });
+        //     var location = region.getCenterChunk();
+        //     plugin.getServer().getRegionScheduler().run(plugin, world, location.x, location.z, task -> {
+        //         try {
+        //             level.getChunkSource().save(flush);
+        //             future.complete(null);
+        //         } catch (Exception e) {
+        //             future.completeExceptionally(e);
+        //         }
+        //     });
+        // });
         futures.add(saveLevelDataAsync(world));
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
@@ -96,10 +96,11 @@ public class FoliaLevelView extends PaperLevelView {
 
                 server.getServer().removeLevel(handle);
 
-                handle.regioniser.computeForAllRegionsUnsynchronised(regionThread -> {
-                    if (regionThread.getData().world != handle) return;
-                    regionThread.getData().getRegionSchedulingHandle().markNonSchedulable();
-                });
+                // todo: uncomment for folia
+                // handle.regioniser.computeForAllRegionsUnsynchronised(regionThread -> {
+                //     if (regionThread.getData().world != handle) return;
+                //     regionThread.getData().getRegionSchedulingHandle().markNonSchedulable();
+                // });
 
                 return true;
             });

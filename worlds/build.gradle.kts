@@ -28,7 +28,8 @@ repositories {
 }
 
 dependencies {
-    paperweight.foliaDevBundle("1.21.6-R0.1-SNAPSHOT")
+    // paperweight.foliaDevBundle("1.21.7-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.7-R0.1-SNAPSHOT")
 
     implementation(project(":worlds-api"))
     implementation(project(":per-worlds"))
