@@ -24,11 +24,11 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.7-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
     
     compileOnlyApi(project(":per-worlds-api"))
 
-    testImplementation("io.papermc.paper:paper-api:1.21.7-R0.1-SNAPSHOT")
+    testImplementation("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
     testImplementation("net.thenextlvl.core:nbt:2.3.2")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation(platform("org.junit:junit-bom:6.0.0-SNAPSHOT"))
