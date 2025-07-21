@@ -92,7 +92,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     }
 
     private void warnVoidGeneratorPlugin() {
-        var names = Stream.of("VoidWorldGenerator", "VoidGen", "VoidGenerator", "VoidWorld");
+        var names = Stream.of("VoidWorldGenerator", "VoidGen", "VoidGenerator", "VoidWorld", "VoidGenPlus");
         if (names.map(getServer().getPluginManager()::getPlugin)
                 .filter(Objects::nonNull).findAny().isEmpty()) return;
         getComponentLogger().warn("It appears you are using a plugin to generate void worlds");

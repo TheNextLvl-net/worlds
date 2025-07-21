@@ -61,6 +61,7 @@ public class PerWorldsPlugin extends JavaPlugin {
 
     final Set<String> knownWorldManagers = Set.of( // list ordered by likelihood of a plugin being used
             "Multiverse-Core", // https://github.com/Multiverse/Multiverse-Core/
+            "My_Worlds", // https://github.com/bergerhealer/MyWorlds
             "MultiWorld", // https://dev.bukkit.org/projects/multiworld-v-2-0 // https://modrinth.com/plugin/multiworld-bukkit
             "PhantomWorlds", // https://github.com/TheNewEconomy/PhantomWorlds
             "Hyperverse", // https://github.com/Incendo/Hyperverse
@@ -68,6 +69,7 @@ public class PerWorldsPlugin extends JavaPlugin {
             "SolarSystem", // https://github.com/OneLiteFeatherNET/SolarSystemPlugin
             "MoreFoWorld", // https://github.com/Folia-Inquisitors/MoreFoWorld
             "WorldManager", // https://www.spigotmc.org/resources/worldmanager-1-8-1-18-free-download-api.101875/
+            "LilWorlds", // https://github.com/QQuantumBits/LilWorlds
             "WorldMaster", // https://www.spigotmc.org/resources/worldmaster.101171/
             "TheGalaxyLimits", // https://hangar.papermc.io/TheGlitchedVirus/thegalaxylimits
             "WorldMagic", // https://github.com/hotwopik/WorldMagic
