@@ -19,7 +19,8 @@ public class ChatListener implements Listener {
     public void onChat(AsyncChatEvent event) {
         var group = provider.getGroup(event.getPlayer().getWorld())
                 .orElse(provider.getUnownedWorldGroup());
-        if (group.getSettings().chat()) event.viewers().removeIf(audience ->
+        if (!group.getSettings().enabled() || !group.getSettings().chat()) return;
+        event.viewers().removeIf(audience ->
                 audience instanceof Player player
                 && !player.equals(event.getPlayer())
                 && !group.containsWorld(player.getWorld())
