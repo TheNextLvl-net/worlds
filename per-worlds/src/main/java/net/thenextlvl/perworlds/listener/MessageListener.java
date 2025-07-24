@@ -71,7 +71,8 @@ public class MessageListener implements Listener {
     private @Nullable List<Player> receivers(World world, @Nullable GameRule<Boolean> gameRule, Predicate<GroupSettings> enabled) {
         if (!canReceive(gameRule, world)) return null;
         var group = provider.getGroup(world).orElse(provider.getUnownedWorldGroup());
-        return enabled.test(group.getSettings()) ? group.getPlayers() : provider.getAllGroups().stream()
+        return group.getSettings().enabled() && enabled.test(group.getSettings())
+                ? group.getPlayers() : provider.getAllGroups().stream()
                 .filter(target -> !enabled.test(target.getSettings()))
                 .filter(target -> canReceive(gameRule, target))
                 .map(WorldGroup::getPlayers)
