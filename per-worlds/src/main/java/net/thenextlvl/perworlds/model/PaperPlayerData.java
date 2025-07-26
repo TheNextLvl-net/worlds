@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Range;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.spigotmc.SpigotConfig;
 
 import java.util.Collection;
 import java.util.HashSet;

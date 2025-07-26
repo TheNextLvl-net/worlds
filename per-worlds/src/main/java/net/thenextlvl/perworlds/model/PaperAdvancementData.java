@@ -6,6 +6,7 @@ import org.bukkit.advancement.AdvancementProgress;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.spigotmc.SpigotConfig;
 
 import java.util.Date;
 import java.util.HashMap;
