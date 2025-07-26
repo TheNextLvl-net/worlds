@@ -70,7 +70,12 @@ public class PaperAdvancementData implements AdvancementData {
 
     @Override
     public boolean shouldSerialize() {
-        return !awardedCriteria.isEmpty();
+        var disabled = SpigotConfig.disabledAdvancements;
+        return !awardedCriteria.isEmpty() && disabled != null
+               && (disabled.contains("*")
+                   || disabled.contains(advancement.key().asString())
+                   || disabled.contains(advancement.key().namespace()
+        ));
     }
 
     @Override
