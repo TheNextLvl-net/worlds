@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Range;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.spigotmc.SpigotConfig;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -119,15 +120,8 @@ public class PaperPlayerData implements PlayerData {
 
     public static PaperPlayerData of(Player player, WorldGroup group) {
         return new PaperPlayerData(group)
-                .attributes(Registry.ATTRIBUTE.stream()
-                        .map(player::getAttribute)
-                        .filter(Objects::nonNull)
-                        .map(PaperAttributeData::new)
-                        .collect(Collectors.toSet()))
-                .advancements(StreamSupport.stream(Spliterators.spliteratorUnknownSize(player.getServer().advancementIterator(), 0), false)
-                        .map(advancement -> new PaperAdvancementData(player.getAdvancementProgress(advancement)))
-                        .filter(AdvancementData::shouldSerialize)
-                        .collect(Collectors.toSet()))
+                .attributes(collectAttributes(player))
+                .advancements(collectAdvancements(player))
                 // todo: replace - https://github.com/PaperMC/Paper/pull/12826
                 .invulnerable(((CraftPlayer) player).getHandle().isInvulnerable())
                 .portalCooldown(player.getPortalCooldown())
@@ -166,6 +160,22 @@ public class PaperPlayerData implements PlayerData {
                 .level(player.getLevel())
                 .remainingAir(player.getRemainingAir())
                 .score(player.getDeathScreenScore());
+    }
+
+    private static Set<AttributeData> collectAttributes(Player player) {
+        return Registry.ATTRIBUTE.stream()
+                .map(player::getAttribute)
+                .filter(Objects::nonNull)
+                .map(PaperAttributeData::new)
+                .collect(Collectors.toSet());
+    }
+
+    private static Set<AdvancementData> collectAdvancements(Player player) {
+        if (SpigotConfig.disableAdvancementSaving) return Set.of();
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(player.getServer().advancementIterator(), 0), false)
+                .map(advancement -> new PaperAdvancementData(player.getAdvancementProgress(advancement)))
+                .filter(AdvancementData::shouldSerialize)
+                .collect(Collectors.toSet());
     }
 
     @Override
