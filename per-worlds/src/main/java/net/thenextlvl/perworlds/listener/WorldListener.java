@@ -63,8 +63,9 @@ public class WorldListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onTimeSkip(TimeSkipEvent event) {
-        processWorldDataUpdate(event.getWorld(), Type.TIME, data ->
-                data.time(event.getWorld().getFullTime() + event.getSkipAmount()));
+        processWorldDataUpdate(event.getWorld(), Type.TIME, data -> {
+            data.time(event.getWorld().getFullTime() + event.getSkipAmount());
+        });
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -93,13 +94,13 @@ public class WorldListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWorldBorderChange(WorldBorderCenterChangeEvent event) {
-        processWorldDataUpdate(event.getWorld(), Type.WORLD_BORDER, data ->
-                data.getWorldBorder().center(event.getNewCenter()));
+        processWorldDataUpdate(event.getWorld(), Type.WORLD_BORDER, data -> {
+            data.getWorldBorder().center(event.getNewCenter());
+        });
     }
 
     private void processWorldDataUpdate(World world, Type type, Consumer<GroupData> process) {
-        var group = provider.getGroup(world)
-                .orElse(provider.getUnownedWorldGroup());
+        var group = provider.getGroup(world).orElse(provider.getUnownedWorldGroup());
         if (!lock.computeIfAbsent(type, ignored -> new HashSet<>()).add(group)) return;
         process.accept(group.getGroupData());
         group.getWorlds()
