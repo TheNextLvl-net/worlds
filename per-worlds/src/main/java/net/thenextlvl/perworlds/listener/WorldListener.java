@@ -44,6 +44,13 @@ public class WorldListener implements Listener {
 
     private final Map<Type, Set<WorldGroup>> lock = new HashMap<>();
 
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onWorldDifficultyChange(WorldDifficultyChangeEvent event) {
+        processWorldDataUpdate(event.getWorld(), Type.DIFFICULTY, data -> {
+            data.setDifficulty(event.getDifficulty());
+        });
+    }
+
     @SuppressWarnings("unchecked")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWorldGameRuleChange(WorldGameRuleChangeEvent event) {
