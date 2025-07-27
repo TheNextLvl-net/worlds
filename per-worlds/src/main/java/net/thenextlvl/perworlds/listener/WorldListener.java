@@ -1,5 +1,6 @@
 package net.thenextlvl.perworlds.listener;
 
+import io.papermc.paper.event.world.WorldDifficultyChangeEvent;
 import io.papermc.paper.event.world.WorldGameRuleChangeEvent;
 import io.papermc.paper.event.world.border.WorldBorderBoundsChangeEvent;
 import io.papermc.paper.event.world.border.WorldBorderCenterChangeEvent;
@@ -38,9 +39,6 @@ public class WorldListener implements Listener {
                 .orElse(provider.getUnownedWorldGroup())
                 .updateWorldData(event.getWorld());
     }
-
-    // todo: there is no difficulty change event????
-    // https://github.com/PaperMC/Paper/pull/12471
 
     private final Map<Type, Set<WorldGroup>> lock = new HashMap<>();
 
