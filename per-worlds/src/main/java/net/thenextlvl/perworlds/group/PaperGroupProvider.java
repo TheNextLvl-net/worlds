@@ -16,10 +16,10 @@ import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.adapter.AdvancementDataAdapter;
 import net.thenextlvl.perworlds.adapter.AttributeAdapter;
 import net.thenextlvl.perworlds.adapter.AttributeDataAdapter;
-import net.thenextlvl.perworlds.adapter.DateAdapter;
 import net.thenextlvl.perworlds.adapter.GroupConfigAdapter;
 import net.thenextlvl.perworlds.adapter.GroupDataAdapter;
 import net.thenextlvl.perworlds.adapter.GroupSettingsAdapter;
+import net.thenextlvl.perworlds.adapter.InstantAdapter;
 import net.thenextlvl.perworlds.adapter.ItemStackArrayAdapter;
 import net.thenextlvl.perworlds.adapter.KeyAdapter;
 import net.thenextlvl.perworlds.adapter.LocationAdapter;
@@ -56,8 +56,8 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -79,12 +79,12 @@ public class PaperGroupProvider implements GroupProvider {
                 .registerTypeHierarchyAdapter(AdvancementData.class, new AdvancementDataAdapter(getServer()))
                 .registerTypeHierarchyAdapter(Attribute.class, new AttributeAdapter())
                 .registerTypeHierarchyAdapter(AttributeData.class, new AttributeDataAdapter())
-                .registerTypeHierarchyAdapter(Date.class, new DateAdapter())
                 .registerTypeHierarchyAdapter(Difficulty.class, new EnumAdapter<>(Difficulty.class))
                 .registerTypeHierarchyAdapter(GameMode.class, new EnumAdapter<>(GameMode.class))
                 .registerTypeHierarchyAdapter(GroupConfig.class, new GroupConfigAdapter(this))
                 .registerTypeHierarchyAdapter(GroupData.class, new GroupDataAdapter(this))
                 .registerTypeHierarchyAdapter(GroupSettings.class, new GroupSettingsAdapter())
+                .registerTypeHierarchyAdapter(Instant.class, new InstantAdapter())
                 .registerTypeHierarchyAdapter(ItemStack[].class, new ItemStackArrayAdapter())
                 .registerTypeHierarchyAdapter(Key.class, new KeyAdapter())
                 .registerTypeHierarchyAdapter(Location.class, new LocationAdapter())
