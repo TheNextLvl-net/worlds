@@ -9,6 +9,7 @@ import core.nbt.tag.CompoundTag;
 import core.nbt.tag.ListTag;
 import core.nbt.tag.StringTag;
 import core.nbt.tag.Tag;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.util.TriState;
 import net.thenextlvl.perworlds.data.AdvancementData;
 import net.thenextlvl.perworlds.data.AttributeData;
@@ -30,7 +31,7 @@ import java.util.Objects;
 @NullMarked
 public class PlayerDataAdapter implements TagAdapter<PlayerData> {
     private final PaperGroupProvider provider;
-    
+
     public PlayerDataAdapter(PaperGroupProvider provider) {
         this.provider = provider;
     }
@@ -67,6 +68,9 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         root.optional("potionEffects").map(Tag::getAsList).map(list ->
                 list.stream().map(effect -> context.deserialize(effect, PotionEffect.class)).toList()
         ).ifPresent(data::potionEffects);
+        root.optional("lastAdvancementTab").map(advancement ->
+                context.deserialize(advancement, Key.class)
+        ).ifPresent(data::lastAdvancementTab);
         root.optional("statistics").map(stats -> context.deserialize(stats, Stats.class)).ifPresent(data::stats);
         root.optional("gameMode").map(mode -> context.deserialize(mode, GameMode.class)).ifPresent(data::gameMode);
         root.optional("seenCredits").map(Tag::getAsBoolean).ifPresent(data::seenCredits);
@@ -121,6 +125,8 @@ public class PlayerDataAdapter implements TagAdapter<PlayerData> {
         tag.add("attributes", new ListTag<>(data.attributes().stream().map(context::serialize).toList(), CompoundTag.ID));
         tag.add("enderChest", context.serialize(data.enderChest()));
         tag.add("inventory", context.serialize(data.inventory()));
+        var lastAdvancementTab = data.lastAdvancementTab();
+        if (lastAdvancementTab != null) tag.add("lastAdvancementTab", context.serialize(lastAdvancementTab));
         var respawnLocation = data.respawnLocation();
         if (respawnLocation != null) tag.add("respawnLocation", context.serialize(respawnLocation));
         var previousGameMode = data.previousGameMode();

@@ -1,14 +1,15 @@
 package net.thenextlvl.perworlds.model;
 
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.AdvancementProgress;
 import net.thenextlvl.perworlds.data.AdvancementData;
 import org.bukkit.advancement.Advancement;
-import org.bukkit.advancement.AdvancementProgress;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -18,24 +19,24 @@ import java.util.Set;
 public class PaperAdvancementData implements AdvancementData {
     private final Advancement advancement;
     private final Set<String> remainingCriteria = new HashSet<>();
-    private final Map<String, Date> awardedCriteria = new HashMap<>();
+    private final Map<String, @Nullable Instant> awardedCriteria = new HashMap<>();
 
-    public PaperAdvancementData(AdvancementProgress progress) {
-        this.advancement = progress.getAdvancement();
-        progress.getAwardedCriteria().forEach(criteria -> {
-            var date = progress.getDateAwarded(criteria);
-            awardedCriteria.put(criteria, date != null ? date : new Date());
+    public PaperAdvancementData(AdvancementHolder holder, AdvancementProgress progress) {
+        this.advancement = holder.toBukkit();
+        progress.getCompletedCriteria().forEach(criteria -> {
+            var criterion = progress.getCriterion(criteria);
+            awardedCriteria.put(criteria, criterion != null ? criterion.getObtained() : null);
         });
-        this.remainingCriteria.addAll(progress.getRemainingCriteria());
+        progress.getRemainingCriteria().forEach(this.remainingCriteria::add);
     }
 
-    public PaperAdvancementData(Advancement advancement, Map<String, Date> awardedCriteria, Set<String> remainingCriteria) {
+    public PaperAdvancementData(Advancement advancement, Map<String, Instant> awardedCriteria, Set<String> remainingCriteria) {
         this.advancement = advancement;
         this.awardedCriteria.putAll(awardedCriteria);
         this.remainingCriteria.addAll(remainingCriteria);
     }
 
-    public @Unmodifiable Map<String, Date> awardedCriteria() {
+    public @Unmodifiable Map<String, @Nullable Instant> awardedCriteria() {
         return Map.copyOf(awardedCriteria);
     }
 
@@ -51,7 +52,7 @@ public class PaperAdvancementData implements AdvancementData {
 
     @Override
     public boolean awardCriteria(String criteria) {
-        return remainingCriteria.remove(criteria) && awardedCriteria.putIfAbsent(criteria, new Date()) == null;
+        return remainingCriteria.remove(criteria) && awardedCriteria.putIfAbsent(criteria, Instant.now()) == null;
     }
 
     @Override
@@ -60,23 +61,26 @@ public class PaperAdvancementData implements AdvancementData {
     }
 
     @Override
-    public @Nullable Date getDateAwarded(String criteria) {
+    public @Nullable Instant getTimeAwarded(String criteria) {
         return awardedCriteria.get(criteria);
     }
 
     @Override
-    public boolean setDateAwarded(String criteria, Date date) {
-        return awardedCriteria.containsKey(criteria) && awardedCriteria.put(criteria, date) != null;
+    public boolean setTimeAwarded(String criteria, Instant instant) {
+        return awardedCriteria.containsKey(criteria) && awardedCriteria.put(criteria, instant) != null;
     }
 
     @Override
     public boolean shouldSerialize() {
+        return !awardedCriteria.isEmpty() && isEnabled();
+    }
+
+    private boolean isEnabled() {
         var disabled = SpigotConfig.disabledAdvancements;
-        return !awardedCriteria.isEmpty() && disabled != null
-               && (disabled.contains("*")
-                   || disabled.contains(advancement.key().asString())
-                   || disabled.contains(advancement.key().namespace()
-        ));
+        if (disabled == null || disabled.isEmpty()) return true;
+        if (disabled.contains("*")) return false;
+        if (disabled.contains(advancement.getKey().asString())) return false;
+        return !disabled.contains(advancement.getKey().getNamespace());
     }
 
     @Override

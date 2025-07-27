@@ -9,12 +9,13 @@ import core.nbt.tag.Tag;
 import org.bukkit.NamespacedKey;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.Objects;
+
 @NullMarked
 public class NamespacedKeyAdapter implements TagAdapter<NamespacedKey> {
     @Override
     public NamespacedKey deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
-        var split = tag.getAsString().split(":", 2);
-        return new NamespacedKey(split[0], split[1]);
+        return Objects.requireNonNull(NamespacedKey.fromString(tag.getAsString()), "Encountered invalid namespaced key: " + tag.getAsString());
     }
 
     @Override
