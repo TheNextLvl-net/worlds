@@ -4,7 +4,6 @@ import net.kyori.adventure.text.Component;
 import net.thenextlvl.perworlds.GroupProvider;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
-import net.thenextlvl.perworlds.group.PaperWorldGroup;
 import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -36,11 +35,6 @@ public class MessageListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerAdvancementDone(PlayerAdvancementDoneEvent event) {
-        // todo: remove this, temp solution until advancements are granted only internally
-        if (event.getPlayer().hasMetadata(PaperWorldGroup.LOADING_METADATA_KEY)) {
-            event.message(null);
-            return;
-        }
         handle(event.getPlayer().getWorld(), ANNOUNCE_ADVANCEMENTS, GroupSettings::advancementMessages, event::message, event.message());
     }
 
