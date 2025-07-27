@@ -1,5 +1,6 @@
 package net.thenextlvl.perworlds.data;
 
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.util.TriState;
 import net.thenextlvl.perworlds.GroupData;
 import net.thenextlvl.perworlds.GroupSettings;
@@ -23,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface PlayerData {
     WorldGroup group();
-    
+
     @Nullable
     ItemStack[] enderChest();
 
@@ -55,6 +56,9 @@ public interface PlayerData {
 
     @Nullable
     Location respawnLocation();
+
+    @Nullable
+    Key lastAdvancementTab();
 
     PlayerData absorption(double absorption);
 
@@ -109,6 +113,8 @@ public interface PlayerData {
     PlayerData lastDeathLocation(@Nullable Location location);
 
     PlayerData lastLocation(@Nullable Location location);
+
+    PlayerData lastAdvancementTab(@Nullable Key key);
 
     PlayerData level(int level);
 

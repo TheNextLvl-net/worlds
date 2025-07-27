@@ -76,6 +76,7 @@ public class PaperPlayerData implements PlayerData {
     private @Nullable GameMode previousGameMode = null;
     private @Nullable ItemStack[] enderChest = DEFAULT_ENDERCHEST;
     private @Nullable ItemStack[] inventory = DEFAULT_INVENTORY;
+    private @Nullable Key lastAdvancementTab = null;
     private @Nullable Location lastDeathLocation = DEFAULT_LAST_DEATH_LOCATION;
     private @Nullable Location lastLocation = DEFAULT_LAST_LOCATION;
     private @Nullable Location respawnLocation = DEFAULT_RESPAWN_LOCATION;
@@ -390,6 +391,17 @@ public class PaperPlayerData implements PlayerData {
     @Override
     public @Nullable Location respawnLocation() {
         return respawnLocation;
+    }
+
+    @Override
+    public @Nullable Key lastAdvancementTab() {
+        return lastAdvancementTab;
+    }
+
+    @Override
+    public PaperPlayerData lastAdvancementTab(@Nullable Key key) {
+        this.lastAdvancementTab = key;
+        return this;
     }
 
     @Override
