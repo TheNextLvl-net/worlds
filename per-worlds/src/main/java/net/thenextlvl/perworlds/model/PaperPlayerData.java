@@ -341,6 +341,7 @@ public class PaperPlayerData implements PlayerData {
         if (settings.recipes()) {
             var toAdd = new HashSet<>(recipes);
             toAdd.removeAll(player.getDiscoveredRecipes());
+            // todo: discover internally, don't send toast
             player.discoverRecipes(toAdd);
 
             var toRemove = new HashSet<>(player.getDiscoveredRecipes());

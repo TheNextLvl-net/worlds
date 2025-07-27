@@ -18,6 +18,9 @@ public class RespawnListener implements Listener {
         this.provider = provider;
     }
 
+    // fixme: new bug, no idea why
+    //  just respawn and exp, health, and levels are not reset
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerDeath(PlayerDeathEvent event) {
         var group = provider.getGroup(event.getPlayer().getWorld())
