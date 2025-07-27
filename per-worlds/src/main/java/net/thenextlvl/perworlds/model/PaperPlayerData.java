@@ -202,9 +202,9 @@ public class PaperPlayerData implements PlayerData {
             var progress = handle.getAdvancements().getClass().getDeclaredField("lastSelectedTab");
             var access = progress.canAccess(handle.getAdvancements());
             if (!access) progress.setAccessible(true);
-            var lastSelectedTab = (AdvancementHolder) progress.get(handle.getAdvancements());
+            var tab = (AdvancementHolder) progress.get(handle.getAdvancements());
             progress.setAccessible(access);
-            return Key.key(lastSelectedTab.id().getNamespace(), lastSelectedTab.id().getPath());
+            return tab != null ? Key.key(tab.id().getNamespace(), tab.id().getPath()) : null;
         } catch (Exception e) {
             group().getGroupProvider().getLogger().error("Failed to get last selected advancement tab from player {}", player.getName(), e);
             group().getGroupProvider().getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
