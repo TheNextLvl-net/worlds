@@ -8,6 +8,7 @@ import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Pose;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.data.AdvancementData;
@@ -232,8 +233,10 @@ public class PaperPlayerData implements PlayerData {
         if (player.isDead()) {
             // this partly prevents a dupe exploit :)
             // Players can't be teleported while dead, so we have to revive them to be able to load the data
-            var attribute = player.getAttribute(Attribute.MAX_HEALTH);
-            player.setHealth(attribute != null ? attribute.getValue() : 20);
+            var handle = ((CraftPlayer) player).getHandle();
+            handle.setPose(Pose.STANDING);
+            handle.reset();
+            handle.unsetRemoved();
         }
         return player.teleportAsync(location).thenApply(success -> {
             if (!success) return false;
@@ -279,7 +282,9 @@ public class PaperPlayerData implements PlayerData {
 
         var attribute = player.getAttribute(Attribute.MAX_HEALTH);
         var maxHealth = attribute != null ? attribute.getValue() : 20;
-        player.setHealth(Math.clamp(settings.health() ? health : DEFAULT_HEALTH, 0, maxHealth));
+
+        var handle = ((CraftPlayer) player).getHandle();
+        handle.setHealth((float) Math.clamp(settings.health() ? health : DEFAULT_HEALTH, 0, maxHealth));
 
         player.setAbsorptionAmount(settings.absorption() ? absorption : DEFAULT_ABSORPTION);
         player.setExhaustion(settings.exhaustion() ? exhaustion : DEFAULT_EXHAUSTION);

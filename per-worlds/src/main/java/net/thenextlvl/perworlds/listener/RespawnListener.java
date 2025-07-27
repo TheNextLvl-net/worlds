@@ -2,13 +2,17 @@ package net.thenextlvl.perworlds.listener;
 
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import net.thenextlvl.perworlds.group.PaperGroupProvider;
+import org.bukkit.GameRule;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.util.Vector;
 import org.jspecify.annotations.NullMarked;
+
+import java.util.List;
 
 @NullMarked
 public class RespawnListener implements Listener {
@@ -17,9 +21,6 @@ public class RespawnListener implements Listener {
     public RespawnListener(PaperGroupProvider provider) {
         this.provider = provider;
     }
-
-    // fixme: new bug, no idea why
-    //  just respawn and exp, health, and levels are not reset
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerDeath(PlayerDeathEvent event) {
@@ -34,6 +35,26 @@ public class RespawnListener implements Listener {
                 .orElse(provider.getUnownedWorldGroup());
 
         group.persistPlayerData(event.getPlayer(), playerData -> {
+            // The PlayerRespawnEvent is fired before the player data is reset,
+            // so to prevent duplication and preserve data integrity, we have to reset everything manually
+            if (Boolean.FALSE.equals(event.getPlayer().getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY))) {
+                playerData.experience(0);
+                playerData.level(0);
+                playerData.score(0);
+            }
+
+            playerData.absorption(0);
+            playerData.arrowsInBody(0);
+            playerData.beeStingersInBody(0);
+            playerData.exhaustion(0);
+            playerData.fallDistance(0);
+            playerData.fireTicks(0);
+            playerData.foodLevel(20);
+            playerData.potionEffects(List.of());
+            playerData.remainingAir(event.getPlayer().getMaximumAir());
+            playerData.saturation(20);
+            playerData.velocity(new Vector());
+
             var attribute = event.getPlayer().getAttribute(Attribute.MAX_HEALTH);
             playerData.health(attribute != null ? attribute.getValue() : 20);
         });
@@ -45,8 +66,8 @@ public class RespawnListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerPostRespawn(PlayerPostRespawnEvent event) {
-        provider.getGroup(event.getPlayer().getWorld())
+        provider.getGroup(event.getRespawnedLocation().getWorld())
                 .orElse(provider.getUnownedWorldGroup())
-                .persistPlayerData(event.getPlayer());
+                .loadPlayerData(event.getPlayer(), false);
     }
 }
