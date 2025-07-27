@@ -386,6 +386,9 @@ public class PaperPlayerData implements PlayerData {
                 progressChanged.add(holder);
             }
 
+            progressUpdate.setAccessible(access);
+            advancements.flushDirty(handle, false);
+
             if (settings.advancements()) {
                 var tab = lastAdvancementTab != null ? ResourceLocation.fromNamespaceAndPath(
                         lastAdvancementTab.namespace(),
@@ -393,9 +396,6 @@ public class PaperPlayerData implements PlayerData {
                 ) : null;
                 advancements.setSelectedTab(tab != null ? server.getAdvancements().get(tab) : null);
             }
-
-            progressUpdate.setAccessible(access);
-            advancements.flushDirty(handle, false);
         } catch (Exception e) {
             group().getGroupProvider().getLogger().error("Failed to update advancements for player {}", player.getName(), e);
             group().getGroupProvider().getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
