@@ -510,15 +510,6 @@ public abstract class LevelData implements Level {
         if (settings.filter(s -> s.equals(GeneratorType.AMPLIFIED.key().asString())).isPresent())
             return Optional.of(GeneratorType.AMPLIFIED);
 
-        // var type = generator.<CompoundTag>optional("biome_source")
-        //         .flatMap(tag -> tag.<StringTag>optional("type"))
-        //         .map(Tag::getAsString);
-
-        // if (type.filter(s -> s.equals(BiomeSource.SINGLE_BIOME.key().asString())).isPresent())
-        //     return Optional.of(GeneratorType.SINGLE_BIOME);
-        // if (type.filter(s -> s.equals(GeneratorType.CHECKERBOARD.key().asString())).isPresent())
-        //     return Optional.of(GeneratorType.CHECKERBOARD);
-
         var generatorType = generator.optional("type").map(Tag::getAsString);
         if (generatorType.filter(s -> s.equals(GeneratorType.DEBUG.key().asString())).isPresent())
             return Optional.of(GeneratorType.DEBUG);
