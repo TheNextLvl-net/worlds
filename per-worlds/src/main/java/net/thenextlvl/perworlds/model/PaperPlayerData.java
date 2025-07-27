@@ -1,19 +1,28 @@
 package net.thenextlvl.perworlds.model;
 
 import com.google.common.base.Preconditions;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.util.TriState;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.AdvancementProgress;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.PlayerAdvancements;
+import net.minecraft.server.level.ServerPlayer;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.data.AdvancementData;
 import net.thenextlvl.perworlds.data.AttributeData;
 import net.thenextlvl.perworlds.data.PlayerData;
 import net.thenextlvl.perworlds.data.WardenSpawnTracker;
+import net.thenextlvl.perworlds.group.PaperWorldGroup;
 import net.thenextlvl.perworlds.statistics.Stats;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.craftbukkit.advancement.CraftAdvancement;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -28,13 +37,15 @@ import org.spigotmc.SpigotConfig;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.Spliterators;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+
+import static net.thenextlvl.perworlds.SharedWorlds.ISSUES;
 
 @NullMarked
 public class PaperPlayerData implements PlayerData {
@@ -113,16 +124,17 @@ public class PaperPlayerData implements PlayerData {
     private int remainingAir = DEFAULT_REMAINING_AIR;
     private int score = DEFAULT_SCORE;
 
-    private @Nullable WorldGroup group;
+    private @Nullable PaperWorldGroup group;
 
-    public PaperPlayerData(@Nullable WorldGroup group) {
+    public PaperPlayerData(@Nullable PaperWorldGroup group) {
         this.group = group;
     }
 
-    public static PaperPlayerData of(Player player, WorldGroup group) {
-        return new PaperPlayerData(group)
-                .attributes(collectAttributes(player))
-                .advancements(collectAdvancements(player))
+    public static PaperPlayerData of(Player player, PaperWorldGroup group) {
+        var data = new PaperPlayerData(group);
+        return data.attributes(collectAttributes(player))
+                .advancements(data.collectAdvancements(player))
+                .lastAdvancementTab(data.getLastAdvancementTab(player))
                 // todo: replace - https://github.com/PaperMC/Paper/pull/12826
                 .invulnerable(((CraftPlayer) player).getHandle().isInvulnerable())
                 .portalCooldown(player.getPortalCooldown())
@@ -171,12 +183,33 @@ public class PaperPlayerData implements PlayerData {
                 .collect(Collectors.toSet());
     }
 
-    private static Set<AdvancementData> collectAdvancements(Player player) {
+    private Set<AdvancementData> collectAdvancements(Player player) {
         if (SpigotConfig.disableAdvancementSaving) return Set.of();
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(player.getServer().advancementIterator(), 0), false)
-                .map(advancement -> new PaperAdvancementData(player.getAdvancementProgress(advancement)))
-                .filter(AdvancementData::shouldSerialize)
-                .collect(Collectors.toSet());
+        var handle = ((CraftPlayer) player).getHandle();
+        var progress = getProgress(handle, handle.getAdvancements());
+        var data = new HashSet<AdvancementData>();
+        progress.forEach((key, value) -> {
+            var advancementData = new PaperAdvancementData(key, value);
+            if (advancementData.shouldSerialize()) data.add(advancementData);
+        });
+        return data;
+    }
+
+    @SuppressWarnings("PatternValidation")
+    private @Nullable Key getLastAdvancementTab(Player player) {
+        try {
+            var handle = ((CraftPlayer) player).getHandle();
+            var progress = handle.getAdvancements().getClass().getDeclaredField("lastSelectedTab");
+            var access = progress.canAccess(handle.getAdvancements());
+            if (!access) progress.setAccessible(true);
+            var lastSelectedTab = (AdvancementHolder) progress.get(handle.getAdvancements());
+            progress.setAccessible(access);
+            return Key.key(lastSelectedTab.id().getNamespace(), lastSelectedTab.id().getPath());
+        } catch (Exception e) {
+            group().getGroupProvider().getLogger().error("Failed to get last selected advancement tab from player {}", player.getName(), e);
+            group().getGroupProvider().getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
+            return null;
+        }
     }
 
     @Override
@@ -317,28 +350,99 @@ public class PaperPlayerData implements PlayerData {
     }
 
     private void applyAdvancements(Player player, GroupSettings settings) {
-        // todo: only grant advancements internally
-        var toRemove = StreamSupport.stream(Spliterators.spliteratorUnknownSize(
-                player.getServer().advancementIterator(), 0
-        ), false).collect(Collectors.toSet());
+        try {
+            var handle = ((CraftPlayer) player).getHandle();
+            var server = ((CraftServer) player.getServer()).getServer();
 
-        if (settings.advancements()) toRemove.removeAll(advancements.stream()
-                .map(AdvancementData::getAdvancement)
-                .collect(Collectors.toSet()));
+            var advancements = handle.getAdvancements();
+            var toRemove = new HashSet<>(server.getAdvancements().getAllAdvancements());
 
-        toRemove.forEach(advancement -> {
-            var progress = player.getAdvancementProgress(advancement);
-            progress.getAwardedCriteria().forEach(progress::revokeCriteria);
-        });
+            var progressChanged = getProgressChanged(handle, advancements);
 
-        if (settings.advancements()) advancements.forEach(data -> {
-            var progress = player.getAdvancementProgress(data.getAdvancement());
-            data.getAwardedCriteria().forEach(progress::awardCriteria);
-            data.getRemainingCriteria().forEach(progress::revokeCriteria);
-        });
+            if (settings.advancements()) this.advancements.stream()
+                    .map(AdvancementData::getAdvancement)
+                    .map(CraftAdvancement.class::cast)
+                    .map(CraftAdvancement::getHandle)
+                    .forEach(toRemove::remove);
+
+            var progressUpdate = advancements.getClass().getDeclaredMethod("markForVisibilityUpdate", AdvancementHolder.class);
+            var access = progressUpdate.canAccess(advancements);
+            if (!access) progressUpdate.setAccessible(true);
+
+            for (var holder : toRemove) {
+                var progress = advancements.getOrStartProgress(holder);
+                progress.getCompletedCriteria().forEach(progress::revokeProgress);
+                progressUpdate.invoke(advancements, holder);
+                progressChanged.add(holder);
+            }
+
+            if (settings.advancements()) for (var data : this.advancements) {
+                var holder = ((CraftAdvancement) data.getAdvancement()).getHandle();
+                var progress = advancements.getOrStartProgress(holder);
+                data.getAwardedCriteria().forEach(name -> updateProgress(progress, name, data));
+                data.getRemainingCriteria().forEach(progress::revokeProgress);
+                progressUpdate.invoke(advancements, holder);
+                progressChanged.add(holder);
+            }
+
+            if (settings.advancements()) {
+                var tab = lastAdvancementTab != null ? ResourceLocation.fromNamespaceAndPath(
+                        lastAdvancementTab.namespace(),
+                        lastAdvancementTab.value()
+                ) : null;
+                advancements.setSelectedTab(tab != null ? server.getAdvancements().get(tab) : null);
+            }
+
+            progressUpdate.setAccessible(access);
+            advancements.flushDirty(handle, false);
+        } catch (Exception e) {
+            group().getGroupProvider().getLogger().error("Failed to update advancements for player {}", player.getName(), e);
+            group().getGroupProvider().getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
+        }
     }
 
-    public PaperPlayerData group(WorldGroup group) {
+    @SuppressWarnings("unchecked")
+    private Set<AdvancementHolder> getProgressChanged(ServerPlayer player, PlayerAdvancements advancements) throws NoSuchFieldException, IllegalAccessException {
+        var progress = advancements.getClass().getDeclaredField("progressChanged");
+        var access = progress.canAccess(advancements);
+        if (!access) progress.setAccessible(true);
+        var progressChanged = (Set<AdvancementHolder>) progress.get(advancements);
+        progress.setAccessible(access);
+        return progressChanged;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<AdvancementHolder, AdvancementProgress> getProgress(ServerPlayer player, PlayerAdvancements advancements) {
+        try {
+            var progress = advancements.getClass().getDeclaredField("progress");
+            var access = progress.canAccess(advancements);
+            if (!access) progress.setAccessible(true);
+            var progressChanged = (Map<AdvancementHolder, AdvancementProgress>) progress.get(advancements);
+            progress.setAccessible(access);
+            return progressChanged;
+        } catch (Exception e) {
+            group().getGroupProvider().getLogger().error("Failed to get advancement progress for player {}", player.getName(), e);
+            group().getGroupProvider().getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
+            return new LinkedHashMap<>();
+        }
+    }
+
+    private void updateProgress(AdvancementProgress progress, String criteria, AdvancementData data) {
+        try {
+            var criterion = progress.getCriterion(criteria);
+            if (criterion == null) return;
+            var obtained = criterion.getClass().getDeclaredField("obtained");
+            var access = obtained.canAccess(criterion);
+            if (!access) obtained.setAccessible(true);
+            obtained.set(criterion, data.getTimeAwarded(criteria));
+            obtained.setAccessible(access);
+        } catch (Exception e) {
+            group().getGroupProvider().getLogger().error("Failed to update advancement progress {}", criteria, e);
+            group().getGroupProvider().getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
+        }
+    }
+
+    public PaperPlayerData group(PaperWorldGroup group) {
         Preconditions.checkState(this.group == null, "Player data has already been finalized");
         if (respawnLocation != null && !group.containsWorld(respawnLocation.getWorld())) respawnLocation = null;
         if (lastDeathLocation != null && !group.containsWorld(lastDeathLocation.getWorld())) lastDeathLocation = null;
@@ -348,7 +452,7 @@ public class PaperPlayerData implements PlayerData {
     }
 
     @Override
-    public WorldGroup group() {
+    public PaperWorldGroup group() {
         Preconditions.checkState(group != null, "Player data has not been finalized yet");
         return group;
     }
