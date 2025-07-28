@@ -5,10 +5,14 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.util.TriState;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
+import net.minecraft.network.protocol.game.ClientboundRecipeBookAddPacket;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.ServerRecipeBook;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.thenextlvl.perworlds.GroupSettings;
 import net.thenextlvl.perworlds.WorldGroup;
 import net.thenextlvl.perworlds.data.AdvancementData;
@@ -25,6 +29,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.advancement.CraftAdvancement;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.inventory.CraftRecipe;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -36,6 +41,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -346,13 +352,48 @@ public class PaperPlayerData implements PlayerData {
         if (settings.recipes()) {
             var toAdd = new HashSet<>(recipes);
             toAdd.removeAll(player.getDiscoveredRecipes());
-            // todo: discover internally, don't send toast
-            player.discoverRecipes(toAdd);
+            discoverRecipes(player, toAdd);
 
             var toRemove = new HashSet<>(player.getDiscoveredRecipes());
             toRemove.removeAll(recipes);
             player.undiscoverRecipes(toRemove);
         } else player.undiscoverRecipes(player.getDiscoveredRecipes());
+    }
+
+    private void discoverRecipes(Player player, Set<NamespacedKey> recipes) {
+        var handle = ((CraftPlayer) player).getHandle();
+        var list = new ArrayList<ClientboundRecipeBookAddPacket.Entry>();
+        var manager = ((CraftServer) player.getServer()).getServer().getRecipeManager();
+        var recipeBook = handle.getRecipeBook();
+
+        var recipeHolders = recipes.stream().map(CraftRecipe::toMinecraft)
+                .map(manager::byKey)
+                .map(recipeHolder -> recipeHolder.orElse(null))
+                .filter(Objects::nonNull);
+
+        recipeHolders.forEach(recipeHolder -> {
+            if (recipeBook.known.contains(recipeHolder.id()) || recipeHolder.value().isSpecial()) return;
+            recipeBook.add(recipeHolder.id());
+            manager.listDisplaysForRecipe(recipeHolder.id(), (entry) -> {
+                list.add(new ClientboundRecipeBookAddPacket.Entry(entry, false, true));
+            });
+            addHighlight(player, recipeHolder, recipeBook);
+        });
+
+        if (!list.isEmpty()) handle.connection.send(new ClientboundRecipeBookAddPacket(list, false));
+    }
+
+    private void addHighlight(Player player, RecipeHolder<?> recipeHolder, ServerRecipeBook recipeBook) {
+        try {
+            var addHighlight = recipeBook.getClass().getDeclaredMethod("addHighlight", ResourceKey.class);
+            var access = addHighlight.canAccess(recipeBook);
+            if (!access) addHighlight.setAccessible(true);
+            addHighlight.invoke(recipeBook, recipeHolder.id());
+            addHighlight.setAccessible(access);
+        } catch (Exception e) {
+            group().getGroupProvider().getLogger().error("Failed to add recipe highlight for player {}", player.getName(), e);
+            group().getGroupProvider().getLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
+        }
     }
 
     private void applyAdvancements(Player player, GroupSettings settings) {
