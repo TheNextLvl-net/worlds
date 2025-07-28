@@ -1,5 +1,6 @@
 package net.thenextlvl.perworlds.data;
 
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.util.TriState;
 import net.thenextlvl.perworlds.GroupData;
 import net.thenextlvl.perworlds.GroupSettings;
@@ -14,6 +15,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Range;
 import org.jetbrains.annotations.Unmodifiable;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
@@ -21,9 +23,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+@NullMarked
 public interface PlayerData {
     WorldGroup group();
-    
+
     @Nullable
     ItemStack[] enderChest();
 
@@ -55,6 +58,9 @@ public interface PlayerData {
 
     @Nullable
     Location respawnLocation();
+
+    @Nullable
+    Key lastAdvancementTab();
 
     PlayerData absorption(double absorption);
 
@@ -109,6 +115,8 @@ public interface PlayerData {
     PlayerData lastDeathLocation(@Nullable Location location);
 
     PlayerData lastLocation(@Nullable Location location);
+
+    PlayerData lastAdvancementTab(@Nullable Key key);
 
     PlayerData level(int level);
 
