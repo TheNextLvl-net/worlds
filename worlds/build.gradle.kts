@@ -19,7 +19,7 @@ tasks.compileJava {
 }
 
 group = "net.thenextlvl.worlds"
-version = "3.2.4"
+version = "3.2.5"
 
 repositories {
     mavenCentral()
@@ -28,6 +28,7 @@ repositories {
 }
 
 dependencies {
+    // paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
     paperweight.foliaDevBundle("1.21.6-R0.1-SNAPSHOT")
 
     implementation(project(":worlds-api"))
