@@ -21,7 +21,7 @@ tasks.compileJava {
 }
 
 group = "net.thenextlvl.worlds"
-version = "0.2.5"
+version = "0.2.7"
 
 repositories {
     mavenCentral()
@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle("1.21.6-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
 
     api("org.bstats:bstats-bukkit:3.1.1-SNAPSHOT")
 

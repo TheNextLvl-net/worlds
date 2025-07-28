@@ -8,17 +8,17 @@ import core.nbt.tag.LongTag;
 import core.nbt.tag.Tag;
 import org.jspecify.annotations.NullMarked;
 
-import java.util.Date;
+import java.time.Instant;
 
 @NullMarked
-public class DateAdapter implements TagAdapter<Date> {
+public class InstantAdapter implements TagAdapter<Instant> {
     @Override
-    public Date deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
-        return new Date(tag.getAsLong());
+    public Instant deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
+        return Instant.ofEpochMilli(tag.getAsLong());
     }
 
     @Override
-    public Tag serialize(Date date, TagSerializationContext context) throws ParserException {
-        return new LongTag(date.getTime());
+    public Tag serialize(Instant instant, TagSerializationContext context) throws ParserException {
+        return new LongTag(instant.toEpochMilli());
     }
 }
