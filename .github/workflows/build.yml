@@ -17,12 +17,7 @@ jobs:
         run: ./gradlew test
       - name: Build with Gradle
         run: ./gradlew shadowJar
-      - name: Upload PerWorlds Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: per-worlds
-          path: per-worlds/build/libs/*.jar
-      - name: Upload Worlds Build Artifact
+      - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: worlds
