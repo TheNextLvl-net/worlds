@@ -77,7 +77,6 @@ paper {
         register("worlds.admin") {
             description = "Allows access to all world commands"
             children = listOf(
-                "perworlds.admin",
                 "worlds.command.backup",
                 "worlds.command.clone",
                 "worlds.command.create",
@@ -172,7 +171,4 @@ modrinth {
     gameVersions.set(versions)
     syncBodyFrom.set(rootProject.file("README.md").readText())
     loaders.addAll((property("loaders") as String).split(",").map { it.trim() })
-    dependencies {
-        optional.project("perworlds")
-    }
 }
