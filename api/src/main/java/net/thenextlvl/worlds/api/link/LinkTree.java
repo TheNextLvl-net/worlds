@@ -12,6 +12,8 @@ import java.util.Optional;
 /**
  * A LinkTree is a mapping between one Overworld, one Nether, and one End.
  * Links restore vanilla portal behavior.
+ *
+ * @since 3.0.0
  */
 @NullMarked
 public interface LinkTree {

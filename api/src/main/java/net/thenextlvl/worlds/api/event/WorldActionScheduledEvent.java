@@ -22,6 +22,8 @@ import java.util.function.Consumer;
  * <p>
  * The {@link ActionType} enum defines the possible actions that can be scheduled,
  * such as deleting a world or regenerating it.
+ *
+ * @since 3.0.0
  */
 @NullMarked
 public class WorldActionScheduledEvent extends WorldEvent implements Cancellable {

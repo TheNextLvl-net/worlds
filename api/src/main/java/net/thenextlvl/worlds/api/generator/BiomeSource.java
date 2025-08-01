@@ -9,6 +9,9 @@ import org.jspecify.annotations.NullMarked;
 
 import java.util.Set;
 
+/**
+ * @since 3.0.0
+ */
 @NullMarked
 @ApiStatus.Experimental
 public interface BiomeSource extends Keyed {

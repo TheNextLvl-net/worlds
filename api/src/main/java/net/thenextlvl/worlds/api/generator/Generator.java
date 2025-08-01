@@ -16,6 +16,8 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * The `Generator` record offers methods to serialize its state, retrieve chunk generators,
  * and obtain biome providers for specific world names.
+ *
+ * @since 3.0.0
  */
 @NullMarked
 public record Generator(Plugin plugin, @Nullable String id) {

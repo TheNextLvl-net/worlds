@@ -14,6 +14,8 @@ import java.util.stream.Stream;
  * LinkProvider defines an interface for managing and retrieving associations
  * between worlds and their respective {@link LinkTree} structures.
  * It allows querying linked worlds, establishing links, and managing portal relationships.
+ *
+ * @since 3.0.0
  */
 @NullMarked
 public interface LinkProvider {

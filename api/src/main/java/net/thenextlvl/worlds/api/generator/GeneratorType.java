@@ -8,6 +8,9 @@ import org.jspecify.annotations.NullMarked;
 
 import java.util.Optional;
 
+/**
+ * @since 3.0.0
+ */
 @NullMarked
 @ApiStatus.Experimental
 public record GeneratorType(Key key) implements Keyed {

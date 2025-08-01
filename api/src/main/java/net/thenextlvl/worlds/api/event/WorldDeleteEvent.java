@@ -14,6 +14,7 @@ import org.jspecify.annotations.NullMarked;
  * It also provides an option to check if the deleted world is slated for regeneration.
  *
  * @see WorldActionScheduledEvent
+ * @since 2.0.0
  */
 @NullMarked
 public class WorldDeleteEvent extends WorldEvent implements Cancellable {

@@ -20,6 +20,9 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * @since 3.0.0
+ */
 @NullMarked
 public interface Level extends Keyed {
     /**
@@ -166,6 +169,7 @@ public interface Level extends Keyed {
      * </ul>
      *
      * @return a {@code CompletableFuture} completing with the created {@link World}
+     * @since 3.2.0
      */
     @Contract(mutates = "io")
     CompletableFuture<World> createAsync();

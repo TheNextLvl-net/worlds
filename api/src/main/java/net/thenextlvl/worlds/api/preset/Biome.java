@@ -6,6 +6,9 @@ import net.kyori.adventure.key.Keyed;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 
+/**
+ * @since 2.0.0
+ */
 @NullMarked
 public record Biome(Key key) implements Keyed {
     public Biome(org.bukkit.block.Biome biome) {
