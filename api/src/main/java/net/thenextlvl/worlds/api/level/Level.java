@@ -12,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -19,6 +20,9 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * @since 3.0.0
+ */
 @NullMarked
 public interface Level extends Keyed {
     /**
@@ -26,6 +30,7 @@ public interface Level extends Keyed {
      *
      * @return the file path as a {@code Path} object
      */
+    @Contract(pure = true)
     Path getDirectory();
 
     /**
@@ -33,6 +38,7 @@ public interface Level extends Keyed {
      *
      * @return the level name as a {@code String}
      */
+    @Contract(pure = true)
     String getName();
 
     /**
@@ -41,6 +47,7 @@ public interface Level extends Keyed {
      * @return an {@code Optional} containing the {@code Preset} if one is present, or {@link Optional#empty()}
      * if no preset is associated with the level
      */
+    @Contract(pure = true)
     Optional<Preset> getPreset();
 
     /**
@@ -49,6 +56,7 @@ public interface Level extends Keyed {
      * @return an {@code Optional} containing the {@code BiomeProvider} if one is present, or {@link Optional#empty()}
      * if no biome provider is associated with the level
      */
+    @Contract(pure = true)
     Optional<BiomeProvider> getBiomeProvider();
 
     /**
@@ -57,6 +65,7 @@ public interface Level extends Keyed {
      * @return an {@code Optional} containing the {@code ChunkGenerator} if one is present, or {@link Optional#empty()}
      * if no chunk generator is associated with the level
      */
+    @Contract(pure = true)
     Optional<ChunkGenerator> getChunkGenerator();
 
     /**
@@ -65,6 +74,7 @@ public interface Level extends Keyed {
      * @return an {@code Optional} containing the {@code Generator} if one is present, or {@link Optional#empty()}
      * if no generator is associated with the level
      */
+    @Contract(pure = true)
     Optional<Generator> getGenerator();
 
     /**
@@ -72,6 +82,7 @@ public interface Level extends Keyed {
      *
      * @return true if the level is set to hardcore mode, false otherwise
      */
+    @Contract(pure = true)
     boolean isHardcore();
 
     /**
@@ -79,6 +90,7 @@ public interface Level extends Keyed {
      *
      * @return true if structures are present in the level, false otherwise
      */
+    @Contract(pure = true)
     boolean hasStructures();
 
     /**
@@ -86,13 +98,17 @@ public interface Level extends Keyed {
      *
      * @return true if the bonus chest is enabled for this level, false otherwise
      */
+    @Contract(pure = true)
     boolean hasBonusChest();
 
     /**
      * Retrieves the spawn chunk radius for the level.
      *
      * @return an integer representing the spawn chunk radius
+     * @deprecated spawn chunks will be removed in the next release of minecraft
      */
+    @Contract(pure = true)
+    @Deprecated(forRemoval = true, since = "3.3.1")
     int getSpawnChunkRadius();
 
     /**
@@ -100,18 +116,23 @@ public interface Level extends Keyed {
      *
      * @return the seed value as a {@code long}
      */
+    @Contract(pure = true)
     long getSeed();
 
+    @Contract(pure = true)
     @ApiStatus.Experimental
     GeneratorType getGeneratorType();
 
+    @Contract(pure = true)
     @ApiStatus.Experimental
     LevelStem getLevelStem();
 
     @ApiStatus.Internal
+    @Contract(pure = true)
     TriState isEnabled();
 
     @ApiStatus.Internal
+    @Contract(pure = true)
     boolean isWorldKnown();
 
     /**
@@ -120,6 +141,7 @@ public interface Level extends Keyed {
      *
      * @return a Builder instance initialized with the current Level's configuration
      */
+    @Contract(pure = true)
     Builder toBuilder();
 
     /**
@@ -130,6 +152,7 @@ public interface Level extends Keyed {
      * @return an {@code Optional} containing the created {@code World}, or {@link Optional#empty()} otherwise
      * @deprecated use {@link #createAsync()}
      */
+    @Contract(mutates = "io")
     @Deprecated(forRemoval = true, since = "3.2.0")
     default Optional<World> create() {
         return Optional.of(createAsync().join());
@@ -146,7 +169,9 @@ public interface Level extends Keyed {
      * </ul>
      *
      * @return a {@code CompletableFuture} completing with the created {@link World}
+     * @since 3.2.0
      */
+    @Contract(mutates = "io")
     CompletableFuture<World> createAsync();
 
     interface Builder {
@@ -155,6 +180,7 @@ public interface Level extends Keyed {
          *
          * @return the {@link Path} representing the directory, or null if no directory is set
          */
+        @Contract(pure = true)
         Path directory();
 
         /**
@@ -163,6 +189,7 @@ public interface Level extends Keyed {
          * @param directory the {@link Path} representing the directory to set
          * @return the builder instance for chaining method calls
          */
+        @Contract(mutates = "this")
         Builder directory(Path directory);
 
         /**
@@ -171,6 +198,7 @@ public interface Level extends Keyed {
          * @return the {@link Key} instance associated with the builder, or null if no key is set
          */
         @Nullable
+        @Contract(pure = true)
         Key key();
 
         /**
@@ -179,6 +207,7 @@ public interface Level extends Keyed {
          * @param key the {@link Key} instance to associate with the builder, or null to unset the key
          * @return the builder instance for chaining method calls
          */
+        @Contract(mutates = "this")
         Builder key(@Nullable Key key);
 
         /**
@@ -187,6 +216,7 @@ public interface Level extends Keyed {
          * @return the name as a {@link String}, or null if no name is set
          */
         @Nullable
+        @Contract(pure = true)
         String name();
 
         /**
@@ -195,6 +225,7 @@ public interface Level extends Keyed {
          * @param name the name to associate with the builder, or null to unset the name
          * @return the builder instance for chaining method calls
          */
+        @Contract(mutates = "this")
         Builder name(@Nullable String name);
 
         /**
@@ -205,6 +236,7 @@ public interface Level extends Keyed {
          * @return the {@link BiomeProvider} instance, or null if no biome provider is set
          */
         @Nullable
+        @Contract(pure = true)
         BiomeProvider biomeProvider();
 
         /**
@@ -214,6 +246,7 @@ public interface Level extends Keyed {
          * @param provider the {@link BiomeProvider} to set, or null to remove any previously set biome provider
          * @return the builder instance for chaining method calls
          */
+        @Contract(mutates = "this")
         Builder biomeProvider(@Nullable BiomeProvider provider);
 
         /**
@@ -225,6 +258,7 @@ public interface Level extends Keyed {
          * or null if no chunk generator has been set.
          */
         @Nullable
+        @Contract(pure = true)
         ChunkGenerator chunkGenerator();
 
         /**
@@ -234,6 +268,7 @@ public interface Level extends Keyed {
          * @param generator the {@link ChunkGenerator} instance to set, or null to remove the chunk generator.
          * @return the builder instance for chaining method calls
          */
+        @Contract(mutates = "this")
         Builder chunkGenerator(@Nullable ChunkGenerator generator);
 
         /**
@@ -243,6 +278,7 @@ public interface Level extends Keyed {
          * @return the {@link Generator} instance associated with the builder, or null if no generator is set
          */
         @Nullable
+        @Contract(pure = true)
         Generator generator();
 
         /**
@@ -251,6 +287,7 @@ public interface Level extends Keyed {
          * @param generator the {@link Generator} instance to set, or null to remove the generator configuration
          * @return the builder instance for chaining method calls
          */
+        @Contract(mutates = "this")
         Builder generator(@Nullable Generator generator);
 
         /**
@@ -260,6 +297,7 @@ public interface Level extends Keyed {
          * @return the {@link Preset} applied to the builder, or null if no preset is set
          */
         @Nullable
+        @Contract(pure = true)
         Preset preset();
 
         /**
@@ -269,6 +307,7 @@ public interface Level extends Keyed {
          * @param preset the {@link Preset} to apply to the builder, or null to leave the preset undefined
          * @return the builder instance for chaining method calls
          */
+        @Contract(mutates = "this")
         Builder preset(@Nullable Preset preset);
 
         /**
@@ -278,6 +317,7 @@ public interface Level extends Keyed {
          * or null if the value is not explicitly set and the server default should be used.
          */
         @Nullable
+        @Contract(pure = true)
         Boolean hardcore();
 
         /**
@@ -288,6 +328,7 @@ public interface Level extends Keyed {
          *                 or null to use the server default
          * @return the builder instance for chaining method calls
          */
+        @Contract(mutates = "this")
         Builder hardcore(@Nullable Boolean hardcore);
 
         /**
@@ -297,6 +338,7 @@ public interface Level extends Keyed {
          * or null if the server default should be used
          */
         @Nullable
+        @Contract(pure = true)
         Boolean structures();
 
         /**
@@ -307,6 +349,7 @@ public interface Level extends Keyed {
          *                   be generated, or null to use the server default
          * @return the builder instance for chaining method calls
          */
+        @Contract(mutates = "this")
         Builder structures(@Nullable Boolean structures);
 
         /**
@@ -315,6 +358,7 @@ public interface Level extends Keyed {
          * @return a {@link Boolean} indicating whether a bonus chest should be generated.
          */
         @Nullable
+        @Contract(pure = true)
         Boolean bonusChest();
 
         /**
@@ -325,6 +369,7 @@ public interface Level extends Keyed {
          *                   should be generated, or null to leave the value unset
          * @return the builder instance for chaining method calls
          */
+        @Contract(mutates = "this")
         Builder bonusChest(@Nullable Boolean bonusChest);
 
         /**
@@ -332,8 +377,11 @@ public interface Level extends Keyed {
          *
          * @return an {@link Integer} representing the radius of spawn chunks to keep loaded,
          * or null if the default value is to be used.
+         * @deprecated spawn chunks will be removed in the next release of minecraft
          */
         @Nullable
+        @Contract(pure = true)
+        @Deprecated(forRemoval = true, since = "3.3.1")
         Integer spawnChunkRadius();
 
         /**
@@ -343,7 +391,10 @@ public interface Level extends Keyed {
          * @param radius an {@link Integer} representing the radius of chunks to keep loaded,
          *               or null to use the server default
          * @return the builder instance for chaining method calls
+         * @deprecated spawn chunks will be removed in the next release of minecraft
          */
+        @Contract(mutates = "this")
+        @Deprecated(forRemoval = true, since = "3.3.1")
         Builder spawnChunkRadius(@Nullable Integer radius);
 
         /**
@@ -352,6 +403,7 @@ public interface Level extends Keyed {
          * @return the seed as a {@link Long}, or null if no seed is set
          */
         @Nullable
+        @Contract(pure = true)
         Long seed();
 
         /**
@@ -360,6 +412,7 @@ public interface Level extends Keyed {
          * @param seed the seed to use for world generation, or null to generate a random seed
          * @return this builder instance for chaining method calls
          */
+        @Contract(mutates = "this")
         Builder seed(@Nullable Long seed);
 
         /**
@@ -367,33 +420,42 @@ public interface Level extends Keyed {
          *
          * @return the constructed Level instance
          */
+        @Contract(pure = true)
         Level build();
 
         @Nullable
+        @Contract(pure = true)
         @ApiStatus.Experimental
         LevelStem levelStem();
 
         @ApiStatus.Experimental
+        @Contract(mutates = "this")
         Builder levelStem(@Nullable LevelStem type);
 
         @Nullable
+        @Contract(pure = true)
         @ApiStatus.Experimental
         GeneratorType generatorType();
 
         @ApiStatus.Experimental
+        @Contract(mutates = "this")
         Builder generatorType(@Nullable GeneratorType type);
 
         @Nullable
         @ApiStatus.Internal
+        @Contract(pure = true)
         Boolean worldKnown();
 
         @ApiStatus.Internal
+        @Contract(mutates = "this")
         Builder worldKnown(@Nullable Boolean worldKnown);
 
         @ApiStatus.Internal
+        @Contract(pure = true)
         TriState enabled();
 
         @ApiStatus.Internal
+        @Contract(mutates = "this")
         Builder enabled(TriState enabled);
     }
 }

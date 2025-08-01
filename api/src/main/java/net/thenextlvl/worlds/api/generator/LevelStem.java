@@ -2,6 +2,9 @@ package net.thenextlvl.worlds.api.generator;
 
 import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * @since 3.0.0
+ */
 @ApiStatus.Experimental
 public record LevelStem(DimensionType dimensionType) {
     public static final LevelStem OVERWORLD = new LevelStem(DimensionType.OVERWORLD);

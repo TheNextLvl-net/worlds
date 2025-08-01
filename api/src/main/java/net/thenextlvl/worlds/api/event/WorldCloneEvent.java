@@ -6,6 +6,7 @@ import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.world.WorldEvent;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -19,6 +20,8 @@ import java.util.function.BiPredicate;
  * It provides information about whether the entire
  * world, including all data and entities, is being cloned, or if only the
  * {@code level.dat} is copied for generation.
+ *
+ * @since 3.0.0
  */
 @NullMarked
 public class WorldCloneEvent extends WorldEvent {
@@ -36,15 +39,17 @@ public class WorldCloneEvent extends WorldEvent {
     }
 
     @ApiStatus.Internal
+    @Contract(pure = true)
     public @Nullable BiPredicate<Path, BasicFileAttributes> getFileFilter() {
         return fileFilter;
     }
-    
+
     /**
      * Retrieves the cloned {@link Level} associated with this event.
      *
      * @return the clone of the level involved in the cloning process
      */
+    @Contract(pure = true)
     public Level getClone() {
         return clone;
     }
@@ -66,6 +71,7 @@ public class WorldCloneEvent extends WorldEvent {
      *               {@code false} otherwise
      * @throws IllegalStateException if the event represents a non-{@link #isFullClone() full} clone operation
      */
+    @Contract(mutates = "this")
     public void addFileFilter(BiPredicate<Path, BasicFileAttributes> filter) throws IllegalStateException {
         Preconditions.checkState(full, "Cannot add file filter to non-full clone event");
         this.fileFilter = this.fileFilter != null ? this.fileFilter.and(filter) : filter;
@@ -77,6 +83,7 @@ public class WorldCloneEvent extends WorldEvent {
      *
      * @return true if the entire world will be cloned, false, if only the {@code level.dat} file will be cloned
      */
+    @Contract(pure = true)
     public boolean isFullClone() {
         return full;
     }

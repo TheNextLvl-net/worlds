@@ -4,6 +4,9 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * @since 3.0.0
+ */
 // https://minecraft.wiki/w/Dimension_type
 @ApiStatus.Experimental
 public record DimensionType(Key key) implements Keyed {
