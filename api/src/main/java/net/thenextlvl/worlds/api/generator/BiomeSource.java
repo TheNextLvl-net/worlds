@@ -3,6 +3,7 @@ package net.thenextlvl.worlds.api.generator;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
@@ -19,6 +20,7 @@ public interface BiomeSource extends Keyed {
      * @param biomes the set of biomes to use for the checkerboard pattern
      * @return a new CheckerboardColumnBiomeSource configured with the specified biomes
      */
+    @Contract(value = "_ -> new", pure = true)
     static CheckerboardColumnBiomeSource checkerboard(Set<Key> biomes) {
         return new CheckerboardColumnBiomeSource(biomes);
     }
@@ -30,6 +32,7 @@ public interface BiomeSource extends Keyed {
      * @param biome the biome to use for the world
      * @return a new FixedBiomeSource configured with the specified biome
      */
+    @Contract(value = "_ -> new", pure = true)
     static FixedBiomeSource fixed(Key biome) {
         return new FixedBiomeSource(biome);
     }
@@ -58,11 +61,13 @@ public interface BiomeSource extends Keyed {
          *
          * @return the biome key
          */
+        @Contract(pure = true)
         public Key biome() {
             return biome;
         }
 
         @Override
+        @Contract(pure = true)
         public Key key() {
             return key;
         }
@@ -92,11 +97,13 @@ public interface BiomeSource extends Keyed {
          *
          * @return an unmodifiable set of biome keys
          */
+        @Contract(pure = true)
         public @Unmodifiable Set<Key> biomes() {
             return Set.copyOf(biomes);
         }
 
         @Override
+        @Contract(pure = true)
         public Key key() {
             return key;
         }

@@ -5,6 +5,7 @@ import net.thenextlvl.worlds.api.level.Level;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
@@ -26,6 +27,7 @@ public interface LevelView {
      *
      * @return the {@link Path} representing the backup folder
      */
+    @Contract(pure = true)
     Path getBackupFolder();
 
     /**
@@ -33,6 +35,7 @@ public interface LevelView {
      *
      * @return the {@link Path} representing the world container directory
      */
+    @Contract(pure = true)
     Path getWorldContainer();
 
     /**
@@ -42,6 +45,7 @@ public interface LevelView {
      * @return an {@code Optional} containing the {@code Level.Builder} if the directory represents a valid level,
      * or {@link Optional#empty()} if the directory is invalid
      */
+    @Contract(value = "_ -> new", pure = true)
     Optional<Level.Builder> read(Path directory);
 
     /**
@@ -51,6 +55,7 @@ public interface LevelView {
      * @return an {@code Optional} containing the associated {@code JavaPlugin}, or {@link Optional#empty()}
      * if the world does not have a generator or if the generator is not associated with a plugin
      */
+    @Contract(pure = true)
     Optional<JavaPlugin> getGenerator(World world);
 
     /**
@@ -62,6 +67,7 @@ public interface LevelView {
      * or an empty set if no valid levels are found or if an error occurs while accessing the filesystem.
      */
     @Unmodifiable
+    @Contract(pure = true)
     Set<Path> listLevels();
 
     /**
@@ -71,6 +77,7 @@ public interface LevelView {
      * @param level the path to the level directory to be checked
      * @return true if the level can be loaded, otherwise false
      */
+    @Contract(pure = true)
     boolean canLoad(Path level);
 
     /**
@@ -79,6 +86,7 @@ public interface LevelView {
      * @param level the path to the directory to be checked
      * @return true if the level directory contains a {@code DIM1} folder, otherwise false
      */
+    @Contract(pure = true)
     boolean hasEndDimension(Path level);
 
     /**
@@ -87,6 +95,7 @@ public interface LevelView {
      * @param level the path to the directory to be checked
      * @return true if the level directory contains a {@code DIM-1} folder, otherwise false
      */
+    @Contract(pure = true)
     boolean hasNetherDimension(Path level);
 
     /**
@@ -96,6 +105,7 @@ public interface LevelView {
      * @return {@code true} if the directory contains a {@code level.dat}
      * or {@code level.dat_old}, otherwise {@code false}
      */
+    @Contract(pure = true)
     boolean isLevel(Path path);
 
     /**
@@ -106,6 +116,7 @@ public interface LevelView {
      * @return true if the world was successfully unloaded, otherwise false
      * @deprecated use {@link #unloadAsync(World, boolean)}
      */
+    @Contract(mutates = "io,param1")
     @Deprecated(forRemoval = true, since = "3.2.0")
     default boolean unload(World world, boolean save) {
         return unloadAsync(world, save).join();
@@ -118,6 +129,7 @@ public interface LevelView {
      * @param save  whether changes to the world should be saved before unloading
      * @return A {@code CompletableFuture} completing with true if the world was successfully unloaded, otherwise false
      */
+    @Contract(mutates = "io,param1")
     CompletableFuture<Boolean> unloadAsync(World world, boolean save);
 
     /**
@@ -127,6 +139,7 @@ public interface LevelView {
      * @param flush whether to flush pending changes to disk immediately
      * @deprecated use {@link #saveAsync(World, boolean)}
      */
+    @Contract(mutates = "io,param1")
     @Deprecated(forRemoval = true, since = "3.2.0")
     default void save(World world, boolean flush) {
         saveAsync(world, flush).join();
@@ -139,6 +152,7 @@ public interface LevelView {
      * @param flush whether to flush pending changes to disk immediately
      * @return A {@code CompletableFuture} that might complete exceptionally
      */
+    @Contract(mutates = "io,param1")
     CompletableFuture<Void> saveAsync(World world, boolean flush);
 
     /**
@@ -148,6 +162,7 @@ public interface LevelView {
      * @param async whether the save operation should be performed asynchronously
      * @deprecated use {@link #saveLevelDataAsync(World)}
      */
+    @Contract(mutates = "io,param1")
     @Deprecated(forRemoval = true, since = "3.2.0")
     default void saveLevelData(World world, boolean async) {
         var future = saveLevelDataAsync(world);
@@ -159,6 +174,7 @@ public interface LevelView {
      *
      * @param world the world whose level data should be saved
      */
+    @Contract(mutates = "io,param1")
     CompletableFuture<Void> saveLevelDataAsync(World world);
 
     /**
@@ -167,6 +183,7 @@ public interface LevelView {
      * @param world the world to check
      * @return true if the world is enabled, false otherwise
      */
+    @Contract(pure = true)
     boolean isEnabled(World world);
 
     /**
@@ -175,6 +192,7 @@ public interface LevelView {
      * @param world   the world to enable or disable
      * @param enabled true to enable the world, false to disable it
      */
+    @Contract(mutates = "param1")
     void setEnabled(World world, boolean enabled);
 
     /**
@@ -184,6 +202,7 @@ public interface LevelView {
      * @return the size of the created backup in bytes
      * @throws IOException if an I/O error occurs while creating the backup
      */
+    @Contract(mutates = "io,param1")
     @SuppressWarnings("RedundantThrows")
     default long backup(World world) throws IOException {
         return backupAsync(world).join();
@@ -197,6 +216,7 @@ public interface LevelView {
      * @param world the world to back up
      * @return A {@code CompletableFuture} completing with the size of the created backup in bytes
      */
+    @Contract(mutates = "io,param1")
     CompletableFuture<Long> backupAsync(World world);
 
     /**
@@ -222,6 +242,7 @@ public interface LevelView {
      * @see WorldCloneEvent#isFullClone()
      * @deprecated use {@link #cloneAsync(World, Consumer, boolean)}
      */
+    @Contract(mutates = "io,param1")
     @SuppressWarnings("RedundantThrows")
     @Deprecated(forRemoval = true, since = "3.2.0")
     default Optional<World> clone(World world, Consumer<Level.Builder> builder, boolean full) throws IllegalArgumentException, IllegalStateException, IOException {
@@ -248,6 +269,7 @@ public interface LevelView {
      * @return A {@code CompletableFuture} completing with the cloned world
      * @see WorldCloneEvent#isFullClone()
      */
+    @Contract(mutates = "io,param1")
     CompletableFuture<World> cloneAsync(World world, Consumer<Level.Builder> builder, boolean full);
 
     /**
@@ -260,6 +282,7 @@ public interface LevelView {
      * @return a {@code DeletionResult} indicating the outcome of the deletion process.
      * @deprecated use {@link #deleteAsync(World, boolean)}
      */
+    @Contract(mutates = "io,param1")
     @Deprecated(forRemoval = true, since = "3.2.0")
     default DeletionResult delete(World world, boolean schedule) {
         return deleteAsync(world, schedule).join();
@@ -275,6 +298,7 @@ public interface LevelView {
      * @return A {@code CompletableFuture} completing with a {@code DeletionResult}
      * indicating the outcome of the deletion process.
      */
+    @Contract(mutates = "io,param1")
     CompletableFuture<DeletionResult> deleteAsync(World world, boolean schedule);
 
     /**
@@ -283,6 +307,7 @@ public interface LevelView {
      * @param world the world for which the scheduled deletion should be canceled
      * @return true if the scheduled deletion was successfully canceled, false if no deletion was scheduled
      */
+    @Contract(mutates = "this")
     boolean cancelScheduledDeletion(World world);
 
     /**
@@ -291,6 +316,7 @@ public interface LevelView {
      * @param world the world to check for a scheduled deletion
      * @return true if a deletion process is scheduled for the world, otherwise false
      */
+    @Contract(pure = true)
     boolean isDeletionScheduled(World world);
 
     /**
@@ -302,6 +328,7 @@ public interface LevelView {
      * @return a {@code DeletionResult} indicating the outcome of the regeneration process.
      * @deprecated use {@link #regenerateAsync(World, boolean)}
      */
+    @Contract(mutates = "io,param1")
     @Deprecated(forRemoval = true, since = "3.2.0")
     default DeletionResult regenerate(World world, boolean schedule) {
         return regenerateAsync(world, schedule).join();
@@ -316,6 +343,7 @@ public interface LevelView {
      * @return a {@code CompletableFuture} completing with a
      * {@code DeletionResult} indicating the outcome of the regeneration process.
      */
+    @Contract(mutates = "io,param1")
     CompletableFuture<DeletionResult> regenerateAsync(World world, boolean schedule);
 
     /**
@@ -324,6 +352,7 @@ public interface LevelView {
      * @param world the world for which the scheduled regeneration should be canceled
      * @return true if the scheduled regeneration was successfully canceled, false if no regeneration was scheduled
      */
+    @Contract(mutates = "this")
     boolean cancelScheduledRegeneration(World world);
 
     /**
@@ -332,6 +361,7 @@ public interface LevelView {
      * @param world the world to check for a scheduled regeneration
      * @return true if a regeneration process is scheduled for the world, otherwise false
      */
+    @Contract(pure = true)
     boolean isRegenerationScheduled(World world);
 
     /**
@@ -368,6 +398,7 @@ public interface LevelView {
          *
          * @return true if the result is either {@code SUCCESS} or {@code SCHEDULED}, otherwise false
          */
+        @Contract(pure = true)
         public boolean isSuccess() {
             return this == SUCCESS || this == SCHEDULED;
         }

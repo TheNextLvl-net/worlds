@@ -5,6 +5,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.world.WorldEvent;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -26,11 +27,13 @@ public class WorldDeleteEvent extends WorldEvent implements Cancellable {
     }
 
     @Override
+    @Contract(pure = true)
     public boolean isCancelled() {
         return this.cancelled;
     }
 
     @Override
+    @Contract(mutates = "this")
     public void setCancelled(boolean cancel) {
         this.cancelled = cancel;
     }
