@@ -3,6 +3,7 @@ package net.thenextlvl.worlds.api.link;
 import net.kyori.adventure.key.Key;
 import org.bukkit.PortalType;
 import org.bukkit.World;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 
@@ -22,6 +23,7 @@ public interface LinkProvider {
      * @return a stream of all {@link LinkTree} instances
      */
     @Unmodifiable
+    @Contract(pure = true)
     Stream<LinkTree> getLinkTrees();
 
     /**
@@ -30,6 +32,7 @@ public interface LinkProvider {
      * @param key the key for which the associated LinkTree is to be retrieved
      * @return an Optional containing the associated LinkTree
      */
+    @Contract(pure = true)
     Optional<LinkTree> getLinkTree(Key key);
 
     /**
@@ -38,6 +41,7 @@ public interface LinkProvider {
      * @param world the world for which the associated LinkTree is to be retrieved
      * @return an Optional containing the associated LinkTree
      */
+    @Contract(pure = true)
     Optional<LinkTree> getLinkTree(World world);
 
     /**
@@ -49,6 +53,7 @@ public interface LinkProvider {
      * @param type  the type of portal that dictates the relationship between worlds (e.g., NETHER, ENDER)
      * @return an Optional containing the target world if available
      */
+    @Contract(pure = true)
     Optional<World> getTarget(World world, PortalType type);
 
     /**
@@ -95,6 +100,7 @@ public interface LinkProvider {
      * @param key the key to check for an associated LinkTree
      * @return whether the specified key has an associated LinkTree
      */
+    @Contract(pure = true)
     boolean hasLinkTree(Key key);
 
     /**
@@ -103,5 +109,6 @@ public interface LinkProvider {
      * @param world the world to check for an associated LinkTree
      * @return whether the specified world has an associated LinkTree
      */
+    @Contract(pure = true)
     boolean hasLinkTree(World world);
 }

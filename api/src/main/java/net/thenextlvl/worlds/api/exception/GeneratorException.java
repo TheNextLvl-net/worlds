@@ -1,6 +1,7 @@
 package net.thenextlvl.worlds.api.exception;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -32,6 +33,7 @@ public class GeneratorException extends RuntimeException {
      *
      * @return a string representing the plugin name
      */
+    @Contract(pure = true)
     public String getPlugin() {
         return plugin;
     }
@@ -41,6 +43,7 @@ public class GeneratorException extends RuntimeException {
      *
      * @return a nullable string representing the ID of the generator, or null if no ID is provided
      */
+    @Contract(pure = true)
     public @Nullable String getId() {
         return id;
     }

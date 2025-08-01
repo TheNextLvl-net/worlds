@@ -5,6 +5,7 @@ import net.thenextlvl.worlds.api.exception.GeneratorException;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -30,6 +31,7 @@ public record Generator(Plugin plugin, @Nullable String id) {
         return plugin().getDefaultBiomeProvider(worldName, id());
     }
 
+    @Contract(value = "_, _ -> new", pure = true)
     public static Generator of(WorldsProvider provider, String string) throws GeneratorException {
         var split = string.split(":", 2);
 

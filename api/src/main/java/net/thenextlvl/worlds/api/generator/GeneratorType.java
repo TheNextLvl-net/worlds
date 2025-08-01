@@ -3,6 +3,7 @@ package net.thenextlvl.worlds.api.generator;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.Optional;
@@ -46,6 +47,7 @@ public record GeneratorType(Key key) implements Keyed {
      */
     public static final GeneratorType SINGLE_BIOME = new GeneratorType(Key.key("minecraft", "fixed"));
 
+    @Contract(pure = true)
     public Key presetName() {
         if (equals(DEBUG)) return Key.key("debug_all_block_states");
         if (equals(SINGLE_BIOME)) return Key.key("single_biome_surface");
@@ -53,6 +55,7 @@ public record GeneratorType(Key key) implements Keyed {
         return key();
     }
 
+    @Contract(pure = true)
     public static Optional<GeneratorType> getByKey(Key key) {
         if (key.equals(AMPLIFIED.key())) return Optional.of(AMPLIFIED);
         if (key.equals(DEBUG.key())) return Optional.of(DEBUG);
