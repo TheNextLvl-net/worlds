@@ -3,6 +3,7 @@ package net.thenextlvl.worlds.api.link;
 import net.kyori.adventure.key.Key;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -11,6 +12,8 @@ import java.util.Optional;
 /**
  * A LinkTree is a mapping between one Overworld, one Nether, and one End.
  * Links restore vanilla portal behavior.
+ *
+ * @since 3.0.0
  */
 @NullMarked
 public interface LinkTree {
@@ -19,6 +22,7 @@ public interface LinkTree {
      *
      * @return the {@code World} associated with this {@code LinkTree}
      */
+    @Contract(pure = true)
     World getOverworld();
 
     /**
@@ -26,6 +30,7 @@ public interface LinkTree {
      *
      * @return an Optional containing the world, or empty if undefined or not loaded
      */
+    @Contract(pure = true)
     Optional<World> getNether();
 
     /**
@@ -33,6 +38,7 @@ public interface LinkTree {
      *
      * @return an Optional containing the key of the world, or empty if undefined
      */
+    @Contract(pure = true)
     Optional<Key> getPersistedNether();
 
     /**
@@ -41,6 +47,7 @@ public interface LinkTree {
      * @param world the {@link World} to be set, or null to clear the current world mapping
      * @return true if the world mapping was successfully set or cleared, false otherwise
      */
+    @Contract(mutates = "this")
     boolean setNether(@Nullable World world);
 
     /**
@@ -48,6 +55,7 @@ public interface LinkTree {
      *
      * @return an Optional containing the world, or empty if undefined or not loaded
      */
+    @Contract(pure = true)
     Optional<World> getEnd();
 
     /**
@@ -55,6 +63,7 @@ public interface LinkTree {
      *
      * @return an Optional containing the key of the world, or empty if undefined
      */
+    @Contract(pure = true)
     Optional<Key> getPersistedEnd();
 
     /**
@@ -63,6 +72,7 @@ public interface LinkTree {
      * @param world the {@link World} to be set, or null to clear the current world mapping
      * @return true if the world mapping was successfully set or cleared, false otherwise
      */
+    @Contract(mutates = "this")
     boolean setEnd(@Nullable World world);
 
     /**
@@ -70,6 +80,7 @@ public interface LinkTree {
      *
      * @return true if the link tree contains no associations, false otherwise
      */
+    @Contract(pure = true)
     boolean isEmpty();
 
     /**
@@ -78,6 +89,7 @@ public interface LinkTree {
      * @param key the key to check for containment within the link tree
      * @return true if the specified key is present in the link tree, false otherwise
      */
+    @Contract(pure = true)
     boolean contains(Key key);
 
     /**
@@ -86,6 +98,7 @@ public interface LinkTree {
      * @param world the world to check for containment within the link tree
      * @return true if the specified world is present in the link tree, false otherwise
      */
+    @Contract(pure = true)
     boolean contains(World world);
 
     /**
@@ -94,6 +107,7 @@ public interface LinkTree {
      * @param key the key associated with the world to be removed from the link tree
      * @return true if the key was successfully removed, false otherwise
      */
+    @Contract(mutates = "this")
     boolean remove(Key key);
 
     /**
@@ -102,6 +116,7 @@ public interface LinkTree {
      * @param world the world to be removed from the link tree
      * @return true if the world was successfully removed, false otherwise
      */
+    @Contract(mutates = "this")
     boolean remove(World world);
 
     /**
@@ -110,6 +125,7 @@ public interface LinkTree {
      * @param environment the environment for which the associated world is to be retrieved
      * @return an Optional containing the associated world, or an empty Optional if none exists
      */
+    @Contract(pure = true)
     Optional<World> getWorld(Environment environment);
 
     /**
@@ -117,5 +133,6 @@ public interface LinkTree {
      *
      * @return the {@link LinkProvider} managing associations and interactions for this LinkTree
      */
+    @Contract(pure = true)
     LinkProvider getLinkProvider();
 }
