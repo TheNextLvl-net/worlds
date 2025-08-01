@@ -201,9 +201,11 @@ public interface LevelView {
      * @param world the world to back up
      * @return the size of the created backup in bytes
      * @throws IOException if an I/O error occurs while creating the backup
+     * @deprecated use {@link #backupAsync(World)}
      */
     @Contract(mutates = "io,param1")
     @SuppressWarnings("RedundantThrows")
+    @Deprecated(forRemoval = true, since = "3.3.1")
     default long backup(World world) throws IOException {
         return backupAsync(world).join();
     }
