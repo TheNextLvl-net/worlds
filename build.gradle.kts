@@ -3,7 +3,7 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
     id("java")
-    id("com.gradleup.shadow") version "9.0.0-rc2"
+    id("com.gradleup.shadow") version "9.0.0-rc3"
     id("com.modrinth.minotaur") version "2.+"
     id("de.eldoria.plugin-yml.paper") version "0.7.1"
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
@@ -19,7 +19,7 @@ tasks.compileJava {
 }
 
 group = "net.thenextlvl.worlds"
-version = "3.3.0"
+version = "3.3.1"
 
 repositories {
     mavenCentral()
@@ -77,7 +77,6 @@ paper {
         register("worlds.admin") {
             description = "Allows access to all world commands"
             children = listOf(
-                "perworlds.admin",
                 "worlds.command.backup",
                 "worlds.command.clone",
                 "worlds.command.create",
@@ -172,7 +171,4 @@ modrinth {
     gameVersions.set(versions)
     syncBodyFrom.set(rootProject.file("README.md").readText())
     loaders.addAll((property("loaders") as String).split(",").map { it.trim() })
-    dependencies {
-        optional.project("perworlds")
-    }
 }

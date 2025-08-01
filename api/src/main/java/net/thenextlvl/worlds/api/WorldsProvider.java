@@ -8,6 +8,7 @@ import net.thenextlvl.worlds.api.view.LevelView;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -18,6 +19,8 @@ import java.nio.file.Path;
  * functionalities such as chunk generation, level handling, and world grouping.
  * It provides access to various tools and services
  * that facilitate operations on Minecraft world data and configurations.
+ *
+ * @since 2.0.0
  */
 @NullMarked
 public interface WorldsProvider extends Plugin {
@@ -28,6 +31,7 @@ public interface WorldsProvider extends Plugin {
      *
      * @return the {@link GeneratorView} instance used for managing and retrieving generator information
      */
+    @Contract(pure = true)
     GeneratorView generatorView();
 
     /**
@@ -36,7 +40,9 @@ public interface WorldsProvider extends Plugin {
      *
      * @param level the path representing the level to be built
      * @return a {@link Level.Builder} for configuring and creating the specified level
+     * @since 3.0.0
      */
+    @Contract(value = "_ -> new", pure = true)
     Level.Builder levelBuilder(Path level);
 
     /**
@@ -45,7 +51,9 @@ public interface WorldsProvider extends Plugin {
      *
      * @param world the world to create a builder copy from
      * @return a {@link Level.Builder} instance for configuring and modifying the copied level
+     * @since 3.0.0
      */
+    @Contract(value = "_ -> new", pure = true)
     Level.Builder levelBuilder(World world);
 
     /**
@@ -54,6 +62,7 @@ public interface WorldsProvider extends Plugin {
      *
      * @return the {@link LevelView} instance used to interact with world level operations
      */
+    @Contract(pure = true)
     LevelView levelView();
 
     /**
@@ -63,7 +72,9 @@ public interface WorldsProvider extends Plugin {
      * and management of links between worlds and their portal relationships.
      *
      * @return the {@link LinkProvider} instance
+     * @since 3.0.0
      */
+    @Contract(pure = true)
     LinkProvider linkProvider();
 
     /**
@@ -71,8 +82,10 @@ public interface WorldsProvider extends Plugin {
      * A group provider facilitates the creation, retrieval, and modification of world groups.
      *
      * @return the {@link net.thenextlvl.perworlds.GroupProvider} instance, or {@code null} if unsupported (e.g., in environments like Folia)
+     * @since 2.2.0
      * @deprecated Worlds does no longer provide PerWorlds anymore.
      */
+    @Contract(pure = true)
     @Deprecated(forRemoval = true, since = "3.3.0")
     default net.thenextlvl.perworlds.@Nullable GroupProvider groupProvider() {
         return org.bukkit.Bukkit.getServicesManager().load(net.thenextlvl.perworlds.GroupProvider.class);

@@ -9,6 +9,8 @@ import org.jspecify.annotations.NullMarked;
 /**
  * Represents an event triggered when a {@link World} is backed up.
  * This event allows developers to modify the world before it is written to disk.
+ *
+ * @since 3.0.0
  */
 @NullMarked
 public class WorldBackupEvent extends WorldEvent {

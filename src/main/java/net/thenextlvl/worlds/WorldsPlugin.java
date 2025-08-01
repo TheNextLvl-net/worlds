@@ -68,8 +68,25 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     public void onLoad() {
         createPresetsFolder();
         if (RUNNING_FOLIA) warnExperimental();
+        else checkPerWorldsRemnants();
         versionChecker.checkVersion();
         registerServices();
+    }
+
+    private void checkPerWorldsRemnants() {
+        if (getServer().getPluginManager().getPlugin("PerWorlds") != null) return;
+        try (var files = Files.list(Path.of("plugins", "PerWorlds", "groups"))) {
+            if (files.noneMatch(path -> {
+                return switch (path.getFileName().toString()) {
+                    case "unowned", "unowned.dat", "unowned.dat_old" -> false;
+                    default -> true;
+                };
+            })) return;
+            getComponentLogger().warn("It looks like you have been using world groups before.");
+            getComponentLogger().warn("World groups were provided by PerWorlds which is no longer inbuilt!");
+            getComponentLogger().warn("If you want to continue using it you can download it from https://modrinth.com/project/lpfQmSV2");
+        } catch (IOException ignored) {
+        }
     }
 
     @Override

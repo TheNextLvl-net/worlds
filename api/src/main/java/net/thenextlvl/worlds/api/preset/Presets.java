@@ -6,6 +6,9 @@ import org.jspecify.annotations.NullMarked;
 
 import java.util.Set;
 
+/**
+ * @since 2.0.0
+ */
 @NullMarked
 public class Presets {
     public static final Preset BOTTOMLESS_PIT = new Preset("Bottomless Pit")

@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
-    compileOnly("net.thenextlvl:per-worlds:0.2.7")
+    compileOnly("net.thenextlvl:per-worlds:0.3.1")
 
     testImplementation("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
     testImplementation("net.thenextlvl.core:nbt:2.3.2")
@@ -47,6 +47,13 @@ publishing {
     publications.create<MavenPublication>("maven") {
         artifactId = "worlds"
         groupId = "net.thenextlvl"
+        pom.url.set("https://thenextlvl.net/docs/worlds")
+        pom.scm {
+            val repository = "TheNextLvl-net/worlds"
+            url.set("https://github.com/$repository")
+            connection.set("scm:git:git://github.com/$repository.git")
+            developerConnection.set("scm:git:ssh://github.com/$repository.git")
+        }
         from(components["java"])
     }
     repositories.maven {

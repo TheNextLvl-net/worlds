@@ -5,6 +5,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.world.WorldEvent;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -21,6 +22,8 @@ import java.util.function.Consumer;
  * <p>
  * The {@link ActionType} enum defines the possible actions that can be scheduled,
  * such as deleting a world or regenerating it.
+ *
+ * @since 3.0.0
  */
 @NullMarked
 public class WorldActionScheduledEvent extends WorldEvent implements Cancellable {
@@ -41,6 +44,7 @@ public class WorldActionScheduledEvent extends WorldEvent implements Cancellable
      *
      * @return the scheduled action type
      */
+    @Contract(pure = true)
     public ActionType getActionType() {
         return actionType;
     }
@@ -50,6 +54,7 @@ public class WorldActionScheduledEvent extends WorldEvent implements Cancellable
      *
      * @param action the action to be performed
      */
+    @Contract(mutates = "this")
     public void addAction(Consumer<Path> action) {
         this.action = this.action != null ? this.action.andThen(action) : action;
     }
@@ -60,11 +65,13 @@ public class WorldActionScheduledEvent extends WorldEvent implements Cancellable
     }
 
     @Override
+    @Contract(pure = true)
     public boolean isCancelled() {
         return this.cancelled;
     }
 
     @Override
+    @Contract(mutates = "this")
     public void setCancelled(boolean cancel) {
         this.cancelled = cancel;
     }

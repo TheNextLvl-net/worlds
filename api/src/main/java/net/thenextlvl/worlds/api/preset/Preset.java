@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.thenextlvl.worlds.api.generator.GeneratorType;
 import org.bukkit.Material;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
  * <a href="https://minecraft.wiki/w/Superflat#Vanilla_superflat_level_generation_presets">Wiki</a>
  *
  * @see GeneratorType#FLAT
+ * @since 2.0.0
  */
 @NullMarked
 public class Preset {
@@ -56,7 +58,9 @@ public class Preset {
      * @param presetCode the preset code string to parse in the expected format
      * @return a {@code Preset} object configured with the layers and biome described in the preset code
      * @throws IllegalArgumentException if the preset code contains invalid materials or does not adhere to the required format
+     * @since 3.0.0
      */
+    @Contract(pure = true)
     @SuppressWarnings("PatternValidation")
     public static Preset parse(String presetCode) {
         var strings = presetCode.split(";", 2);
@@ -75,7 +79,9 @@ public class Preset {
      * Retrieves the name of the preset.
      *
      * @return the name of the preset as a {@code String}
+     * @since 3.0.0
      */
+    @Contract(pure = true)
     public @Nullable String name() {
         return name;
     }
@@ -84,7 +90,9 @@ public class Preset {
      * Retrieves the biome associated with the preset.
      *
      * @return the biome as a {@code Biome} record
+     * @since 2.0.4
      */
+    @Contract(pure = true)
     public Biome biome() {
         return biome;
     }
@@ -94,7 +102,9 @@ public class Preset {
      *
      * @param biome the biome to be set, encapsulated in a {@code Biome} record
      * @return the current {@code Preset} instance, allowing for method chaining
+     * @since 2.0.4
      */
+    @Contract(value = "_ -> this", mutates = "this")
     public Preset biome(Biome biome) {
         this.biome = biome;
         return this;
@@ -104,7 +114,9 @@ public class Preset {
      * Determines whether lakes are enabled for the preset.
      *
      * @return true if lakes are enabled, false otherwise
+     * @since 2.0.4
      */
+    @Contract(pure = true)
     public boolean lakes() {
         return lakes;
     }
@@ -114,7 +126,9 @@ public class Preset {
      *
      * @param lakes a boolean indicating whether lakes should be included
      * @return the current Preset instance, allowing for method chaining
+     * @since 2.0.4
      */
+    @Contract(value = "_ -> this", mutates = "this")
     public Preset lakes(boolean lakes) {
         this.lakes = lakes;
         return this;
@@ -124,7 +138,9 @@ public class Preset {
      * Determines whether features are enabled for the preset.
      *
      * @return true if features are enabled, false otherwise
+     * @since 2.0.4
      */
+    @Contract(pure = true)
     public boolean features() {
         return features;
     }
@@ -134,7 +150,9 @@ public class Preset {
      *
      * @param features a boolean indicating whether features are enabled
      * @return the current Preset instance, allowing for method chaining
+     * @since 2.0.4
      */
+    @Contract(value = "_ -> this", mutates = "this")
     public Preset features(boolean features) {
         this.features = features;
         return this;
@@ -144,7 +162,9 @@ public class Preset {
      * Determines whether decoration is enabled for the preset.
      *
      * @return true if decoration is enabled, false otherwise
+     * @since 2.0.4
      */
+    @Contract(pure = true)
     public boolean decoration() {
         return decoration;
     }
@@ -154,7 +174,9 @@ public class Preset {
      *
      * @param decoration a boolean indicating whether decoration is enabled
      * @return the current Preset instance, allowing for method chaining
+     * @since 2.0.4
      */
+    @Contract(value = "_ -> this", mutates = "this")
     public Preset decoration(boolean decoration) {
         this.decoration = decoration;
         return this;
@@ -164,7 +186,9 @@ public class Preset {
      * Retrieves the set of layers associated with the preset.
      *
      * @return a {@code Set} containing the layers of the preset
+     * @since 2.0.4
      */
+    @Contract(pure = true)
     public @Unmodifiable Set<Layer> layers() {
         return Set.copyOf(layers);
     }
@@ -174,7 +198,9 @@ public class Preset {
      *
      * @param layers the set of layers to be associated with the preset
      * @return the preset instance for method chaining
+     * @since 2.0.4
      */
+    @Contract(value = "_ -> this", mutates = "this")
     public Preset layers(Set<Layer> layers) {
         this.layers = new LinkedHashSet<>(layers);
         return this;
@@ -184,7 +210,9 @@ public class Preset {
      * Retrieves the set of structures associated with the preset.
      *
      * @return a {@code LinkedHashSet} containing the structures of the preset
+     * @since 2.0.4
      */
+    @Contract(pure = true)
     public @Unmodifiable Set<Structure> structures() {
         return Set.copyOf(structures);
     }
@@ -194,7 +222,9 @@ public class Preset {
      *
      * @param structures the set of structures to be associated with the preset
      * @return the preset instance for method chaining
+     * @since 2.0.4
      */
+    @Contract(value = "_ -> this", mutates = "this")
     public Preset structures(Set<Structure> structures) {
         this.structures = new LinkedHashSet<>(structures);
         return this;
@@ -205,7 +235,9 @@ public class Preset {
      *
      * @param layer the layer to add
      * @return the preset
+     * @since 2.0.4
      */
+    @Contract(value = "_ -> this", mutates = "this")
     public Preset addLayer(Layer layer) {
         layers.add(layer);
         return this;
@@ -216,7 +248,9 @@ public class Preset {
      *
      * @param structure the structure to add
      * @return the preset
+     * @since 2.0.4
      */
+    @Contract(value = "_ -> this", mutates = "this")
     public Preset addStructure(Structure structure) {
         structures.add(structure);
         return this;
@@ -231,7 +265,9 @@ public class Preset {
      * This is a lossy conversion. If you want to save this preset, use {@link #serialize()}.
      *
      * @return a {@code String} containing the serialized layers and biome information of the preset
+     * @since 3.0.0
      */
+    @Contract(pure = true)
     public String toPresetCode() {
         var layers = this.layers.stream()
                 .map(Layer::toString)
@@ -246,6 +282,7 @@ public class Preset {
      * @return the serialized preset as a JsonObject
      * @see #deserialize(JsonObject)
      */
+    @Contract(value = " -> new", pure = true)
     public JsonObject serialize() {
         var root = new JsonObject();
         var layers = new JsonArray();
@@ -277,6 +314,7 @@ public class Preset {
      * @see #serialize()
      */
     @SuppressWarnings("PatternValidation")
+    @Contract(value = "_ -> new", pure = true)
     public static Preset deserialize(JsonObject object) throws IllegalArgumentException {
         Preconditions.checkArgument(object.has("layers"), "Missing layers");
         var preset = new Preset(object.has("name") ? object.get("name").getAsString() : null);
