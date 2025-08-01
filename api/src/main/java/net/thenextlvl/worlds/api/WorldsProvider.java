@@ -19,6 +19,8 @@ import java.nio.file.Path;
  * functionalities such as chunk generation, level handling, and world grouping.
  * It provides access to various tools and services
  * that facilitate operations on Minecraft world data and configurations.
+ *
+ * @since 2.0.0
  */
 @NullMarked
 public interface WorldsProvider extends Plugin {
@@ -38,6 +40,7 @@ public interface WorldsProvider extends Plugin {
      *
      * @param level the path representing the level to be built
      * @return a {@link Level.Builder} for configuring and creating the specified level
+     * @since 3.0.0
      */
     @Contract(value = "_ -> new", pure = true)
     Level.Builder levelBuilder(Path level);
@@ -48,6 +51,7 @@ public interface WorldsProvider extends Plugin {
      *
      * @param world the world to create a builder copy from
      * @return a {@link Level.Builder} instance for configuring and modifying the copied level
+     * @since 3.0.0
      */
     @Contract(value = "_ -> new", pure = true)
     Level.Builder levelBuilder(World world);
@@ -68,6 +72,7 @@ public interface WorldsProvider extends Plugin {
      * and management of links between worlds and their portal relationships.
      *
      * @return the {@link LinkProvider} instance
+     * @since 3.0.0
      */
     @Contract(pure = true)
     LinkProvider linkProvider();
@@ -77,6 +82,7 @@ public interface WorldsProvider extends Plugin {
      * A group provider facilitates the creation, retrieval, and modification of world groups.
      *
      * @return the {@link net.thenextlvl.perworlds.GroupProvider} instance, or {@code null} if unsupported (e.g., in environments like Folia)
+     * @since 2.2.0
      * @deprecated Worlds does no longer provide PerWorlds anymore.
      */
     @Contract(pure = true)

@@ -19,6 +19,8 @@ import java.util.function.Consumer;
 /**
  * Interface representing a view for managing levels in a server environment.
  * It provides methods for reading, validating, and managing world directories and data.
+ *
+ * @since 2.0.0
  */
 @NullMarked
 public interface LevelView {
@@ -26,6 +28,7 @@ public interface LevelView {
      * Retrieves the path to the backup folder.
      *
      * @return the {@link Path} representing the backup folder
+     * @since 3.0.0
      */
     @Contract(pure = true)
     Path getBackupFolder();
@@ -34,6 +37,7 @@ public interface LevelView {
      * Retrieves the path to the world container directory.
      *
      * @return the {@link Path} representing the world container directory
+     * @since 3.0.0
      */
     @Contract(pure = true)
     Path getWorldContainer();
@@ -44,6 +48,7 @@ public interface LevelView {
      * @param directory the directory containing the level data to be read
      * @return an {@code Optional} containing the {@code Level.Builder} if the directory represents a valid level,
      * or {@link Optional#empty()} if the directory is invalid
+     * @since 3.0.0
      */
     @Contract(value = "_ -> new", pure = true)
     Optional<Level.Builder> read(Path directory);
@@ -54,6 +59,7 @@ public interface LevelView {
      * @param world the world whose generator plugin is to be retrieved
      * @return an {@code Optional} containing the associated {@code JavaPlugin}, or {@link Optional#empty()}
      * if the world does not have a generator or if the generator is not associated with a plugin
+     * @since 3.0.0
      */
     @Contract(pure = true)
     Optional<JavaPlugin> getGenerator(World world);
@@ -65,6 +71,7 @@ public interface LevelView {
      *
      * @return an unmodifiable set of {@link Path} objects representing valid level directories,
      * or an empty set if no valid levels are found or if an error occurs while accessing the filesystem.
+     * @since 3.0.0
      */
     @Unmodifiable
     @Contract(pure = true)
@@ -76,6 +83,7 @@ public interface LevelView {
      *
      * @param level the path to the level directory to be checked
      * @return true if the level can be loaded, otherwise false
+     * @since 3.0.0
      */
     @Contract(pure = true)
     boolean canLoad(Path level);
@@ -85,6 +93,7 @@ public interface LevelView {
      *
      * @param level the path to the directory to be checked
      * @return true if the level directory contains a {@code DIM1} folder, otherwise false
+     * @since 3.0.0
      */
     @Contract(pure = true)
     boolean hasEndDimension(Path level);
@@ -94,6 +103,7 @@ public interface LevelView {
      *
      * @param level the path to the directory to be checked
      * @return true if the level directory contains a {@code DIM-1} folder, otherwise false
+     * @since 3.0.0
      */
     @Contract(pure = true)
     boolean hasNetherDimension(Path level);
@@ -104,6 +114,7 @@ public interface LevelView {
      * @param path the path to the directory being checked
      * @return {@code true} if the directory contains a {@code level.dat}
      * or {@code level.dat_old}, otherwise {@code false}
+     * @since 3.0.0
      */
     @Contract(pure = true)
     boolean isLevel(Path path);
@@ -114,6 +125,7 @@ public interface LevelView {
      * @param world the world to be unloaded
      * @param save  whether changes to the world should be saved before unloading
      * @return true if the world was successfully unloaded, otherwise false
+     * @since 3.0.0
      * @deprecated use {@link #unloadAsync(World, boolean)}
      */
     @Contract(mutates = "io,param1")
@@ -128,6 +140,7 @@ public interface LevelView {
      * @param world the world to be unloaded
      * @param save  whether changes to the world should be saved before unloading
      * @return A {@code CompletableFuture} completing with true if the world was successfully unloaded, otherwise false
+     * @since 3.2.0
      */
     @Contract(mutates = "io,param1")
     CompletableFuture<Boolean> unloadAsync(World world, boolean save);
@@ -137,6 +150,7 @@ public interface LevelView {
      *
      * @param world the world to be saved
      * @param flush whether to flush pending changes to disk immediately
+     * @since 3.0.0
      * @deprecated use {@link #saveAsync(World, boolean)}
      */
     @Contract(mutates = "io,param1")
@@ -151,6 +165,7 @@ public interface LevelView {
      * @param world the world to be saved
      * @param flush whether to flush pending changes to disk immediately
      * @return A {@code CompletableFuture} that might complete exceptionally
+     * @since 3.2.0
      */
     @Contract(mutates = "io,param1")
     CompletableFuture<Void> saveAsync(World world, boolean flush);
@@ -173,6 +188,7 @@ public interface LevelView {
      * Saves the {@code level.dat} of the specified world to disk.
      *
      * @param world the world whose level data should be saved
+     * @since 3.2.0
      */
     @Contract(mutates = "io,param1")
     CompletableFuture<Void> saveLevelDataAsync(World world);
@@ -182,6 +198,7 @@ public interface LevelView {
      *
      * @param world the world to check
      * @return true if the world is enabled, false otherwise
+     * @since 3.2.0
      */
     @Contract(pure = true)
     boolean isEnabled(World world);
@@ -191,6 +208,7 @@ public interface LevelView {
      *
      * @param world   the world to enable or disable
      * @param enabled true to enable the world, false to disable it
+     * @since 3.2.0
      */
     @Contract(mutates = "param1")
     void setEnabled(World world, boolean enabled);
@@ -201,6 +219,7 @@ public interface LevelView {
      * @param world the world to back up
      * @return the size of the created backup in bytes
      * @throws IOException if an I/O error occurs while creating the backup
+     * @since 3.0.0
      * @deprecated use {@link #backupAsync(World)}
      */
     @Contract(mutates = "io,param1")
@@ -217,6 +236,7 @@ public interface LevelView {
      *
      * @param world the world to back up
      * @return A {@code CompletableFuture} completing with the size of the created backup in bytes
+     * @since 3.2.0
      */
     @Contract(mutates = "io,param1")
     CompletableFuture<Long> backupAsync(World world);
@@ -242,6 +262,7 @@ public interface LevelView {
      * @throws IllegalStateException    if the target directory already exists
      * @throws IOException              if an I/O error occurs during the cloning process
      * @see WorldCloneEvent#isFullClone()
+     * @since 3.0.0
      * @deprecated use {@link #cloneAsync(World, Consumer, boolean)}
      */
     @Contract(mutates = "io,param1")
@@ -270,6 +291,7 @@ public interface LevelView {
      * @param full    whether to fully clone including regions, entities..., or only the {@code level.dat}
      * @return A {@code CompletableFuture} completing with the cloned world
      * @see WorldCloneEvent#isFullClone()
+     * @since 3.2.0
      */
     @Contract(mutates = "io,param1")
     CompletableFuture<World> cloneAsync(World world, Consumer<Level.Builder> builder, boolean full);
@@ -282,6 +304,7 @@ public interface LevelView {
      * @param schedule if true, the deletion process will be scheduled for a later operation
      *                 (e.g., during server shutdown); if false, the deletion will be attempted immediately
      * @return a {@code DeletionResult} indicating the outcome of the deletion process.
+     * @since 3.0.0
      * @deprecated use {@link #deleteAsync(World, boolean)}
      */
     @Contract(mutates = "io,param1")
@@ -299,6 +322,7 @@ public interface LevelView {
      *                 (e.g., during server shutdown); if false, the deletion will be attempted immediately
      * @return A {@code CompletableFuture} completing with a {@code DeletionResult}
      * indicating the outcome of the deletion process.
+     * @since 3.2.0
      */
     @Contract(mutates = "io,param1")
     CompletableFuture<DeletionResult> deleteAsync(World world, boolean schedule);
@@ -308,6 +332,7 @@ public interface LevelView {
      *
      * @param world the world for which the scheduled deletion should be canceled
      * @return true if the scheduled deletion was successfully canceled, false if no deletion was scheduled
+     * @since 3.0.0
      */
     @Contract(mutates = "this")
     boolean cancelScheduledDeletion(World world);
@@ -317,6 +342,7 @@ public interface LevelView {
      *
      * @param world the world to check for a scheduled deletion
      * @return true if a deletion process is scheduled for the world, otherwise false
+     * @since 3.0.0
      */
     @Contract(pure = true)
     boolean isDeletionScheduled(World world);
@@ -328,6 +354,7 @@ public interface LevelView {
      * @param schedule if true, the regeneration will be scheduled for later execution;
      *                 if false, the regeneration will be attempted immediately
      * @return a {@code DeletionResult} indicating the outcome of the regeneration process.
+     * @since 3.0.0
      * @deprecated use {@link #regenerateAsync(World, boolean)}
      */
     @Contract(mutates = "io,param1")
@@ -344,6 +371,7 @@ public interface LevelView {
      *                 if false, the regeneration will be attempted immediately
      * @return a {@code CompletableFuture} completing with a
      * {@code DeletionResult} indicating the outcome of the regeneration process.
+     * @since 3.2.0
      */
     @Contract(mutates = "io,param1")
     CompletableFuture<DeletionResult> regenerateAsync(World world, boolean schedule);
@@ -353,6 +381,7 @@ public interface LevelView {
      *
      * @param world the world for which the scheduled regeneration should be canceled
      * @return true if the scheduled regeneration was successfully canceled, false if no regeneration was scheduled
+     * @since 3.0.0
      */
     @Contract(mutates = "this")
     boolean cancelScheduledRegeneration(World world);
@@ -362,12 +391,15 @@ public interface LevelView {
      *
      * @param world the world to check for a scheduled regeneration
      * @return true if a regeneration process is scheduled for the world, otherwise false
+     * @since 3.0.0
      */
     @Contract(pure = true)
     boolean isRegenerationScheduled(World world);
 
     /**
      * Represents the possible outcomes of a world deletion process.
+     *
+     * @since 3.0.0
      */
     enum DeletionResult {
         /**

@@ -20,6 +20,8 @@ import java.util.function.BiPredicate;
  * It provides information about whether the entire
  * world, including all data and entities, is being cloned, or if only the
  * {@code level.dat} is copied for generation.
+ *
+ * @since 3.0.0
  */
 @NullMarked
 public class WorldCloneEvent extends WorldEvent {
@@ -41,7 +43,7 @@ public class WorldCloneEvent extends WorldEvent {
     public @Nullable BiPredicate<Path, BasicFileAttributes> getFileFilter() {
         return fileFilter;
     }
-    
+
     /**
      * Retrieves the cloned {@link Level} associated with this event.
      *

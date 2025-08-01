@@ -6,6 +6,9 @@ import net.kyori.adventure.key.Keyed;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 
+/**
+ * @since 2.0.0
+ */
 @NullMarked
 public record Structure(Key key) implements Keyed {
     @Override

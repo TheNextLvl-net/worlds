@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
  * <a href="https://minecraft.wiki/w/Superflat#Vanilla_superflat_level_generation_presets">Wiki</a>
  *
  * @see GeneratorType#FLAT
+ * @since 2.0.0
  */
 @NullMarked
 public class Preset {
@@ -57,6 +58,7 @@ public class Preset {
      * @param presetCode the preset code string to parse in the expected format
      * @return a {@code Preset} object configured with the layers and biome described in the preset code
      * @throws IllegalArgumentException if the preset code contains invalid materials or does not adhere to the required format
+     * @since 3.0.0
      */
     @Contract(pure = true)
     @SuppressWarnings("PatternValidation")
@@ -77,6 +79,7 @@ public class Preset {
      * Retrieves the name of the preset.
      *
      * @return the name of the preset as a {@code String}
+     * @since 3.0.0
      */
     @Contract(pure = true)
     public @Nullable String name() {
@@ -87,6 +90,7 @@ public class Preset {
      * Retrieves the biome associated with the preset.
      *
      * @return the biome as a {@code Biome} record
+     * @since 2.0.4
      */
     @Contract(pure = true)
     public Biome biome() {
@@ -98,6 +102,7 @@ public class Preset {
      *
      * @param biome the biome to be set, encapsulated in a {@code Biome} record
      * @return the current {@code Preset} instance, allowing for method chaining
+     * @since 2.0.4
      */
     @Contract(value = "_ -> this", mutates = "this")
     public Preset biome(Biome biome) {
@@ -109,6 +114,7 @@ public class Preset {
      * Determines whether lakes are enabled for the preset.
      *
      * @return true if lakes are enabled, false otherwise
+     * @since 2.0.4
      */
     @Contract(pure = true)
     public boolean lakes() {
@@ -120,6 +126,7 @@ public class Preset {
      *
      * @param lakes a boolean indicating whether lakes should be included
      * @return the current Preset instance, allowing for method chaining
+     * @since 2.0.4
      */
     @Contract(value = "_ -> this", mutates = "this")
     public Preset lakes(boolean lakes) {
@@ -131,6 +138,7 @@ public class Preset {
      * Determines whether features are enabled for the preset.
      *
      * @return true if features are enabled, false otherwise
+     * @since 2.0.4
      */
     @Contract(pure = true)
     public boolean features() {
@@ -142,6 +150,7 @@ public class Preset {
      *
      * @param features a boolean indicating whether features are enabled
      * @return the current Preset instance, allowing for method chaining
+     * @since 2.0.4
      */
     @Contract(value = "_ -> this", mutates = "this")
     public Preset features(boolean features) {
@@ -153,6 +162,7 @@ public class Preset {
      * Determines whether decoration is enabled for the preset.
      *
      * @return true if decoration is enabled, false otherwise
+     * @since 2.0.4
      */
     @Contract(pure = true)
     public boolean decoration() {
@@ -164,6 +174,7 @@ public class Preset {
      *
      * @param decoration a boolean indicating whether decoration is enabled
      * @return the current Preset instance, allowing for method chaining
+     * @since 2.0.4
      */
     @Contract(value = "_ -> this", mutates = "this")
     public Preset decoration(boolean decoration) {
@@ -175,6 +186,7 @@ public class Preset {
      * Retrieves the set of layers associated with the preset.
      *
      * @return a {@code Set} containing the layers of the preset
+     * @since 2.0.4
      */
     @Contract(pure = true)
     public @Unmodifiable Set<Layer> layers() {
@@ -186,6 +198,7 @@ public class Preset {
      *
      * @param layers the set of layers to be associated with the preset
      * @return the preset instance for method chaining
+     * @since 2.0.4
      */
     @Contract(value = "_ -> this", mutates = "this")
     public Preset layers(Set<Layer> layers) {
@@ -197,6 +210,7 @@ public class Preset {
      * Retrieves the set of structures associated with the preset.
      *
      * @return a {@code LinkedHashSet} containing the structures of the preset
+     * @since 2.0.4
      */
     @Contract(pure = true)
     public @Unmodifiable Set<Structure> structures() {
@@ -208,6 +222,7 @@ public class Preset {
      *
      * @param structures the set of structures to be associated with the preset
      * @return the preset instance for method chaining
+     * @since 2.0.4
      */
     @Contract(value = "_ -> this", mutates = "this")
     public Preset structures(Set<Structure> structures) {
@@ -220,6 +235,7 @@ public class Preset {
      *
      * @param layer the layer to add
      * @return the preset
+     * @since 2.0.4
      */
     @Contract(value = "_ -> this", mutates = "this")
     public Preset addLayer(Layer layer) {
@@ -232,6 +248,7 @@ public class Preset {
      *
      * @param structure the structure to add
      * @return the preset
+     * @since 2.0.4
      */
     @Contract(value = "_ -> this", mutates = "this")
     public Preset addStructure(Structure structure) {
@@ -248,6 +265,7 @@ public class Preset {
      * This is a lossy conversion. If you want to save this preset, use {@link #serialize()}.
      *
      * @return a {@code String} containing the serialized layers and biome information of the preset
+     * @since 3.0.0
      */
     @Contract(pure = true)
     public String toPresetCode() {

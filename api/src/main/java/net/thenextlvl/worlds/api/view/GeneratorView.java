@@ -4,6 +4,9 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 
+/**
+ * @since 2.0.0
+ */
 @NullMarked
 public interface GeneratorView {
     /**
@@ -12,7 +15,7 @@ public interface GeneratorView {
      * @param plugin the plugin to check for an associated generator
      * @return true if the plugin has a generator, otherwise false
      */
-    
+
     @Contract(pure = true)
     boolean hasGenerator(Plugin plugin);
 

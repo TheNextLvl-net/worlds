@@ -14,6 +14,7 @@ import org.jspecify.annotations.NullMarked;
  * providing an opportunity for developers to listen to or modify the regeneration process.
  *
  * @see WorldActionScheduledEvent
+ * @since 2.0.0
  */
 @NullMarked
 public class WorldRegenerateEvent extends WorldEvent implements Cancellable {
