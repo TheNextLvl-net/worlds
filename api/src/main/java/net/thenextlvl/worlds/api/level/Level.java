@@ -102,8 +102,10 @@ public interface Level extends Keyed {
      * Retrieves the spawn chunk radius for the level.
      *
      * @return an integer representing the spawn chunk radius
+     * @deprecated spawn chunks will be removed in the next release of minecraft
      */
     @Contract(pure = true)
+    @Deprecated(forRemoval = true, since = "3.3.1")
     int getSpawnChunkRadius();
 
     /**
@@ -371,9 +373,11 @@ public interface Level extends Keyed {
          *
          * @return an {@link Integer} representing the radius of spawn chunks to keep loaded,
          * or null if the default value is to be used.
+         * @deprecated spawn chunks will be removed in the next release of minecraft
          */
         @Nullable
         @Contract(pure = true)
+        @Deprecated(forRemoval = true, since = "3.3.1")
         Integer spawnChunkRadius();
 
         /**
@@ -383,8 +387,10 @@ public interface Level extends Keyed {
          * @param radius an {@link Integer} representing the radius of chunks to keep loaded,
          *               or null to use the server default
          * @return the builder instance for chaining method calls
+         * @deprecated spawn chunks will be removed in the next release of minecraft
          */
         @Contract(mutates = "this")
+        @Deprecated(forRemoval = true, since = "3.3.1")
         Builder spawnChunkRadius(@Nullable Integer radius);
 
         /**
