@@ -47,6 +47,7 @@ public record GeneratorType(Key key) implements Keyed {
      */
     public static final GeneratorType SINGLE_BIOME = new GeneratorType(Key.key("minecraft", "fixed"));
 
+    @ApiStatus.Internal
     @Contract(pure = true)
     public Key presetName() {
         if (equals(DEBUG)) return Key.key("debug_all_block_states");
