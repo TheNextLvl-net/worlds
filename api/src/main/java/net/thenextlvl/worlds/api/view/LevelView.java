@@ -5,6 +5,7 @@ import net.thenextlvl.worlds.api.level.Level;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
@@ -23,6 +24,7 @@ import java.util.function.Consumer;
  * @since 2.0.0
  */
 @NullMarked
+@ApiStatus.NonExtendable
 public interface LevelView {
     /**
      * Retrieves the path to the backup folder.

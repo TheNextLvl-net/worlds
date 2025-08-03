@@ -8,6 +8,7 @@ import net.thenextlvl.worlds.api.view.LevelView;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -23,6 +24,7 @@ import java.nio.file.Path;
  * @since 2.0.0
  */
 @NullMarked
+@ApiStatus.NonExtendable
 public interface WorldsProvider extends Plugin {
     /**
      * Provides access to the {@link GeneratorView} instance, which allows querying and interacting

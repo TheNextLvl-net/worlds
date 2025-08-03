@@ -14,6 +14,7 @@ import java.util.Set;
  */
 @NullMarked
 @ApiStatus.Experimental
+@ApiStatus.NonExtendable
 public interface BiomeSource extends Keyed {
     /**
      * Creates a CheckerboardColumnBiomeSource instance using the specified biomes.
