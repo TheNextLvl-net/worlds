@@ -1,6 +1,7 @@
 package net.thenextlvl.worlds.api.view;
 
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 
@@ -8,6 +9,7 @@ import org.jspecify.annotations.NullMarked;
  * @since 2.0.0
  */
 @NullMarked
+@ApiStatus.NonExtendable
 public interface GeneratorView {
     /**
      * Checks whether the given plugin has an associated generator.

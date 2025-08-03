@@ -24,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
  * @since 3.0.0
  */
 @NullMarked
+@ApiStatus.NonExtendable
 public interface Level extends Keyed {
     /**
      * Retrieves the file path associated with this level.

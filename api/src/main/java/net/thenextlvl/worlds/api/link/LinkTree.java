@@ -3,6 +3,7 @@ package net.thenextlvl.worlds.api.link;
 import net.kyori.adventure.key.Key;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -16,6 +17,7 @@ import java.util.Optional;
  * @since 3.0.0
  */
 @NullMarked
+@ApiStatus.NonExtendable
 public interface LinkTree {
     /**
      * Retrieves the {@code Overworld} associated with this {@link LinkTree}, if available.

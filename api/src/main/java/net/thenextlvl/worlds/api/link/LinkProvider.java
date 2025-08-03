@@ -3,6 +3,7 @@ package net.thenextlvl.worlds.api.link;
 import net.kyori.adventure.key.Key;
 import org.bukkit.PortalType;
 import org.bukkit.World;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
@@ -18,6 +19,7 @@ import java.util.stream.Stream;
  * @since 3.0.0
  */
 @NullMarked
+@ApiStatus.NonExtendable
 public interface LinkProvider {
     /**
      * Retrieves all {@link LinkTree} instances managed by the provider.
