@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
-    compileOnly("net.thenextlvl:per-worlds:1.0.1")
+    compileOnly("net.thenextlvl:per-worlds:1.0.2")
 
     testImplementation("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
     testImplementation("net.thenextlvl.core:nbt:2.3.2")
