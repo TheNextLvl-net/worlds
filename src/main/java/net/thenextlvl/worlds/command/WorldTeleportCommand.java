@@ -81,7 +81,7 @@ class WorldTeleportCommand {
         });
         if (entities.size() == 1 && entities.getFirst().equals(sender)) return Command.SINGLE_SUCCESS;
         plugin.bundle().sendMessage(sender, message,
-                Placeholder.component("entity", entities.isEmpty() ? Component.empty() : entities.getFirst().name()),
+                Placeholder.component("entity", entities.isEmpty() ? Component.empty() : entities.getFirst().teamDisplayName()),
                 Placeholder.parsed("entities", String.valueOf(entities.size())),
                 Placeholder.parsed("world", location.getWorld().getName()));
         return entities.isEmpty() ? 0 : Command.SINGLE_SUCCESS;
