@@ -106,7 +106,8 @@ class PaperLevel extends LevelData {
 
         LevelStorageSource.LevelStorageAccess levelStorageAccess;
         try {
-            levelStorageAccess = LevelStorageSource.createDefault(server.getWorldContainer().toPath()).validateAndCreateAccess(name, dimensionType);
+            levelStorageAccess = LevelStorageSource.createDefault(server.getWorldContainer().toPath())
+                    .validateAndCreateAccess(directory.getFileName().toString(), dimensionType);
         } catch (IOException | ContentValidationException ex) {
             return CompletableFuture.failedFuture(ex);
         }
@@ -174,8 +175,8 @@ class PaperLevel extends LevelData {
                     hardcore, Difficulty.EASY,
                     false,
                     new GameRules(context.dataConfiguration().enabledFeatures()),
-                    context.dataConfiguration())
-            ;
+                    context.dataConfiguration()
+            );
             worldDimensions = properties.create(context.datapackWorldgen());
 
             WorldDimensions.Complete complete = worldDimensions.bake(contextLevelStemRegistry);
