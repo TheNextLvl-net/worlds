@@ -1,7 +1,6 @@
 package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -20,65 +19,42 @@ import net.thenextlvl.worlds.command.argument.LevelStemArgument;
 import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.Set;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
-class WorldImportCommand {
+class WorldImportCommand extends OptionCommand {
+    private WorldImportCommand(WorldsPlugin plugin) {
+        super(plugin);
+    }
+
     public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
+        var command = new WorldImportCommand(plugin);
         return Commands.literal("import")
                 .requires(source -> source.getSender().hasPermission("worlds.command.import"))
-                .then(importWorld(plugin));
+                .then(command.importWorld());
     }
-    
-    private static RequiredArgumentBuilder<CommandSourceStack, String> importWorld(WorldsPlugin plugin) {
-        var world = Commands.argument("world", StringArgumentType.string())
-                .suggests(new LevelSuggestionProvider<>(plugin, true))
-                .executes(context -> execute(context, plugin));
 
-        addOptions(world, Set.of(
+    private RequiredArgumentBuilder<CommandSourceStack, String> importWorld() {
+        var command = Commands.argument("world", StringArgumentType.string())
+                .suggests(new LevelSuggestionProvider<>(plugin, true))
+                .executes(this::execute);
+
+        addOptions(command, Set.of(
                 new Option("key", ArgumentTypes.key()),
                 new Option("generator", new GeneratorArgument(plugin)),
                 new Option("name", StringArgumentType.string()),
                 new Option("type", "level-type", new LevelStemArgument(plugin))
-        ), plugin);
+        ));
 
-        return world;
+        return command;
     }
 
-    private record Option(String name, String argument, ArgumentType<?> type) {
-        public Option(String name, ArgumentType<?> type) {
-            this(name, name, type);
-        }
-    }
-
-    private static void addOptions(ArgumentBuilder<CommandSourceStack, ?> parent, Set<Option> options, WorldsPlugin plugin) {
-        for (var option : options) {
-            var nextRemaining = new HashSet<>(options);
-            nextRemaining.remove(option);
-
-            var argument = Commands.argument(option.argument, option.type)
-                    .executes(context -> execute(context, plugin));
-            addOptions(argument, nextRemaining, plugin);
-            parent.then(Commands.literal(option.name).then(argument));
-        }
-    }
-
-    private static <T> @Nullable T tryGetArgument(CommandContext<CommandSourceStack> context, String name, Class<T> type) {
-        try {
-            return context.getArgument(name, type);
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().equals("No such argument '" + name + "' exists on this command")) return null;
-            throw e;
-        }
-    }
-
-    private static int execute(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
+    @Override
+    protected int execute(CommandContext<CommandSourceStack> context) {
         var path = context.getArgument("world", String.class);
 
         var displayName = tryGetArgument(context, "name", String.class);
