@@ -1,18 +1,21 @@
 package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
+import net.thenextlvl.worlds.command.argument.GeneratorArgument;
 import net.thenextlvl.worlds.command.argument.LevelStemArgument;
 import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.entity.Entity;
@@ -20,9 +23,9 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
 
-import static net.thenextlvl.worlds.command.WorldCommand.generatorArgument;
-import static net.thenextlvl.worlds.command.WorldCommand.keyArgument;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
@@ -32,57 +35,70 @@ class WorldImportCommand {
                 .requires(source -> source.getSender().hasPermission("worlds.command.import"))
                 .then(importWorld(plugin));
     }
-
+    
+    
     private static RequiredArgumentBuilder<CommandSourceStack, String> importWorld(WorldsPlugin plugin) {
-        return Commands.argument("world", StringArgumentType.string())
+        var world = Commands.argument("world", StringArgumentType.string())
                 .suggests(new LevelSuggestionProvider<>(plugin, true))
-                .then(importKeyed(plugin))
-                .executes(context -> execute(context, null, null, null, plugin));
+                .executes(context -> execute(context, plugin));
+
+        addOptions(world, Set.of(
+                new Option("key", ArgumentTypes.key()),
+                new Option("generator", new GeneratorArgument(plugin)),
+                new Option("name", StringArgumentType.string()),
+                new Option("type", "level-type", new LevelStemArgument(plugin))
+        ), plugin);
+
+        return world;
     }
 
-    private static RequiredArgumentBuilder<CommandSourceStack, Key> importKeyed(WorldsPlugin plugin) {
-        return keyArgument().then(importDimension(plugin)).executes(context -> {
-            var key = context.getArgument("key", Key.class);
-            return execute(context, key, null, null, plugin);
-        });
+    private record Option(String name, String argument, ArgumentType<?> type) {
+        public Option(String name, ArgumentType<?> type) {
+            this(name, name, type);
+        }
     }
 
-    private static RequiredArgumentBuilder<CommandSourceStack, LevelStem> importDimension(WorldsPlugin plugin) {
-        return Commands.argument("level-type", new LevelStemArgument(plugin))
-                .then(importGenerator(plugin))
-                .executes(context -> importWorld(plugin, context));
+    private static void addOptions(ArgumentBuilder<CommandSourceStack, ?> parent, Set<Option> options, WorldsPlugin plugin) {
+        for (var option : options) {
+            var nextRemaining = new HashSet<>(options);
+            nextRemaining.remove(option);
+
+            var argument = Commands.argument(option.argument, option.type)
+                    .executes(context -> execute(context, plugin));
+            addOptions(argument, nextRemaining, plugin);
+            parent.then(Commands.literal(option.name).then(argument));
+        }
     }
 
-    private static int importWorld(WorldsPlugin plugin, CommandContext<CommandSourceStack> context) {
-        var levelStem = context.getArgument("level-type", LevelStem.class);
-        var key = context.getArgument("key", Key.class);
-        return execute(context, key, levelStem, null, plugin);
+    private static <T> @Nullable T tryGetArgument(CommandContext<CommandSourceStack> context, String name, Class<T> type) {
+        try {
+            return context.getArgument(name, type);
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage().equals("No such argument '" + name + "' exists on this command")) return null;
+            throw e;
+        }
     }
 
-    private static RequiredArgumentBuilder<CommandSourceStack, Generator> importGenerator(WorldsPlugin plugin) {
-        return generatorArgument(plugin).executes(context -> {
-            var levelStem = context.getArgument("level-type", LevelStem.class);
-            var generator = context.getArgument("generator", Generator.class);
-            var key = context.getArgument("key", Key.class);
-            return execute(context, key, levelStem, generator, plugin);
-        });
-    }
+    private static int execute(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
+        var path = context.getArgument("world", String.class);
 
-    private static int execute(CommandContext<CommandSourceStack> context, @Nullable Key key,
-                               @Nullable LevelStem levelStem, @Nullable Generator generator, WorldsPlugin plugin) {
-        var name = context.getArgument("world", String.class);
-        var build = plugin.levelView().read(Path.of(name))
-                .map(level -> level.levelStem(levelStem).generator(generator).key(key).build());
+        var displayName = tryGetArgument(context, "name", String.class);
+        var generator = tryGetArgument(context, "generator", Generator.class);
+        var key = tryGetArgument(context, "key", Key.class);
+        var levelStem = tryGetArgument(context, "level-type", LevelStem.class);
+
+        var build = plugin.levelView().read(Path.of(path)).map(level ->
+                level.key(key).name(displayName).generator(generator).levelStem(levelStem).build());
         var world = build.filter(level -> !level.isWorldKnown()).map(Level::createAsync).orElse(null);
 
         if (world == null) {
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.import.failed",
-                    Placeholder.parsed("world", name));
+                    Placeholder.parsed("world", path));
             return 0;
         }
 
         plugin.bundle().sendMessage(context.getSource().getSender(), "world.import",
-                Placeholder.parsed("world", name));
+                Placeholder.parsed("world", path));
         world.thenAccept(level -> {
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.import.success",
                     Placeholder.parsed("world", level.getName()));
@@ -90,8 +106,8 @@ class WorldImportCommand {
             entity.teleportAsync(level.getSpawnLocation(), COMMAND);
         }).exceptionally(throwable -> {
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.import.failed",
-                    Placeholder.parsed("world", name));
-            plugin.getComponentLogger().warn("Failed to import world {}", name, throwable);
+                    Placeholder.parsed("world", path));
+            plugin.getComponentLogger().warn("Failed to import world {}", path, throwable);
             return null;
         });
 
