@@ -10,6 +10,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
 abstract class OptionCommand {
     protected final WorldsPlugin plugin;
@@ -24,15 +25,19 @@ abstract class OptionCommand {
         }
     }
 
-    protected void addOptions(ArgumentBuilder<CommandSourceStack, ?> parent, Set<Option> options) {
-        for (var option : options) {
-            var nextRemaining = new HashSet<>(options);
-            nextRemaining.remove(option);
-
+    protected void addOptions(ArgumentBuilder<CommandSourceStack, ?> parent, boolean fixed, Set<Option> options, @Nullable Consumer<ArgumentBuilder<CommandSourceStack, ?>> consumer) {
+        options.forEach(option -> {
             var argument = Commands.argument(option.argument, option.type).executes(this::execute);
-            addOptions(argument, nextRemaining);
+            if (consumer != null) consumer.accept(argument);
+
+            if (!fixed) {
+                var nextRemaining = new HashSet<>(options);
+                nextRemaining.remove(option);
+                addOptions(argument, false, nextRemaining, consumer);
+            }
+
             parent.then(Commands.literal(option.name).then(argument));
-        }
+        });
     }
 
     protected <T> @Nullable T tryGetArgument(CommandContext<CommandSourceStack> context, String name, Class<T> type) {
