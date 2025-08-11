@@ -36,7 +36,6 @@ class WorldImportCommand {
                 .then(importWorld(plugin));
     }
     
-    
     private static RequiredArgumentBuilder<CommandSourceStack, String> importWorld(WorldsPlugin plugin) {
         var world = Commands.argument("world", StringArgumentType.string())
                 .suggests(new LevelSuggestionProvider<>(plugin, true))
