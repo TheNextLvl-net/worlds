@@ -43,12 +43,12 @@ class WorldImportCommand extends OptionCommand {
                 .suggests(new LevelSuggestionProvider<>(plugin, true))
                 .executes(this::execute);
 
-        addOptions(command, Set.of(
+        addOptions(command, false, Set.of(
                 new Option("key", ArgumentTypes.key()),
                 new Option("generator", new GeneratorArgument(plugin)),
                 new Option("name", StringArgumentType.string()),
-                new Option("type", "level-type", new LevelStemArgument(plugin))
-        ));
+                new Option("dimension", new LevelStemArgument(plugin))
+        ), null);
 
         return command;
     }
@@ -60,10 +60,10 @@ class WorldImportCommand extends OptionCommand {
         var displayName = tryGetArgument(context, "name", String.class);
         var generator = tryGetArgument(context, "generator", Generator.class);
         var key = tryGetArgument(context, "key", Key.class);
-        var levelStem = tryGetArgument(context, "level-type", LevelStem.class);
+        var dimension = tryGetArgument(context, "dimension", LevelStem.class);
 
         var build = plugin.levelView().read(Path.of(path)).map(level ->
-                level.key(key).name(displayName).generator(generator).levelStem(levelStem).build());
+                level.key(key).name(displayName).generator(generator).levelStem(dimension).build());
         var world = build.filter(level -> !level.isWorldKnown()).map(Level::createAsync).orElse(null);
 
         if (world == null) {
