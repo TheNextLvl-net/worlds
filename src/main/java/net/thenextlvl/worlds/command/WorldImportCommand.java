@@ -7,7 +7,6 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
@@ -15,6 +14,7 @@ import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.command.argument.GeneratorArgument;
+import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.argument.LevelStemArgument;
 import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.entity.Entity;
@@ -44,7 +44,7 @@ class WorldImportCommand extends OptionCommand {
                 .executes(this::execute);
 
         addOptions(command, false, Set.of(
-                new Option("key", ArgumentTypes.key()),
+                new Option("key", new KeyArgument()),
                 new Option("generator", new GeneratorArgument(plugin)),
                 new Option("name", StringArgumentType.string()),
                 new Option("dimension", new LevelStemArgument(plugin))

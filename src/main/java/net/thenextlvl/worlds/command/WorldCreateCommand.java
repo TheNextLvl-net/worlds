@@ -8,7 +8,6 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
@@ -18,6 +17,7 @@ import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.preset.Preset;
 import net.thenextlvl.worlds.command.argument.GeneratorArgument;
 import net.thenextlvl.worlds.command.argument.GeneratorTypeArgument;
+import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.argument.LevelStemArgument;
 import net.thenextlvl.worlds.command.argument.SeedArgument;
 import net.thenextlvl.worlds.command.argument.WorldPresetArgument;
@@ -53,7 +53,7 @@ class WorldCreateCommand extends OptionCommand {
                 new Option("bonus-chest", BoolArgumentType.bool()),
                 new Option("hardcore", BoolArgumentType.bool()),
                 new Option("dimension", new LevelStemArgument(plugin)),
-                new Option("key", ArgumentTypes.key()),
+                new Option("key", new KeyArgument()),
                 new Option("seed", new SeedArgument()),
                 new Option("structures", BoolArgumentType.bool())
         ), null));
@@ -63,14 +63,6 @@ class WorldCreateCommand extends OptionCommand {
 
     @Override
     protected int execute(CommandContext<CommandSourceStack> context) {
-        // todo: custom parser
-        // var keyInput = context.getNodes().stream()
-        //         .filter(node -> node.getNode().getName().equals("key"))
-        //         .map(ParsedCommandNode::getRange)
-        //         .map(range -> range.get(context.getInput()))
-        //         .findAny();
-        // var key = keyInput.map(Key::key).orElseGet(() -> tryGetArgument(context, "key", Key.class));
-
         var generator = tryGetArgument(context, "generator", Generator.class);
         var key = tryGetArgument(context, "key", Key.class);
         var dimension = tryGetArgument(context, "dimension", LevelStem.class);
