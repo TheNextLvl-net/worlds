@@ -9,6 +9,7 @@ import net.kyori.adventure.key.Key;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.command.argument.GeneratorArgument;
+import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
@@ -45,7 +46,7 @@ public class WorldCommand {
     }
 
     public static RequiredArgumentBuilder<CommandSourceStack, Key> keyArgument() {
-        return Commands.argument("key", ArgumentTypes.key());
+        return Commands.argument("key", new KeyArgument());
     }
 
     public static RequiredArgumentBuilder<CommandSourceStack, Generator> generatorArgument(WorldsPlugin plugin) {

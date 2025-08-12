@@ -10,6 +10,7 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.suggestion.LinkSuggestionProvider;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
@@ -25,7 +26,7 @@ class WorldLinkRemoveCommand {
     private static RequiredArgumentBuilder<CommandSourceStack, World> remove(WorldsPlugin plugin) {
         return Commands.argument("world", ArgumentTypes.world())
                 .suggests(new LinkSuggestionProvider<>(plugin, true))
-                .then(Commands.argument("destination", ArgumentTypes.key())
+                .then(Commands.argument("destination", new KeyArgument())
                         .suggests(new LinkSuggestionProvider.Linked<>(plugin))
                         .executes(context -> remove(plugin, context)));
     }
