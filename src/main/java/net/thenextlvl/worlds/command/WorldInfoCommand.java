@@ -61,7 +61,7 @@ class WorldInfoCommand {
                 Formatter.number("players", world.getPlayers().size()));
         plugin.bundle().sendMessage(sender, "world.info.type",
                 Placeholder.parsed("type", root.map(Level::getGeneratorType)
-                        .orElse(GeneratorType.NORMAL).presetName().asString()));
+                        .orElse(GeneratorType.NORMAL).name()));
         plugin.bundle().sendMessage(sender, "world.info.dimension",
                 Placeholder.parsed("dimension", root.map(level -> level.getLevelStem().dimensionType())
                         .orElse(DimensionType.OVERWORLD).key().asString()));
