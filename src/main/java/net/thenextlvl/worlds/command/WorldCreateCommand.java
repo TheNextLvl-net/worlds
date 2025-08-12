@@ -50,13 +50,15 @@ class WorldCreateCommand extends OptionCommand {
                 new Option("preset", new WorldPresetArgument(plugin)),
                 new Option("type", new GeneratorTypeArgument(plugin))
         ), builder -> addOptions(builder, false, Set.of(
+                new Option("bonus-chest", BoolArgumentType.bool()),
+                new Option("hardcore", BoolArgumentType.bool()),
                 new Option("dimension", new LevelStemArgument(plugin)),
                 new Option("key", ArgumentTypes.key()),
                 new Option("seed", new SeedArgument()),
                 new Option("structures", BoolArgumentType.bool())
         ), null));
 
-        return name;
+        return name.executes(this::execute);
     }
 
     @Override
@@ -75,6 +77,8 @@ class WorldCreateCommand extends OptionCommand {
         var preset = tryGetArgument(context, "preset", Preset.class);
         var seed = tryGetArgument(context, "seed", Long.class);
         var structures = tryGetArgument(context, "structures", Boolean.class);
+        var bonusChest = tryGetArgument(context, "bonus-chest", Boolean.class);
+        var hardcore = tryGetArgument(context, "hardcore", Boolean.class);
         var type = tryGetArgument(context, "type", GeneratorType.class);
 
         var name = context.getArgument("name", String.class);
@@ -87,6 +91,8 @@ class WorldCreateCommand extends OptionCommand {
                 .seed(seed)
                 .structures(structures)
                 .generatorType(type)
+                .bonusChest(bonusChest)
+                .hardcore(hardcore)
                 .build();
 
         plugin.bundle().sendMessage(context.getSource().getSender(), "world.create",
