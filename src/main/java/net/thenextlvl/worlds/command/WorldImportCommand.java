@@ -7,7 +7,6 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
@@ -15,6 +14,7 @@ import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.command.argument.GeneratorArgument;
+import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.argument.LevelStemArgument;
 import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.entity.Entity;
@@ -43,12 +43,12 @@ class WorldImportCommand extends OptionCommand {
                 .suggests(new LevelSuggestionProvider<>(plugin, true))
                 .executes(this::execute);
 
-        addOptions(command, Set.of(
-                new Option("key", ArgumentTypes.key()),
+        addOptions(command, false, Set.of(
+                new Option("key", new KeyArgument()),
                 new Option("generator", new GeneratorArgument(plugin)),
                 new Option("name", StringArgumentType.string()),
-                new Option("type", "level-type", new LevelStemArgument(plugin))
-        ));
+                new Option("dimension", new LevelStemArgument(plugin))
+        ), null);
 
         return command;
     }
@@ -60,10 +60,10 @@ class WorldImportCommand extends OptionCommand {
         var displayName = tryGetArgument(context, "name", String.class);
         var generator = tryGetArgument(context, "generator", Generator.class);
         var key = tryGetArgument(context, "key", Key.class);
-        var levelStem = tryGetArgument(context, "level-type", LevelStem.class);
+        var dimension = tryGetArgument(context, "dimension", LevelStem.class);
 
         var build = plugin.levelView().read(Path.of(path)).map(level ->
-                level.key(key).name(displayName).generator(generator).levelStem(levelStem).build());
+                level.key(key).name(displayName).generator(generator).levelStem(dimension).build());
         var world = build.filter(level -> !level.isWorldKnown()).map(Level::createAsync).orElse(null);
 
         if (world == null) {
