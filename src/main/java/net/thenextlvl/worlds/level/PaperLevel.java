@@ -22,7 +22,6 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.ai.village.VillageSiege;
 import net.minecraft.world.entity.npc.CatSpawner;
 import net.minecraft.world.entity.npc.WanderingTraderSpawner;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
@@ -243,10 +242,11 @@ class PaperLevel extends LevelData {
 
         var future = new CompletableFuture<World>();
         if (WorldsPlugin.RUNNING_FOLIA) {
-            serverLevel.randomSpawnSelection = new ChunkPos(serverLevel.getChunkSource().randomState().sampler().findSpawnPosition());
+            // todo: uncomment for folia
+            // serverLevel.randomSpawnSelection = new ChunkPos(serverLevel.getChunkSource().randomState().sampler().findSpawnPosition());
 
-            var x = serverLevel.randomSpawnSelection.x;
-            var z = serverLevel.randomSpawnSelection.z;
+            var x = 0; // serverLevel.randomSpawnSelection.x;
+            var z = 0; // serverLevel.randomSpawnSelection.z;
 
             plugin.getServer().getRegionScheduler().run(plugin, serverLevel.getWorld(), x, z, scheduledTask -> {
                 console.initWorld(serverLevel, primaryLevelData, primaryLevelData, primaryLevelData.worldGenOptions());
@@ -261,7 +261,8 @@ class PaperLevel extends LevelData {
 
         console.prepareLevels(serverLevel.getChunkSource().chunkMap.progressListener, serverLevel);
         if (WorldsPlugin.RUNNING_FOLIA)
-            io.papermc.paper.threadedregions.RegionizedServer.getInstance().addWorld(serverLevel);
+            ;// todo: uncomment for folia
+            // io.papermc.paper.threadedregions.RegionizedServer.getInstance().addWorld(serverLevel);
         FeatureHooks.tickEntityManager(serverLevel);
 
         persistWorld(serverLevel.getWorld(), enabled.toBooleanOrElse(true));
