@@ -76,21 +76,28 @@ public class FoliaLevelView extends PaperLevelView {
                     plugin.getComponentLogger().error("Error during world save", throwable);
                 }
 
-                try {
-                    handle.getChunkSource().close(false);
-                    FeatureHooks.closeEntityManager(handle, save);
-                    handle.levelStorageAccess.close();
-                } catch (Exception ex) {
-                    plugin.getComponentLogger().error("Failed to properly close world after saving", ex);
-                }
+                var closingFuture = new CompletableFuture<@Nullable Void>();
+                plugin.getServer().getRegionScheduler().run(plugin, world, 0, 0, task -> {
+                    try {
+                        handle.getChunkSource().close(false);
+                        FeatureHooks.closeEntityManager(handle, save);
+                        handle.levelStorageAccess.close();
+                    } catch (Exception e) {
+                        plugin.getComponentLogger().error("Failed to properly close world after saving", e);
+                    } finally {
+                        closingFuture.complete(null);
+                    }
+                });
 
+                return closingFuture;
+            }).thenApply(ignored -> {
                 try {
                     var field = server.getClass().getDeclaredField("worlds");
                     field.trySetAccessible();
                     @SuppressWarnings("unchecked") var worlds = (Map<String, World>) field.get(server);
                     worlds.remove(world.getName().toLowerCase(Locale.ROOT));
                 } catch (NoSuchFieldException | IllegalAccessException e) {
-                    plugin.getComponentLogger().error("Failed to remove world from memory", throwable);
+                    plugin.getComponentLogger().error("Failed to remove world from memory", e);
                     return false;
                 }
 
