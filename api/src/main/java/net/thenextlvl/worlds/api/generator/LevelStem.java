@@ -14,6 +14,9 @@ public record LevelStem(DimensionType dimensionType) {
     public static final LevelStem NETHER = new LevelStem(DimensionType.THE_NETHER);
     public static final LevelStem END = new LevelStem(DimensionType.THE_END);
 
+    /**
+     * @since 3.4.0
+     */
     @Contract(pure = true)
     public static @Nullable LevelStem of(Key key) {
         if (key.equals(DimensionType.OVERWORLD.key())) return OVERWORLD;
