@@ -264,16 +264,18 @@ class PaperLevel extends LevelData {
             io.papermc.paper.threadedregions.RegionizedServer.getInstance().addWorld(serverLevel);
         FeatureHooks.tickEntityManager(serverLevel);
 
-        persistWorld(serverLevel.getWorld(), enabled.toBooleanOrElse(true));
+        persistWorld(serverLevel.getWorld(), levelStem, enabled.toBooleanOrElse(true));
         if (generator != null) persistGenerator(serverLevel.getWorld(), generator);
 
         new WorldLoadEvent(serverLevel.getWorld()).callEvent();
         return future;
     }
 
-    public void persistWorld(World world, boolean enabled) {
+    public void persistWorld(World world, net.thenextlvl.worlds.api.generator.LevelStem dimension, boolean enabled) {
         var worldKey = new NamespacedKey("worlds", "world_key");
+        var dimensionKey = new NamespacedKey("worlds", "dimension");
         world.getPersistentDataContainer().set(worldKey, STRING, world.key().asString());
+        world.getPersistentDataContainer().set(dimensionKey, STRING, dimension.dimensionType().key().asString());
         plugin.levelView().setEnabled(world, enabled);
     }
 
