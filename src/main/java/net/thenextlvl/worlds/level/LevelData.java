@@ -421,11 +421,12 @@ public abstract class LevelData implements Level {
         var worldKnown = pdc.map(LevelData::isKnown).orElse(false);
         var key = pdc.flatMap(tag -> tag.optional("worlds:world_key")
                 .map(Tag::getAsString).map(Key::key)).orElseGet(() -> Key.key("worlds", createKey(name)));
+        var levelStem = pdc.flatMap(tag -> tag.optional("worlds:dimension").map(Tag::getAsString))
+                .map(Key::key).map(LevelStem::of).orElseGet(() -> getLevelStem(plugin, level));
         var enabled = pdc.flatMap(tag -> tag.optional("worlds:enabled").map(Tag::getAsBoolean)
                 .map(TriState::byBoolean)).orElse(TriState.NOT_SET);
         var chunkGenerator = pdc.flatMap(tag -> tag.optional("worlds:generator").map(Tag::getAsString)).map(serialized ->
                 Generator.of(plugin, serialized)).orElse(null);
-        var levelStem = getLevelStem(plugin, level);
         var settings = data.flatMap(tag -> tag.<CompoundTag>optional("WorldGenSettings"));
         var dimensions = settings.flatMap(tag -> tag.<CompoundTag>optional("dimensions"));
         var dimension = dimensions.flatMap(tag -> tag.<CompoundTag>optional(levelStem.dimensionType().key().asString()));
@@ -530,7 +531,10 @@ public abstract class LevelData implements Level {
     }
 
     private static boolean isKnown(CompoundTag tag) {
-        return tag.containsKey("worlds:world_key") || tag.containsKey("worlds:enabled") || tag.containsKey("worlds:generator");
+        return tag.containsKey("worlds:dimension")
+               || tag.containsKey("worlds:enabled")
+               || tag.containsKey("worlds:generator")
+               || tag.containsKey("worlds:world_key");
     }
 
     public static @Subst("pattern") String createKey(String name) {
