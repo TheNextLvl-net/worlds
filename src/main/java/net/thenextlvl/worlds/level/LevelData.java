@@ -58,7 +58,8 @@ public abstract class LevelData implements Level {
         this.name = builder.name != null ? builder.name : directory.getFileName().toString();
         this.key = builder.key != null ? builder.key : Key.key("worlds", createKey(name));
         this.levelStem = builder.levelStem != null ? builder.levelStem : getLevelStem(plugin, directory);
-        this.generatorType = builder.generatorType != null ? builder.generatorType : GeneratorType.NORMAL;
+        this.generatorType = builder.generatorType != null ? builder.generatorType
+                : builder.preset != null ? GeneratorType.FLAT : GeneratorType.NORMAL;
         this.biomeProvider = builder.biomeProvider != null ? builder.biomeProvider
                 : builder.generator != null ? builder.generator.biomeProvider(name) : null;
         this.chunkGenerator = builder.chunkGenerator != null ? builder.chunkGenerator
