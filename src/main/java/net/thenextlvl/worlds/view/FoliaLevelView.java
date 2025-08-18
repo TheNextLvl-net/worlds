@@ -90,7 +90,7 @@ public class FoliaLevelView extends PaperLevelView {
                 });
 
                 return closingFuture;
-            }).thenApply(ignored -> {
+            }).thenCompose(self -> self).thenApply(ignored -> {
                 try {
                     var field = server.getClass().getDeclaredField("worlds");
                     field.trySetAccessible();
