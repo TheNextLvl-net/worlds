@@ -78,7 +78,7 @@ public class PortalListener implements Listener {
 
     private void generateEndPlatform(World world, Entity entity) {
         var handle = ((CraftWorld) world).getHandle();
-        var entityHandle = ((CraftEntity) entity).getHandle();
+        var entityHandle = WorldsPlugin.RUNNING_FOLIA ? null : ((CraftEntity) entity).getHandle();
         EndPlatformFeature.createEndPlatform(handle, new BlockPos(100, 49, 0), true, entityHandle);
     }
 }
