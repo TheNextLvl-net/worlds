@@ -57,10 +57,10 @@ class WorldImportCommand extends OptionCommand {
     protected int execute(CommandContext<CommandSourceStack> context) {
         var path = context.getArgument("world", String.class);
 
-        var displayName = tryGetArgument(context, "name", String.class);
-        var generator = tryGetArgument(context, "generator", Generator.class);
-        var key = tryGetArgument(context, "key", Key.class);
-        var dimension = tryGetArgument(context, "dimension", LevelStem.class);
+        var displayName = tryGetArgument(context, "name", String.class).orElse(null);
+        var generator = tryGetArgument(context, "generator", Generator.class).orElse(null);
+        var key = tryGetArgument(context, "key", Key.class).orElse(null);
+        var dimension = tryGetArgument(context, "dimension", LevelStem.class).orElse(null);
 
         var build = plugin.levelView().read(Path.of(path)).map(level ->
                 level.key(key).name(displayName).generator(generator).levelStem(dimension).build());
