@@ -66,15 +66,15 @@ class WorldCreateCommand extends OptionCommand {
     protected int execute(CommandContext<CommandSourceStack> context) {
         var name = context.getArgument("name", String.class);
         var level = plugin.levelBuilder(plugin.levelView().findFreePath(name))
-                .levelStem(tryGetArgument(context, "dimension", LevelStem.class))
-                .generator(tryGetArgument(context, "generator", Generator.class))
-                .key(tryGetArgument(context, "key", Key.class))
-                .preset(tryGetArgument(context, "preset", Preset.class))
-                .seed(tryGetArgument(context, "seed", Long.class))
-                .structures(tryGetArgument(context, "structures", Boolean.class))
-                .generatorType(tryGetArgument(context, "type", GeneratorType.class))
-                .bonusChest(tryGetArgument(context, "bonus-chest", Boolean.class))
-                .hardcore(tryGetArgument(context, "hardcore", Boolean.class))
+                .levelStem(tryGetArgument(context, "dimension", LevelStem.class).orElse(null))
+                .generator(tryGetArgument(context, "generator", Generator.class).orElse(null))
+                .key(tryGetArgument(context, "key", Key.class).orElse(null))
+                .preset(tryGetArgument(context, "preset", Preset.class).orElse(null))
+                .seed(tryGetArgument(context, "seed", Long.class).orElse(null))
+                .structures(tryGetArgument(context, "structures", Boolean.class).orElse(null))
+                .generatorType(tryGetArgument(context, "type", GeneratorType.class).orElse(null))
+                .bonusChest(tryGetArgument(context, "bonus-chest", Boolean.class).orElse(null))
+                .hardcore(tryGetArgument(context, "hardcore", Boolean.class).orElse(null))
                 .name(name)
                 .build();
 

@@ -9,6 +9,7 @@ import net.thenextlvl.worlds.WorldsPlugin;
 import org.jspecify.annotations.Nullable;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -40,11 +41,11 @@ abstract class OptionCommand {
         });
     }
 
-    protected <T> @Nullable T tryGetArgument(CommandContext<CommandSourceStack> context, String name, Class<T> type) {
+    protected <T> Optional<T> tryGetArgument(CommandContext<CommandSourceStack> context, String name, Class<T> type) {
         try {
-            return context.getArgument(name, type);
+            return Optional.ofNullable(context.getArgument(name, type));
         } catch (IllegalArgumentException e) {
-            if (e.getMessage().equals("No such argument '" + name + "' exists on this command")) return null;
+            if (e.getMessage().equals("No such argument '" + name + "' exists on this command")) return Optional.empty();
             throw e;
         }
     }
