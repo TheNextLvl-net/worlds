@@ -31,6 +31,7 @@ public class WorldCommand {
                 .then(WorldLinkCommand.create(plugin))
                 .then(WorldListCommand.create(plugin))
                 .then(WorldLoadCommand.create(plugin))
+                .then(WorldRecreateCommand.create(plugin))
                 .then(WorldRegenerateCommand.create(plugin))
                 .then(WorldSaveCommand.create(plugin))
                 .then(WorldSetSpawnCommand.create(plugin))
