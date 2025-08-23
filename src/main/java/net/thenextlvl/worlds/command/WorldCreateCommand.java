@@ -30,7 +30,6 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
 class WorldCreateCommand extends OptionCommand {
-
     private WorldCreateCommand(WorldsPlugin plugin) {
         super(plugin);
     }
