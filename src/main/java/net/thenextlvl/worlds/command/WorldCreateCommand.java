@@ -62,42 +62,33 @@ class WorldCreateCommand extends OptionCommand {
     }
 
     @Override
+    @SuppressWarnings("DuplicatedCode")
     protected int execute(CommandContext<CommandSourceStack> context) {
-        var generator = tryGetArgument(context, "generator", Generator.class);
-        var key = tryGetArgument(context, "key", Key.class);
-        var dimension = tryGetArgument(context, "dimension", LevelStem.class);
-        var preset = tryGetArgument(context, "preset", Preset.class);
-        var seed = tryGetArgument(context, "seed", Long.class);
-        var structures = tryGetArgument(context, "structures", Boolean.class);
-        var bonusChest = tryGetArgument(context, "bonus-chest", Boolean.class);
-        var hardcore = tryGetArgument(context, "hardcore", Boolean.class);
-        var type = tryGetArgument(context, "type", GeneratorType.class);
-
         var name = context.getArgument("name", String.class);
         var level = plugin.levelBuilder(plugin.levelView().findFreePath(name))
+                .levelStem(tryGetArgument(context, "dimension", LevelStem.class))
+                .generator(tryGetArgument(context, "generator", Generator.class))
+                .key(tryGetArgument(context, "key", Key.class))
+                .preset(tryGetArgument(context, "preset", Preset.class))
+                .seed(tryGetArgument(context, "seed", Long.class))
+                .structures(tryGetArgument(context, "structures", Boolean.class))
+                .generatorType(tryGetArgument(context, "type", GeneratorType.class))
+                .bonusChest(tryGetArgument(context, "bonus-chest", Boolean.class))
+                .hardcore(tryGetArgument(context, "hardcore", Boolean.class))
                 .name(name)
-                .levelStem(dimension)
-                .generator(generator)
-                .key(key)
-                .preset(preset)
-                .seed(seed)
-                .structures(structures)
-                .generatorType(type)
-                .bonusChest(bonusChest)
-                .hardcore(hardcore)
                 .build();
 
-        plugin.bundle().sendMessage(context.getSource().getSender(), "world.create",
-                Placeholder.parsed("world", name));
+        var sender = context.getSource().getSender();
+        var placeholder = Placeholder.parsed("world", level.getName());
+        
+        plugin.bundle().sendMessage(sender, "world.create", placeholder);
         level.createAsync().thenAccept(world -> {
-            plugin.bundle().sendMessage(context.getSource().getSender(), "world.create.success",
-                    Placeholder.parsed("world", world.getName()));
-            if (!(context.getSource().getSender() instanceof Entity entity)) return;
+            plugin.bundle().sendMessage(sender, "world.create.success", placeholder);
+            if (!(sender instanceof Entity entity)) return;
             entity.teleportAsync(world.getSpawnLocation(), COMMAND);
         }).exceptionally(throwable -> {
-            plugin.getComponentLogger().warn("Failed to create world {} ({})", key, name, throwable);
-            plugin.bundle().sendMessage(context.getSource().getSender(), "world.create.failed",
-                    Placeholder.parsed("world", name));
+            plugin.getComponentLogger().warn("Failed to create world {} ({})", level.key(), name, throwable);
+            plugin.bundle().sendMessage(sender, "world.create.failed", placeholder);
             return null;
         });
         return Command.SINGLE_SUCCESS;
