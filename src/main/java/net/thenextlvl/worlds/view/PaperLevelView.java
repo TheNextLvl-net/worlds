@@ -6,6 +6,7 @@ import core.nbt.file.NBTFile;
 import core.nbt.tag.CompoundTag;
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.key.KeyPattern;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.thenextlvl.worlds.WorldsPlugin;
@@ -254,6 +255,21 @@ public class PaperLevelView implements LevelView {
         return findFreeName(usedNames, name);
     }
 
+    @SuppressWarnings("PatternValidation")
+    public Key findFreeKey(Key key) {
+        return findFreeKey(key.namespace(), key.value());
+    }
+
+    @SuppressWarnings("PatternValidation")
+    public Key findFreeKey(@KeyPattern.Namespace String namespace, @KeyPattern.Value String value) {
+        var usedValues = plugin.getServer().getWorlds().stream()
+                .map(World::key)
+                .filter(key -> key.namespace().equals(namespace))
+                .map(Key::value)
+                .collect(Collectors.toSet());
+        return Key.key(namespace, findFreeValue(usedValues, value));
+    }
+
     public Path findFreePath(String name) {
         var usedPaths = listDirectories().stream()
                 .map(Path::getFileName)
@@ -286,16 +302,38 @@ public class PaperLevelView implements LevelView {
         return candidate;
     }
 
+    public static String findFreeValue(Set<String> usedValues, String value) {
+        if (!usedValues.contains(value)) return value;
+
+        var baseValue = value;
+        int suffix = 1;
+        String candidate = baseValue + "_1";
+
+        var pattern = Pattern.compile("^(.+) \\((\\d+)\\)$");
+        var matcher = pattern.matcher(value);
+
+        if (matcher.matches()) {
+            baseValue = matcher.group(1);
+            suffix = Integer.parseInt(matcher.group(2)) + 1;
+            candidate = baseValue + "_" + suffix;
+            suffix++;
+        }
+
+        while (usedValues.contains(candidate)) {
+            candidate = baseValue + "_" + suffix++;
+        }
+
+        return candidate;
+    }
+
 
     @Override
-    @SuppressWarnings("PatternValidation")
     public CompletableFuture<World> cloneAsync(World world, Consumer<Level.Builder> builder, boolean full) {
         AsyncCatcher.catchOp("world cloning");
         var levelBuilder = plugin.levelBuilder(world);
 
-        var name = findFreeName(world.getName());
-        levelBuilder.name(name);
-        levelBuilder.key(Key.key(world.key().namespace(), LevelData.createKey(name)));
+        levelBuilder.name(findFreeName(world.getName()));
+        levelBuilder.key(findFreeKey(world.key()));
         levelBuilder.directory(findFreePath(world.getWorldFolder().getName()));
 
         builder.accept(levelBuilder);
