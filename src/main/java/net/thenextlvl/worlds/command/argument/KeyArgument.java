@@ -14,7 +14,7 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class KeyArgument implements CustomArgumentType<Key, Key> {
-    public static final SimpleCommandExceptionType ERROR_INVALID = new ComponentCommandExceptionType(
+    private static final SimpleCommandExceptionType ERROR_INVALID = new ComponentCommandExceptionType(
             Component.translatable("argument.id.invalid")
     );
 
