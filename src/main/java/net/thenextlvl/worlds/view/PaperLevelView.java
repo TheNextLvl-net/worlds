@@ -401,7 +401,7 @@ public class PaperLevelView implements LevelView {
         var fallback = getOverworld().getSpawnLocation();
         return CompletableFuture.allOf(world.getPlayers().stream()
                 .map(player -> player.teleportAsync(fallback))
-                .toList().toArray(new CompletableFuture[0])
+                .toArray(CompletableFuture[]::new)
         ).thenCompose(ignored -> unloadAsync(world, false).thenApplyAsync(success -> {
             if (!success) return DeletionResult.UNLOAD_FAILED;
             delete(world.getWorldFolder().toPath());
@@ -440,7 +440,7 @@ public class PaperLevelView implements LevelView {
         var fallback = getOverworld().getSpawnLocation();
         return CompletableFuture.allOf(players.stream()
                 .map(player -> player.teleportAsync(fallback, TeleportCause.PLUGIN))
-                .toList().toArray(new CompletableFuture[0])
+                .toArray(CompletableFuture[]::new)
         ).thenCompose(ignored -> saveLevelDataAsync(world).thenCompose(ignored1 -> {
             return unloadAsync(world, false).thenCompose(success -> {
                 if (!success) return CompletableFuture.completedFuture(DeletionResult.UNLOAD_FAILED);
