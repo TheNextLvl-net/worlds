@@ -6,9 +6,9 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.command.argument.WorldArgument;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -36,7 +36,7 @@ class WorldUnloadCommand {
     }
 
     private static RequiredArgumentBuilder<CommandSourceStack, World> unloadFallback(WorldsPlugin plugin) {
-        return Commands.argument("fallback", ArgumentTypes.world())
+        return Commands.argument("fallback", new WorldArgument(plugin))
                 .suggests(new WorldSuggestionProvider<>(plugin, (context, world) ->
                         !world.equals(context.getLastChild().getArgument("world", World.class))))
                 .executes(context -> unload(plugin, context.getArgument("fallback", World.class), context));
