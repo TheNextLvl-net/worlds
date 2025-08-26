@@ -2,36 +2,39 @@ package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.command.brigadier.BrigadierCommand;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
 import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
-class WorldSaveCommand {
+final class WorldSaveCommand extends BrigadierCommand {
+    private WorldSaveCommand(WorldsPlugin plugin) {
+        super(plugin, "save", "worlds.command.save");
+    }
+
     public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        return Commands.literal("save")
-                .requires(source -> source.getSender().hasPermission("worlds.command.save"))
-                .then(save(plugin));
+        var command = new WorldSaveCommand(plugin);
+        return command.create().then(worldArgument(plugin)
+                .then(Commands.literal("flush").executes(command::flush))
+                .executes(command::save));
     }
 
-    private static RequiredArgumentBuilder<CommandSourceStack, World> save(WorldsPlugin plugin) {
-        return worldArgument(plugin).then(flushArgument(plugin))
-                .executes(context -> save(context, false, plugin));
+    public int flush(CommandContext<CommandSourceStack> context) {
+        return save(context, true);
     }
 
-    private static LiteralArgumentBuilder<CommandSourceStack> flushArgument(WorldsPlugin plugin) {
-        return Commands.literal("flush").executes(context -> save(context, true, plugin));
+    private int save(CommandContext<CommandSourceStack> context) {
+        return save(context, false);
     }
 
-    private static int save(CommandContext<CommandSourceStack> context, boolean flush, WorldsPlugin plugin) {
+    private int save(CommandContext<CommandSourceStack> context, boolean flush) {
         var world = context.getArgument("world", World.class);
         var placeholder = Placeholder.parsed("world", world.getName());
         plugin.bundle().sendMessage(context.getSource().getSender(), "world.save", placeholder);

@@ -1,25 +1,28 @@
-package net.thenextlvl.worlds.command;
+package net.thenextlvl.worlds.command.link;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.link.LinkTree;
+import net.thenextlvl.worlds.command.brigadier.SimpleCommand;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-class WorldLinkListCommand {
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        return Commands.literal("list")
-                .requires(source -> source.getSender().hasPermission("worlds.command.link.list"))
-                .executes(context -> list(context, plugin));
+final class WorldLinkListCommand extends SimpleCommand {
+    private WorldLinkListCommand(WorldsPlugin plugin) {
+        super(plugin, "list", "worlds.command.link.list");
     }
 
-    private static int list(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
+        var command = new WorldLinkListCommand(plugin);
+        return command.create().executes(command);
+    }
+
+    @Override
+    public int run(CommandContext<CommandSourceStack> context) {
         var sender = context.getSource().getSender();
         var links = plugin.linkProvider().getLinkTrees()
                 .filter(tree -> !tree.isEmpty())
@@ -30,6 +33,6 @@ class WorldLinkListCommand {
         else plugin.bundle().sendMessage(sender, "world.link.list",
                 Formatter.joining("links", links),
                 Formatter.number("amount", links.size()));
-        return links.isEmpty() ? 0 : Command.SINGLE_SUCCESS;
+        return links.isEmpty() ? 0 : SINGLE_SUCCESS;
     }
 }

@@ -8,30 +8,35 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.command.brigadier.BrigadierCommand;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
 import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
-public class WorldBackupCommand {
+final class WorldBackupCommand extends BrigadierCommand {
+    private WorldBackupCommand(WorldsPlugin plugin) {
+        super(plugin, "backup", "worlds.command.backup");
+    }
+
     public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        return Commands.literal("backup")
-                .requires(source -> source.getSender().hasPermission("worlds.command.backup"))
-                .then(Commands.literal("*").executes(context -> backupAll(context, plugin)))
-                .then(worldArgument(plugin).executes(context -> backup(context, plugin)))
-                .executes(context -> backup(context, context.getSource().getLocation().getWorld(), plugin));
+        var command = new WorldBackupCommand(plugin);
+        return command.create()
+                .then(Commands.literal("*").executes(command::backupAll))
+                .then(worldArgument(plugin).executes(command::backup))
+                .executes(context -> command.backup(context, context.getSource().getLocation().getWorld()));
     }
 
-    private static int backupAll(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
-        return plugin.getServer().getWorlds().stream().mapToInt(world -> backup(context, world, plugin)).sum();
+    private int backupAll(CommandContext<CommandSourceStack> context) {
+        return plugin.getServer().getWorlds().stream().mapToInt(world -> backup(context, world)).sum();
     }
 
-    private static int backup(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
-        return backup(context, context.getArgument("world", World.class), plugin);
+    private int backup(CommandContext<CommandSourceStack> context) {
+        return backup(context, context.getArgument("world", World.class));
     }
 
-    private static int backup(CommandContext<CommandSourceStack> context, World world, WorldsPlugin plugin) {
+    private int backup(CommandContext<CommandSourceStack> context, World world) {
         var sender = context.getSource().getSender();
         var placeholder = Placeholder.parsed("world", world.getName());
         plugin.bundle().sendMessage(sender, "world.backup", placeholder);

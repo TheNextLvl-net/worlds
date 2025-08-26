@@ -1,27 +1,31 @@
 package net.thenextlvl.worlds.command;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.command.brigadier.SimpleCommand;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-class WorldListCommand {
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        return Commands.literal("list")
-                .requires(source -> source.getSender().hasPermission("worlds.command.list"))
-                .executes(context -> list(context, plugin));
+final class WorldListCommand extends SimpleCommand {
+    private WorldListCommand(WorldsPlugin plugin) {
+        super(plugin, "list", "worlds.command.list");
     }
 
-    private static int list(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
+        var command = new WorldListCommand(plugin);
+        return command.create().executes(command);
+    }
+
+    @Override
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var sender = context.getSource().getSender();
         var worlds = plugin.getServer().getWorlds();
 
@@ -33,6 +37,6 @@ class WorldListCommand {
         plugin.bundle().sendMessage(sender, "world.list",
                 Placeholder.parsed("amount", String.valueOf(worlds.size())),
                 Formatter.joining("worlds", joined));
-        return Command.SINGLE_SUCCESS;
+        return SINGLE_SUCCESS;
     }
 }

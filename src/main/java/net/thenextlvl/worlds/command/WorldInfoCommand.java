@@ -1,20 +1,16 @@
 package net.thenextlvl.worlds.command;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.generator.DimensionType;
 import net.thenextlvl.worlds.api.generator.GeneratorType;
 import net.thenextlvl.worlds.api.level.Level;
+import net.thenextlvl.worlds.command.brigadier.SimpleCommand;
 import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -29,29 +25,23 @@ import java.util.concurrent.atomic.AtomicLong;
 import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
-class WorldInfoCommand {
+final class WorldInfoCommand extends SimpleCommand {
+    private WorldInfoCommand(WorldsPlugin plugin) {
+        super(plugin, "info", "worlds.command.info");
+    }
+
     public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        return Commands.literal("info")
-                .requires(source -> source.getSender().hasPermission("worlds.command.info"))
-                .then(info(plugin))
-                .executes(context -> info(plugin, context));
+        var command = new WorldInfoCommand(plugin);
+        return command.create()
+                .then(worldArgument(plugin).executes(command))
+                .executes(command);
     }
 
-    private static int info(WorldsPlugin plugin, CommandContext<CommandSourceStack> context) {
-        if (!(context.getSource().getSender() instanceof Player player)) {
-            plugin.bundle().sendMessage(context.getSource().getSender(), "command.sender");
-            return 0;
-        } else return list(context.getSource().getSender(), player.getWorld(), plugin);
-    }
-
-    private static RequiredArgumentBuilder<CommandSourceStack, World> info(WorldsPlugin plugin) {
-        return worldArgument(plugin).executes(context -> {
-            var world = context.getArgument("world", World.class);
-            return list(context.getSource().getSender(), world, plugin);
-        });
-    }
-
-    private static int list(CommandSender sender, World world, WorldsPlugin plugin) {
+    @Override
+    public int run(CommandContext<CommandSourceStack> context) {
+        var sender = context.getSource().getSender();
+        var world = tryGetArgument(context, "world", World.class)
+                .orElseGet(() -> context.getSource().getLocation().getWorld());
         var path = world.getWorldFolder().toPath();
         var root = plugin.levelView().read(path).map(Level.Builder::build);
         plugin.bundle().sendMessage(sender, "world.info.name",
@@ -80,10 +70,10 @@ class WorldInfoCommand {
         } catch (IOException e) {
             plugin.getComponentLogger().warn("Failed to get world size for {}", world.key(), e);
         }
-        return Command.SINGLE_SUCCESS;
+        return SINGLE_SUCCESS;
     }
 
-    private static long getSize(Path path) throws IOException {
+    private long getSize(Path path) throws IOException {
         var size = new AtomicLong(0);
         Files.walkFileTree(path, new SimpleFileVisitor<>() {
             @Override
