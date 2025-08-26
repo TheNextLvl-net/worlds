@@ -1,31 +1,36 @@
 package net.thenextlvl.worlds.command;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.command.brigadier.SimpleCommand;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
-class WorldSpawnCommand {
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        return Commands.literal("spawn")
-                .requires(source -> source.getSender().hasPermission("worlds.command.spawn")
-                                    && source.getSender() instanceof Player)
-                .executes(context -> spawn(plugin, context));
+final class WorldSpawnCommand extends SimpleCommand {
+    private WorldSpawnCommand(WorldsPlugin plugin) {
+        super(plugin, "spawn", "worlds.command.spawn");
     }
 
-    private static int spawn(WorldsPlugin plugin, CommandContext<CommandSourceStack> context) {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
+        var command = new WorldSpawnCommand(plugin);
+        return command.create()
+                .requires(source -> source.getSender() instanceof Player && command.canUse(source))
+                .executes(command);
+    }
+
+    @Override
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var player = (Player) context.getSource().getSender();
         player.teleportAsync(player.getWorld().getSpawnLocation(), COMMAND);
         plugin.bundle().sendMessage(player, "world.teleport.self",
                 Placeholder.parsed("world", player.getWorld().getName()));
-        return Command.SINGLE_SUCCESS;
+        return SINGLE_SUCCESS;
     }
 }

@@ -1,6 +1,5 @@
 package net.thenextlvl.worlds.command;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -21,6 +20,7 @@ import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.argument.LevelStemArgument;
 import net.thenextlvl.worlds.command.argument.SeedArgument;
 import net.thenextlvl.worlds.command.argument.WorldPresetArgument;
+import net.thenextlvl.worlds.command.brigadier.OptionCommand;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 
@@ -29,19 +29,18 @@ import java.util.Set;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
-class WorldCreateCommand extends OptionCommand {
+final class WorldCreateCommand extends OptionCommand {
     private WorldCreateCommand(WorldsPlugin plugin) {
-        super(plugin);
+        super(plugin, "create", "worlds.command.create");
     }
 
     public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         var command = new WorldCreateCommand(plugin);
-        return Commands.literal("create")
-                .requires(source -> source.getSender().hasPermission("worlds.command.create"))
-                .then(command.createCommand());
+        return command.create().then(command.createCommand());
     }
 
-    private RequiredArgumentBuilder<CommandSourceStack, ?> createCommand() {
+    @Override
+    protected RequiredArgumentBuilder<CommandSourceStack, ?> createCommand() {
         var name = Commands.argument("name", StringArgumentType.string());
 
         addOptions(name, true, Set.of(
@@ -57,12 +56,11 @@ class WorldCreateCommand extends OptionCommand {
                 new Option("structures", BoolArgumentType.bool())
         ), null));
 
-        return name.executes(this::execute);
+        return name.executes(this);
     }
 
     @Override
-    @SuppressWarnings("DuplicatedCode")
-    protected int execute(CommandContext<CommandSourceStack> context) {
+    public int run(CommandContext<CommandSourceStack> context) {
         var name = context.getArgument("name", String.class);
         var level = plugin.levelBuilder(plugin.levelView().findFreePath(name))
                 .levelStem(tryGetArgument(context, "dimension", LevelStem.class).orElse(null))
@@ -79,7 +77,7 @@ class WorldCreateCommand extends OptionCommand {
 
         var sender = context.getSource().getSender();
         var placeholder = Placeholder.parsed("world", level.getName());
-        
+
         plugin.bundle().sendMessage(sender, "world.create", placeholder);
         level.createAsync().thenAccept(world -> {
             plugin.bundle().sendMessage(sender, "world.create.success", placeholder);
@@ -90,7 +88,6 @@ class WorldCreateCommand extends OptionCommand {
             plugin.bundle().sendMessage(sender, "world.create.failed", placeholder);
             return null;
         });
-        return Command.SINGLE_SUCCESS;
-
+        return SINGLE_SUCCESS;
     }
 }

@@ -1,6 +1,5 @@
 package net.thenextlvl.worlds.command;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -10,6 +9,7 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.level.Level;
+import net.thenextlvl.worlds.command.brigadier.SimpleCommand;
 import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
@@ -19,20 +19,24 @@ import java.nio.file.Path;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
-class WorldLoadCommand {
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        return Commands.literal("load")
-                .requires(source -> source.getSender().hasPermission("worlds.command.load"))
-                .then(load(plugin));
+final class WorldLoadCommand extends SimpleCommand {
+    private WorldLoadCommand(WorldsPlugin plugin) {
+        super(plugin, "load", "worlds.command.load");
     }
 
-    private static RequiredArgumentBuilder<CommandSourceStack, String> load(WorldsPlugin plugin) {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
+        var command = new WorldLoadCommand(plugin);
+        return command.create().then(command.load());
+    }
+
+    private RequiredArgumentBuilder<CommandSourceStack, String> load() {
         return Commands.argument("world", StringArgumentType.string())
                 .suggests(new LevelSuggestionProvider<>(plugin, false))
-                .executes(context -> load(context, plugin));
+                .executes(this);
     }
 
-    private static int load(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
+    @Override
+    public int run(CommandContext<CommandSourceStack> context) {
         var name = context.getArgument("world", String.class);
 
         plugin.bundle().sendMessage(context.getSource().getSender(), "world.load",
@@ -59,6 +63,6 @@ class WorldLoadCommand {
                     Placeholder.parsed("world", name));
             return null;
         });
-        return Command.SINGLE_SUCCESS;
+        return SINGLE_SUCCESS;
     }
 }

@@ -1,14 +1,15 @@
 package net.thenextlvl.worlds.command;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.argument.CommandFlagsArgument;
+import net.thenextlvl.worlds.command.brigadier.SimpleCommand;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
@@ -17,36 +18,41 @@ import java.util.Set;
 import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
-class WorldRegenerateCommand {
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        return Commands.literal("regenerate")
-                .requires(source -> source.getSender().hasPermission("worlds.command.regenerate"))
-                .then(regenerate(plugin));
+final class WorldRegenerateCommand extends SimpleCommand {
+    private WorldRegenerateCommand(WorldsPlugin plugin) {
+        super(plugin, "regenerate", "worlds.command.regenerate");
     }
 
-    private static RequiredArgumentBuilder<CommandSourceStack, World> regenerate(WorldsPlugin plugin) {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
+        var command = new WorldRegenerateCommand(plugin);
+        return command.create().then(command.regenerate());
+    }
+
+    private RequiredArgumentBuilder<CommandSourceStack, World> regenerate() {
         return worldArgument(plugin)
                 .then(Commands.argument("flags", new CommandFlagsArgument(
                         Set.of("--confirm", "--schedule")
-                )).executes(context -> regenerate(context, plugin)))
-                .executes(context -> confirmationNeeded(context, plugin));
+                )).executes(this))
+                .executes(this::confirmationNeeded);
     }
 
-    private static int confirmationNeeded(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
+    private int confirmationNeeded(CommandContext<CommandSourceStack> context) {
         var sender = context.getSource().getSender();
         plugin.bundle().sendMessage(sender, "command.confirmation",
                 Placeholder.parsed("action", "/" + context.getInput()),
                 Placeholder.parsed("confirmation", "/" + context.getInput() + " --confirm"));
-        return Command.SINGLE_SUCCESS;
+        return 0;
     }
 
-    private static int regenerate(CommandContext<CommandSourceStack> context, WorldsPlugin plugin) {
+    @Override
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var flags = context.getArgument("flags", CommandFlagsArgument.Flags.class);
-        if (!flags.contains("--confirm")) return confirmationNeeded(context, plugin);
+        if (!flags.contains("--confirm")) return confirmationNeeded(context);
         var world = context.getArgument("world", World.class);
-        plugin.bundle().sendMessage(context.getSource().getSender(), "world.regenerate",
+        var schedule = flags.contains("--schedule");
+        if (!schedule) plugin.bundle().sendMessage(context.getSource().getSender(), "world.regenerate",
                 Placeholder.parsed("world", world.getName()));
-        plugin.levelView().regenerateAsync(world, flags.contains("--schedule")).thenAccept(result -> {
+        plugin.levelView().regenerateAsync(world, schedule).thenAccept(result -> {
             var message = switch (result) {
                 case SUCCESS -> "world.regenerate.success";
                 case SCHEDULED -> "world.regenerate.scheduled";
@@ -62,6 +68,6 @@ class WorldRegenerateCommand {
             plugin.getComponentLogger().warn("Failed to regenerate world {}", world.getName(), throwable);
             return null;
         });
-        return Command.SINGLE_SUCCESS;
+        return SINGLE_SUCCESS;
     }
 }

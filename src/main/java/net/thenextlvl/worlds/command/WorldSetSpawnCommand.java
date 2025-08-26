@@ -1,6 +1,5 @@
 package net.thenextlvl.worlds.command;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -10,71 +9,50 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.thenextlvl.worlds.WorldsPlugin;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
+import net.thenextlvl.worlds.command.brigadier.SimpleCommand;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public class WorldSetSpawnCommand {
+public final class WorldSetSpawnCommand extends SimpleCommand {
+    private WorldSetSpawnCommand(WorldsPlugin plugin, String name) {
+        super(plugin, name, "minecraft.command.setworldspawn");
+    }
+
     static LiteralCommandNode<CommandSourceStack> create(WorldsPlugin plugin) {
         return create(plugin, "setspawn");
     }
 
-    public static LiteralCommandNode<CommandSourceStack> create(WorldsPlugin plugin, String label) {
-        return Commands.literal(label)
-                .requires(source -> source.getSender().hasPermission("minecraft.command.setworldspawn"))
-                .then(setSpawn(plugin))
-                .executes(context -> setSpawn(plugin, context))
+    public static LiteralCommandNode<CommandSourceStack> create(WorldsPlugin plugin, String name) {
+        var command = new WorldSetSpawnCommand(plugin, name);
+        return command.create()
+                .then(command.positioned())
+                .executes(command)
                 .build();
     }
 
-    private static int setSpawn(WorldsPlugin plugin, CommandContext<CommandSourceStack> context) {
-        var location = context.getSource().getLocation();
-        return setSpawn(context.getSource().getSender(),
-                location.getWorld(),
-                location.blockX(),
-                location.blockY(),
-                location.blockZ(), 0,
-                plugin);
-    }
-
-    private static RequiredArgumentBuilder<CommandSourceStack, BlockPositionResolver> setSpawn(WorldsPlugin plugin) {
+    private RequiredArgumentBuilder<CommandSourceStack, BlockPositionResolver> positioned() {
         return Commands.argument("position", ArgumentTypes.blockPosition())
-                .then(Commands.argument("angle", FloatArgumentType.floatArg(-180, 180))
-                        .executes(context -> setSpawnWithAngle(plugin, context)))
-                .executes(context -> setSpawnPosition(plugin, context));
+                .then(Commands.argument("angle", FloatArgumentType.floatArg(-180, 180)).executes(this))
+                .executes(this);
     }
 
-    private static int setSpawnPosition(WorldsPlugin plugin, CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var resolver = context.getArgument("position", BlockPositionResolver.class);
-        var position = resolver.resolve(context.getSource());
-        return setSpawn(context.getSource().getSender(),
-                context.getSource().getLocation().getWorld(),
-                position.blockX(), position.blockY(), position.blockZ(), 0,
-                plugin);
-    }
+    @Override
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var location = context.getSource().getLocation();
+        var resolver = tryGetArgument(context, "position", BlockPositionResolver.class).orElse(null);
+        var position = resolver != null ? resolver.resolve(context.getSource()) : location;
+        var angle = tryGetArgument(context, "angle", float.class).orElse(0f);
 
-    private static int setSpawnWithAngle(WorldsPlugin plugin, CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var angle = context.getArgument("angle", float.class);
-        var resolver = context.getArgument("position", BlockPositionResolver.class);
-        var position = resolver.resolve(context.getSource());
-        return setSpawn(context.getSource().getSender(),
-                context.getSource().getLocation().getWorld(),
-                position.blockX(), position.blockY(), position.blockZ(), angle,
-                plugin
-        );
-    }
-
-    private static int setSpawn(CommandSender sender, World world, int x, int y, int z, float angle, WorldsPlugin plugin) {
-        var success = world.setSpawnLocation(x, y, z, angle);
+        var success = location.getWorld().setSpawnLocation(position.blockX(), position.blockY(), position.blockZ(), angle);
         var message = success ? "world.spawn.set.success" : "world.spawn.set.failed";
-        plugin.bundle().sendMessage(sender, message,
-                Placeholder.parsed("x", String.valueOf(x)),
-                Placeholder.parsed("y", String.valueOf(y)),
-                Placeholder.parsed("z", String.valueOf(z)),
-                Placeholder.parsed("angle", String.valueOf(angle)));
-        return success ? Command.SINGLE_SUCCESS : 0;
+        
+        plugin.bundle().sendMessage(context.getSource().getSender(), message,
+                Formatter.number("x", position.blockX()),
+                Formatter.number("y", position.blockY()),
+                Formatter.number("z", position.blockZ()),
+                Formatter.number("angle", angle));
+        return success ? SINGLE_SUCCESS : 0;
     }
 }

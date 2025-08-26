@@ -1,16 +1,19 @@
-package net.thenextlvl.worlds.command;
+package net.thenextlvl.worlds.command.link;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import io.papermc.paper.command.brigadier.Commands;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.command.brigadier.BrigadierCommand;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-class WorldLinkCommand {
+public final class WorldLinkCommand extends BrigadierCommand {
+    WorldLinkCommand(WorldsPlugin plugin) {
+        super(plugin, "link", "worlds.command.link");
+    }
+
     public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        return Commands.literal("link")
-                .requires(source -> source.getSender().hasPermission("worlds.command.link"))
+        return new WorldLinkCommand(plugin).create()
                 .then(WorldLinkCreateCommand.create(plugin))
                 .then(WorldLinkListCommand.create(plugin))
                 .then(WorldLinkRemoveCommand.create(plugin));
