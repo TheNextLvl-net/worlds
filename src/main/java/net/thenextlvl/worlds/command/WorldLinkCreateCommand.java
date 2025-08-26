@@ -6,12 +6,14 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.command.argument.WorldArgument;
 import net.thenextlvl.worlds.command.suggestion.LinkSuggestionProvider;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
+
+import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
 class WorldLinkCreateCommand {
@@ -22,9 +24,9 @@ class WorldLinkCreateCommand {
     }
 
     private static RequiredArgumentBuilder<CommandSourceStack, World> createArgument(WorldsPlugin plugin) {
-        return Commands.argument("world", ArgumentTypes.world())
+        return worldArgument(plugin)
                 .suggests(new LinkSuggestionProvider<>(plugin, false))
-                .then(Commands.argument("destination", ArgumentTypes.world())
+                .then(Commands.argument("destination", new WorldArgument(plugin))
                         .suggests(new LinkSuggestionProvider.Unlinked<>(plugin))
                         .executes(context -> create(plugin, context)));
     }

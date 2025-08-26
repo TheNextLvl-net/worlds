@@ -4,12 +4,12 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.command.argument.GeneratorArgument;
 import net.thenextlvl.worlds.command.argument.KeyArgument;
+import net.thenextlvl.worlds.command.argument.WorldArgument;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
@@ -42,7 +42,7 @@ public class WorldCommand {
     }
 
     public static RequiredArgumentBuilder<CommandSourceStack, World> worldArgument(WorldsPlugin plugin) {
-        return Commands.argument("world", ArgumentTypes.world())
+        return Commands.argument("world", new WorldArgument(plugin))
                 .suggests(new WorldSuggestionProvider<>(plugin));
     }
 
