@@ -186,11 +186,11 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     private void registerCommands() {
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS.newHandler(event -> {
-            event.registrar().register(SaveAllCommand.create(this));
-            event.registrar().register(SaveOffCommand.create(this));
-            event.registrar().register(SaveOnCommand.create(this));
-            event.registrar().register(SeedCommand.create(this));
-            event.registrar().register(WorldCommand.create(this));
+            event.registrar().register(SaveAllCommand.create(this), "Save all worlds");
+            event.registrar().register(SaveOffCommand.create(this), "Disable automatic world saving");
+            event.registrar().register(SaveOnCommand.create(this), "Enable automatic world saving");
+            event.registrar().register(SeedCommand.create(this), "Query the seed of a world");
+            event.registrar().register(WorldCommand.create(this), "The main command to interact with this plugin");
             event.registrar().register(WorldSetSpawnCommand.create(this, "setworldspawn"), "Set the world spawn");
         }));
     }
