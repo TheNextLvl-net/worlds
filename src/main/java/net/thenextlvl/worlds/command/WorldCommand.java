@@ -10,15 +10,20 @@ import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.command.argument.GeneratorArgument;
 import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.argument.WorldArgument;
+import net.thenextlvl.worlds.command.brigadier.BrigadierCommand;
+import net.thenextlvl.worlds.command.link.WorldLinkCommand;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public class WorldCommand {
+public final class WorldCommand extends BrigadierCommand {
+    private WorldCommand(WorldsPlugin plugin) {
+        super(plugin, "world", "worlds.command");
+    }
+
     public static LiteralCommandNode<CommandSourceStack> create(WorldsPlugin plugin) {
-        return Commands.literal("world")
-                .requires(source -> source.getSender().hasPermission("worlds.command"))
+        return new WorldCommand(plugin).create()
                 .then(SaveAllCommand.create(plugin))
                 .then(SaveOffCommand.create(plugin))
                 .then(SaveOnCommand.create(plugin))

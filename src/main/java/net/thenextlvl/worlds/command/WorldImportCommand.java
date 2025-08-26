@@ -1,6 +1,5 @@
 package net.thenextlvl.worlds.command;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -16,6 +15,7 @@ import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.command.argument.GeneratorArgument;
 import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.argument.LevelStemArgument;
+import net.thenextlvl.worlds.command.brigadier.OptionCommand;
 import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
@@ -26,22 +26,21 @@ import java.util.Set;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
-class WorldImportCommand extends OptionCommand {
+final class WorldImportCommand extends OptionCommand {
     private WorldImportCommand(WorldsPlugin plugin) {
-        super(plugin);
+        super(plugin, "import", "worlds.command.import");
     }
 
     public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         var command = new WorldImportCommand(plugin);
-        return Commands.literal("import")
-                .requires(source -> source.getSender().hasPermission("worlds.command.import"))
-                .then(command.importWorld());
+        return command.create().then(command.createCommand());
     }
 
-    private RequiredArgumentBuilder<CommandSourceStack, String> importWorld() {
+    @Override
+    protected RequiredArgumentBuilder<CommandSourceStack, String> createCommand() {
         var command = Commands.argument("world", StringArgumentType.string())
                 .suggests(new LevelSuggestionProvider<>(plugin, true))
-                .executes(this::execute);
+                .executes(this);
 
         addOptions(command, false, Set.of(
                 new Option("key", new KeyArgument()),
@@ -54,7 +53,7 @@ class WorldImportCommand extends OptionCommand {
     }
 
     @Override
-    protected int execute(CommandContext<CommandSourceStack> context) {
+    public int run(CommandContext<CommandSourceStack> context) {
         var path = context.getArgument("world", String.class);
 
         var displayName = tryGetArgument(context, "name", String.class).orElse(null);
@@ -86,6 +85,6 @@ class WorldImportCommand extends OptionCommand {
             return null;
         });
 
-        return Command.SINGLE_SUCCESS;
+        return SINGLE_SUCCESS;
     }
 }

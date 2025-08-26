@@ -1,6 +1,5 @@
 package net.thenextlvl.worlds.command;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -18,6 +17,7 @@ import net.thenextlvl.worlds.api.preset.Preset;
 import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.argument.LevelStemArgument;
 import net.thenextlvl.worlds.command.argument.SeedArgument;
+import net.thenextlvl.worlds.command.brigadier.OptionCommand;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
@@ -28,19 +28,18 @@ import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
-class WorldRecreateCommand extends OptionCommand {
+final class WorldRecreateCommand extends OptionCommand {
     private WorldRecreateCommand(WorldsPlugin plugin) {
-        super(plugin);
+        super(plugin, "recreate", "worlds.command.recreate");
     }
 
     public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
         var command = new WorldRecreateCommand(plugin);
-        return Commands.literal("recreate")
-                .requires(source -> source.getSender().hasPermission("worlds.command.recreate"))
-                .then(command.createCommand());
+        return command.create().then(command.createCommand());
     }
 
-    private RequiredArgumentBuilder<CommandSourceStack, ?> createCommand() {
+    @Override
+    protected RequiredArgumentBuilder<CommandSourceStack, ?> createCommand() {
         var name = Commands.argument("name", StringArgumentType.string());
 
         addOptions(name, false, Set.of(
@@ -52,11 +51,11 @@ class WorldRecreateCommand extends OptionCommand {
                 new Option("structures", BoolArgumentType.bool())
         ), null);
 
-        return worldArgument(plugin).then(name.executes(this::execute));
+        return worldArgument(plugin).then(name.executes(this));
     }
 
     @Override
-    protected int execute(CommandContext<CommandSourceStack> context) {
+    public int run(CommandContext<CommandSourceStack> context) {
         var world = context.getArgument("world", World.class);
         var name = context.getArgument("name", String.class);
 
@@ -88,6 +87,6 @@ class WorldRecreateCommand extends OptionCommand {
             plugin.bundle().sendMessage(sender, "world.recreate.failed", placeholder);
             return null;
         });
-        return Command.SINGLE_SUCCESS;
+        return SINGLE_SUCCESS;
     }
 }
