@@ -2,10 +2,10 @@ package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.FloatArgumentType;
-import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
@@ -17,12 +17,17 @@ import org.bukkit.command.CommandSender;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-class WorldSetSpawnCommand {
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        return Commands.literal("setspawn")
-                .requires(source -> source.getSender().hasPermission("worlds.command.setspawn"))
+public class WorldSetSpawnCommand {
+    static LiteralCommandNode<CommandSourceStack> create(WorldsPlugin plugin) {
+        return create(plugin, "setspawn");
+    }
+
+    public static LiteralCommandNode<CommandSourceStack> create(WorldsPlugin plugin, String label) {
+        return Commands.literal(label)
+                .requires(source -> source.getSender().hasPermission("minecraft.command.setworldspawn"))
                 .then(setSpawn(plugin))
-                .executes(context -> setSpawn(plugin, context));
+                .executes(context -> setSpawn(plugin, context))
+                .build();
     }
 
     private static int setSpawn(WorldsPlugin plugin, CommandContext<CommandSourceStack> context) {
