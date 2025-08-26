@@ -13,6 +13,7 @@ import net.thenextlvl.worlds.command.SaveOffCommand;
 import net.thenextlvl.worlds.command.SaveOnCommand;
 import net.thenextlvl.worlds.command.SeedCommand;
 import net.thenextlvl.worlds.command.WorldCommand;
+import net.thenextlvl.worlds.command.WorldSetSpawnCommand;
 import net.thenextlvl.worlds.level.LevelData;
 import net.thenextlvl.worlds.link.WorldLinkProvider;
 import net.thenextlvl.worlds.listener.PortalListener;
@@ -190,6 +191,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
             event.registrar().register(SaveOnCommand.create(this));
             event.registrar().register(SeedCommand.create(this));
             event.registrar().register(WorldCommand.create(this));
+            event.registrar().register(WorldSetSpawnCommand.create(this, "setworldspawn"), "Set the world spawn");
         }));
     }
 }
