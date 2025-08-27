@@ -33,7 +33,12 @@ public final class KeyArgument implements CustomArgumentType<Key, Key> {
         }
     }
 
-    private static String readGreedy(StringReader reader) {
+    @Override
+    public ArgumentType<Key> getNativeType() {
+        return ArgumentTypes.key();
+    }
+
+    private String readGreedy(StringReader reader) {
         var cursor = reader.getCursor();
 
         while (reader.canRead() && isAllowedInKey(reader.peek())) {
@@ -43,14 +48,9 @@ public final class KeyArgument implements CustomArgumentType<Key, Key> {
         return reader.getString().substring(cursor, reader.getCursor());
     }
 
-    public static boolean isAllowedInKey(char character) {
+    private boolean isAllowedInKey(char character) {
         // todo: replace with Key#allowedInKey
         //  https://github.com/KyoriPowered/adventure/pull/1286
         return Key.allowedInNamespace(character) || Key.allowedInValue(character) || character == ':';
-    }
-
-    @Override
-    public ArgumentType<Key> getNativeType() {
-        return ArgumentTypes.key();
     }
 }
