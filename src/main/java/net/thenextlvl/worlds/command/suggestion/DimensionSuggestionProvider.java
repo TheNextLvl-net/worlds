@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
-public class DimensionSuggestionProvider implements SuggestionProvider {
+public final class DimensionSuggestionProvider implements SuggestionProvider {
     private final Map<String, String> dimensions;
     private final WorldsPlugin plugin;
 

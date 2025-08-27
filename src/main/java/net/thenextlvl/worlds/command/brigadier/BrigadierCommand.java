@@ -10,7 +10,7 @@ import org.jspecify.annotations.NullMarked;
 import java.util.Optional;
 
 @NullMarked
-public class BrigadierCommand {
+public abstract class BrigadierCommand {
     protected final WorldsPlugin plugin;
 
     private final String permission;

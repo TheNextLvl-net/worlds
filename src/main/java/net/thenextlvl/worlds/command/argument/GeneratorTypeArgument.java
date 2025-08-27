@@ -10,7 +10,7 @@ import org.jspecify.annotations.NullMarked;
 import java.util.Map;
 
 @NullMarked
-public class GeneratorTypeArgument extends WrappedArgumentType<String, GeneratorType> {
+public final class GeneratorTypeArgument extends WrappedArgumentType<String, GeneratorType> {
     public GeneratorTypeArgument(WorldsPlugin plugin) {
         super(StringArgumentType.word(), (reader, type) -> GeneratorType.getByName(type)
                         .orElseThrow(() -> new IllegalArgumentException("Unknown dimension type")),

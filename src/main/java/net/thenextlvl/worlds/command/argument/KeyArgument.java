@@ -13,7 +13,7 @@ import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public class KeyArgument implements CustomArgumentType<Key, Key> {
+public final class KeyArgument implements CustomArgumentType<Key, Key> {
     private static final SimpleCommandExceptionType ERROR_INVALID = new ComponentCommandExceptionType(
             Component.translatable("argument.id.invalid")
     );

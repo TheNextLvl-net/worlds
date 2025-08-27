@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @NullMarked
-public class CommandFlagsArgument extends WrappedArgumentType<String, CommandFlagsArgument.Flags> {
+public final class CommandFlagsArgument extends WrappedArgumentType<String, CommandFlagsArgument.Flags> {
     public CommandFlagsArgument(Set<String> flags) {
         super(StringArgumentType.greedyString(), (reader, type) -> {
             var split = type.split(" ");
@@ -27,7 +27,7 @@ public class CommandFlagsArgument extends WrappedArgumentType<String, CommandFla
         });
     }
 
-    public static class Flags extends HashSet<String> {
+    public static final class Flags extends HashSet<String> {
         private Flags(String... flags) {
             super(Set.of(flags));
         }
