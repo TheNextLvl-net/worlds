@@ -1,9 +1,9 @@
 package net.thenextlvl.worlds.command.suggestion;
 
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import core.paper.command.SuggestionProvider;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.thenextlvl.worlds.WorldsPlugin;
@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
-public class DimensionSuggestionProvider implements SuggestionProvider {
+public final class DimensionSuggestionProvider<S> implements SuggestionProvider<S> {
     private final Map<String, String> dimensions;
     private final WorldsPlugin plugin;
 
@@ -23,7 +23,7 @@ public class DimensionSuggestionProvider implements SuggestionProvider {
     }
 
     @Override
-    public CompletableFuture<Suggestions> suggest(CommandContext<?> context, SuggestionsBuilder builder) {
+    public CompletableFuture<Suggestions> getSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         var sender = ((CommandSourceStack) context.getSource()).getSender();
         dimensions.entrySet().stream()
                 .filter(entry -> entry.getKey().contains(builder.getRemaining()))

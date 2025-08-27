@@ -1,10 +1,14 @@
 package net.thenextlvl.worlds.command.argument;
 
 import com.google.gson.JsonObject;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import core.file.format.JsonFile;
 import core.io.IO;
-import core.paper.command.WrappedArgumentType;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.preset.Preset;
 import net.thenextlvl.worlds.api.preset.Presets;
@@ -20,30 +24,40 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @NullMarked
-public class WorldPresetArgument extends WrappedArgumentType<String, Preset> {
+public final class WorldPresetArgument implements SimpleArgumentType<Preset, String> {
     private static final Map<String, Preset> identifiers = Presets.presets().stream()
             .filter(preset -> preset.name() != null).collect(Collectors.toMap(
                     preset -> toIdentifier(Objects.requireNonNull(preset.name(), "Preset name cannot be null")),
                     preset -> preset
             ));
 
-    private static String toIdentifier(String name) {
-        return name.toLowerCase(Locale.ROOT).replace(" ", "-").replace("'", "");
-    }
+    private final WorldsPlugin plugin;
 
     public WorldPresetArgument(WorldsPlugin plugin) {
-        super(StringArgumentType.string(), (reader, type) -> {
-            var optional = identifiers.get(toIdentifier(type));
-            if (optional != null) return optional;
+        this.plugin = plugin;
+    }
 
-            var file = plugin.presetsFolder().resolve(type + ".json");
-            if (!Files.isRegularFile(file)) throw new IllegalStateException("No preset found");
+    @Override
+    public Preset convert(StringReader reader, String type) {
+        var optional = identifiers.get(toIdentifier(type));
+        if (optional != null) return optional;
 
-            var root = new JsonFile<>(IO.of(file), new JsonObject()).getRoot();
-            if (root.isJsonObject()) return Preset.deserialize(root);
-            throw new IllegalStateException("Not a valid preset");
+        var file = plugin.presetsFolder().resolve(type + ".json");
+        if (!Files.isRegularFile(file)) throw new IllegalStateException("No preset found");
 
-        }, (context, builder) -> CompletableFuture.runAsync(() -> {
+        var root = new JsonFile<>(IO.of(file), new JsonObject()).getRoot();
+        if (root.isJsonObject()) return Preset.deserialize(root);
+        throw new IllegalStateException("Not a valid preset");
+    }
+
+    @Override
+    public ArgumentType<String> getNativeType() {
+        return StringArgumentType.string();
+    }
+
+    @Override
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        return CompletableFuture.runAsync(() -> {
             var presets = new HashSet<>(identifiers.keySet());
 
             try (var directoryStream = Files.newDirectoryStream(plugin.presetsFolder(), "*.json")) {
@@ -61,6 +75,10 @@ public class WorldPresetArgument extends WrappedArgumentType<String, Preset> {
         }).exceptionally(throwable -> {
             plugin.getComponentLogger().error("Failed to list presets", throwable);
             return null;
-        }).thenApply(ignored -> builder.build()));
+        }).thenApply(ignored -> builder.build());
+    }
+
+    private static String toIdentifier(String name) {
+        return name.toLowerCase(Locale.ROOT).replace(" ", "-").replace("'", "");
     }
 }

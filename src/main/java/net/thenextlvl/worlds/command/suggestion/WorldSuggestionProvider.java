@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiPredicate;
 
 @NullMarked
-public class WorldSuggestionProvider<S> implements SuggestionProvider<S> {
+public final class WorldSuggestionProvider<S> implements SuggestionProvider<S> {
     private final Plugin plugin;
     private final BiPredicate<CommandContext<S>, World> filter;
 
