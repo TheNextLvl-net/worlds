@@ -38,7 +38,7 @@ final class WorldImportCommand extends OptionCommand {
 
     @Override
     protected RequiredArgumentBuilder<CommandSourceStack, String> createCommand() {
-        var command = Commands.argument("world", StringArgumentType.string())
+        var command = Commands.argument("path", StringArgumentType.string())
                 .suggests(new LevelSuggestionProvider<>(plugin, true))
                 .executes(this);
 
@@ -54,7 +54,7 @@ final class WorldImportCommand extends OptionCommand {
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) {
-        var path = context.getArgument("world", String.class);
+        var path = context.getArgument("path", String.class);
 
         var displayName = tryGetArgument(context, "name", String.class).orElse(null);
         var generator = tryGetArgument(context, "generator", Generator.class).orElse(null);
