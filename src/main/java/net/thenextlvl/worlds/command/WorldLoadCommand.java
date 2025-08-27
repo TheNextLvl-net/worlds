@@ -30,24 +30,24 @@ final class WorldLoadCommand extends SimpleCommand {
     }
 
     private RequiredArgumentBuilder<CommandSourceStack, String> load() {
-        return Commands.argument("world", StringArgumentType.string())
+        return Commands.argument("path", StringArgumentType.string())
                 .suggests(new LevelSuggestionProvider<>(plugin, false))
                 .executes(this);
     }
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) {
-        var name = context.getArgument("world", String.class);
+        var path = context.getArgument("path", String.class);
 
         plugin.bundle().sendMessage(context.getSource().getSender(), "world.load",
-                Placeholder.parsed("world", name));
+                Placeholder.parsed("world", path));
 
-        var build = plugin.levelView().read(Path.of(name)).map(Level.Builder::build);
+        var build = plugin.levelView().read(Path.of(path)).map(Level.Builder::build);
         var future = build.filter(Level::isWorldKnown).map(Level::createAsync).orElse(null);
 
         if (future == null) {
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.load.failed",
-                    Placeholder.parsed("world", name));
+                    Placeholder.parsed("world", path));
             return 0;
         }
 
@@ -58,9 +58,9 @@ final class WorldLoadCommand extends SimpleCommand {
             if (!(context.getSource().getSender() instanceof Entity entity)) return;
             entity.teleportAsync(level.getSpawnLocation(), COMMAND);
         }).exceptionally(throwable -> {
-            plugin.getComponentLogger().warn("Failed to load world {}", name, throwable);
+            plugin.getComponentLogger().warn("Failed to load world {}", path, throwable);
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.load.failed",
-                    Placeholder.parsed("world", name));
+                    Placeholder.parsed("world", path));
             return null;
         });
         return SINGLE_SUCCESS;
