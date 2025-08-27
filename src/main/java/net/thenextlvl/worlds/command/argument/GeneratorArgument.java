@@ -8,7 +8,7 @@ import net.thenextlvl.worlds.command.suggestion.GeneratorSuggestionProvider;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public class GeneratorArgument extends WrappedArgumentType<String, Generator> {
+public final class GeneratorArgument extends WrappedArgumentType<String, Generator> {
     public GeneratorArgument(WorldsPlugin plugin) {
         super(StringArgumentType.string(), (reader, type) ->
                         Generator.of(plugin, type),

@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
-public class LevelSuggestionProvider<S> implements SuggestionProvider<S> {
+public final class LevelSuggestionProvider<S> implements SuggestionProvider<S> {
     private final WorldsPlugin plugin;
     private final boolean unknownLevels;
 

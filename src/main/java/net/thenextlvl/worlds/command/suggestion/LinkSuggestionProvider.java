@@ -14,7 +14,7 @@ import org.jspecify.annotations.NullMarked;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
-public class LinkSuggestionProvider<T> implements SuggestionProvider<T> {
+public final class LinkSuggestionProvider<T> implements SuggestionProvider<T> {
     private final WorldsPlugin plugin;
     private final boolean unlink;
 

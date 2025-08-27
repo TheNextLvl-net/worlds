@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
-public class GeneratorSuggestionProvider implements SuggestionProvider {
+public final class GeneratorSuggestionProvider implements SuggestionProvider {
     private final WorldsPlugin plugin;
 
     public GeneratorSuggestionProvider(WorldsPlugin plugin) {

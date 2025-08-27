@@ -11,7 +11,7 @@ import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public class WorldArgument extends WrappedArgumentType<Key, World> {
+public final class WorldArgument extends WrappedArgumentType<Key, World> {
     public WorldArgument(WorldsPlugin plugin) {
         super(new KeyArgument(), (reader, type) -> {
             var world = plugin.getServer().getWorld(type);

@@ -10,7 +10,7 @@ import org.jspecify.annotations.NullMarked;
 import java.util.Map;
 
 @NullMarked
-public class LevelStemArgument extends WrappedArgumentType<String, LevelStem> {
+public final class LevelStemArgument extends WrappedArgumentType<String, LevelStem> {
     public LevelStemArgument(WorldsPlugin plugin) {
         super(StringArgumentType.word(), (reader, type) -> switch (type) {
             case "normal", "overworld" -> LevelStem.OVERWORLD;

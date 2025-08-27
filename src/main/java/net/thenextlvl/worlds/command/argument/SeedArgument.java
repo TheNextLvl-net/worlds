@@ -5,7 +5,7 @@ import core.paper.command.WrappedArgumentType;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public class SeedArgument extends WrappedArgumentType<String, Long> {
+public final class SeedArgument extends WrappedArgumentType<String, Long> {
     public SeedArgument() {
         super(StringArgumentType.string(), (reader, type) -> {
             try {
