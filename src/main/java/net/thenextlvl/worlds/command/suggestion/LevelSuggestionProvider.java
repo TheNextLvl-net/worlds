@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.util.TriState;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.exception.GeneratorException;
@@ -17,11 +18,11 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
-public final class LevelSuggestionProvider<S> implements SuggestionProvider<S> {
-    private final WorldsPlugin plugin;
+public class LevelSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
+    protected final WorldsPlugin plugin;
     private final boolean unknownLevels;
 
-    public LevelSuggestionProvider(WorldsPlugin plugin, boolean unknownLevels) {
+    protected LevelSuggestionProvider(WorldsPlugin plugin, boolean unknownLevels) {
         this.unknownLevels = unknownLevels;
         this.plugin = plugin;
     }
@@ -38,7 +39,7 @@ public final class LevelSuggestionProvider<S> implements SuggestionProvider<S> {
     }
 
     @Override
-    public CompletableFuture<Suggestions> getSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
         return CompletableFuture.runAsync(() -> plugin.levelView().listLevels().stream()
                 .filter(plugin.levelView()::canLoad)
                 .map(this::safeRead)
@@ -52,5 +53,10 @@ public final class LevelSuggestionProvider<S> implements SuggestionProvider<S> {
                     builder.suggest(escaped, () -> level.key().asString());
                 })
         ).thenApply(ignored -> builder.build());
+    }
+
+    @SuppressWarnings("unchecked")
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        return getSuggestions((CommandContext<CommandSourceStack>) context, builder);
     }
 }

@@ -14,9 +14,9 @@ import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.command.argument.GeneratorArgument;
 import net.thenextlvl.worlds.command.argument.KeyArgument;
+import net.thenextlvl.worlds.command.argument.LevelPathArgument;
 import net.thenextlvl.worlds.command.argument.LevelStemArgument;
 import net.thenextlvl.worlds.command.brigadier.OptionCommand;
-import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 
@@ -37,10 +37,8 @@ final class WorldImportCommand extends OptionCommand {
     }
 
     @Override
-    protected RequiredArgumentBuilder<CommandSourceStack, String> createCommand() {
-        var command = Commands.argument("path", StringArgumentType.string())
-                .suggests(new LevelSuggestionProvider<>(plugin, true))
-                .executes(this);
+    protected RequiredArgumentBuilder<CommandSourceStack, Path> createCommand() {
+        var command = Commands.argument("path", new LevelPathArgument(plugin, true)).executes(this);
 
         addOptions(command, false, Set.of(
                 new Option("key", new KeyArgument()),
@@ -54,25 +52,25 @@ final class WorldImportCommand extends OptionCommand {
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) {
-        var path = context.getArgument("path", String.class);
+        var path = context.getArgument("path", Path.class);
 
         var displayName = tryGetArgument(context, "name", String.class).orElse(null);
         var generator = tryGetArgument(context, "generator", Generator.class).orElse(null);
         var key = tryGetArgument(context, "key", Key.class).orElse(null);
         var dimension = tryGetArgument(context, "dimension", LevelStem.class).orElse(null);
 
-        var build = plugin.levelView().read(Path.of(path)).map(level ->
+        var build = plugin.levelView().read(path).map(level ->
                 level.key(key).name(displayName).generator(generator).levelStem(dimension).build());
         var world = build.filter(level -> !level.isWorldKnown()).map(Level::createAsync).orElse(null);
 
         if (world == null) {
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.import.failed",
-                    Placeholder.parsed("world", path));
+                    Placeholder.parsed("world", path.toString()));
             return 0;
         }
 
         plugin.bundle().sendMessage(context.getSource().getSender(), "world.import",
-                Placeholder.parsed("world", path));
+                Placeholder.parsed("world", path.toString()));
         world.thenAccept(level -> {
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.import.success",
                     Placeholder.parsed("world", level.getName()));
@@ -80,7 +78,7 @@ final class WorldImportCommand extends OptionCommand {
             entity.teleportAsync(level.getSpawnLocation(), COMMAND);
         }).exceptionally(throwable -> {
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.import.failed",
-                    Placeholder.parsed("world", path));
+                    Placeholder.parsed("world", path.toString()));
             plugin.getComponentLogger().warn("Failed to import world {}", path, throwable);
             return null;
         });
