@@ -2,13 +2,13 @@ package net.thenextlvl.worlds.view;
 
 import com.google.common.base.Preconditions;
 import core.io.IO;
-import core.nbt.file.NBTFile;
-import core.nbt.tag.CompoundTag;
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.KeyPattern;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.storage.LevelStorageSource;
+import net.thenextlvl.nbt.file.NBTFile;
+import net.thenextlvl.nbt.tag.CompoundTag;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.event.WorldActionScheduledEvent;
 import net.thenextlvl.worlds.api.event.WorldActionScheduledEvent.ActionType;
@@ -86,7 +86,7 @@ public class PaperLevelView implements LevelView {
     }
 
     public Optional<NBTFile<CompoundTag>> getLevelDataFile(Path level) {
-        return getLevelDataPath(level).map(path -> new NBTFile<>(IO.of(path), new CompoundTag()));
+        return getLevelDataPath(level).map(path -> new NBTFile<>(IO.of(path), CompoundTag.empty()));
     }
 
     private static @Nullable Path getFile(Path level, String other) {
