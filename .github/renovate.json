@@ -5,5 +5,33 @@
     ":disableDependencyDashboard"
   ],
   "ignoreUnstable": false,
-  "dependencyDashboard": false
+  "dependencyDashboard": false,
+  "regexManagers": [
+    {
+      "description": "Update Paper dev bundle",
+      "fileMatch": [
+        "(^|/)build\\.gradle\\.kts$"
+      ],
+      "matchStrings": [
+        "paperweight\\.paperDevBundle\\(\"(?<currentValue>[^\"]+)\"\\)",
+        "paperweight\\.foliaDevBundle\\(\"(?<currentValue>[^\"]+)\"\\)"
+      ],
+      "datasourceTemplate": "maven",
+      "depNameTemplate": "io.papermc.paper:dev-bundle",
+      "versioningTemplate": "maven"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": [
+        "maven"
+      ],
+      "matchDepNames": [
+        "io.papermc.paper:dev-bundle"
+      ],
+      "registryUrls": [
+        "https://repo.papermc.io/repository/maven-public/"
+      ]
+    }
+  ]
 }
