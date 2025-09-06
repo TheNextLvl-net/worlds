@@ -20,6 +20,7 @@ version = rootProject.version
 repositories {
     mavenCentral()
     maven("https://repo.thenextlvl.net/releases")
+    maven("https://repo.thenextlvl.net/snapshots")
     maven("https://repo.papermc.io/repository/maven-public/")
 }
 
@@ -28,7 +29,7 @@ dependencies {
     compileOnly("net.thenextlvl:per-worlds:1.0.3")
 
     testImplementation("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
-    testImplementation("net.thenextlvl.core:nbt:2.4.0")
+    testImplementation("net.thenextlvl:nbt:3.0.0-pre1")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation(platform("org.junit:junit-bom:6.0.0-SNAPSHOT"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
