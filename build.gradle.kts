@@ -24,6 +24,7 @@ version = "3.6.0"
 repositories {
     mavenCentral()
     maven("https://repo.thenextlvl.net/releases")
+    maven("https://repo.thenextlvl.net/snapshots")
     maven("https://repo.papermc.io/repository/maven-public/")
 }
 
@@ -33,7 +34,7 @@ dependencies {
     implementation(project(":api"))
 
     implementation("net.thenextlvl.core:i18n:3.2.1")
-    implementation("net.thenextlvl.core:nbt:2.4.0")
+    implementation("net.thenextlvl:nbt:2.3.3")
     implementation("net.thenextlvl.core:paper:2.2.1")
 
     implementation("org.bstats:bstats-bukkit:3.1.1-SNAPSHOT")
