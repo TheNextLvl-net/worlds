@@ -1,12 +1,12 @@
 package net.thenextlvl.worlds.level;
 
-import core.nbt.tag.ByteTag;
-import core.nbt.tag.CompoundTag;
-import core.nbt.tag.ListTag;
-import core.nbt.tag.LongTag;
-import core.nbt.tag.Tag;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.util.TriState;
+import net.thenextlvl.nbt.tag.ByteTag;
+import net.thenextlvl.nbt.tag.CompoundTag;
+import net.thenextlvl.nbt.tag.ListTag;
+import net.thenextlvl.nbt.tag.LongTag;
+import net.thenextlvl.nbt.tag.Tag;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.generator.GeneratorType;
