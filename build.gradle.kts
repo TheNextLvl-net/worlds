@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-    paperweight.foliaDevBundle("1.21.8-R0.1-SNAPSHOT")
+    paperweight.foliaDevBundle("1.21.9-pre2-R0.1-SNAPSHOT")
 
     implementation(project(":api"))
 
