@@ -21,4 +21,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: worlds
-          path: worlds/build/libs/*.jar
+          path: build/libs/*.jar
