@@ -59,14 +59,9 @@ public class FoliaLevelView extends PaperLevelView {
         if (!handle.players().isEmpty())
             return CompletableFuture.completedFuture(false);
 
-
-        var future = new CompletableFuture<Boolean>();
-
-        plugin.getServer().getGlobalRegionScheduler().execute(plugin, () -> {
-            future.complete(new WorldUnloadEvent(handle.getWorld()).callEvent());
-        });
-
-        return future.thenCompose(success -> {
+        return plugin.supplyGlobal(() -> {
+            return CompletableFuture.completedFuture(new WorldUnloadEvent(handle.getWorld()).callEvent());
+        }).thenCompose(success -> {
             if (!success) return CompletableFuture.completedFuture(false);
 
             var saving = save ? saveAsync(world, true) : CompletableFuture.completedFuture(null);
@@ -76,20 +71,16 @@ public class FoliaLevelView extends PaperLevelView {
                     plugin.getComponentLogger().error("Error during world save", throwable);
                 }
 
-                var closingFuture = new CompletableFuture<@Nullable Void>();
-                plugin.getServer().getRegionScheduler().run(plugin, world, 0, 0, task -> {
+                return plugin.supplyGlobal(() -> {
                     try {
                         handle.getChunkSource().close(false);
                         FeatureHooks.closeEntityManager(handle, save);
                         handle.levelStorageAccess.close();
                     } catch (Exception e) {
                         plugin.getComponentLogger().error("Failed to properly close world after saving", e);
-                    } finally {
-                        closingFuture.complete(null);
                     }
+                    return CompletableFuture.completedFuture(null);
                 });
-
-                return closingFuture;
             }).thenCompose(self -> self).thenApply(ignored -> {
                 try {
                     var field = server.getClass().getDeclaredField("worlds");
