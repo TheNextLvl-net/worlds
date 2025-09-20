@@ -35,6 +35,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @NullMarked
@@ -150,6 +152,17 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
                 })
                 .seed(world.getSeed())
                 .name(world.getName());
+    }
+    
+    public <T> CompletableFuture<T> supplyGlobal(Supplier<CompletableFuture<T>> supplier) {
+        var future = new CompletableFuture<T>();
+        getServer().getGlobalRegionScheduler().execute(this, () -> {
+            supplier.get().thenAccept(future::complete).exceptionally(e -> {
+                future.completeExceptionally(e);
+                return null;
+            });
+        });
+        return future;
     }
 
     @Override
