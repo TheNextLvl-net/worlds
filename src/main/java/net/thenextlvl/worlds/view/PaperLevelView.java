@@ -28,7 +28,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.spigotmc.AsyncCatcher;
 
 import java.io.File;
 import java.io.IOException;
@@ -170,15 +169,13 @@ public class PaperLevelView implements LevelView {
     @Override
     public CompletableFuture<Boolean> unloadAsync(World world, boolean save) {
         return saveLevelDataAsync(world).thenCompose(ignored -> {
-            var future = new CompletableFuture<Boolean>();
-            plugin.getServer().getGlobalRegionScheduler().run(plugin, scheduledTask -> {
+            return plugin.supplyGlobal(() -> {
                 var dragonBattle = world.getEnderDragonBattle();
-                if (plugin.getServer().unloadWorld(world, save)) {
-                    if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
-                    future.complete(true);
-                } else future.complete(false);
+                if (!plugin.getServer().unloadWorld(world, save))
+                    return CompletableFuture.completedFuture(false);
+                if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
+                return CompletableFuture.completedFuture(true);
             });
-            return future;
         }).exceptionally(throwable -> {
             plugin.getComponentLogger().warn("Failed to save level data before unloading", throwable);
             return false;
@@ -190,20 +187,18 @@ public class PaperLevelView implements LevelView {
      */
     @Override
     public CompletableFuture<@Nullable Void> saveAsync(World world, boolean flush) {
-        var future = new CompletableFuture<@Nullable Void>();
-        plugin.getServer().getGlobalRegionScheduler().execute(plugin, () -> {
+        return plugin.supplyGlobal(() -> {
             try {
                 var level = ((CraftWorld) world).getHandle();
                 var oldSave = level.noSave;
                 level.noSave = false;
                 level.save(null, flush, false);
                 level.noSave = oldSave;
-                future.complete(null);
+                return CompletableFuture.completedFuture(null);
             } catch (Exception e) {
-                future.completeExceptionally(e);
+                return CompletableFuture.failedFuture(e);
             }
-        });
-        return future.thenRun(() -> saveLevelDataAsync(world));
+        }).thenRun(() -> saveLevelDataAsync(world));
     }
 
     /**
@@ -236,7 +231,10 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public CompletableFuture<Long> backupAsync(World world) {
-        AsyncCatcher.catchOp("world backup");
+        return plugin.supplyGlobal(() -> backupInternal(world));
+    }
+
+    private CompletableFuture<Long> backupInternal(World world) {
         new WorldBackupEvent(world).callEvent();
         return saveAsync(world, true).thenComposeAsync(ignored -> {
             try {
@@ -326,10 +324,12 @@ public class PaperLevelView implements LevelView {
         return candidate;
     }
 
-
     @Override
     public CompletableFuture<World> cloneAsync(World world, Consumer<Level.Builder> builder, boolean full) {
-        AsyncCatcher.catchOp("world cloning");
+        return plugin.supplyGlobal(() -> cloneInternal(world, builder, full));
+    }
+
+    private CompletableFuture<World> cloneInternal(World world, Consumer<Level.Builder> builder, boolean full) {
         var levelBuilder = plugin.levelBuilder(world);
 
         levelBuilder.name(findFreeName(world.getName()));
@@ -362,8 +362,7 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public CompletableFuture<DeletionResult> deleteAsync(World world, boolean schedule) {
-        AsyncCatcher.catchOp("world deletion");
-        return schedule ? CompletableFuture.completedFuture(scheduleDeletion(world)) : deleteNow(world);
+        return plugin.supplyGlobal(() -> schedule ? CompletableFuture.completedFuture(scheduleDeletion(world)) : deleteNow(world));
     }
 
     @Override
@@ -378,8 +377,7 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public CompletableFuture<DeletionResult> regenerateAsync(World world, boolean schedule) {
-        AsyncCatcher.catchOp("world regeneration");
-        return schedule ? CompletableFuture.completedFuture(scheduleRegeneration(world)) : regenerateNow(world);
+        return plugin.supplyGlobal(() -> schedule ? CompletableFuture.completedFuture(scheduleRegeneration(world)) : regenerateNow(world));
     }
 
     @Override
