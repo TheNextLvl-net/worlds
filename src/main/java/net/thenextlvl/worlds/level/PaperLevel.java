@@ -12,6 +12,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.Main;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldLoader;
 import net.minecraft.server.dedicated.DedicatedServerProperties;
 import net.minecraft.server.level.ServerLevel;
@@ -67,6 +68,7 @@ class PaperLevel extends LevelData {
     }
 
     /**
+     * @see MinecraftServer#createLevel(LevelStem, PaperWorldLoader.WorldLoadingInfo, LevelStorageSource.LevelStorageAccess, PrimaryLevelData)
      * @see CraftServer#createWorld(org.bukkit.WorldCreator)
      */
     private CompletableFuture<World> createInternal() {
@@ -114,7 +116,11 @@ class PaperLevel extends LevelData {
         WorldLoader.DataLoadContext context = console.worldLoaderContext;
         RegistryAccess.Frozen registryAccess = context.datapackDimensions();
         Registry<LevelStem> contextLevelStemRegistry = registryAccess.lookupOrThrow(Registries.LEVEL_STEM);
-        Dynamic<?> dataTag = PaperWorldLoader.getLevelData(levelStorageAccess).dataTag();
+        /// Worlds start - fail if dimension could not be read
+        var levelData = PaperWorldLoader.getLevelData(levelStorageAccess);
+        if (levelData.fatalError()) return CompletableFuture.failedFuture(new IOException("Failed to read level data"));
+        /// Worlds end
+        Dynamic<?> dataTag = levelData.dataTag();
 
         if (dataTag != null) {
             LevelDataAndDimensions levelDataAndDimensions = LevelStorageSource.getLevelDataAndDimensions(
