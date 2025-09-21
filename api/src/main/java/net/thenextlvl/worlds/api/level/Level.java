@@ -110,7 +110,9 @@ public interface Level extends Keyed {
      */
     @Contract(pure = true)
     @Deprecated(forRemoval = true, since = "3.3.1")
-    int getSpawnChunkRadius();
+    default int getSpawnChunkRadius() {
+        return 0;
+    }
 
     /**
      * Retrieves the seed value associated with this Level.
@@ -383,7 +385,9 @@ public interface Level extends Keyed {
         @Nullable
         @Contract(pure = true)
         @Deprecated(forRemoval = true, since = "3.3.1")
-        Integer spawnChunkRadius();
+        default Integer spawnChunkRadius() {
+            return 0;
+        }
 
         /**
          * Sets the radius of chunks around the spawn point that should remain loaded.
@@ -396,7 +400,9 @@ public interface Level extends Keyed {
          */
         @Contract(mutates = "this")
         @Deprecated(forRemoval = true, since = "3.3.1")
-        Builder spawnChunkRadius(@Nullable Integer radius);
+        default Builder spawnChunkRadius(@Nullable Integer radius) {
+            return this;
+        }
 
         /**
          * Retrieves the world seed used for generation, if available.
