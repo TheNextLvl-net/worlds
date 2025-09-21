@@ -29,12 +29,13 @@ repositories {
 }
 
 dependencies {
-    // paperweight.foliaDevBundle("1.21.9-pre2-R0.1-SNAPSHOT")
+    // paperweight.foliaDevBundle("1.21.9-pre2-R0.1-SNAPSHOT") // fixme: restore folia support once possible
     paperweight.paperDevBundle("1.21.9-pre2-R0.1-SNAPSHOT")
 
     implementation(project(":api"))
 
     implementation("net.thenextlvl.core:i18n:3.2.2") {
+        // todo: remove – temp solution until adventure is stable
         exclude("net.kyori", "adventure-text-logger-slf4j")
         exclude("net.kyori", "adventure-text-minimessage")
     }
