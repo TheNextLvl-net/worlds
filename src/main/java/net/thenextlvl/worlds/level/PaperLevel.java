@@ -5,15 +5,13 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
 import io.papermc.paper.FeatureHooks;
+import io.papermc.paper.world.PaperWorldLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.NbtException;
-import net.minecraft.nbt.ReportedNbtException;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.Main;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldLoader;
 import net.minecraft.server.dedicated.DedicatedServerProperties;
 import net.minecraft.server.level.ServerLevel;
@@ -22,7 +20,6 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.ai.village.VillageSiege;
 import net.minecraft.world.entity.npc.CatSpawner;
 import net.minecraft.world.entity.npc.WanderingTraderSpawner;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
@@ -36,7 +33,6 @@ import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.storage.LevelDataAndDimensions;
 import net.minecraft.world.level.storage.LevelStorageSource;
-import net.minecraft.world.level.storage.LevelSummary;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraft.world.level.validation.ContentValidationException;
 import net.thenextlvl.worlds.WorldsPlugin;
@@ -47,7 +43,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.generator.CraftWorldInfo;
-import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.generator.WorldInfo;
 import org.jspecify.annotations.NullMarked;
 
@@ -94,6 +89,7 @@ final class PaperLevel extends LevelData {
             return CompletableFuture.failedFuture(e);
         }
 
+        /// Worlds start - find generator and biome provider
         var chunkGenerator = Optional.ofNullable(super.chunkGenerator)
                 .orElseGet(() -> Optional.ofNullable(generator)
                         .map(generator -> generator.generator(name))
@@ -102,6 +98,7 @@ final class PaperLevel extends LevelData {
                 .orElseGet(() -> Optional.ofNullable(generator)
                         .map(generator -> generator.biomeProvider(name))
                         .orElseGet(() -> server.getBiomeProvider(name)));
+        /// Worlds end
 
         var dimensionType = resolveDimensionKey();
 
@@ -113,51 +110,12 @@ final class PaperLevel extends LevelData {
             return CompletableFuture.failedFuture(ex);
         }
 
-        Dynamic<?> dataTag;
-        if (levelStorageAccess.hasWorldData()) {
-            LevelSummary summary;
-            try {
-                dataTag = levelStorageAccess.getDataTag();
-                summary = levelStorageAccess.getSummary(dataTag);
-            } catch (NbtException | ReportedNbtException | IOException e) {
-                LevelStorageSource.LevelDirectory levelDirectory = levelStorageAccess.getLevelDirectory();
-                plugin.getComponentLogger().warn("Failed to load world data from {}, attempting to use fallback", levelDirectory.dataFile(), e);
-
-                try {
-                    dataTag = levelStorageAccess.getDataTagFallback();
-                    summary = levelStorageAccess.getSummary(dataTag);
-                } catch (NbtException | ReportedNbtException | IOException e1) {
-                    plugin.getComponentLogger().error("Failed to load world data from {}", levelDirectory.oldDataFile(), e1);
-                    plugin.getComponentLogger().error(
-                            "Failed to load world data from {} and {}. World files may be corrupted.",
-                            levelDirectory.dataFile(),
-                            levelDirectory.oldDataFile()
-                    );
-                    return CompletableFuture.failedFuture(e1);
-                }
-
-                levelStorageAccess.restoreLevelDataFromOld();
-            }
-
-            if (summary.requiresManualConversion()) {
-                plugin.getComponentLogger().warn("This world must be opened in an older version (like 1.6.4) to be safely converted");
-                return CompletableFuture.failedFuture(new IllegalStateException("World requires manual conversion"));
-            }
-
-            if (!summary.isCompatible()) {
-                plugin.getComponentLogger().warn("This world was created by an incompatible version.");
-                return CompletableFuture.failedFuture(new IllegalStateException("World is incompatible"));
-            }
-        } else {
-            dataTag = null;
-        }
-
-        var generatorSettings = Optional.ofNullable(preset).orElse(Presets.CLASSIC_FLAT).serialize();
-
         PrimaryLevelData primaryLevelData;
-        WorldLoader.DataLoadContext context = console.worldLoader;
+        WorldLoader.DataLoadContext context = console.worldLoaderContext;
         RegistryAccess.Frozen registryAccess = context.datapackDimensions();
         Registry<LevelStem> contextLevelStemRegistry = registryAccess.lookupOrThrow(Registries.LEVEL_STEM);
+        Dynamic<?> dataTag = PaperWorldLoader.getLevelData(levelStorageAccess).dataTag();
+
         if (dataTag != null) {
             LevelDataAndDimensions levelDataAndDimensions = LevelStorageSource.getLevelDataAndDimensions(
                     dataTag, context.dataConfiguration(), contextLevelStemRegistry, context.datapackWorldgen()
@@ -169,6 +127,7 @@ final class PaperLevel extends LevelData {
             WorldOptions worldOptions = new WorldOptions(seed, structures, bonusChest);
             WorldDimensions worldDimensions;
 
+            var generatorSettings = Optional.ofNullable(preset).orElse(Presets.CLASSIC_FLAT).serialize(); /// Worlds - serialize preset
             DedicatedServerProperties.WorldDimensionData properties = new DedicatedServerProperties.WorldDimensionData(generatorSettings, generatorType.presetName().asString());
             levelSettings = new LevelSettings(
                     name,
@@ -217,8 +176,6 @@ final class PaperLevel extends LevelData {
             dimensionKey = ResourceKey.create(Registries.DIMENSION, ResourceLocation.fromNamespaceAndPath(key.namespace(), key.value()));
         }
 
-        primaryLevelData.getGameRules().getRule(GameRules.RULE_SPAWN_CHUNK_RADIUS).set(spawnChunkRadius, null);
-
         ServerLevel serverLevel = new ServerLevel(
                 console,
                 console.executor,
@@ -226,49 +183,57 @@ final class PaperLevel extends LevelData {
                 primaryLevelData,
                 dimensionKey,
                 customStem,
-                MinecraftServer.getServer().progressListenerFactory.create(primaryLevelData.getGameRules().getInt(GameRules.RULE_SPAWN_CHUNK_RADIUS)),
                 primaryLevelData.isDebugWorld(),
                 seed,
-                levelStem == net.thenextlvl.worlds.api.generator.LevelStem.OVERWORLD ? list : ImmutableList.of(),
+                levelStem == net.thenextlvl.worlds.api.generator.LevelStem.OVERWORLD ? list : ImmutableList.of(), ///  Worlds
                 true,
                 console.overworld().getRandomSequences(),
                 toBukkit(levelStem.dimensionType()),
                 chunkGenerator, biomeProvider
         );
 
+        /// Worlds start - ensure world is memoized before adding to server
         if (server.getWorld(name) == null) return CompletableFuture.failedFuture(
                 new IllegalStateException("World with name " + name + " was not properly memoized")
         );
+        /// Worlds end
 
         console.addLevel(serverLevel);
 
+        /// Worlds start - initialize world for folia
         var future = new CompletableFuture<World>();
         if (WorldsPlugin.RUNNING_FOLIA) {
-            serverLevel.randomSpawnSelection = new ChunkPos(serverLevel.getChunkSource().randomState().sampler().findSpawnPosition());
+            // fixme: restore folia support once possible
+            // serverLevel.randomSpawnSelection = new ChunkPos(serverLevel.getChunkSource().randomState().sampler().findSpawnPosition());
 
-            var x = serverLevel.randomSpawnSelection.x;
-            var z = serverLevel.randomSpawnSelection.z;
+            // var x = serverLevel.randomSpawnSelection.x;
+            // var z = serverLevel.randomSpawnSelection.z;
 
-            plugin.getServer().getRegionScheduler().run(plugin, serverLevel.getWorld(), x, z, scheduledTask -> {
-                console.initWorld(serverLevel, primaryLevelData, primaryLevelData, primaryLevelData.worldGenOptions());
-                future.complete(serverLevel.getWorld());
-            });
-        } else {
-            console.initWorld(serverLevel, primaryLevelData, primaryLevelData, primaryLevelData.worldGenOptions());
-            future.complete(serverLevel.getWorld());
-        }
+            // plugin.getServer().getRegionScheduler().run(plugin, serverLevel.getWorld(), x, z, scheduledTask -> {
+            //     console.initWorld(serverLevel, primaryLevelData, primaryLevelData.worldGenOptions());
+            //     future.complete(serverLevel.getWorld());
+            // });
+            /// Worlds end
+        } else console.initWorld(serverLevel, primaryLevelData, primaryLevelData.worldGenOptions());
 
         serverLevel.setSpawnSettings(true);
 
-        console.prepareLevels(serverLevel.getChunkSource().chunkMap.progressListener, serverLevel);
-        if (WorldsPlugin.RUNNING_FOLIA)
-            io.papermc.paper.threadedregions.RegionizedServer.getInstance().addWorld(serverLevel);
-        FeatureHooks.tickEntityManager(serverLevel);
-
+        /// Worlds start - persist world extra data
         persistWorld(serverLevel.getWorld(), levelStem, enabled.toBooleanOrElse(true));
         if (generator != null) persistGenerator(serverLevel.getWorld(), generator);
+        /// Worlds end
 
-        new WorldLoadEvent(serverLevel.getWorld()).callEvent();
+        /// Worlds start - start entity and region ticking for folia
+        // fixme: restore folia support once possible
+        // if (WorldsPlugin.RUNNING_FOLIA)
+        //     io.papermc.paper.threadedregions.RegionizedServer.getInstance().addWorld(serverLevel);
+        FeatureHooks.tickEntityManager(serverLevel);
+        /// Worlds end
+
+        console.prepareLevel(serverLevel);
+
+        /// Worlds - complete future immediately if not folia
+        if (WorldsPlugin.RUNNING_FOLIA) future.complete(serverLevel.getWorld());
         return future;
     }
 
@@ -293,8 +258,9 @@ final class PaperLevel extends LevelData {
     }
 
     private World.Environment toBukkit(DimensionType type) {
-        if (type.equals(DimensionType.THE_END)) return World.Environment.THE_END;
+        if (type.equals(DimensionType.OVERWORLD)) return World.Environment.NORMAL;
         if (type.equals(DimensionType.THE_NETHER)) return World.Environment.NETHER;
-        return World.Environment.NORMAL;
+        if (type.equals(DimensionType.THE_END)) return World.Environment.THE_END;
+        return World.Environment.CUSTOM;
     }
 }
