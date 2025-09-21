@@ -233,7 +233,7 @@ class PaperLevel extends LevelData {
         console.prepareLevel(serverLevel);
 
         /// Worlds - complete future immediately if not folia
-        if (WorldsPlugin.RUNNING_FOLIA) future.complete(serverLevel.getWorld());
+        if (!WorldsPlugin.RUNNING_FOLIA) future.complete(serverLevel.getWorld());
         return future;
     }
 
