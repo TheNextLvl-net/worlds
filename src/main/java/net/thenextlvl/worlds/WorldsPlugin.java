@@ -104,9 +104,8 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     }
 
     private void warnVoidGeneratorPlugin() {
-        var names = Stream.of("VoidWorldGenerator", "VoidGen", "VoidGenerator", "VoidWorld", "VoidGenPlus");
-        if (names.map(getServer().getPluginManager()::getPlugin)
-                .filter(Objects::nonNull).findAny().isEmpty()) return;
+        var names = Stream.of("VoidWorldGenerator", "VoidGen", "VoidGenerator", "VoidWorld", "VoidGenPlus", "DeluxeVoidWorld");
+        if (names.map(getServer().getPluginManager()::getPlugin).filter(Objects::nonNull).findAny().isEmpty()) return;
         getComponentLogger().warn("It appears you are using a plugin to generate void worlds");
         getComponentLogger().warn("This is not required, and incompatible with Vanilla world generation");
         getComponentLogger().warn("Please use the preset 'the-void' instead");
@@ -153,7 +152,7 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
                 .seed(world.getSeed())
                 .name(world.getName());
     }
-    
+
     public <T> CompletableFuture<T> supplyGlobal(Supplier<CompletableFuture<T>> supplier) {
         var future = new CompletableFuture<T>();
         getServer().getGlobalRegionScheduler().execute(this, () -> {
