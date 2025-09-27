@@ -19,7 +19,7 @@ tasks.compileJava {
 }
 
 group = "net.thenextlvl.worlds"
-version = "3.6.1"
+version = "3.7.0"
 
 repositories {
     mavenCentral()
@@ -29,11 +29,16 @@ repositories {
 }
 
 dependencies {
-    paperweight.foliaDevBundle("1.21.8-R0.1-SNAPSHOT")
+    // paperweight.foliaDevBundle("1.21.9-pre2-R0.1-SNAPSHOT") // fixme: restore folia support once possible
+    paperweight.paperDevBundle("1.21.9-pre2-R0.1-SNAPSHOT")
 
     implementation(project(":api"))
 
-    implementation("net.thenextlvl.core:i18n:3.2.2")
+    implementation("net.thenextlvl.core:i18n:3.2.2") {
+        // todo: remove – temp solution until adventure is stable
+        exclude("net.kyori", "adventure-text-logger-slf4j")
+        exclude("net.kyori", "adventure-text-minimessage")
+    }
     implementation("net.thenextlvl:nbt:3.0.1")
     implementation("net.thenextlvl.core:paper:2.3.1")
 

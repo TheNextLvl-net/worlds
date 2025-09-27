@@ -24,7 +24,6 @@ import net.thenextlvl.worlds.view.FoliaLevelView;
 import net.thenextlvl.worlds.view.PaperLevelView;
 import net.thenextlvl.worlds.view.PluginGeneratorView;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -142,7 +141,6 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
                 .seed(world.getSeed())
                 .biomeProvider(world.getBiomeProvider())
                 .chunkGenerator(world.getGenerator())
-                .spawnChunkRadius(world.getGameRuleValue(GameRule.SPAWN_RADIUS))
                 .key(world.key())
                 .levelStem(switch (world.getEnvironment()) {
                     case NORMAL -> LevelStem.OVERWORLD;
