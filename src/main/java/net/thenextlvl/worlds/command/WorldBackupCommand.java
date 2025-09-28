@@ -47,7 +47,7 @@ final class WorldBackupCommand extends BrigadierCommand {
             try {
                 return Files.size(path);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to calculate backup size for " + path, e);
             }
         }).thenAccept(bytes -> {
             var kb = bytes / 1024d;

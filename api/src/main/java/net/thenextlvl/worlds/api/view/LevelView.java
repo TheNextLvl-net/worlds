@@ -261,7 +261,7 @@ public interface LevelView {
             try {
                 return Files.size(path);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to calculate backup size for " + path, e);
             }
         });
     }
