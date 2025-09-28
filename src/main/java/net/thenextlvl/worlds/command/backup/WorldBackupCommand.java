@@ -16,6 +16,7 @@ public final class WorldBackupCommand extends BrigadierCommand {
         var command = new WorldBackupCommand(plugin);
         return command.create()
                 .then(WorldBackupCreateCommand.create(plugin))
-                .then(WorldBackupListCommand.create(plugin));
+                .then(WorldBackupListCommand.create(plugin))
+                .then(WorldBackupRestoreCommand.create(plugin));
     }
 }

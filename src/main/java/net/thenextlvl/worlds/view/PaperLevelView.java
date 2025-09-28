@@ -38,12 +38,11 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -78,6 +77,7 @@ public class PaperLevelView implements LevelView {
 
     public PaperLevelView(WorldsPlugin plugin) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            backupRestorations.values().forEach(Runnable::run);
             deletions.values().forEach(Runnable::run);
             regenerations.values().forEach(Runnable::run);
         }, "Worlds Shutdown Hook"));
@@ -116,7 +116,8 @@ public class PaperLevelView implements LevelView {
         var backupFolder = System.getenv("WORLDS_BACKUP_FOLDER");
         if (backupFolder == null) backupFolder = System.getProperty("worlds.backup.folder");
         if (backupFolder != null) return Path.of(backupFolder);
-        return getWorldContainer().getParent().resolve("backups");
+        var parent = getWorldContainer().getParent();
+        return parent != null ? parent.resolve("backups") : Path.of("backups");
     }
 
     @Override
@@ -126,7 +127,7 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public Path getWorldContainer() {
-        return plugin.getServer().getWorldContainer().toPath().toAbsolutePath();
+        return plugin.getServer().getWorldContainer().toPath();
     }
 
     @Override
@@ -270,12 +271,12 @@ public class PaperLevelView implements LevelView {
     public CompletableFuture<RestoringResult> restoreBackupAsync(World world, Path backupFile, boolean schedule) {
         return plugin.supplyGlobal(() -> {
             if (schedule) return CompletableFuture.completedFuture(scheduleRestoreBackup(world, backupFile));
+            if (isOverworld(world)) return CompletableFuture.completedFuture(
+                    new RestoringResultImpl(null, DeletionResult.REQUIRES_SCHEDULING)
+            );
             if (!new WorldBackupRestoreEvent(world, backupFile).callEvent())
                 return CompletableFuture.completedFuture(new RestoringResultImpl(null, DeletionResult.FAILED));
-            return unloadAsync(world, false).thenCompose(success -> {
-                if (success) return restoreBackupInternal(world, backupFile);
-                return CompletableFuture.failedFuture(new IllegalStateException("Failed to unload world"));
-            });
+            return restoreBackupInternal(world, backupFile);
         });
     }
 
@@ -305,13 +306,12 @@ public class PaperLevelView implements LevelView {
         return CompletableFuture.allOf(players.stream()
                 .map(player -> player.teleportAsync(fallback, TeleportCause.PLUGIN))
                 .toArray(CompletableFuture[]::new)
-        ).thenCompose(ignored -> saveLevelDataAsync(world).thenCompose(ignored1 -> {
+        ).thenCompose(ignored -> {
             var worldPath = world.getWorldFolder().toPath();
             return unloadAsync(world, false).thenCompose(success -> {
                 if (!success) return CompletableFuture.<RestoringResult>completedFuture(
                         new RestoringResultImpl(null, DeletionResult.UNLOAD_FAILED)
                 );
-
                 restore(worldPath, path);
                 backupRestorations.remove(world.key());
                 return plugin.levelBuilder(worldPath).build().createAsync().thenApply(restored -> {
@@ -322,22 +322,23 @@ public class PaperLevelView implements LevelView {
                 plugin.getComponentLogger().warn("Failed to restore backup", throwable);
                 return new RestoringResultImpl(null, DeletionResult.FAILED);
             });
-        }).exceptionally(throwable -> {
-            plugin.getComponentLogger().warn("Failed to save level data before backup restoration", throwable);
-            return new RestoringResultImpl(null, DeletionResult.FAILED);
-        }));
+        });
     }
 
     private void restore(Path worldPath, Path path) {
-        delete(worldPath);
         try (var input = new ZipInputStream(Files.newInputStream(path, StandardOpenOption.READ))) {
-            Files.createDirectories(worldPath);
+            try (var files = Files.list(worldPath)) {
+                files.forEach(this::delete);
+            }
             ZipEntry entry;
             while ((entry = input.getNextEntry()) != null) {
+                var resolved = worldPath.resolve(entry.getName());
                 if (entry.isDirectory()) {
-                    Files.createDirectories(worldPath.resolve(entry.getName()));
+                    Files.createDirectories(resolved);
                 } else {
-                    Files.copy(input, worldPath.resolve(entry.getName()), StandardCopyOption.COPY_ATTRIBUTES);
+                    var parent = resolved.getParent();
+                    if (parent != null) Files.createDirectories(parent);
+                    Files.copy(input, resolved);
                 }
             }
         } catch (IOException e) {
