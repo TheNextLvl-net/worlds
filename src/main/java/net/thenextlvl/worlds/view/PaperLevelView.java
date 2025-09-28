@@ -339,7 +339,7 @@ public class PaperLevelView implements LevelView {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to restore backup from " + path + " to " + worldPath, e);
         }
     }
 
