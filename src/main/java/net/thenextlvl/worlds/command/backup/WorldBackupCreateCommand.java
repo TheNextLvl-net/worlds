@@ -1,4 +1,4 @@
-package net.thenextlvl.worlds.command;
+package net.thenextlvl.worlds.command.backup;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -18,13 +18,13 @@ import java.nio.file.Files;
 import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
-final class WorldBackupCommand extends BrigadierCommand {
-    private WorldBackupCommand(WorldsPlugin plugin) {
-        super(plugin, "backup", "worlds.command.backup");
+final class WorldBackupCreateCommand extends BrigadierCommand {
+    private WorldBackupCreateCommand(WorldsPlugin plugin) {
+        super(plugin, "create", "worlds.command.backup.create");
     }
 
     public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldBackupCommand(plugin);
+        var command = new WorldBackupCreateCommand(plugin);
         return command.create()
                 .then(Commands.literal("*").executes(command::backupAll))
                 .then(worldArgument(plugin).executes(command::backup))

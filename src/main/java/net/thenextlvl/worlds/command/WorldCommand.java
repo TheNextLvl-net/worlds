@@ -10,6 +10,7 @@ import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.command.argument.GeneratorArgument;
 import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.argument.WorldArgument;
+import net.thenextlvl.worlds.command.backup.WorldBackupCommand;
 import net.thenextlvl.worlds.command.brigadier.BrigadierCommand;
 import net.thenextlvl.worlds.command.link.WorldLinkCommand;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
