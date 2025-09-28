@@ -100,6 +100,13 @@ public class WorldActionScheduledEvent extends WorldEvent implements Cancellable
          *
          * @see WorldRegenerateEvent
          */
-        REGENERATE
+        REGENERATE,
+        /**
+         * This action is used to schedule the restoration of a {@link World} backup.
+         *
+         * @see WorldBackupRestoreEvent
+         * @since 3.7.0
+         */
+        RESTORE_BACKUP
     }
 }
