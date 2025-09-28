@@ -490,6 +490,7 @@ public interface LevelView {
          * {@link DeletionResult#SUCCESS}
          */
         @Nullable
+        @Contract(pure = true)
         World world();
 
         /**
@@ -497,6 +498,7 @@ public interface LevelView {
          *
          * @return the result of the restoration process
          */
+        @Contract(pure = true)
         DeletionResult result();
     }
 
