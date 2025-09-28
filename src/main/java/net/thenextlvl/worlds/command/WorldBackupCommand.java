@@ -12,6 +12,9 @@ import net.thenextlvl.worlds.command.brigadier.BrigadierCommand;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
+import java.io.IOException;
+import java.nio.file.Files;
+
 import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
@@ -40,7 +43,13 @@ final class WorldBackupCommand extends BrigadierCommand {
         var sender = context.getSource().getSender();
         var placeholder = Placeholder.parsed("world", world.getName());
         plugin.bundle().sendMessage(sender, "world.backup", placeholder);
-        plugin.levelView().backupAsync(world).thenAccept(bytes -> {
+        plugin.levelView().createBackupAsync(world).thenApply(path -> {
+            try {
+                return Files.size(path);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).thenAccept(bytes -> {
             var kb = bytes / 1024d;
             var mb = kb / 1024d;
             var gb = mb / 1024d;

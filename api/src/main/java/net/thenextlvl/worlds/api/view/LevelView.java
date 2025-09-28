@@ -9,13 +9,16 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * Interface representing a view for managing levels in a server environment.
@@ -34,6 +37,16 @@ public interface LevelView {
      */
     @Contract(pure = true)
     Path getBackupFolder();
+
+    /**
+     * Retrieves the path to the backup folder for the specified world.
+     *
+     * @param world the world for which to retrieve the backup folder
+     * @return the {@link Path} representing the backup folder for the specified world
+     * @since 3.7.0
+     */
+    @Contract(pure = true)
+    Path getBackupFolder(World world);
 
     /**
      * Retrieves the path to the world container directory.
@@ -239,9 +252,75 @@ public interface LevelView {
      * @param world the world to back up
      * @return A {@code CompletableFuture} completing with the size of the created backup in bytes
      * @since 3.2.0
+     * @deprecated use {@link #createBackupAsync(World)}
      */
     @Contract(mutates = "io,param1")
-    CompletableFuture<Long> backupAsync(World world);
+    @Deprecated(forRemoval = true, since = "3.7.0")
+    default CompletableFuture<Long> backupAsync(World world) {
+        return createBackupAsync(world).thenApply(path -> {
+            try {
+                return Files.size(path);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    /**
+     * Creates a backup for the given world.
+     * <p>
+     * Completes with an {@link IOException} if an I/O error occurs while creating the backup
+     *
+     * @param world the world to back up
+     * @return A {@code CompletableFuture} completing with the path to the created backup
+     * @since 3.7.0
+     */
+    @Contract(mutates = "io,param1")
+    CompletableFuture<Path> createBackupAsync(World world);
+
+    /**
+     * Restores a backup for the given world from the specified backup file.
+     * <p>
+     * Completes with an {@link IOException} if an I/O error occurs while restoring the backup
+     *
+     * @param world      the world to restore the backup for
+     * @param backupFile the path to the backup file
+     * @return A {@code CompletableFuture} completing with the restored world
+     * @since 3.7.0
+     */
+    @Contract(mutates = "io,param1")
+    CompletableFuture<RestoringResult> restoreBackupAsync(World world, Path backupFile, boolean schedule);
+
+    /**
+     * Cancels the backup restoration process for the specified world, if scheduled.
+     *
+     * @param world the world for which the scheduled backup restoration should be canceled
+     * @return true if the scheduled backup restoration was successfully canceled, false if no restoration was scheduled
+     * @since 3.7.0
+     */
+    @Contract(mutates = "this")
+    boolean cancelScheduledBackupRestoration(World world);
+
+    /**
+     * Checks whether a backup restoration process is scheduled for the specified world.
+     *
+     * @param world the world to check for a scheduled backup restoration
+     * @return true if a backup restoration process is scheduled for the world, otherwise false
+     * @since 3.7.0
+     */
+    @Contract(pure = true)
+    boolean isBackupRestorationScheduled(World world);
+
+    /**
+     * Lazily lists the available backups for the specified world.
+     *
+     * @param world the world for which to list the backups
+     * @return A {@code Stream} of {@code Path} objects representing the backup files
+     * @apiNote The resulting stream must be closed by the caller to release system resources
+     * @since 3.7.0
+     */
+    @Contract(pure = true)
+    Stream<Path> listBackups(World world);
 
     /**
      * Clones the specified world with the possibility to modify its properties through a builder.
@@ -397,6 +476,29 @@ public interface LevelView {
      */
     @Contract(pure = true)
     boolean isRegenerationScheduled(World world);
+
+    /**
+     * Represents the outcome of a deletion process that results in the creation of a new world.
+     *
+     * @since 3.7.0
+     */
+    interface RestoringResult {
+        /**
+         * Retrieves the restored world, if available.
+         *
+         * @return the restored world, or {@code null} if the restoration did not complete with
+         * {@link DeletionResult#SUCCESS}
+         */
+        @Nullable
+        World world();
+
+        /**
+         * Retrieves the result of the restoration process.
+         *
+         * @return the result of the restoration process
+         */
+        DeletionResult result();
+    }
 
     /**
      * Represents the possible outcomes of a world deletion process.
