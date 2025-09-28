@@ -64,7 +64,8 @@ import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
 
 @NullMarked
 public class PaperLevelView implements LevelView {
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")
+            .withZone(ZoneId.systemDefault());
     private static final NamespacedKey ENABLED_KEY = new NamespacedKey("worlds", "enabled");
 
     private static final Set<String> SKIP_DIRECTORIES = Set.of("advancements", "datapacks", "playerdata", "stats");
