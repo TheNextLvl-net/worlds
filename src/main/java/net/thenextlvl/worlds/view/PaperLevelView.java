@@ -43,6 +43,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -124,7 +125,7 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public Path getWorldContainer() {
-        return plugin.getServer().getWorldContainer().toPath();
+        return plugin.getServer().getWorldContainer().toPath().toAbsolutePath();
     }
 
     @Override
