@@ -332,8 +332,15 @@ public class PaperLevelView implements LevelView {
                 files.forEach(this::delete);
             }
             ZipEntry entry;
+            var root = worldPath.toAbsolutePath().normalize();
             while ((entry = input.getNextEntry()) != null) {
-                var resolved = worldPath.resolve(entry.getName());
+                Path resolved;
+                try {
+                    resolved = resolveZipEntry(root, entry);
+                } catch (IOException e) {
+                    plugin.getComponentLogger().warn("Skipping suspicious zip entry: {}", entry.getName(), e);
+                    continue;
+                }
                 if (entry.isDirectory()) {
                     Files.createDirectories(resolved);
                 } else {
@@ -345,6 +352,14 @@ public class PaperLevelView implements LevelView {
         } catch (IOException e) {
             throw new RuntimeException("Failed to restore backup from " + path + " to " + worldPath, e);
         }
+    }
+
+    private static Path resolveZipEntry(Path path, ZipEntry entry) throws IOException {
+        var target = path.resolve(entry.getName()).normalize();
+        if (!target.startsWith(path)) {
+            throw new IOException("Zip entry outside target dir: " + entry.getName());
+        }
+        return target;
     }
 
     @Override
@@ -377,7 +392,7 @@ public class PaperLevelView implements LevelView {
                     if (!file.endsWith("session.lock")) {
                         var relative = world.getWorldFolder().toPath().relativize(file).toString().replace('\\', '/');
                         output.putNextEntry(new ZipEntry(relative));
-                        output.write(Files.readAllBytes(file));
+                        Files.copy(file, output);
                         output.closeEntry();
                     }
                     return FileVisitResult.CONTINUE;
