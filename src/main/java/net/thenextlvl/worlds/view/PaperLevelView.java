@@ -289,7 +289,7 @@ public class PaperLevelView implements LevelView {
 
     private RestoringResult scheduleRestoreBackup(World world, Path backupFile) {
         var deletionResult = scheduleAction(world, ActionType.RESTORE_BACKUP, backupRestorations, path -> {
-            restore(world.getWorldFolder().toPath(), backupFile);
+            restore(path, backupFile);
         });
         return new RestoringResultImpl(null, deletionResult);
     }
