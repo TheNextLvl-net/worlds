@@ -34,6 +34,7 @@ import org.jspecify.annotations.Nullable;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -254,12 +255,12 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public CompletableFuture<Path> createBackupAsync(World world) {
+    public CompletableFuture<Path> createBackupAsync(World world, @Nullable String name) {
         return plugin.supplyGlobal(() -> {
             new WorldBackupEvent(world).callEvent();
             return saveAsync(world, true).thenComposeAsync(ignored -> {
                 try {
-                    return CompletableFuture.completedFuture(backupInternal(world));
+                    return CompletableFuture.completedFuture(backupInternal(world, name));
                 } catch (IOException e) {
                     return CompletableFuture.failedFuture(e);
                 }
@@ -361,11 +362,14 @@ public class PaperLevelView implements LevelView {
     /**
      * @see LevelStorageSource.LevelStorageAccess#makeWorldBackup()
      */
-    private Path backupInternal(World world) throws IOException {
+    private Path backupInternal(World world, @Nullable String name) throws IOException {
         var backupPath = getBackupFolder(world);
         Files.createDirectories(backupPath);
-        var path = backupPath.resolve(FileUtil.findAvailableName(backupPath, FORMATTER.format(Instant.now()), ".zip"));
-        try (var output = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(
+        var availableName = name != null ? name + ".zip" : FileUtil.findAvailableName(backupPath, FORMATTER.format(Instant.now()), ".zip");
+        var path = backupPath.resolve(availableName);
+        if (name != null && Files.isRegularFile(path)) {
+            throw new FileAlreadyExistsException(path.toString(), null, "A Backup named " + name + " already exists for " + world.key());
+        } else try (var output = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(
                 path, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE
         )))) {
             Files.walkFileTree(world.getWorldFolder().toPath(), new SimpleFileVisitor<>() {

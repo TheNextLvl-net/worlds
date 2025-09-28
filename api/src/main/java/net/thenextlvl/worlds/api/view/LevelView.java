@@ -12,6 +12,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -267,7 +268,7 @@ public interface LevelView {
     }
 
     /**
-     * Creates a backup for the given world.
+     * Creates a backup for the given world with a default name.
      * <p>
      * Completes with an {@link IOException} if an I/O error occurs while creating the backup
      *
@@ -276,7 +277,23 @@ public interface LevelView {
      * @since 3.7.0
      */
     @Contract(mutates = "io,param1")
-    CompletableFuture<Path> createBackupAsync(World world);
+    default CompletableFuture<Path> createBackupAsync(World world) {
+        return createBackupAsync(world, null);
+    }
+
+    /**
+     * Creates a backup for the given world with a specified name.
+     * <p>
+     * Completes with an {@link IOException} if an I/O error occurs while creating the backup
+     * Completes with a {@link FileAlreadyExistsException} if a backup with the specified name already exists
+     *
+     * @param world the world to back up
+     * @param name  the name for the backup file, or {@code null} to generate a default name
+     * @return A {@code CompletableFuture} completing with the path to the created backup
+     * @since 3.7.0
+     */
+    @Contract(mutates = "io,param1")
+    CompletableFuture<Path> createBackupAsync(World world, @Nullable String name);
 
     /**
      * Restores a backup for the given world from the specified backup file.
