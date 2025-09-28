@@ -74,7 +74,8 @@ final class WorldBackupListCommand extends SimpleCommand {
                     Formatter.number("time", years >= 1 ? years : months >= 1 ? months : weeks >= 1 ? weeks : days >= 1 ? days : hours >= 1 ? hours : minutes >= 1 ? minutes : seconds),
                     Formatter.choice("timeunit", years >= 1 ? 0 : months >= 1 ? 1 : weeks >= 1 ? 2 : days >= 1 ? 3 : hours >= 1 ? 4 : minutes >= 1 ? 5 : 6));
         }).toList();
-        plugin.bundle().sendMessage(context.getSource().getSender(), "world.backup.list",
+        var message = backups.isEmpty() ? "world.backup.list.empty" : "world.backup.list";
+        plugin.bundle().sendMessage(context.getSource().getSender(), message,
                 Placeholder.parsed("world", world.getName()),
                 Formatter.number("amount", backups.size()),
                 Formatter.booleanChoice("singular", backups.size() == 1),
