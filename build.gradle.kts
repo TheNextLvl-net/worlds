@@ -40,7 +40,7 @@ dependencies {
     implementation("org.bstats:bstats-bukkit:3.1.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation(platform("org.junit:junit-bom:6.0.0-SNAPSHOT"))
+    testImplementation(platform("org.junit:junit-bom:6.0.0"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
