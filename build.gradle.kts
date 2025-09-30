@@ -7,7 +7,7 @@ plugins {
     id("com.modrinth.minotaur") version "2.+"
     id("de.eldoria.plugin-yml.paper") version "0.8.0"
     id("io.papermc.hangar-publish-plugin") version "0.1.3"
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.18"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
 }
 
 java {
