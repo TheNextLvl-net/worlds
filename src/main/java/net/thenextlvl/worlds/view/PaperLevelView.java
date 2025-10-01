@@ -357,7 +357,20 @@ public class PaperLevelView implements LevelView {
                     Files.copy(input, resolved);
                 }
             }
-            deleteThrowing(worldPath);
+            Files.walkFileTree(worldPath, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, @Nullable IOException exc) throws IOException {
+                    if (exc != null) throw exc;
+                    Files.delete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
             Files.move(tempPath, worldPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             try {
@@ -647,17 +660,13 @@ public class PaperLevelView implements LevelView {
 
     private void delete(Path path) {
         try {
-            deleteThrowing(path);
+            if (!Files.isDirectory(path)) Files.deleteIfExists(path);
+            else try (var files = Files.list(path)) {
+                files.forEach(this::delete);
+                Files.deleteIfExists(path);
+            }
         } catch (IOException e) {
             plugin.getComponentLogger().warn("Failed to delete {}", path, e);
-        }
-    }
-
-    private void deleteThrowing(Path path) throws IOException {
-        if (!Files.isDirectory(path)) Files.deleteIfExists(path);
-        else try (var files = Files.list(path)) {
-            files.forEach(this::delete);
-            Files.deleteIfExists(path);
         }
     }
 
