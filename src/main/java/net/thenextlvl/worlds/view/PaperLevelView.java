@@ -39,6 +39,7 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
@@ -47,6 +48,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
@@ -270,6 +272,8 @@ public class PaperLevelView implements LevelView {
 
     @Override
     public CompletableFuture<RestoringResult> restoreBackupAsync(World world, Path backupFile, boolean schedule) {
+        if (!Files.isRegularFile(backupFile))
+            return CompletableFuture.completedFuture(new RestoringResultImpl(null, DeletionResult.FAILED));
         return plugin.supplyGlobal(() -> {
             if (schedule) return CompletableFuture.completedFuture(scheduleRestoreBackup(world, backupFile));
             if (isOverworld(world)) return CompletableFuture.completedFuture(
@@ -309,7 +313,7 @@ public class PaperLevelView implements LevelView {
                 .toArray(CompletableFuture[]::new)
         ).thenCompose(ignored -> {
             var worldPath = world.getWorldFolder().toPath();
-            return unloadAsync(world, false).thenCompose(success -> {
+            return unloadAsync(world, true).thenCompose(success -> {
                 if (!success) return CompletableFuture.<RestoringResult>completedFuture(
                         new RestoringResultImpl(null, DeletionResult.UNLOAD_FAILED)
                 );
@@ -319,20 +323,24 @@ public class PaperLevelView implements LevelView {
                     players.forEach(player -> player.teleportAsync(restored.getSpawnLocation(), TeleportCause.PLUGIN));
                     return new RestoringResultImpl(restored, DeletionResult.SUCCESS);
                 });
-            }).exceptionally(throwable -> {
+            }).exceptionallyCompose(throwable -> {
                 plugin.getComponentLogger().warn("Failed to restore backup", throwable);
-                return new RestoringResultImpl(null, DeletionResult.FAILED);
+                return plugin.levelBuilder(world).build().createAsync().thenApply(restored -> {
+                    players.forEach(player -> player.teleportAsync(restored.getSpawnLocation(), TeleportCause.PLUGIN));
+                    return new RestoringResultImpl(null, DeletionResult.FAILED);
+                });
             });
         });
     }
 
     private void restore(Path worldPath, Path path) {
+        Path tempPath;
+        do {
+            tempPath = worldPath.resolveSibling("." + UUID.randomUUID());
+        } while (Files.isDirectory(tempPath));
         try (var input = new ZipInputStream(Files.newInputStream(path, StandardOpenOption.READ))) {
-            try (var files = Files.list(worldPath)) {
-                files.forEach(this::delete);
-            }
             ZipEntry entry;
-            var root = worldPath.toAbsolutePath().normalize();
+            var root = tempPath.toAbsolutePath().normalize();
             while ((entry = input.getNextEntry()) != null) {
                 Path resolved;
                 try {
@@ -349,7 +357,14 @@ public class PaperLevelView implements LevelView {
                     Files.copy(input, resolved);
                 }
             }
+            deleteThrowing(worldPath);
+            Files.move(tempPath, worldPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
+            try {
+                Files.deleteIfExists(tempPath);
+            } catch (IOException ex) {
+                plugin.getComponentLogger().warn("Failed to delete temporary files for backup restoration", ex);
+            }
             throw new RuntimeException("Failed to restore backup from " + path + " to " + worldPath, e);
         }
     }
@@ -632,13 +647,17 @@ public class PaperLevelView implements LevelView {
 
     private void delete(Path path) {
         try {
-            if (!Files.isDirectory(path)) Files.deleteIfExists(path);
-            else try (var files = Files.list(path)) {
-                files.forEach(this::delete);
-                Files.deleteIfExists(path);
-            }
+            deleteThrowing(path);
         } catch (IOException e) {
             plugin.getComponentLogger().warn("Failed to delete {}", path, e);
+        }
+    }
+
+    private void deleteThrowing(Path path) throws IOException {
+        if (!Files.isDirectory(path)) Files.deleteIfExists(path);
+        else try (var files = Files.list(path)) {
+            files.forEach(this::delete);
+            Files.deleteIfExists(path);
         }
     }
 
