@@ -14,6 +14,9 @@ import net.thenextlvl.worlds.command.suggestion.BackupSuggestionProvider;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Set;
 
 import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
@@ -30,12 +33,17 @@ final class WorldBackupRestoreCommand extends SimpleCommand {
     }
 
     private RequiredArgumentBuilder<CommandSourceStack, World> restore() {
-        return worldArgument(plugin).then(Commands.argument("backup", StringArgumentType.string())
-                .suggests(new BackupSuggestionProvider(plugin))
-                .then(Commands.argument("flags", new CommandFlagsArgument(
+        return worldArgument(plugin)
+                .then(x(Commands.argument("backup", StringArgumentType.string())
+                        .suggests(new BackupSuggestionProvider(plugin))))
+                .then(x(Commands.literal("latest")));
+    }
+
+    private ArgumentBuilder<CommandSourceStack, ?> x(ArgumentBuilder<CommandSourceStack, ?> command) {
+        return command.then(Commands.argument("flags", new CommandFlagsArgument(
                         Set.of("--confirm", "--schedule")
                 )).executes(this))
-                .executes(this::confirmationNeeded));
+                .executes(this::confirmationNeeded);
     }
 
     private int confirmationNeeded(CommandContext<CommandSourceStack> context) {
@@ -51,11 +59,32 @@ final class WorldBackupRestoreCommand extends SimpleCommand {
         var flags = context.getArgument("flags", CommandFlagsArgument.Flags.class);
         if (!flags.contains("--confirm")) return confirmationNeeded(context);
         var world = context.getArgument("world", World.class);
-        var backup = context.getArgument("backup", String.class);
+        var backup = tryGetArgument(context, "backup", String.class);
         var schedule = flags.contains("--schedule");
         if (!schedule) plugin.bundle().sendMessage(context.getSource().getSender(), "world.backup.restore",
                 Placeholder.parsed("world", world.getName()));
-        var path = plugin.levelView().getBackupFolder(world).resolve(backup + ".zip");
+        
+        var path = backup.map(name -> plugin.levelView().getBackupFolder(world).resolve(name + ".zip")).or(() -> {
+            return plugin.levelView().listBackups(world).min((first, second) -> {
+                try {
+                    var time1 = Files.readAttributes(first, BasicFileAttributes.class).creationTime();
+                    var time2 = Files.readAttributes(second, BasicFileAttributes.class).creationTime();
+                    return time2.compareTo(time1);
+                } catch (IOException e) {
+                    return 0;
+                }
+            });
+        }).orElse(null);
+
+        if (path == null) {
+            plugin.bundle().sendMessage(context.getSource().getSender(), "world.backup.list.empty",
+                    Placeholder.parsed("world", world.getName()));
+            return 0;
+        }
+
+        var string = path.getFileName().toString();
+        var backupName = backup.orElse(string.substring(0, string.lastIndexOf('.')));
+        
         plugin.levelView().restoreBackupAsync(world, path, schedule).thenAccept(result -> {
             var message = switch (result.result()) {
                 case SUCCESS -> "world.backup.restore.success";
@@ -66,12 +95,12 @@ final class WorldBackupRestoreCommand extends SimpleCommand {
             };
             plugin.bundle().sendMessage(context.getSource().getSender(), message,
                     Placeholder.parsed("world", result.world() != null ? result.world().getName() : world.getName()),
-                    Placeholder.parsed("identifier", backup));
+                    Placeholder.parsed("identifier", backupName));
         }).exceptionally(throwable -> {
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.backup.restore.failed",
                     Placeholder.parsed("world", world.getName()),
-                    Placeholder.parsed("identifier", backup));
-            plugin.getComponentLogger().warn("Failed to restore backup of world {} from {}", world.getName(), backup, throwable);
+                    Placeholder.parsed("identifier", backupName));
+            plugin.getComponentLogger().warn("Failed to restore backup of world {} from {}", world.getName(), backupName, throwable);
             return null;
         });
         return SINGLE_SUCCESS;
