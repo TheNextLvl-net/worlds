@@ -41,6 +41,13 @@ import java.util.function.Consumer;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.END_PORTAL;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.NETHER_PORTAL;
 
+/**
+ * Handles portal teleportation for custom world linking for Folia.
+ * Implementation based on vanilla portal mechanics described in the Minecraft Wiki:
+ * <ul>
+ *   <a href="https://minecraft.wiki/w/Nether_portal">https://minecraft.wiki/w/Nether_portal</a></li>
+ * </ul>
+ */
 @NullMarked
 public final class PortalListener implements Listener {
     private final PortalCooldown cooldown = new PortalCooldown();
@@ -175,6 +182,7 @@ public final class PortalListener implements Listener {
      * Gets the required portal delay ticks from GameRules.
      * Reads PLAYERS_NETHER_PORTAL_CREATIVE_DELAY for creative mode,
      * PLAYERS_NETHER_PORTAL_DEFAULT_DELAY for other modes.
+     * @see <a href="https://minecraft.wiki/w/Nether_portal#Behavior">Portal delay game rules</a>
      */
     private int getRequiredPortalTicks(Player player) {
         var world = player.getWorld();
@@ -259,6 +267,7 @@ public final class PortalListener implements Listener {
     /**
      * Calculates the target coordinates in the destination dimension.
      * Uses vanilla coordinate scaling (1:8 ratio between Overworld and Nether).
+     * @see <a href="https://minecraft.wiki/w/Nether_portal#Portal_linkage_between_Overworld_and_Nether">Portal linkage</a>
      */
     private Location calculateNetherPortalLocation(Location from, World targetWorld) {
         double scale = 1.0;
@@ -291,6 +300,7 @@ public final class PortalListener implements Listener {
      * Searches for an existing portal within the search radius.
      * Uses vanilla search radius (257×257 for Overworld, 33×33 for Nether).
      * Calculates Euclidean distance and prioritizes lower Y coordinates on ties.
+     * @see <a href="https://minecraft.wiki/w/Nether_portal#Portal_search">Portal search</a>
      */
     private Optional<Location> findExistingPortal(Location target, World world) {
         int searchRadius = world.getEnvironment() == World.Environment.NETHER
@@ -351,6 +361,7 @@ public final class PortalListener implements Listener {
      * @see net.minecraft.world.level.portal.PortalForcer#findClosestPortalPosition
      * @see net.minecraft.world.level.portal.PortalForcer#createPortal
      * @see net.minecraft.world.level.portal.PortalShape#createPortalBlocks
+     * @see <a href="https://minecraft.wiki/w/Nether_portal#Portal_creation">Portal creation</a>
      */
     private Location createNetherPortal(Location target, World world, Entity entity) {
         ServerLevel level = ((CraftWorld) world).getHandle();
