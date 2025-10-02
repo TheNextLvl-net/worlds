@@ -56,6 +56,10 @@ public final class PortalListener implements Listener {
         this.plugin = plugin;
     }
 
+    /**
+     * Tracks player's portal status for custom delay handling.
+     * Custom implementation to support GameRule-based portal delays and Folia compatibility.
+     */
     private static class PlayerPortalStatus {
         int ticksInPortal = 0;
         Location portalLocation;
@@ -67,6 +71,10 @@ public final class PortalListener implements Listener {
         }
     }
 
+    /**
+     * Handles entity entering a nether portal.
+     * Implements vanilla portal behavior with Folia region scheduler compatibility.
+     */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPortalEnter(EntityPortalEnterEvent event) {
         if (!WorldsPlugin.RUNNING_FOLIA) return;
@@ -98,6 +106,11 @@ public final class PortalListener implements Listener {
         });
     }
 
+    /**
+     * Handles player portal entry with GameRule-based delays.
+     * Custom implementation supporting PLAYERS_NETHER_PORTAL_DEFAULT_DELAY and
+     * PLAYERS_NETHER_PORTAL_CREATIVE_DELAY game rules.
+     */
     private void handlePlayerPortalEnter(Player player, Location portalLocation) {
         var playerId = player.getUniqueId();
         var status = playerPortalStatus.get(playerId);
@@ -119,11 +132,19 @@ public final class PortalListener implements Listener {
         }
     }
 
+    /**
+     * Checks if two locations belong to the same portal structure.
+     * Custom implementation using distance-based detection.
+     */
     private boolean isSamePortal(Location loc1, Location loc2) {
         if (!loc1.getWorld().equals(loc2.getWorld())) return false;
         return loc1.distance(loc2) < 5.0;
     }
 
+    /**
+     * Timer implementation for portal delay based on GameRules.
+     * Replaces vanilla portal wait time to support custom game rules.
+     */
     private void startPortalTimer(Player player, PlayerPortalStatus status) {
         player.getScheduler().runDelayed(plugin, task -> {
             var currentBlock = player.getLocation().getBlock();
@@ -150,6 +171,11 @@ public final class PortalListener implements Listener {
         }, null, 1L);
     }
 
+    /**
+     * Gets the required portal delay ticks from GameRules.
+     * Reads PLAYERS_NETHER_PORTAL_CREATIVE_DELAY for creative mode,
+     * PLAYERS_NETHER_PORTAL_DEFAULT_DELAY for other modes.
+     */
     private int getRequiredPortalTicks(Player player) {
         var world = player.getWorld();
 
@@ -160,6 +186,9 @@ public final class PortalListener implements Listener {
         }
     }
 
+    /**
+     * Performs the actual player teleportation through the portal.
+     */
     private void performPlayerTeleport(Player player) {
         var readyEvent = new EntityPortalReadyEvent(player, null, PortalType.NETHER);
         onEntityPortal(readyEvent);
@@ -197,6 +226,10 @@ public final class PortalListener implements Listener {
         });
     }
 
+    /**
+     * Detects when player leaves the portal to reset status.
+     * Custom implementation for Folia-compatible portal exit detection.
+     */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerMove(PlayerMoveEvent event) {
         if (!WorldsPlugin.RUNNING_FOLIA) return;
@@ -213,6 +246,9 @@ public final class PortalListener implements Listener {
         }
     }
 
+    /**
+     * Cleanup portal status on player disconnect.
+     */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
         if (!WorldsPlugin.RUNNING_FOLIA) return;
@@ -220,6 +256,10 @@ public final class PortalListener implements Listener {
         playerPortalStatus.remove(event.getPlayer().getUniqueId());
     }
 
+    /**
+     * Calculates the target coordinates in the destination dimension.
+     * Uses vanilla coordinate scaling (1:8 ratio between Overworld and Nether).
+     */
     private Location calculateNetherPortalLocation(Location from, World targetWorld) {
         double scale = 1.0;
 
@@ -239,11 +279,19 @@ public final class PortalListener implements Listener {
         return new Location(targetWorld, x, y, z, from.getYaw(), from.getPitch());
     }
 
+    /**
+     * Finds an existing portal or creates a new one at the target location.
+     */
     private Location findOrCreatePortal(Location target, World world, Entity entity) {
         var existingPortal = findExistingPortal(target, world);
         return existingPortal.orElseGet(() -> createNetherPortal(target, world, entity));
     }
 
+    /**
+     * Searches for an existing portal within the search radius.
+     * Uses vanilla search radius (257×257 for Overworld, 33×33 for Nether).
+     * Calculates Euclidean distance and prioritizes lower Y coordinates on ties.
+     */
     private Optional<Location> findExistingPortal(Location target, World world) {
         int searchRadius = world.getEnvironment() == World.Environment.NETHER
                 ? SEARCH_RADIUS_NETHER
@@ -282,6 +330,10 @@ public final class PortalListener implements Listener {
         return Optional.ofNullable(closestPortal);
     }
 
+    /**
+     * Finds the center position of a portal for teleportation.
+     * Locates the bottom of the portal and returns the center coordinates.
+     */
     private Location findPortalCenter(Block portalBlock) {
         var bottom = portalBlock;
         while (bottom.getRelative(BlockFace.DOWN).getType() == Material.NETHER_PORTAL) {
@@ -293,6 +345,13 @@ public final class PortalListener implements Listener {
         return bottom.getLocation().add(0.5, 0, 0.5);
     }
 
+    /**
+     * Creates a new nether portal at the target location.
+     * Use vanilla PortalForcer and PortalShape APIs for portal generation.
+     * @see net.minecraft.world.level.portal.PortalForcer#findClosestPortalPosition
+     * @see net.minecraft.world.level.portal.PortalForcer#createPortal
+     * @see net.minecraft.world.level.portal.PortalShape#createPortalBlocks
+     */
     private Location createNetherPortal(Location target, World world, Entity entity) {
         ServerLevel level = ((CraftWorld) world).getHandle();
 
