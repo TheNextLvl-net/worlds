@@ -155,7 +155,13 @@ public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     public <T> CompletableFuture<T> supplyGlobal(Supplier<CompletableFuture<T>> supplier) {
         var future = new CompletableFuture<T>();
-        getServer().getGlobalRegionScheduler().execute(this, () -> {
+        if (getServer().isGlobalTickThread()) {
+            try {
+                future.complete(supplier.get().join());
+            } catch (Exception e) {
+                future.completeExceptionally(e);
+            }
+        } else getServer().getGlobalRegionScheduler().execute(this, () -> {
             supplier.get().thenAccept(future::complete).exceptionally(e -> {
                 future.completeExceptionally(e);
                 return null;
