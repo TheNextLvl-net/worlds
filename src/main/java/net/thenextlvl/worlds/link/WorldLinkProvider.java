@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 import static org.bukkit.persistence.PersistentDataType.STRING;
 
 @NullMarked
-public class WorldLinkProvider implements LinkProvider {
+public final class WorldLinkProvider implements LinkProvider {
     private static final NamespacedKey OLD_LINK_NETHER = new NamespacedKey("relative", "nether");
     private static final NamespacedKey OLD_LINK_END = new NamespacedKey("relative", "the_end");
 

@@ -14,7 +14,7 @@ import org.bukkit.event.world.WorldUnloadEvent;
 
 import java.nio.file.Path;
 
-public class WorldListener implements Listener {
+public final class WorldListener implements Listener {
     private final WorldsPlugin plugin;
 
     public WorldListener(WorldsPlugin plugin) {

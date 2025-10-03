@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
-public class TooltipSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
+public abstract class TooltipSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
     private final Map<String, String> tooltips;
     protected final WorldsPlugin plugin;
 

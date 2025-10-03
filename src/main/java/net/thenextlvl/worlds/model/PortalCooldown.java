@@ -9,7 +9,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.WeakHashMap;
 
 @NullMarked
-public class PortalCooldown extends WeakHashMap<Entity, @Nullable ScheduledTask> {
+public final class PortalCooldown extends WeakHashMap<Entity, @Nullable ScheduledTask> {
     public boolean isActive(Entity entity) {
         return containsKey(entity);
     }

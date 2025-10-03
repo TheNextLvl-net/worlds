@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
 @NullMarked
-public class PluginGeneratorView implements GeneratorView {
+public final class PluginGeneratorView implements GeneratorView {
     @Override
     public boolean hasGenerator(Plugin plugin) {
         return hasChunkGenerator(plugin.getClass()) || hasBiomeProvider(plugin.getClass());
