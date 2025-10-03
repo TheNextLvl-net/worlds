@@ -61,7 +61,7 @@ import java.util.concurrent.CompletableFuture;
 import static org.bukkit.persistence.PersistentDataType.STRING;
 
 @NullMarked
-class PaperLevel extends LevelData {
+final class PaperLevel extends LevelData {
     public PaperLevel(WorldsPlugin plugin, Builder builder) {
         super(plugin, builder);
     }

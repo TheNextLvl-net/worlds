@@ -40,7 +40,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @NullMarked
-public class WorldsPlugin extends JavaPlugin implements WorldsProvider {
+public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     public static final String ISSUES = "https://github.com/TheNextLvl-net/worlds/issues/new?template=bug_report.yml";
     public static final boolean RUNNING_FOLIA = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
 

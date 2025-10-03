@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.END_PORTAL;
 
 @NullMarked
-public class PortalListener implements Listener {
+public final class PortalListener implements Listener {
     private final PortalCooldown cooldown = new PortalCooldown();
     private final WorldsPlugin plugin;
 

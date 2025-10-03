@@ -11,7 +11,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.Optional;
 
 @NullMarked
-public class WorldLinkTree implements LinkTree {
+public final class WorldLinkTree implements LinkTree {
     public static final NamespacedKey LINK_NETHER = new NamespacedKey("worlds", "link_nether");
     public static final NamespacedKey LINK_END = new NamespacedKey("worlds", "link_end");
 

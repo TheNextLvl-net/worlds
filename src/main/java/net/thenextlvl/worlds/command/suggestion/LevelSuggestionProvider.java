@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
-public class LevelSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
+public abstract class LevelSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
     protected final WorldsPlugin plugin;
     private final boolean unknownLevels;
 

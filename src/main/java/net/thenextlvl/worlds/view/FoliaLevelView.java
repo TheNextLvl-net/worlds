@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
-public class FoliaLevelView extends PaperLevelView {
+public final class FoliaLevelView extends PaperLevelView {
     public FoliaLevelView(WorldsPlugin plugin) {
         super(plugin);
     }

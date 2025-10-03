@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.Set;
 
 @NullMarked
-public class MessageMigrator implements ResourceMigrator {
+public final class MessageMigrator implements ResourceMigrator {
     private final Set<MigrationRule> rules = Set.of(
             new MigrationRule(Locale.US, "world.list", "<worlds>", "<worlds:'<gray>, </gray>'>"),
             new MigrationRule(Locale.GERMANY, "world.list", "<worlds>", "<worlds:'<gray>, </gray>'>"),
