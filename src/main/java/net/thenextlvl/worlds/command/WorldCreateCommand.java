@@ -65,7 +65,6 @@ final class WorldCreateCommand extends OptionCommand {
     @Override
     public int run(CommandContext<CommandSourceStack> context) {
         var sender = context.getSource().getSender();
-
         var level = buildLevel(context, sender);
         if (level == null) return 0;
 
