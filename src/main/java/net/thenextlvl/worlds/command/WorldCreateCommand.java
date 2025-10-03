@@ -68,18 +68,14 @@ final class WorldCreateCommand extends OptionCommand {
         var level = buildLevel(context, sender);
         if (level == null) return 0;
 
-        if (plugin.getServer().getWorld(level.getName()) != null) {
-            plugin.bundle().sendMessage(context.getSource().getSender(), "world.name.taken",
-                    Placeholder.parsed("name", level.getName()));
-            return 0;
-        }
-        if (plugin.getServer().getWorld(level.key()) != null) {
-            plugin.bundle().sendMessage(context.getSource().getSender(), "world.key.taken",
-                    Placeholder.parsed("key", level.key().asString()));
-            return 0;
-        }
-
         var placeholder = Placeholder.parsed("world", level.getName());
+        if (plugin.getServer().getWorld(level.getName()) != null) {
+            plugin.bundle().sendMessage(sender, "world.name.taken", placeholder);
+            return 0;
+        } else if (plugin.getServer().getWorld(level.key()) != null) {
+            plugin.bundle().sendMessage(sender, "world.key.taken", Placeholder.parsed("key", level.key().asString()));
+            return 0;
+        }
 
         plugin.bundle().sendMessage(sender, "world.create", placeholder);
         level.createAsync().thenAccept(world -> {
