@@ -64,10 +64,9 @@ final class WorldCreateCommand extends OptionCommand {
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) {
-        var name = context.getArgument("name", String.class);
         var sender = context.getSource().getSender();
 
-        var level = buildLevel(context, name, sender);
+        var level = buildLevel(context, sender);
         if (level == null) return 0;
 
         if (plugin.getServer().getWorld(level.getName()) != null) {
@@ -89,14 +88,15 @@ final class WorldCreateCommand extends OptionCommand {
             if (!(sender instanceof Entity entity)) return;
             entity.teleportAsync(world.getSpawnLocation(), COMMAND);
         }).exceptionally(throwable -> {
-            plugin.getComponentLogger().warn("Failed to create world {} ({})", level.key(), name, throwable);
+            plugin.getComponentLogger().warn("Failed to create world {} ({})", level.key(), level.getName(), throwable);
             plugin.bundle().sendMessage(sender, "world.create.failed", placeholder);
             return null;
         });
         return SINGLE_SUCCESS;
     }
 
-    private @Nullable Level buildLevel(CommandContext<CommandSourceStack> context, String name, CommandSender sender) {
+    private @Nullable Level buildLevel(CommandContext<CommandSourceStack> context, CommandSender sender) {
+        var name = context.getArgument("name", String.class);
         try {
             return plugin.levelBuilder(plugin.levelView().findFreePath(name))
                     .levelStem(tryGetArgument(context, "dimension", LevelStem.class).orElse(null))
