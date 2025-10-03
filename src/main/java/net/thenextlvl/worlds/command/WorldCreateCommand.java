@@ -13,6 +13,7 @@ import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.api.generator.GeneratorType;
 import net.thenextlvl.worlds.api.generator.LevelStem;
+import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.preset.Preset;
 import net.thenextlvl.worlds.command.argument.GeneratorArgument;
 import net.thenextlvl.worlds.command.argument.GeneratorTypeArgument;
@@ -21,8 +22,10 @@ import net.thenextlvl.worlds.command.argument.LevelStemArgument;
 import net.thenextlvl.worlds.command.argument.SeedArgument;
 import net.thenextlvl.worlds.command.argument.WorldPresetArgument;
 import net.thenextlvl.worlds.command.brigadier.OptionCommand;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
@@ -62,18 +65,10 @@ final class WorldCreateCommand extends OptionCommand {
     @Override
     public int run(CommandContext<CommandSourceStack> context) {
         var name = context.getArgument("name", String.class);
-        var level = plugin.levelBuilder(plugin.levelView().findFreePath(name))
-                .levelStem(tryGetArgument(context, "dimension", LevelStem.class).orElse(null))
-                .generator(tryGetArgument(context, "generator", Generator.class).orElse(null))
-                .key(tryGetArgument(context, "key", Key.class).orElse(null))
-                .preset(tryGetArgument(context, "preset", Preset.class).orElse(null))
-                .seed(tryGetArgument(context, "seed", Long.class).orElse(null))
-                .structures(tryGetArgument(context, "structures", Boolean.class).orElse(null))
-                .generatorType(tryGetArgument(context, "type", GeneratorType.class).orElse(null))
-                .bonusChest(tryGetArgument(context, "bonus-chest", Boolean.class).orElse(null))
-                .hardcore(tryGetArgument(context, "hardcore", Boolean.class).orElse(null))
-                .name(name)
-                .build();
+        var sender = context.getSource().getSender();
+
+        var level = buildLevel(context, name, sender);
+        if (level == null) return 0;
 
         if (plugin.getServer().getWorld(level.getName()) != null) {
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.name.taken",
@@ -86,7 +81,6 @@ final class WorldCreateCommand extends OptionCommand {
             return 0;
         }
 
-        var sender = context.getSource().getSender();
         var placeholder = Placeholder.parsed("world", level.getName());
 
         plugin.bundle().sendMessage(sender, "world.create", placeholder);
@@ -100,5 +94,26 @@ final class WorldCreateCommand extends OptionCommand {
             return null;
         });
         return SINGLE_SUCCESS;
+    }
+
+    private @Nullable Level buildLevel(CommandContext<CommandSourceStack> context, String name, CommandSender sender) {
+        try {
+            return plugin.levelBuilder(plugin.levelView().findFreePath(name))
+                    .levelStem(tryGetArgument(context, "dimension", LevelStem.class).orElse(null))
+                    .generator(tryGetArgument(context, "generator", Generator.class).orElse(null))
+                    .key(tryGetArgument(context, "key", Key.class).orElse(null))
+                    .preset(tryGetArgument(context, "preset", Preset.class).orElse(null))
+                    .seed(tryGetArgument(context, "seed", Long.class).orElse(null))
+                    .structures(tryGetArgument(context, "structures", Boolean.class).orElse(null))
+                    .generatorType(tryGetArgument(context, "type", GeneratorType.class).orElse(null))
+                    .bonusChest(tryGetArgument(context, "bonus-chest", Boolean.class).orElse(null))
+                    .hardcore(tryGetArgument(context, "hardcore", Boolean.class).orElse(null))
+                    .name(name)
+                    .build();
+        } catch (Exception e) {
+            plugin.getComponentLogger().warn("Failed to create world {}", name, e);
+            plugin.bundle().sendMessage(sender, "world.create.failed", Placeholder.parsed("world", name));
+            return null;
+        }
     }
 }
