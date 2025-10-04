@@ -133,8 +133,6 @@ public final class FoliaPortalListener extends PortalListener {
         var targetWorld = readyEvent.getTargetWorld();
         if (targetWorld != null) try {
             var level = ((CraftWorld) targetWorld).getHandle();
-            System.out.println(entity.getBukkitEntity().getWorld().getName() + " -> " + targetWorld.getName());
-
             var portalType = Arrays.stream(net.minecraft.world.entity.Entity.class.getDeclaredClasses())
                     .filter(c -> c.getSimpleName().equals("PortalType"))
                     .findAny().orElseThrow(() -> new IllegalStateException("PortalType class not found"));
