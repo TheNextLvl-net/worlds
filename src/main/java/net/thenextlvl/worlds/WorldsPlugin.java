@@ -16,6 +16,7 @@ import net.thenextlvl.worlds.command.WorldCommand;
 import net.thenextlvl.worlds.command.WorldSetSpawnCommand;
 import net.thenextlvl.worlds.level.LevelData;
 import net.thenextlvl.worlds.link.WorldLinkProvider;
+import net.thenextlvl.worlds.listener.FoliaPortalListener;
 import net.thenextlvl.worlds.listener.PortalListener;
 import net.thenextlvl.worlds.listener.WorldListener;
 import net.thenextlvl.worlds.model.MessageMigrator;
@@ -197,7 +198,8 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     }
 
     private void registerListeners() {
-        getServer().getPluginManager().registerEvents(new PortalListener(this), this);
+        var portalListener = RUNNING_FOLIA ? new FoliaPortalListener(this) : new PortalListener(this);
+        getServer().getPluginManager().registerEvents(portalListener, this);
         getServer().getPluginManager().registerEvents(new WorldListener(this), this);
     }
 
