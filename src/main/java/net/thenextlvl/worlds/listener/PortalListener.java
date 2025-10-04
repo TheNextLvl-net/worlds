@@ -25,9 +25,9 @@ import java.util.function.Consumer;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.END_PORTAL;
 
 @NullMarked
-public final class PortalListener implements Listener {
+public class PortalListener implements Listener {
     private final PortalCooldown cooldown = new PortalCooldown();
-    private final WorldsPlugin plugin;
+    protected final WorldsPlugin plugin;
 
     public PortalListener(WorldsPlugin plugin) {
         this.plugin = plugin;
@@ -62,18 +62,26 @@ public final class PortalListener implements Listener {
         } else if (event.getEntity() instanceof CraftPlayer player) {
             Consumer<@Nullable Location> teleport = location -> player.getScheduler().run(plugin, scheduledTask -> {
                 var level = ((CraftWorld) player.getWorld()).getHandle();
-                if (WorldsPlugin.RUNNING_FOLIA || level.paperConfig().misc.disableEndCredits)
+
+                if (WorldsPlugin.RUNNING_FOLIA || level.paperConfig().misc.disableEndCredits) {
                     player.getHandle().seenCredits = true;
-                else if (!player.getHandle().seenCredits) player.getHandle().showEndCredits();
+                } else if (!player.getHandle().seenCredits) {
+                    player.getHandle().showEndCredits();
+                }
+
                 player.teleportAsync(Objects.requireNonNullElseGet(location, targetWorld::getSpawnLocation), END_PORTAL);
             }, null);
+
             var potentialLocation = player.getPotentialRespawnLocation();
             if (WorldsPlugin.RUNNING_FOLIA && potentialLocation != null) {
-                plugin.getServer().getRegionScheduler().run(plugin, potentialLocation, task ->
-                        teleport.accept(player.getRespawnLocation(true)));
+                plugin.getServer().getRegionScheduler().run(plugin, potentialLocation, task -> {
+                    teleport.accept(player.getRespawnLocation(true));
+                });
             } else teleport.accept(player.getRespawnLocation(true));
-        } else event.getEntity().getScheduler().run(plugin, task ->
-                event.getEntity().teleportAsync(targetWorld.getSpawnLocation(), END_PORTAL), null);
+
+        } else event.getEntity().getScheduler().run(plugin, task -> {
+            event.getEntity().teleportAsync(targetWorld.getSpawnLocation(), END_PORTAL);
+        }, null);
     }
 
     private void generateEndPlatform(World world, Entity entity) {
