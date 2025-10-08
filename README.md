@@ -23,7 +23,7 @@ Simply pick a predefined preset—or define your own!
   (Currently, Worlds can load custom dimension worlds, but in-game/API creation is coming soon.)
 
 🚀 Simplify world management & unlock new possibilities with Worlds!<br>
-🔗 [Download now on Modrinth](https://modrinth.com/plugin/worlds-1)
+🔗 [Download now on Modrinth](https://modrinth.com/project/gBIw3Gvy)
 
 ### Versions
 
