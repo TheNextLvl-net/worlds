@@ -5,12 +5,15 @@ import net.minecraft.util.DirectoryLock;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.exception.GeneratorException;
 import net.thenextlvl.worlds.api.level.Level;
+import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 
 import java.nio.file.Path;
 
@@ -23,10 +26,22 @@ public final class WorldListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onOverworldLoad(WorldLoadEvent event) {
+        registerEntryPermission(event.getWorld());
         if (!plugin.levelView().isOverworld(event.getWorld())) return;
         plugin.levelView().listLevels().stream()
                 .filter(plugin.levelView()::canLoad)
                 .forEach(this::loadLevel);
+    }
+
+    private void registerEntryPermission(World world) {
+        var manager = plugin.getServer().getPluginManager();
+        var permission = plugin.levelView().getEntryPermission(world);
+        if (manager.getPermission(permission) != null) return;
+        manager.addPermission(new Permission(
+                permission,
+                "Allows entering the world " + world.key().asString() + " (" + world.getName() + ")",
+                PermissionDefault.TRUE
+        ));
     }
 
     private void loadLevel(Path path) {

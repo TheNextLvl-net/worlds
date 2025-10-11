@@ -59,6 +59,16 @@ public interface LevelView {
     Path getWorldContainer();
 
     /**
+     * Retrieves the permission required to enter the specified world.
+     *
+     * @param world the world for which to retrieve the entry permission
+     * @return the permission string required to enter the world
+     * @since 3.8.0
+     */
+    @Contract(pure = true)
+    String getEntryPermission(World world);
+
+    /**
      * Reads a level from the specified directory path.
      *
      * @param directory the directory containing the level data to be read
