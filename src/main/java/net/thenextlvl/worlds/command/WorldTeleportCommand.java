@@ -57,10 +57,14 @@ final class WorldTeleportCommand extends SimpleCommand {
         var entities = entityResolver != null ? entityResolver.resolve(context.getSource()) : List.of((Player) sender);
         var location = position != null ? position.resolve(context.getSource()).toLocation(world) : world.getSpawnLocation();
 
-        entities.forEach(entity -> entity.teleportAsync(location, COMMAND).thenAccept(success -> {
-            var message = success ? "world.teleport.self" : "world.teleport.failed";
-            plugin.bundle().sendMessage(entity, message, Placeholder.parsed("world", location.getWorld().getName()));
-        }));
+        entities.forEach(entity -> {
+            if (entity instanceof Player player && !player.hasPermission(plugin.levelView().getEntryPermission(world))) {
+                plugin.bundle().sendMessage(entity, "world.entry.denied", Placeholder.parsed("world", world.getName()));
+            } else entity.teleportAsync(location, COMMAND).thenAccept(success -> {
+                var message = success ? "world.teleport.self" : "world.teleport.failed";
+                plugin.bundle().sendMessage(entity, message, Placeholder.parsed("world", location.getWorld().getName()));
+            });
+        });
 
         if (entities.size() == 1 && entities.getFirst().equals(sender)) return SINGLE_SUCCESS;
 
