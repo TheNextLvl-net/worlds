@@ -19,8 +19,9 @@ public final class TeleportListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         var world = event.getTo().getWorld();
+        if (event.getFrom().getWorld().equals(world)) return;
         if (event.getPlayer().hasPermission(plugin.levelView().getEntryPermission(world))) return;
-        plugin.bundle().sendMessage(event.getPlayer(), "world.entry.denied", 
+        plugin.bundle().sendMessage(event.getPlayer(), "world.entry.denied",
                 Placeholder.parsed("world", world.getName()));
         event.setCancelled(true);
     }
