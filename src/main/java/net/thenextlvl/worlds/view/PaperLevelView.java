@@ -314,7 +314,9 @@ public class PaperLevelView implements LevelView {
         var players = world.getPlayers();
         var fallback = getOverworld().getSpawnLocation();
         return CompletableFuture.allOf(players.stream()
-                .map(player -> player.teleportAsync(fallback, TeleportCause.PLUGIN))
+                .map(player -> player.teleportAsync(fallback, TeleportCause.PLUGIN).thenAccept(success -> {
+                    if (!success) player.kick(plugin.bundle().component("world.unload.kicked", player));
+                }))
                 .toArray(CompletableFuture[]::new)
         ).thenCompose(ignored -> {
             var worldPath = world.getWorldFolder().toPath();
@@ -587,7 +589,9 @@ public class PaperLevelView implements LevelView {
 
         var fallback = getOverworld().getSpawnLocation();
         return CompletableFuture.allOf(world.getPlayers().stream()
-                .map(player -> player.teleportAsync(fallback))
+                .map(player -> player.teleportAsync(fallback, TeleportCause.PLUGIN).thenAccept(success -> {
+                    if (!success) player.kick(plugin.bundle().component("world.unload.kicked", player));
+                }))
                 .toArray(CompletableFuture[]::new)
         ).thenCompose(ignored -> unloadAsync(world, false).thenApplyAsync(success -> {
             if (!success) return DeletionResult.UNLOAD_FAILED;
@@ -626,7 +630,9 @@ public class PaperLevelView implements LevelView {
         var players = world.getPlayers();
         var fallback = getOverworld().getSpawnLocation();
         return CompletableFuture.allOf(players.stream()
-                .map(player -> player.teleportAsync(fallback, TeleportCause.PLUGIN))
+                .map(player -> player.teleportAsync(fallback, TeleportCause.PLUGIN).thenAccept(success -> {
+                    if (!success) player.kick(plugin.bundle().component("world.unload.kicked", player));
+                }))
                 .toArray(CompletableFuture[]::new)
         ).thenCompose(ignored -> saveLevelDataAsync(world).thenCompose(ignored1 -> {
             return unloadAsync(world, false).thenCompose(success -> {

@@ -18,6 +18,7 @@ import org.jspecify.annotations.NullMarked;
 import java.util.concurrent.CompletableFuture;
 
 import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
+import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
 final class WorldUnloadCommand extends SimpleCommand {
@@ -61,7 +62,9 @@ final class WorldUnloadCommand extends SimpleCommand {
                 Placeholder.parsed("world", world.getName()));
 
         CompletableFuture.allOf(world.getPlayers().stream()
-                .map(player -> player.teleportAsync(fallbackSpawn))
+                .map(player -> player.teleportAsync(fallbackSpawn, COMMAND).thenAccept(success -> {
+                    if (!success) player.kick(plugin.bundle().component("world.unload.kicked", player));
+                }))
                 .toArray(CompletableFuture[]::new)
         ).thenCompose(ignored -> {
             plugin.levelView().setEnabled(world, false);
