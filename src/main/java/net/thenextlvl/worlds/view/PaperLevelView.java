@@ -134,6 +134,11 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
+    public String getEntryPermission(World world) {
+        return "worlds.enter." + world.key().asString();
+    }
+
+    @Override
     public Optional<Level.Builder> read(Path directory) {
         try {
             return LevelData.read(plugin, directory);
