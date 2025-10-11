@@ -28,9 +28,10 @@ final class WorldSpawnCommand extends SimpleCommand {
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var player = (Player) context.getSource().getSender();
-        player.teleportAsync(player.getWorld().getSpawnLocation(), COMMAND);
-        plugin.bundle().sendMessage(player, "world.teleport.self",
-                Placeholder.parsed("world", player.getWorld().getName()));
+        player.teleportAsync(player.getWorld().getSpawnLocation(), COMMAND).thenAccept(success -> {
+            var message = success ? "world.teleport.self" : "world.teleport.failed";
+            plugin.bundle().sendMessage(player, message, Placeholder.parsed("world", player.getWorld().getName()));
+        });
         return SINGLE_SUCCESS;
     }
 }
