@@ -59,7 +59,7 @@ final class WorldRecreateCommand extends OptionCommand {
         var world = context.getArgument("world", World.class);
         var name = context.getArgument("name", String.class);
 
-        var builder = plugin.levelBuilder(world).directory(plugin.levelView().findFreePath(name));
+        var builder = plugin.levelBuilder(world).directory(plugin.levelView().findFreePath(name).getFileName());
 
         tryGetArgument(context, "bonus-chest", Boolean.class).ifPresent(builder::bonusChest);
         tryGetArgument(context, "dimension", LevelStem.class).ifPresent(builder::levelStem);
