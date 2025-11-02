@@ -93,7 +93,7 @@ final class WorldCreateCommand extends OptionCommand {
     private @Nullable Level buildLevel(CommandContext<CommandSourceStack> context, CommandSender sender) {
         var name = context.getArgument("name", String.class);
         try {
-            return plugin.levelBuilder(plugin.levelView().findFreePath(name))
+            return plugin.levelBuilder(plugin.levelView().findFreePath(name).getFileName())
                     .levelStem(tryGetArgument(context, "dimension", LevelStem.class).orElse(null))
                     .generator(tryGetArgument(context, "generator", Generator.class).orElse(null))
                     .key(tryGetArgument(context, "key", Key.class).orElse(null))

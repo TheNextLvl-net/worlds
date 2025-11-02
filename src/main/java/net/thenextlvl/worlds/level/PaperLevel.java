@@ -54,6 +54,7 @@ import org.jspecify.annotations.NullMarked;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -107,8 +108,12 @@ final class PaperLevel extends LevelData {
 
         LevelStorageSource.LevelStorageAccess levelStorageAccess;
         try {
-            levelStorageAccess = LevelStorageSource.createDefault(server.getWorldContainer().toPath())
-                    .validateAndCreateAccess(directory.getFileName().toString(), dimensionType);
+            Path fullPath = server.getWorldContainer().toPath().resolve(directory);
+
+            Files.createDirectories(fullPath);
+
+            levelStorageAccess = LevelStorageSource.createDefault(fullPath.getParent())
+                    .validateAndCreateAccess(fullPath.getFileName().toString(), dimensionType);
         } catch (IOException | ContentValidationException ex) {
             return CompletableFuture.failedFuture(ex);
         }
