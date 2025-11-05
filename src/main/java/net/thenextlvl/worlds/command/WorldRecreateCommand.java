@@ -62,7 +62,7 @@ final class WorldRecreateCommand extends OptionCommand {
         var name = context.getArgument("name", String.class);
 
         if (Path.of(name).getNameCount() != 1) {
-            plugin.bundle().sendMessage(sender, "world.subfolders.create");
+            plugin.bundle().sendMessage(sender, "world.container.create");
             return 0;
         }
 

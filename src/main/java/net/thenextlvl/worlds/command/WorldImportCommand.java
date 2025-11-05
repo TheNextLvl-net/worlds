@@ -56,8 +56,8 @@ final class WorldImportCommand extends OptionCommand {
         var path = context.getArgument("path", Path.class);
         var container = plugin.levelView().getWorldContainer();
 
-            plugin.bundle().sendMessage(sender, "world.subfolders.load");
         if (!path.startsWith(container) || path.getNameCount() != container.getNameCount() + 1) {
+            plugin.bundle().sendMessage(sender, "world.container.load");
             return 0;
         }
 
