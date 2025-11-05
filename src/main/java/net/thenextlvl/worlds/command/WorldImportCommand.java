@@ -71,20 +71,20 @@ final class WorldImportCommand extends OptionCommand {
         var world = build.filter(level -> !level.isWorldKnown()).map(Level::createAsync).orElse(null);
 
         if (world == null) {
-            plugin.bundle().sendMessage(context.getSource().getSender(), "world.import.failed",
+            plugin.bundle().sendMessage(sender, "world.import.failed",
                     Placeholder.parsed("world", path.toString()));
             return 0;
         }
 
-        plugin.bundle().sendMessage(context.getSource().getSender(), "world.import",
+        plugin.bundle().sendMessage(sender, "world.import",
                 Placeholder.parsed("world", path.toString()));
         world.thenAccept(level -> {
-            plugin.bundle().sendMessage(context.getSource().getSender(), "world.import.success",
+            plugin.bundle().sendMessage(sender, "world.import.success",
                     Placeholder.parsed("world", level.getName()));
-            if (!(context.getSource().getSender() instanceof Entity entity)) return;
+            if (!(sender instanceof Entity entity)) return;
             entity.teleportAsync(level.getSpawnLocation(), COMMAND);
         }).exceptionally(throwable -> {
-            plugin.bundle().sendMessage(context.getSource().getSender(), "world.import.failed",
+            plugin.bundle().sendMessage(sender, "world.import.failed",
                     Placeholder.parsed("world", path.toString()));
             plugin.getComponentLogger().warn("Failed to import world {}", path, throwable);
             return null;
