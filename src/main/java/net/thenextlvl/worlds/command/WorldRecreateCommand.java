@@ -22,7 +22,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Set;
 
 import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
