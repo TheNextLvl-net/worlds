@@ -22,6 +22,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 
+import java.nio.file.Path;
 import java.util.Set;
 
 import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
@@ -56,8 +57,14 @@ final class WorldRecreateCommand extends OptionCommand {
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) {
+        var sender = context.getSource().getSender();
         var world = context.getArgument("world", World.class);
         var name = context.getArgument("name", String.class);
+
+        if (Path.of(name).getNameCount() != 1) {
+            plugin.bundle().sendMessage(sender, "world.container.create");
+            return 0;
+        }
 
         var builder = plugin.levelBuilder(world).directory(plugin.levelView().findFreePath(name));
 
@@ -74,7 +81,6 @@ final class WorldRecreateCommand extends OptionCommand {
 
         var level = builder.name(name).build();
 
-        var sender = context.getSource().getSender();
         var placeholder = Placeholder.parsed("world", world.getName());
 
         plugin.bundle().sendMessage(sender, "world.recreate", placeholder);

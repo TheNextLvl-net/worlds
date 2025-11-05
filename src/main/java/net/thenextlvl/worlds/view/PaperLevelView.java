@@ -326,7 +326,7 @@ public class PaperLevelView implements LevelView {
                 );
                 restore(worldPath, path);
                 backupRestorations.remove(world.key());
-                return plugin.levelBuilder(worldPath).build().createAsync().thenApply(restored -> {
+                return plugin.levelView().read(worldPath).orElseThrow().build().createAsync().thenApply(restored -> {
                     players.forEach(player -> player.teleportAsync(restored.getSpawnLocation(), TeleportCause.PLUGIN));
                     return new RestoringResultImpl(restored, DeletionResult.SUCCESS);
                 });

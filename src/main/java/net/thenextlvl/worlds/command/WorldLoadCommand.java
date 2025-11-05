@@ -34,30 +34,33 @@ final class WorldLoadCommand extends SimpleCommand {
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) {
+        var sender = context.getSource().getSender();
         var path = context.getArgument("path", Path.class);
+        var container = plugin.levelView().getWorldContainer();
 
-        plugin.bundle().sendMessage(context.getSource().getSender(), "world.load",
-                Placeholder.parsed("world", path.toString()));
+        if (!path.startsWith(container) || path.getNameCount() != container.getNameCount() + 1) {
+            plugin.bundle().sendMessage(sender, "world.container.load");
+            return 0;
+        }
+
+        plugin.bundle().sendMessage(sender, "world.load", Placeholder.parsed("world", path.toString()));
 
         var build = plugin.levelView().read(path).map(Level.Builder::build);
         var future = build.filter(Level::isWorldKnown).map(Level::createAsync).orElse(null);
 
         if (future == null) {
-            plugin.bundle().sendMessage(context.getSource().getSender(), "world.load.failed",
-                    Placeholder.parsed("world", path.toString()));
+            plugin.bundle().sendMessage(sender, "world.load.failed", Placeholder.parsed("world", path.toString()));
             return 0;
         }
 
         future.thenAccept(level -> {
             plugin.levelView().setEnabled(level, true);
-            plugin.bundle().sendMessage(context.getSource().getSender(), "world.load.success",
-                    Placeholder.parsed("world", level.getName()));
-            if (!(context.getSource().getSender() instanceof Entity entity)) return;
+            plugin.bundle().sendMessage(sender, "world.load.success", Placeholder.parsed("world", level.getName()));
+            if (!(sender instanceof Entity entity)) return;
             entity.teleportAsync(level.getSpawnLocation(), COMMAND);
         }).exceptionally(throwable -> {
             plugin.getComponentLogger().warn("Failed to load world {}", path, throwable);
-            plugin.bundle().sendMessage(context.getSource().getSender(), "world.load.failed",
-                    Placeholder.parsed("world", path.toString()));
+            plugin.bundle().sendMessage(sender, "world.load.failed", Placeholder.parsed("world", path.toString()));
             return null;
         });
         return SINGLE_SUCCESS;
