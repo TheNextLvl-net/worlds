@@ -39,7 +39,7 @@ final class WorldLoadCommand extends SimpleCommand {
         var path = context.getArgument("path", Path.class);
 
         if (path.normalize().getNameCount() != 1) {
-            plugin.bundle().sendMessage(sender, "world.create.subfolders");
+            plugin.bundle().sendMessage(sender, "world.subfolders.create");
             return 0;
         }
 
