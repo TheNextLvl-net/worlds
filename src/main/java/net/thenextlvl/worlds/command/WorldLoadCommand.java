@@ -36,9 +36,10 @@ final class WorldLoadCommand extends SimpleCommand {
     public int run(CommandContext<CommandSourceStack> context) {
         var sender = context.getSource().getSender();
         var path = context.getArgument("path", Path.class);
+        var container = plugin.levelView().getWorldContainer();
 
-        if (path.normalize().getNameCount() != 1) {
             plugin.bundle().sendMessage(sender, "world.subfolders.create");
+        if (!path.startsWith(container) || path.getNameCount() != container.getNameCount() + 1) {
             return 0;
         }
 
