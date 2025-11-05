@@ -14,7 +14,6 @@ import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
