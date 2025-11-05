@@ -14,6 +14,7 @@ import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
@@ -34,7 +35,13 @@ final class WorldLoadCommand extends SimpleCommand {
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) {
+        var sender = context.getSource().getSender();
         var path = context.getArgument("path", Path.class);
+
+        if (path.normalize().getNameCount() != 1) {
+            plugin.bundle().sendMessage(sender, "world.create.subfolders");
+            return 0;
+        }
 
         plugin.bundle().sendMessage(context.getSource().getSender(), "world.load",
                 Placeholder.parsed("world", path.toString()));

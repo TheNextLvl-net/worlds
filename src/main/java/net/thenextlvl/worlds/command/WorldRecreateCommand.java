@@ -22,6 +22,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 
+import java.nio.file.Paths;
 import java.util.Set;
 
 import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
@@ -56,10 +57,16 @@ final class WorldRecreateCommand extends OptionCommand {
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) {
+        var sender = context.getSource().getSender();
         var world = context.getArgument("world", World.class);
         var name = context.getArgument("name", String.class);
 
-        var builder = plugin.levelBuilder(world).directory(plugin.levelView().findFreePath(name).getFileName());
+        if (Paths.get(name).getNameCount() != 1) {
+            plugin.bundle().sendMessage(sender, "world.create.subfolders");
+            return 0;
+        }
+
+        var builder = plugin.levelBuilder(world).directory(plugin.levelView().findFreePath(name));
 
         tryGetArgument(context, "bonus-chest", Boolean.class).ifPresent(builder::bonusChest);
         tryGetArgument(context, "dimension", LevelStem.class).ifPresent(builder::levelStem);
@@ -74,7 +81,6 @@ final class WorldRecreateCommand extends OptionCommand {
 
         var level = builder.name(name).build();
 
-        var sender = context.getSource().getSender();
         var placeholder = Placeholder.parsed("world", world.getName());
 
         plugin.bundle().sendMessage(sender, "world.recreate", placeholder);

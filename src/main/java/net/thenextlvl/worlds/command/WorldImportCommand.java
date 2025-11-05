@@ -52,7 +52,13 @@ final class WorldImportCommand extends OptionCommand {
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) {
+        var sender = context.getSource().getSender();
         var path = context.getArgument("path", Path.class);
+
+        if (path.normalize().getNameCount() != 1) {
+            plugin.bundle().sendMessage(sender, "world.create.subfolders");
+            return 0;
+        }
 
         var displayName = tryGetArgument(context, "name", String.class).orElse(null);
         var generator = tryGetArgument(context, "generator", Generator.class).orElse(null);
