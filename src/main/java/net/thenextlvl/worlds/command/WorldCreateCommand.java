@@ -94,7 +94,7 @@ final class WorldCreateCommand extends OptionCommand {
     private @Nullable Level buildLevel(CommandContext<CommandSourceStack> context, CommandSender sender) {
         var name = context.getArgument("name", String.class);
         if (Path.of(name).getNameCount() != 1) {
-            plugin.bundle().sendMessage(sender, "world.subfolders.create");
+            plugin.bundle().sendMessage(sender, "world.container.create");
             return null;
         } else try {
             return plugin.levelBuilder(plugin.levelView().findFreePath(name))
