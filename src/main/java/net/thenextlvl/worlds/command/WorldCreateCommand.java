@@ -27,6 +27,8 @@ import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Set;
 
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
@@ -92,8 +94,14 @@ final class WorldCreateCommand extends OptionCommand {
 
     private @Nullable Level buildLevel(CommandContext<CommandSourceStack> context, CommandSender sender) {
         var name = context.getArgument("name", String.class);
+
+        if (Paths.get(name).getNameCount() != 1) {
+            plugin.bundle().sendMessage(sender, "world.create.subfolders");
+            return null;
+        }
+
         try {
-            return plugin.levelBuilder(plugin.levelView().findFreePath(name).getFileName())
+            return plugin.levelBuilder(plugin.levelView().findFreePath(name))
                     .levelStem(tryGetArgument(context, "dimension", LevelStem.class).orElse(null))
                     .generator(tryGetArgument(context, "generator", Generator.class).orElse(null))
                     .key(tryGetArgument(context, "key", Key.class).orElse(null))
