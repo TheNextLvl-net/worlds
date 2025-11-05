@@ -107,10 +107,8 @@ final class PaperLevel extends LevelData {
 
         LevelStorageSource.LevelStorageAccess levelStorageAccess;
         try {
-            var fullPath = server.getWorldContainer().toPath().resolve(directory);
-            Files.createDirectories(fullPath);
-            levelStorageAccess = LevelStorageSource.createDefault(fullPath.getParent())
-                    .validateAndCreateAccess(fullPath.getFileName().toString(), dimensionType);
+            levelStorageAccess = LevelStorageSource.createDefault(directory.getParent())
+                    .validateAndCreateAccess(directory.getFileName().toString(), dimensionType);
         } catch (IOException | ContentValidationException ex) {
             return CompletableFuture.failedFuture(ex);
         }
