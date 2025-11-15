@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.profiling.Profiler;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.PortalProcessor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.NetherPortalBlock;
@@ -39,7 +38,7 @@ public final class FoliaPortalListener extends PortalListener {
     }
 
     /**
-     * @see NetherPortalBlock#entityInside(BlockState, Level, BlockPos, Entity, InsideBlockEffectApplier)
+     * @see NetherPortalBlock#entityInside(BlockState, Level, BlockPos, Entity, net.minecraft.world.entity.InsideBlockEffectApplier)
      */
     @SuppressWarnings("JavadocReference")
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
