@@ -19,7 +19,7 @@ tasks.compileJava {
 }
 
 group = "net.thenextlvl.worlds"
-version = "3.8.1"
+version = "3.9.0"
 
 repositories {
     mavenCentral()
@@ -29,7 +29,8 @@ repositories {
 }
 
 dependencies {
-    paperweight.foliaDevBundle("1.21.8-R0.1-SNAPSHOT")
+    // paperweight.foliaDevBundle("1.21.10-R0.1-SNAPSHOT") // fixme: restore folia support once possible
+    paperweight.paperDevBundle("1.21.10-R0.1-SNAPSHOT")
 
     implementation(project(":api"))
 
