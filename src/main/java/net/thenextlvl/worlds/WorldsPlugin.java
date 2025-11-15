@@ -136,7 +136,7 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     public Level.Builder levelBuilder(World world) {
         return levelView().read(world.getWorldFolder().toPath())
                 .orElseGet(() -> levelBuilder(world.getWorldFolder().toPath()))
-                .bonusChest(world.hasBonusChest())
+                //.bonusChest(world.hasBonusChest())
                 .hardcore(world.isHardcore())
                 .structures(world.canGenerateStructures())
                 .worldKnown(true)

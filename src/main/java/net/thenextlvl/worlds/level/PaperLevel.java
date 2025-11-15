@@ -193,7 +193,7 @@ final class PaperLevel extends LevelData {
         primaryLevelData.setModdedInfo(console.getServerModName(), console.getModdedStatus().shouldReportAsModified());
 
         if (console.options.has("forceUpgrade")) {
-            Main.forceUpgrade(levelStorageAccess, primaryLevelData, DataFixers.getDataFixer(), console.options.has("eraseCache"), () -> true, registryAccess, console.options.has("recreateRegionFiles"));
+            Main.forceUpgrade(levelStorageAccess, DataFixers.getDataFixer(), console.options.has("eraseCache"), () -> true, registryAccess, console.options.has("recreateRegionFiles"));
         }
 
         long seed = BiomeManager.obfuscateSeed(primaryLevelData.worldGenOptions().seed());
