@@ -1,9 +1,9 @@
 package net.thenextlvl.worlds;
 
-import core.i18n.file.ComponentBundle;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
+import net.thenextlvl.i18n.ComponentBundle;
 import net.thenextlvl.worlds.api.WorldsProvider;
 import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
