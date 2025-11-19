@@ -33,7 +33,7 @@ dependencies {
 
     implementation(project(":api"))
 
-    implementation("net.thenextlvl.core:i18n:3.2.2")
+    implementation("net.thenextlvl:i18n:1.0.0")
     implementation("net.thenextlvl:nbt:3.0.1")
     implementation("net.thenextlvl.core:paper:2.3.1")
 

@@ -1,6 +1,6 @@
 package net.thenextlvl.worlds.model;
 
-import core.i18n.file.ResourceMigrator;
+import net.thenextlvl.i18n.ResourceMigrator;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
