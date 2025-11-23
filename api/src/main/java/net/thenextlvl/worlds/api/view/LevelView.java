@@ -479,10 +479,30 @@ public interface LevelView {
      *                 if false, the regeneration will be attempted immediately
      * @return a {@code CompletableFuture} completing with a
      * {@code DeletionResult} indicating the outcome of the regeneration process.
+     * @see #regenerateAsync(World, boolean, Consumer)
      * @since 3.2.0
      */
     @Contract(mutates = "io,param1")
-    CompletableFuture<DeletionResult> regenerateAsync(World world, boolean schedule);
+    default CompletableFuture<DeletionResult> regenerateAsync(World world, boolean schedule) {
+        return regenerateAsync(world, schedule, builder -> {
+        });
+    }
+
+    /**
+     * Regenerates the specified world, either immediately or scheduled, based on the provided parameters.
+     * <p>
+     * The builder consumer is only applied when the regeneration is not scheduled.
+     *
+     * @param world    the world to be regenerated
+     * @param schedule if true, the regeneration will be scheduled for later execution;
+     *                 if false, the regeneration will be attempted immediately
+     * @param builder  a consumer that modifies the {@link Level.Builder} properties of the regenerated world
+     * @return a {@code CompletableFuture} completing with a
+     * {@code DeletionResult} indicating the outcome of the regeneration process.
+     * @since 3.10.0
+     */
+    @Contract(mutates = "io,param1")
+    CompletableFuture<DeletionResult> regenerateAsync(World world, boolean schedule, Consumer<Level.Builder> builder);
 
     /**
      * Cancels the regeneration process for the specified world, if scheduled.
