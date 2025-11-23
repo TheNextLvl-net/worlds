@@ -19,7 +19,7 @@ tasks.compileJava {
 }
 
 group = "net.thenextlvl.worlds"
-version = "3.8.1"
+version = "3.10.0-mc1.21.8"
 
 repositories {
     mavenCentral()
@@ -33,7 +33,7 @@ dependencies {
 
     implementation(project(":api"))
 
-    implementation("net.thenextlvl.core:i18n:3.2.2")
+    implementation("net.thenextlvl:i18n:1.0.0")
     implementation("net.thenextlvl:nbt:3.0.1")
     implementation("net.thenextlvl.core:paper:2.3.1")
 
