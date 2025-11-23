@@ -238,6 +238,7 @@ public class PaperLevelView implements LevelView {
      * @see ServerLevel#saveLevelData(boolean)
      */
     @Override
+    @SuppressWarnings("JavadocReference")
     public CompletableFuture<@Nullable Void> saveLevelDataAsync(World world) {
         var level = ((CraftWorld) world).getHandle();
         if (level.getDragonFight() != null) {
@@ -566,8 +567,8 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public CompletableFuture<DeletionResult> regenerateAsync(World world, boolean schedule) {
-        return plugin.supplyGlobal(() -> schedule ? CompletableFuture.completedFuture(scheduleRegeneration(world)) : regenerateNow(world));
+    public CompletableFuture<DeletionResult> regenerateAsync(World world, boolean schedule, Consumer<Level.Builder> builder) {
+        return plugin.supplyGlobal(() -> schedule ? CompletableFuture.completedFuture(scheduleRegeneration(world)) : regenerateNow(world, builder));
     }
 
     @Override
@@ -620,7 +621,7 @@ public class PaperLevelView implements LevelView {
         return DeletionResult.SCHEDULED;
     }
 
-    private CompletableFuture<DeletionResult> regenerateNow(World world) {
+    private CompletableFuture<DeletionResult> regenerateNow(World world, Consumer<Level.Builder> consumer) {
         if (isOverworld(world)) return CompletableFuture.completedFuture(DeletionResult.REQUIRES_SCHEDULING);
 
         if (!new WorldRegenerateEvent(world).callEvent())
@@ -639,7 +640,9 @@ public class PaperLevelView implements LevelView {
 
                 regenerate(world.getWorldFolder().toPath());
                 regenerations.remove(world.key());
-                return plugin.levelBuilder(world).build().createAsync().thenAccept(regenerated -> {
+                var builder = plugin.levelBuilder(world);
+                consumer.accept(builder);
+                return builder.build().createAsync().thenAccept(regenerated -> {
                     players.forEach(player -> player.teleportAsync(regenerated.getSpawnLocation(), TeleportCause.PLUGIN));
                 }).thenApply(ignored2 -> DeletionResult.SUCCESS);
             }).exceptionally(throwable -> {

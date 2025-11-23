@@ -128,6 +128,19 @@ final class PaperLevel extends LevelData {
             );
             primaryLevelData = (PrimaryLevelData) levelDataAndDimensions.worldData();
             registryAccess = levelDataAndDimensions.dimensions().dimensionsRegistryAccess();
+
+            /// Worlds start - override options
+            try {
+                var worldOptions = new WorldOptions(seed, structures, bonusChest);
+                var optionsField = PrimaryLevelData.class.getDeclaredField("worldOptions");
+                var accessible = optionsField.canAccess(primaryLevelData);
+                if (!accessible) optionsField.trySetAccessible();
+                optionsField.set(primaryLevelData, worldOptions);
+                if (!accessible) optionsField.setAccessible(false);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                plugin.getComponentLogger().warn("Failed to override world options", e);
+            }
+            /// Worlds end
         } else {
             LevelSettings levelSettings;
             WorldOptions worldOptions = new WorldOptions(seed, structures, bonusChest);
