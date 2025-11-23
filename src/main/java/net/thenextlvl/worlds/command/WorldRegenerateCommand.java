@@ -31,7 +31,7 @@ final class WorldRegenerateCommand extends SimpleCommand {
     private RequiredArgumentBuilder<CommandSourceStack, World> regenerate() {
         return worldArgument(plugin)
                 .then(Commands.argument("flags", new CommandFlagsArgument(
-                        Set.of("--confirm", "--schedule")
+                        Set.of("--confirm", "--schedule", "--seed")
                 )).executes(this))
                 .executes(this::confirmationNeeded);
     }
@@ -52,7 +52,9 @@ final class WorldRegenerateCommand extends SimpleCommand {
         var schedule = flags.contains("--schedule");
         if (!schedule) plugin.bundle().sendMessage(context.getSource().getSender(), "world.regenerate",
                 Placeholder.parsed("world", world.getName()));
-        plugin.levelView().regenerateAsync(world, schedule).thenAccept(result -> {
+        plugin.levelView().regenerateAsync(world, schedule, builder -> {
+            if (flags.contains("--seed")) builder.seed(null);
+        }).thenAccept(result -> {
             var message = switch (result) {
                 case SUCCESS -> "world.regenerate.success";
                 case SCHEDULED -> "world.regenerate.scheduled";
