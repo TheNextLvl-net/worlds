@@ -33,6 +33,7 @@ dependencies {
 
     implementation(project(":api"))
 
+    implementation("dev.faststats.metrics:bukkit:0.4.1")
     implementation("net.thenextlvl.version-checker:modrinth-paper:1.0.0")
     implementation("net.thenextlvl:i18n:1.0.0")
     implementation("net.thenextlvl:nbt:3.0.1")
