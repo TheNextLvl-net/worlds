@@ -1,5 +1,6 @@
 package net.thenextlvl.worlds;
 
+import dev.faststats.bukkit.BukkitMetrics;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
@@ -62,9 +63,12 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
             .build();
 
     private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
+    private final dev.faststats.core.Metrics fastStats = BukkitMetrics.factory()
+            .token("978c4aa9ecf78ae2e9c0776601fd4c6c")
+            .create(this);
     private final Metrics metrics = new Metrics(this, 19652);
 
-    public WorldsPlugin() {
+    public WorldsPlugin() throws IOException {
         registerCommands();
     }
 
