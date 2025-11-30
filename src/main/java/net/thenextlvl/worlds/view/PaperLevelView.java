@@ -1,7 +1,6 @@
 package net.thenextlvl.worlds.view;
 
 import com.google.common.base.Preconditions;
-import core.io.IO;
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.KeyPattern;
