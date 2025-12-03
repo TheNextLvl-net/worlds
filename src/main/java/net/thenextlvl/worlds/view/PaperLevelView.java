@@ -7,7 +7,7 @@ import net.kyori.adventure.key.KeyPattern;
 import net.minecraft.FileUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.storage.LevelStorageSource;
-import net.thenextlvl.nbt.file.NBTFile;
+import net.thenextlvl.nbt.NBTInputStream;
 import net.thenextlvl.nbt.tag.CompoundTag;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.event.WorldActionScheduledEvent;
@@ -33,6 +33,7 @@ import org.jspecify.annotations.Nullable;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -60,6 +61,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import static java.nio.file.StandardOpenOption.READ;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
 
@@ -101,13 +103,23 @@ public class PaperLevelView implements LevelView {
                 .or(() -> Optional.ofNullable(getFile(level, "level.dat_old")));
     }
 
-    public Optional<NBTFile<CompoundTag>> getLevelDataFile(Path level) {
-        return getLevelDataPath(level).map(path -> new NBTFile<>(IO.of(path), CompoundTag.empty()));
+    public Optional<CompoundTag> getLevelDataFile(Path level) {
+        return getLevelDataPath(level).map(path -> {
+            try (var inputStream = new NBTInputStream(
+                    Files.newInputStream(path, READ),
+                    StandardCharsets.UTF_8
+            )) {
+                return inputStream.readTag().getAsCompound();
+            } catch (IOException e) {
+                plugin.getComponentLogger().warn("Failed to read level data from {}", path, e);
+                return null;
+            }
+        });
     }
 
     private static @Nullable Path getFile(Path level, String other) {
         var resolved = level.resolve(other);
-        return Files.exists(resolved) ? resolved : null;
+        return Files.isRegularFile(resolved) ? resolved : null;
     }
 
     /**
