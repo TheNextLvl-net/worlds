@@ -34,6 +34,7 @@ import org.jspecify.annotations.Nullable;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -61,6 +62,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import static java.nio.file.StandardOpenOption.READ;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
 
