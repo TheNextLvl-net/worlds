@@ -66,6 +66,9 @@ final class WorldImportCommand extends OptionCommand {
         var key = tryGetArgument(context, "key", Key.class).orElse(null);
         var dimension = tryGetArgument(context, "dimension", LevelStem.class).orElse(null);
 
+        plugin.bundle().sendMessage(sender, "world.import",
+                Placeholder.parsed("world", path.toString()));
+
         var build = plugin.levelView().read(path).map(level ->
                 level.key(key).name(displayName).generator(generator).levelStem(dimension).build());
         var world = build.filter(level -> !level.isWorldKnown()).map(Level::createAsync).orElse(null);
@@ -76,8 +79,6 @@ final class WorldImportCommand extends OptionCommand {
             return 0;
         }
 
-        plugin.bundle().sendMessage(sender, "world.import",
-                Placeholder.parsed("world", path.toString()));
         world.thenAccept(level -> {
             plugin.bundle().sendMessage(sender, "world.import.success",
                     Placeholder.parsed("world", level.getName()));
