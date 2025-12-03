@@ -415,7 +415,7 @@ public abstract class LevelData implements Level {
         var levelData = plugin.levelView().getLevelDataFile(level).orElse(null);
         if (levelData == null) return Optional.empty();
 
-        var data = levelData.getRoot().<CompoundTag>optional("Data");
+        var data = levelData.<CompoundTag>optional("Data");
         var name = data.flatMap(tag -> tag.optional("LevelName").map(Tag::getAsString))
                 .orElseGet(() -> level.getFileName().toString());
         var pdc = data.flatMap(tag -> tag.optional("BukkitValues").map(Tag::getAsCompound));
