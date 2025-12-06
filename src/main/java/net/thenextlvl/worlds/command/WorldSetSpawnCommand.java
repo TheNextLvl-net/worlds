@@ -1,6 +1,5 @@
 package net.thenextlvl.worlds.command;
 
-import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -9,6 +8,8 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver;
+import io.papermc.paper.command.brigadier.argument.resolvers.RotationResolver;
+import io.papermc.paper.math.Rotation;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.brigadier.SimpleCommand;
@@ -34,7 +35,7 @@ public final class WorldSetSpawnCommand extends SimpleCommand {
 
     private RequiredArgumentBuilder<CommandSourceStack, BlockPositionResolver> positioned() {
         return Commands.argument("position", ArgumentTypes.blockPosition())
-                .then(Commands.argument("angle", FloatArgumentType.floatArg(-180, 180)).executes(this))
+                .then(Commands.argument("rotation", ArgumentTypes.rotation()).executes(this))
                 .executes(this);
     }
 
@@ -43,16 +44,18 @@ public final class WorldSetSpawnCommand extends SimpleCommand {
         var location = context.getSource().getLocation();
         var resolver = tryGetArgument(context, "position", BlockPositionResolver.class).orElse(null);
         var position = resolver != null ? resolver.resolve(context.getSource()) : location;
-        var angle = tryGetArgument(context, "angle", float.class).orElse(0f);
+        var rotationResolver = tryGetArgument(context, "rotation", RotationResolver.class).orElse(null);
+        var rotation = rotationResolver != null ? rotationResolver.resolve(context.getSource()) : Rotation.rotation(0f, 0f);
 
-        var success = location.getWorld().setSpawnLocation(position.blockX(), position.blockY(), position.blockZ(), angle);
+        var success = location.getWorld().setSpawnLocation(position.toLocation(location.getWorld()).setRotation(rotation));
         var message = success ? "world.spawn.set.success" : "world.spawn.set.failed";
-        
+
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
                 Formatter.number("x", position.blockX()),
                 Formatter.number("y", position.blockY()),
                 Formatter.number("z", position.blockZ()),
-                Formatter.number("angle", angle));
+                Formatter.number("yaw", rotation.yaw()),
+                Formatter.number("pitch", rotation.pitch()));
         return success ? SINGLE_SUCCESS : 0;
     }
 }
