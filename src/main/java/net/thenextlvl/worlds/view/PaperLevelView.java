@@ -17,6 +17,7 @@ import net.thenextlvl.worlds.api.event.WorldBackupRestoreEvent;
 import net.thenextlvl.worlds.api.event.WorldCloneEvent;
 import net.thenextlvl.worlds.api.event.WorldDeleteEvent;
 import net.thenextlvl.worlds.api.event.WorldRegenerateEvent;
+import net.thenextlvl.worlds.api.exception.GeneratorException;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.view.LevelView;
 import net.thenextlvl.worlds.level.LevelData;
@@ -69,7 +70,7 @@ public class PaperLevelView implements LevelView {
     private static final Key OVERWORLD = Key.key("overworld");
     private static final Key NETHER = Key.key("the_nether");
     private static final Key END = Key.key("the_end");
-    
+
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")
             .withZone(ZoneId.systemDefault());
     private static final NamespacedKey ENABLED_KEY = new NamespacedKey("worlds", "enabled");
@@ -111,23 +112,20 @@ public class PaperLevelView implements LevelView {
         return world.key().equals(OVERWORLD);
     }
 
-    public Optional<Path> getLevelDataPath(Path level) {
+    private @Nullable Path getLevelDataPath(Path level) {
         return Optional.ofNullable(getFile(level, "level.dat"))
-                .or(() -> Optional.ofNullable(getFile(level, "level.dat_old")));
+                .orElseGet(() -> getFile(level, "level.dat_old"));
     }
 
-    public Optional<CompoundTag> getLevelDataFile(Path level) {
-        return getLevelDataPath(level).map(path -> {
-            try (var inputStream = new NBTInputStream(
-                    Files.newInputStream(path, READ),
-                    StandardCharsets.UTF_8
-            )) {
-                return inputStream.readTag().getAsCompound();
-            } catch (IOException e) {
-                plugin.getComponentLogger().warn("Failed to read level data from {}", path, e);
-                return null;
-            }
-        });
+    public @Nullable CompoundTag getLevelDataFile(Path level) throws IOException {
+        var path = getLevelDataPath(level);
+        if (path == null) return null;
+        try (var inputStream = new NBTInputStream(
+                Files.newInputStream(path, READ),
+                StandardCharsets.UTF_8
+        )) {
+            return inputStream.readTag().getAsCompound();
+        }
     }
 
     private static @Nullable Path getFile(Path level, String other) {
@@ -166,6 +164,11 @@ public class PaperLevelView implements LevelView {
     public Optional<Level.Builder> read(Path directory) {
         try {
             return LevelData.read(plugin, directory);
+        } catch (GeneratorException e) {
+            var generator = e.getId() != null ? e.getPlugin() + ":" + e.getId() : e.getPlugin();
+            plugin.getComponentLogger().error("Skip loading dimension '{}'", directory.getFileName());
+            plugin.getComponentLogger().error("Cannot use generator {}: {}", generator, e.getMessage());
+            return Optional.empty();
         } catch (Exception e) {
             if (e.getCause() instanceof ZipException) {
                 plugin.getComponentLogger().warn("Failed to read level data from {}", directory);
