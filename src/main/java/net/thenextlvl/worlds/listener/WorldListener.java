@@ -5,6 +5,7 @@ import net.minecraft.util.DirectoryLock;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.exception.GeneratorException;
 import net.thenextlvl.worlds.api.level.Level;
+import net.thenextlvl.worlds.api.link.LinkTree;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -81,7 +82,13 @@ public final class WorldListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onWorldLoad(WorldLoadEvent event) {
-        plugin.linkProvider().loadTree(event.getWorld());
+        plugin.linkProvider().loadTree(event.getWorld())
+                .filter(LinkTree::isEmpty)
+                .filter(linkTree -> plugin.levelView().isOverworld(linkTree.getOverworld()))
+                .ifPresent(linkTree -> {
+                    plugin.levelView().getNether().ifPresent(linkTree::setNether);
+                    plugin.levelView().getEnd().ifPresent(linkTree::setEnd);
+                });
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

@@ -37,8 +37,8 @@ public final class WorldLinkProvider implements LinkProvider {
         trees.removeIf(tree -> tree.getOverworld().equals(world));
     }
 
-    public void loadTree(World world) {
-        if (!world.getEnvironment().equals(World.Environment.NORMAL)) return;
+    public Optional<LinkTree> loadTree(World world) {
+        if (!world.getEnvironment().equals(World.Environment.NORMAL)) return Optional.empty();
 
         var noneMatch = trees.stream().noneMatch(tree -> tree.getOverworld().equals(world));
         Preconditions.checkState(noneMatch, "World tree is already loaded for %s", world.getName());
@@ -58,6 +58,7 @@ public final class WorldLinkProvider implements LinkProvider {
         Optional.ofNullable(data.get(WorldLinkTree.LINK_NETHER, STRING)).map(Key::key).ifPresent(tree::setNether);
         Optional.ofNullable(data.get(WorldLinkTree.LINK_END, STRING)).map(Key::key).ifPresent(tree::setEnd);
         trees.add(tree);
+        return Optional.of(tree);
     }
 
     public void persistTrees() {
@@ -66,7 +67,7 @@ public final class WorldLinkProvider implements LinkProvider {
 
     public void persistTree(World world) {
         if (!world.getEnvironment().equals(World.Environment.NORMAL)) return;
-        getLinkTree(world).filter(linkTree -> !linkTree.isEmpty()).ifPresent(tree -> {
+        getLinkTree(world).ifPresent(tree -> {
             var container = world.getPersistentDataContainer();
             tree.getPersistedNether().map(Key::asString).ifPresentOrElse(
                     nether -> container.set(WorldLinkTree.LINK_NETHER, PersistentDataType.STRING, nether),
