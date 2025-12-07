@@ -4,6 +4,7 @@ import ca.spottedleaf.moonrise.common.util.TickThread;
 import dev.faststats.bukkit.BukkitMetrics;
 import dev.faststats.core.ErrorTracker;
 import dev.faststats.core.data.Metric;
+import dev.faststats.core.ErrorTracker;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
@@ -229,28 +230,5 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
             event.registrar().register(WorldCommand.create(this), "The main command to interact with this plugin");
             event.registrar().register(WorldSetSpawnCommand.create(this, "setworldspawn"), "Set the world spawn");
         }));
-    }
-
-    private Metric<?> addGeneratorChart() {
-        return Metric.stringArray("generators", () -> Arrays.stream(getServer().getPluginManager().getPlugins())
-                .filter(Plugin::isEnabled)
-                .filter(plugin -> generatorView().hasGenerator(plugin))
-                .map(Plugin::getName)
-                .toArray(String[]::new));
-    }
-
-    private Metric<?> addWorldsChart() {
-        return Metric.number("worlds", () -> getServer().getWorlds().size());
-    }
-
-    private Metric<?> addEnvironmentsChart() {
-        return Metric.stringArray("environments", () -> getServer().getWorlds().stream()
-                .map(world -> switch (world.getEnvironment()) {
-                    case NORMAL -> "Overworld";
-                    case NETHER -> "Nether";
-                    case THE_END -> "End";
-                    case CUSTOM -> "Custom";
-                })
-                .toArray(String[]::new));
     }
 }
