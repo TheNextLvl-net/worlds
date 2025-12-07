@@ -26,11 +26,11 @@ public record Generator(Plugin plugin, @Nullable String id) {
     }
 
     public @Nullable ChunkGenerator generator(String worldName) {
-        return plugin().getDefaultWorldGenerator(worldName, id());
+        return plugin.isEnabled() ? plugin.getDefaultWorldGenerator(worldName, id()) : null;
     }
 
     public @Nullable BiomeProvider biomeProvider(String worldName) {
-        return plugin().getDefaultBiomeProvider(worldName, id());
+        return plugin.isEnabled() ? plugin.getDefaultBiomeProvider(worldName, id()) : null;
     }
 
     @Contract(value = "_, _ -> new", pure = true)
@@ -43,7 +43,7 @@ public record Generator(Plugin plugin, @Nullable String id) {
         var generator = provider.getServer().getPluginManager().getPlugin(plugin);
 
         if (generator == null)
-            throw new GeneratorException(plugin, id, "Unknown plugin");
+            throw new GeneratorException(plugin, id, "Plugin not found");
         if (!generator.isEnabled())
             throw new GeneratorException(plugin, id, "Plugin is not enabled, is it 'load: STARTUP'?");
         if (!provider.generatorView().hasGenerator(generator))

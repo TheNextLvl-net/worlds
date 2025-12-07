@@ -22,6 +22,7 @@ import org.intellij.lang.annotations.Subst;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
 import java.util.Optional;
@@ -387,11 +388,11 @@ public abstract class LevelData implements Level {
                '}';
     }
 
-    public static Optional<Level.Builder> read(WorldsPlugin plugin, Path directory) {
+    public static Optional<Level.Builder> read(WorldsPlugin plugin, Path directory) throws IOException {
         var container = plugin.getServer().getWorldContainer().toPath();
         var level = directory.startsWith(container) ? directory : container.resolve(directory);
 
-        var levelData = plugin.levelView().getLevelDataFile(level).orElse(null);
+        var levelData = plugin.levelView().getLevelDataFile(level);
         if (levelData == null) return Optional.empty();
 
         var data = levelData.<CompoundTag>optional("Data");

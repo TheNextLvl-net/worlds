@@ -3,7 +3,6 @@ package net.thenextlvl.worlds.listener;
 import net.kyori.adventure.util.TriState;
 import net.minecraft.util.DirectoryLock;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.exception.GeneratorException;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.api.link.LinkTree;
 import org.bukkit.World;
@@ -63,11 +62,7 @@ public final class WorldListener implements Listener {
                 world.key().asString(), level.getGeneratorType().key().asString(),
                 world.getWorldFolder().getPath()
         )).exceptionally(throwable -> {
-            if (throwable instanceof GeneratorException e) {
-                var generator = e.getId() != null ? e.getPlugin() + e.getId() : e.getPlugin();
-                plugin.getComponentLogger().error("Skip loading dimension '{}'", path.getFileName());
-                plugin.getComponentLogger().error("Cannot use generator {}: {}", generator, e.getMessage());
-            } else if (throwable.getCause() instanceof DirectoryLock.LockException lock) {
+            if (throwable.getCause() instanceof DirectoryLock.LockException lock) {
                 plugin.getComponentLogger().error("Failed to start the minecraft server", lock);
                 plugin.getServer().shutdown();
             } else {
