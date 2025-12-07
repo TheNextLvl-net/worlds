@@ -292,9 +292,9 @@ final class PaperLevel extends LevelData {
         return builder.buildKeepingLast();
     }
 
-    public void persistWorld(final World world, final net.thenextlvl.worlds.api.generator.LevelStem dimension, final boolean enabled) {
-        final var worldKey = new NamespacedKey("worlds", "world_key");
-        final var dimensionKey = new NamespacedKey("worlds", "dimension");
+    public void persistWorld(World world, net.thenextlvl.worlds.api.generator.LevelStem dimension, boolean enabled) {
+        var worldKey = new NamespacedKey("worlds", "world_key");
+        var dimensionKey = new NamespacedKey("worlds", "dimension");
         world.getPersistentDataContainer().set(worldKey, STRING, world.key().asString());
         world.getPersistentDataContainer().set(dimensionKey, STRING, dimension.dimensionType().key().asString());
         plugin.levelView().setEnabled(world, enabled);
