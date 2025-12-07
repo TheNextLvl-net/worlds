@@ -112,10 +112,6 @@ public class PaperLevelView implements LevelView {
         return world.key().equals(OVERWORLD);
     }
 
-    public boolean isEnd(World world) {
-        return world.key().equals(END);
-    }
-
     private @Nullable Path getLevelDataPath(Path level) {
         return Optional.ofNullable(getFile(level, "level.dat"))
                 .orElseGet(() -> getFile(level, "level.dat_old"));
