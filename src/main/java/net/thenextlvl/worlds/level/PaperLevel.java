@@ -2,10 +2,13 @@ package net.thenextlvl.worlds.level;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
 import io.papermc.paper.FeatureHooks;
 import io.papermc.paper.world.PaperWorldLoader;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -27,6 +30,8 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.biome.BiomeManager;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.PatrolSpawner;
 import net.minecraft.world.level.levelgen.PhantomSpawner;
@@ -51,6 +56,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -158,6 +164,11 @@ final class PaperLevel extends LevelData {
             );
             worldDimensions = properties.create(context.datapackWorldgen());
 
+            /// Worlds start - replace generators
+            worldDimensions = replaceGenerator(LevelStem.NETHER, context.datapackWorldgen(), worldDimensions.dimensions(), worldDimensions.overworld());
+            worldDimensions = replaceGenerator(LevelStem.END, context.datapackWorldgen(), worldDimensions.dimensions(), worldDimensions.overworld());
+            /// Worlds end
+
             WorldDimensions.Complete complete = worldDimensions.bake(contextLevelStemRegistry);
             Lifecycle lifecycle = complete.lifecycle().add(context.datapackWorldgen().allRegistriesLifecycle());
 
@@ -254,6 +265,40 @@ final class PaperLevel extends LevelData {
         /// Worlds - complete future immediately if not folia
         if (!WorldsPlugin.RUNNING_FOLIA) future.complete(serverLevel.getWorld());
         return future;
+    }
+
+    /**
+     * @see WorldDimensions#replaceOverworldGenerator
+     */
+    private static WorldDimensions replaceGenerator(ResourceKey<LevelStem> key, HolderLookup.Provider registries, Map<ResourceKey<LevelStem>, LevelStem> dimensions, ChunkGenerator chunkGenerator) {
+        HolderLookup<net.minecraft.world.level.dimension.DimensionType> holderLookup = registries.lookupOrThrow(Registries.DIMENSION_TYPE);
+        Map<ResourceKey<LevelStem>, LevelStem> map = withGenerator(key, holderLookup, dimensions, chunkGenerator);
+        return new WorldDimensions(map);
+    }
+
+    /**
+     * @see WorldDimensions#withOverworld(HolderLookup, Map, ChunkGenerator)
+     */
+    private static Map<ResourceKey<LevelStem>, LevelStem> withGenerator(
+            ResourceKey<LevelStem> key, HolderLookup<net.minecraft.world.level.dimension.DimensionType> dimensionTypeRegistry, Map<ResourceKey<LevelStem>, LevelStem> dimensions, ChunkGenerator chunkGenerator
+    ) {
+        LevelStem levelStem = dimensions.get(key);
+        Holder<net.minecraft.world.level.dimension.DimensionType> holder = levelStem == null
+                ? dimensionTypeRegistry.getOrThrow(BuiltinDimensionTypes.OVERWORLD)
+                : levelStem.type();
+        return withGenerator(key, dimensions, holder, chunkGenerator);
+    }
+
+    /**
+     * @see WorldDimensions#withOverworld(Map, Holder, ChunkGenerator)
+     */
+    private static Map<ResourceKey<LevelStem>, LevelStem> withGenerator(
+            ResourceKey<LevelStem> key, Map<ResourceKey<LevelStem>, LevelStem> stemMap, Holder<net.minecraft.world.level.dimension.DimensionType> dimensionType, ChunkGenerator chunkGenerator
+    ) {
+        ImmutableMap.Builder<ResourceKey<LevelStem>, LevelStem> builder = ImmutableMap.builder();
+        builder.putAll(stemMap);
+        builder.put(key, new LevelStem(dimensionType, chunkGenerator));
+        return builder.buildKeepingLast();
     }
 
     public void persistWorld(World world, net.thenextlvl.worlds.api.generator.LevelStem dimension, boolean enabled) {
