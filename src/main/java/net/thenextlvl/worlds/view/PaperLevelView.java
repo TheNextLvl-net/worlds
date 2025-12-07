@@ -22,7 +22,6 @@ import net.thenextlvl.worlds.api.view.LevelView;
 import net.thenextlvl.worlds.level.LevelData;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.generator.WorldInfo;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -67,6 +66,10 @@ import static org.bukkit.persistence.PersistentDataType.BOOLEAN;
 
 @NullMarked
 public class PaperLevelView implements LevelView {
+    private static final Key OVERWORLD = Key.key("overworld");
+    private static final Key NETHER = Key.key("the_nether");
+    private static final Key END = Key.key("the_end");
+    
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")
             .withZone(ZoneId.systemDefault());
     private static final NamespacedKey ENABLED_KEY = new NamespacedKey("worlds", "enabled");
@@ -88,14 +91,24 @@ public class PaperLevelView implements LevelView {
         this.plugin = plugin;
     }
 
-    @SuppressWarnings("resource")
     public World getOverworld() {
-        var handle = ((CraftServer) plugin.getServer()).getHandle();
-        return handle.getServer().overworld().getWorld();
+        return getWorld(OVERWORLD).orElseThrow(() -> new IllegalStateException("Overworld not found"));
+    }
+
+    public Optional<World> getNether() {
+        return getWorld(NETHER);
+    }
+
+    public Optional<World> getEnd() {
+        return getWorld(END);
+    }
+
+    private Optional<World> getWorld(Key key) {
+        return Optional.ofNullable(plugin.getServer().getWorld(key));
     }
 
     public boolean isOverworld(World world) {
-        return world.equals(getOverworld());
+        return world.key().equals(OVERWORLD);
     }
 
     public Optional<Path> getLevelDataPath(Path level) {
