@@ -91,6 +91,29 @@ public class Presets {
             .addStructure(Structure.literal("ocean_ruins"))
             .addStructure(Structure.literal("shipwrecks"));
 
+    /**
+     * A custom flat preset for the End dimension.
+     *
+     * @since 3.11.0
+     */
+    public static final Preset END_FLAT = new Preset("Flat End")
+            .biome(Biome.literal("the_end"))
+            .addLayer(new Layer(Material.BEDROCK, 1))
+            .addLayer(new Layer(Material.END_STONE, 3));
+
+    /**
+     * A custom flat preset for the Nether dimension.
+     *
+     * @since 3.11.0
+     */
+    public static final Preset FLAT_NETHER = new Preset("Flat Nether")
+            .lakes(true)
+            .features(true)
+            .decoration(true)
+            .biome(Biome.literal("the_nether"))
+            .addLayer(new Layer(Material.BEDROCK, 1))
+            .addLayer(new Layer(Material.NETHERRACK, 3));
+
     private static final Set<Preset> presets = Set.of(
             BOTTOMLESS_PIT,
             CLASSIC_FLAT,
@@ -100,7 +123,9 @@ public class Presets {
             SNOWY_KINGDOM,
             THE_VOID,
             TUNNELERS_DREAM,
-            WATER_WORLD
+            WATER_WORLD,
+            END_FLAT,
+            FLAT_NETHER
     );
 
     public static @Unmodifiable Set<Preset> presets() {
