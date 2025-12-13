@@ -1,6 +1,7 @@
 package net.thenextlvl.worlds;
 
 import dev.faststats.bukkit.BukkitMetrics;
+import dev.faststats.core.chart.Chart;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
@@ -28,6 +29,7 @@ import net.thenextlvl.worlds.view.PaperLevelView;
 import net.thenextlvl.worlds.view.PluginGeneratorView;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.World;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
@@ -35,6 +37,7 @@ import org.jspecify.annotations.NullMarked;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -65,7 +68,11 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
     private final dev.faststats.core.Metrics fastStats = BukkitMetrics.factory()
             .token("978c4aa9ecf78ae2e9c0776601fd4c6c")
+            .addChart(addGeneratorChart())
+            .addChart(addWorldsChart())
+            // .addChart(addEnvironmentsChart()) // fixme: 
             .create(this);
+
     private final Metrics metrics = new Metrics(this, 19652);
 
     public WorldsPlugin() throws IOException {
@@ -216,5 +223,29 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
             event.registrar().register(WorldCommand.create(this), "The main command to interact with this plugin");
             event.registrar().register(WorldSetSpawnCommand.create(this, "setworldspawn"), "Set the world spawn");
         }));
+    }
+
+    private Chart<?> addGeneratorChart() {
+        return Chart.stringArray("generators", () -> Arrays.stream(getServer().getPluginManager().getPlugins())
+                .filter(Plugin::isEnabled)
+                .filter(plugin -> generatorView().hasGenerator(plugin))
+                .map(Plugin::getName)
+                .toArray(String[]::new));
+    }
+
+    private Chart<?> addWorldsChart() {
+        return Chart.number("worlds", () -> getServer().getWorlds().size());
+    }
+
+    // fixme: use map chart? transmit environment counts instead of array, needs new chart type
+    private Chart<?> addEnvironmentsChart() {
+        return Chart.stringArray("environments", () -> getServer().getWorlds().stream()
+                .map(world -> switch (world.getEnvironment()) {
+                    case NORMAL -> "overworld";
+                    case NETHER -> "nether";
+                    case THE_END -> "end";
+                    case CUSTOM -> "custom";
+                })
+                .toArray(String[]::new));
     }
 }
