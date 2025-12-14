@@ -47,6 +47,7 @@ import net.minecraft.world.level.validation.ContentValidationException;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.generator.DimensionType;
 import net.thenextlvl.worlds.api.generator.Generator;
+import net.thenextlvl.worlds.api.generator.GeneratorType;
 import net.thenextlvl.worlds.api.preset.Presets;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -200,8 +201,10 @@ final class PaperLevel extends LevelData {
             worldDimensions = properties.create(context.datapackWorldgen());
 
             /// Worlds start - replace generators
-            worldDimensions = replaceGenerator(LevelStem.NETHER, context.datapackWorldgen(), worldDimensions.dimensions(), worldDimensions.overworld());
-            worldDimensions = replaceGenerator(LevelStem.END, context.datapackWorldgen(), worldDimensions.dimensions(), worldDimensions.overworld());
+            if (generatorType.equals(GeneratorType.FLAT) || generatorType.equals(GeneratorType.DEBUG)) {
+                worldDimensions = replaceGenerator(LevelStem.NETHER, context.datapackWorldgen(), worldDimensions.dimensions(), worldDimensions.overworld());
+                worldDimensions = replaceGenerator(LevelStem.END, context.datapackWorldgen(), worldDimensions.dimensions(), worldDimensions.overworld());
+            }
             /// Worlds end
 
             WorldDimensions.Complete complete = worldDimensions.bake(contextLevelStemRegistry);
