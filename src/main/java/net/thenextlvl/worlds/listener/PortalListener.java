@@ -2,6 +2,7 @@ package net.thenextlvl.worlds.listener;
 
 import io.papermc.paper.event.entity.EntityPortalReadyEvent;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.levelgen.feature.EndPlatformFeature;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.model.PortalCooldown;
@@ -39,6 +40,11 @@ public class PortalListener implements Listener {
                 .ifPresentOrElse(event::setTargetWorld, () -> event.setTargetWorld(null));
     }
 
+    /**
+     * @see net.minecraft.world.level.block.EndPortalBlock#getPortalDestination(ServerLevel, net.minecraft.world.entity.Entity, BlockPos)
+     * @see net.minecraft.world.entity.Entity#handlePortal()
+     */
+    @SuppressWarnings("JavadocReference")
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityPortalEnter(EntityPortalEnterEvent event) {
         if (!event.getPortalType().equals(PortalType.ENDER)) return;
@@ -52,6 +58,11 @@ public class PortalListener implements Listener {
 
         var targetWorld = readyEvent.getTargetWorld();
         if (targetWorld == null) return;
+
+        if (plugin.levelView().isOverworld(event.getEntity().getWorld()) && plugin.levelView().isEnd(targetWorld)) {
+            event.setCancelled(false); // Don't handle overworld to end teleportation to allow gravity block duping
+            return;
+        }
 
         if (targetWorld.getEnvironment().equals(World.Environment.THE_END)) {
             var spawn = new Location(targetWorld, 100.5, 49, 0.5, 90, 0);
