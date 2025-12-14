@@ -9,6 +9,7 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver;
 import io.papermc.paper.command.brigadier.argument.resolvers.RotationResolver;
+import io.papermc.paper.math.Rotation;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.brigadier.SimpleCommand;
@@ -44,7 +45,7 @@ public final class WorldSetSpawnCommand extends SimpleCommand {
         var resolver = tryGetArgument(context, "position", BlockPositionResolver.class).orElse(null);
         var position = resolver != null ? resolver.resolve(context.getSource()) : location;
         var rotationResolver = tryGetArgument(context, "rotation", RotationResolver.class).orElse(null);
-        var rotation = rotationResolver != null ? rotationResolver.resolve(context.getSource()) : location.getRotation();
+        var rotation = rotationResolver != null ? rotationResolver.resolve(context.getSource()) : Rotation.rotation(location.getYaw(), location.getPitch());
 
         var success = location.getWorld().setSpawnLocation(position.toLocation(location.getWorld()).setRotation(rotation));
         var message = success ? "world.spawn.set.success" : "world.spawn.set.failed";
