@@ -232,22 +232,7 @@ final class PaperLevel extends LevelData {
         /// Worlds end
 
         console.addLevel(serverLevel);
-
-        /// Worlds start - initialize world for folia
-        var future = new CompletableFuture<World>();
-        if (WorldsPlugin.RUNNING_FOLIA) {
-            // fixme: restore folia support once possible
-            // serverLevel.randomSpawnSelection = new ChunkPos(serverLevel.getChunkSource().randomState().sampler().findSpawnPosition());
-
-            // var x = serverLevel.randomSpawnSelection.x;
-            // var z = serverLevel.randomSpawnSelection.z;
-
-            // plugin.getServer().getRegionScheduler().run(plugin, serverLevel.getWorld(), x, z, scheduledTask -> {
-            //     console.initWorld(serverLevel, primaryLevelData, primaryLevelData.worldGenOptions());
-            //     future.complete(serverLevel.getWorld());
-            // });
-            /// Worlds end
-        } else console.initWorld(serverLevel, primaryLevelData, primaryLevelData.worldGenOptions());
+        console.initWorld(serverLevel, primaryLevelData, primaryLevelData.worldGenOptions());
 
         serverLevel.setSpawnSettings(true);
 
@@ -256,18 +241,13 @@ final class PaperLevel extends LevelData {
         if (generator != null) persistGenerator(serverLevel.getWorld(), generator);
         /// Worlds end
 
-        /// Worlds start - start entity and region ticking for folia
-        // fixme: restore folia support once possible
-        // if (WorldsPlugin.RUNNING_FOLIA)
-        //     io.papermc.paper.threadedregions.RegionizedServer.getInstance().addWorld(serverLevel);
+        /// Worlds start - start entity ticking for folia
         FeatureHooks.tickEntityManager(serverLevel);
         /// Worlds end
 
         console.prepareLevel(serverLevel);
 
-        /// Worlds - complete future immediately if not folia
-        if (!WorldsPlugin.RUNNING_FOLIA) future.complete(serverLevel.getWorld());
-        return future;
+        return CompletableFuture.completedFuture(serverLevel.getWorld());
     }
 
     /**

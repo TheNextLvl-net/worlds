@@ -351,7 +351,7 @@ public class PaperLevelView implements LevelView {
                 .toArray(CompletableFuture[]::new)
         ).thenCompose(ignored -> {
             var worldPath = world.getWorldFolder().toPath();
-            return unloadAsync(world, true).thenCompose(success -> {
+            return unloadAsync(world, true).thenComposeAsync(success -> {
                 if (!success) return CompletableFuture.<RestoringResult>completedFuture(
                         new RestoringResultImpl(null, DeletionResult.UNLOAD_FAILED)
                 );

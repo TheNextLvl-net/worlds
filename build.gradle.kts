@@ -29,8 +29,7 @@ repositories {
 }
 
 dependencies {
-    // paperweight.foliaDevBundle("1.21.11-pre3-R0.1-SNAPSHOT") // fixme: restore folia support once possible
-    paperweight.paperDevBundle("1.21.11-pre3-R0.1-SNAPSHOT")
+    paperweight.foliaDevBundle("1.21.11-R0.1-SNAPSHOT")
 
     implementation(project(":api"))
 
