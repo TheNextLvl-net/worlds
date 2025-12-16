@@ -49,8 +49,6 @@ public final class KeyArgument implements CustomArgumentType<Key, Key> {
     }
 
     private boolean isAllowedInKey(char character) {
-        // todo: replace with Key#allowedInKey
-        //  https://github.com/KyoriPowered/adventure/pull/1286
         return Key.allowedInNamespace(character) || Key.allowedInValue(character) || character == ':';
     }
 }
