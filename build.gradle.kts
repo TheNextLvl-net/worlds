@@ -19,7 +19,7 @@ tasks.compileJava {
 }
 
 group = "net.thenextlvl.worlds"
-version = "3.10.4"
+version = "3.10.4-mc1.21.11"
 
 repositories {
     mavenCentral()
@@ -29,8 +29,7 @@ repositories {
 }
 
 dependencies {
-    // paperweight.foliaDevBundle("1.21.10-R0.1-SNAPSHOT") // fixme: restore folia support once possible
-    paperweight.paperDevBundle("1.21.10-R0.1-SNAPSHOT")
+    paperweight.foliaDevBundle("1.21.11-R0.1-SNAPSHOT")
 
     implementation(project(":api"))
 
@@ -64,7 +63,7 @@ tasks.shadowJar {
 paper {
     name = "Worlds"
     main = "net.thenextlvl.worlds.WorldsPlugin"
-    apiVersion = "1.21.5"
+    apiVersion = "1.21.11"
     description = "Create, delete and manage your worlds"
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
     website = "https://thenextlvl.net"

@@ -4,8 +4,8 @@ import com.google.common.base.Preconditions;
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.KeyPattern;
-import net.minecraft.FileUtil;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.FileUtil;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.thenextlvl.nbt.NBTInputStream;
 import net.thenextlvl.nbt.tag.CompoundTag;
@@ -351,7 +351,7 @@ public class PaperLevelView implements LevelView {
                 .toArray(CompletableFuture[]::new)
         ).thenCompose(ignored -> {
             var worldPath = world.getWorldFolder().toPath();
-            return unloadAsync(world, true).thenCompose(success -> {
+            return unloadAsync(world, true).thenComposeAsync(success -> {
                 if (!success) return CompletableFuture.<RestoringResult>completedFuture(
                         new RestoringResultImpl(null, DeletionResult.UNLOAD_FAILED)
                 );
