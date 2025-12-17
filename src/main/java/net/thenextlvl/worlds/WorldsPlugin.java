@@ -1,5 +1,6 @@
 package net.thenextlvl.worlds;
 
+import ca.spottedleaf.moonrise.common.util.TickThread;
 import dev.faststats.bukkit.BukkitMetrics;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -160,7 +161,8 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     }
 
     public <T> CompletableFuture<T> supplyGlobal(Supplier<CompletableFuture<T>> supplier) {
-        if (getServer().isGlobalTickThread()) try {
+        var foliaTickThread = RUNNING_FOLIA && Thread.currentThread().getClass().equals(TickThread.class);
+        if (foliaTickThread || getServer().isGlobalTickThread()) try {
             return supplier.get();
         } catch (Exception e) {
             return CompletableFuture.failedFuture(e);
