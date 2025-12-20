@@ -44,7 +44,6 @@ public class PortalListener implements Listener {
      * @see net.minecraft.world.level.block.EndPortalBlock#getPortalDestination(ServerLevel, net.minecraft.world.entity.Entity, BlockPos)
      * @see net.minecraft.world.entity.Entity#handlePortal()
      */
-    @SuppressWarnings("JavadocReference")
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityPortalEnter(EntityPortalEnterEvent event) {
         if (!event.getPortalType().equals(PortalType.ENDER)) return;
