@@ -264,7 +264,6 @@ public class PaperLevelView implements LevelView {
      * @see ServerLevel#saveLevelData(boolean)
      */
     @Override
-    @SuppressWarnings("JavadocReference")
     public CompletableFuture<@Nullable Void> saveLevelDataAsync(World world) {
         var level = ((CraftWorld) world).getHandle();
         if (level.getDragonFight() != null) {
