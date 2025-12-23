@@ -76,7 +76,7 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     private final Metrics metrics = new Metrics(this, 19652);
 
-    public WorldsPlugin() throws IOException {
+    public WorldsPlugin() {
         registerCommands();
     }
 
