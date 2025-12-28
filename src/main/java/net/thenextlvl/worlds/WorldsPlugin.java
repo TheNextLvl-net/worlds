@@ -124,6 +124,7 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         getComponentLogger().warn("This is not required, and incompatible with Vanilla world generation");
         getComponentLogger().warn("Please use the preset 'the-void' instead");
         getComponentLogger().warn("You can do this with the command '/world create <key> preset the-void'");
+        getComponentLogger().warn("Read more at https://thenextlvl.net/blog/void-generator-plugins");
     }
 
     public Path presetsFolder() {
