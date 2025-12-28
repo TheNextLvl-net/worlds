@@ -71,7 +71,7 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
             .token("978c4aa9ecf78ae2e9c0776601fd4c6c")
             .addChart(addGeneratorChart())
             .addChart(addWorldsChart())
-            // .addChart(addEnvironmentsChart()) // fixme: 
+            .addChart(addEnvironmentsChart())
             .create(this);
 
     private final Metrics metrics = new Metrics(this, 19652);
@@ -239,14 +239,13 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         return Chart.number("worlds", () -> getServer().getWorlds().size());
     }
 
-    // fixme: use map chart? transmit environment counts instead of array, needs new chart type
     private Chart<?> addEnvironmentsChart() {
         return Chart.stringArray("environments", () -> getServer().getWorlds().stream()
                 .map(world -> switch (world.getEnvironment()) {
-                    case NORMAL -> "overworld";
-                    case NETHER -> "nether";
-                    case THE_END -> "end";
-                    case CUSTOM -> "custom";
+                    case NORMAL -> "Overworld";
+                    case NETHER -> "Nether";
+                    case THE_END -> "End";
+                    case CUSTOM -> "Custom";
                 })
                 .toArray(String[]::new));
     }
