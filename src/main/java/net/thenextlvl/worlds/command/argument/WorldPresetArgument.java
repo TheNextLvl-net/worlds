@@ -1,19 +1,22 @@
 package net.thenextlvl.worlds.command.argument;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import core.file.formats.JsonFile;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.preset.Preset;
 import net.thenextlvl.worlds.api.preset.Presets;
 import org.jspecify.annotations.NullMarked;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Locale;
@@ -44,9 +47,16 @@ public final class WorldPresetArgument implements SimpleArgumentType<Preset, Str
         var file = plugin.presetsFolder().resolve(type + ".json");
         if (!Files.isRegularFile(file)) throw new IllegalStateException("No preset found");
 
-        var root = new JsonFile<>(file, new JsonObject()).getRoot();
-        if (root.isJsonObject()) return Preset.deserialize(root);
-        throw new IllegalStateException("Not a valid preset");
+
+        try (var jsonReader = new JsonReader(new InputStreamReader(new BufferedInputStream(
+                Files.newInputStream(file)
+        ), StandardCharsets.UTF_8))) {
+            var root = JsonParser.parseReader(jsonReader);
+            if (root.isJsonObject()) return Preset.deserialize(root.getAsJsonObject());
+            throw new IllegalStateException("Not a valid preset");
+        } catch (IOException e) {
+            throw new IllegalStateException("Not a valid preset", e);
+        }
     }
 
     @Override
