@@ -8,7 +8,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import core.file.formats.JsonFile;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.preset.Preset;
 import net.thenextlvl.worlds.api.preset.Presets;
