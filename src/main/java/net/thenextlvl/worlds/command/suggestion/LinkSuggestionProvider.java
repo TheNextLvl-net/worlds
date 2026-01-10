@@ -45,7 +45,8 @@ public final class LinkSuggestionProvider<T> implements SuggestionProvider<T> {
         @Override
         public CompletableFuture<Suggestions> getSuggestions(CommandContext<T> context, SuggestionsBuilder builder) {
             plugin.getServer().getWorlds().stream()
-                    .filter(world -> !world.getEnvironment().equals(Environment.NORMAL))
+                    .filter(world -> !world.getEnvironment().equals(Environment.NORMAL)
+                            && !world.getEnvironment().equals(Environment.CUSTOM))
                     .filter(world -> !plugin.linkProvider().hasLinkTree(world))
                     .map(World::key)
                     .map(Key::asString)
