@@ -10,6 +10,7 @@ import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.level.Level;
 import net.thenextlvl.worlds.command.argument.LevelPathArgument;
 import net.thenextlvl.worlds.command.brigadier.SimpleCommand;
+import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 
@@ -29,7 +30,8 @@ final class WorldLoadCommand extends SimpleCommand {
     }
 
     private RequiredArgumentBuilder<CommandSourceStack, Path> load() {
-        return Commands.argument("path", new LevelPathArgument(plugin, false)).executes(this);
+        return Commands.argument("path", new LevelPathArgument(plugin))
+                .suggests(new LevelSuggestionProvider(plugin, false)).executes(this);
     }
 
     @Override
