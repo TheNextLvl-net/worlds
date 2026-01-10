@@ -84,8 +84,7 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     @Override
     public void onLoad() {
         createPresetsFolder();
-        if (RUNNING_FOLIA) warnExperimental();
-        else checkPerWorldsRemnants();
+        if (!RUNNING_FOLIA) checkPerWorldsRemnants();
         versionChecker.checkVersion();
         registerServices();
     }
@@ -202,11 +201,6 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         } catch (IOException e) {
             getComponentLogger().warn("Failed to create presets folder", e);
         }
-    }
-
-    private void warnExperimental() {
-        getComponentLogger().warn("Folia builds of Worlds are extremely experimental");
-        getComponentLogger().warn("Please report any issues you encounter to {}", ISSUES);
     }
 
     private void registerServices() {
