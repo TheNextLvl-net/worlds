@@ -63,7 +63,7 @@ tasks.shadowJar {
 paper {
     name = "Worlds"
     main = "net.thenextlvl.worlds.WorldsPlugin"
-    apiVersion = "1.21.5"
+    apiVersion = "1.21.9"
     description = "Create, delete and manage your worlds"
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
     website = "https://thenextlvl.net"
