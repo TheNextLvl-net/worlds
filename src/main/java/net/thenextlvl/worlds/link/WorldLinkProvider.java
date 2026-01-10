@@ -33,12 +33,14 @@ public final class WorldLinkProvider implements LinkProvider {
     }
 
     public void unloadTree(World world) {
-        if (!world.getEnvironment().equals(World.Environment.NORMAL)) return;
+        if (!world.getEnvironment().equals(World.Environment.NORMAL)
+                && !world.getEnvironment().equals(World.Environment.CUSTOM)) return;
         trees.removeIf(tree -> tree.getOverworld().equals(world));
     }
 
     public Optional<LinkTree> loadTree(World world) {
-        if (!world.getEnvironment().equals(World.Environment.NORMAL)) return Optional.empty();
+        if (!world.getEnvironment().equals(World.Environment.NORMAL)
+                && !world.getEnvironment().equals(World.Environment.CUSTOM)) return Optional.empty();
 
         var noneMatch = trees.stream().noneMatch(tree -> tree.getOverworld().equals(world));
         Preconditions.checkState(noneMatch, "World tree is already loaded for %s", world.getName());
@@ -66,7 +68,8 @@ public final class WorldLinkProvider implements LinkProvider {
     }
 
     public void persistTree(World world) {
-        if (!world.getEnvironment().equals(World.Environment.NORMAL)) return;
+        if (!world.getEnvironment().equals(World.Environment.NORMAL)
+                && !world.getEnvironment().equals(World.Environment.CUSTOM)) return;
         getLinkTree(world).ifPresent(tree -> {
             var container = world.getPersistentDataContainer();
             tree.getPersistedNether().map(Key::asString).ifPresentOrElse(
@@ -97,14 +100,12 @@ public final class WorldLinkProvider implements LinkProvider {
     public Optional<World> getTarget(World world, PortalType type) {
         return switch (type) {
             case NETHER -> switch (world.getEnvironment()) {
-                case NORMAL, THE_END -> getLinkTree(world).flatMap(LinkTree::getNether);
+                case NORMAL, THE_END, CUSTOM -> getLinkTree(world).flatMap(LinkTree::getNether);
                 case NETHER -> getLinkTree(world).map(LinkTree::getOverworld);
-                default -> Optional.empty();
             };
             case ENDER -> switch (world.getEnvironment()) {
-                case NORMAL, NETHER -> getLinkTree(world).flatMap(LinkTree::getEnd);
+                case NORMAL, NETHER, CUSTOM -> getLinkTree(world).flatMap(LinkTree::getEnd);
                 case THE_END -> getLinkTree(world).map(LinkTree::getOverworld);
-                default -> Optional.empty();
             };
             default -> Optional.empty();
         };
@@ -112,7 +113,8 @@ public final class WorldLinkProvider implements LinkProvider {
 
     @Override
     public boolean link(World source, World target) {
-        if (!source.getEnvironment().equals(Environment.NORMAL)) return false;
+        if (!source.getEnvironment().equals(Environment.NORMAL)
+                && !source.getEnvironment().equals(Environment.CUSTOM)) return false;
         return getLinkTree(source).map(linkTree -> switch (target.getEnvironment()) {
             case NETHER -> linkTree.setNether(target);
             case THE_END -> linkTree.setEnd(target);
