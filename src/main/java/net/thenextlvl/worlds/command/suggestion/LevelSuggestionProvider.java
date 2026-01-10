@@ -15,11 +15,11 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
-public abstract class LevelSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
-    protected final WorldsPlugin plugin;
+public final class LevelSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
+    private final WorldsPlugin plugin;
     private final boolean unknownLevels;
 
-    protected LevelSuggestionProvider(WorldsPlugin plugin, boolean unknownLevels) {
+    public LevelSuggestionProvider(WorldsPlugin plugin, boolean unknownLevels) {
         this.unknownLevels = unknownLevels;
         this.plugin = plugin;
     }
