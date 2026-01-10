@@ -38,7 +38,8 @@ final class WorldImportCommand extends OptionCommand {
 
     @Override
     protected RequiredArgumentBuilder<CommandSourceStack, Path> createCommand() {
-        var command = Commands.argument("path", new LevelPathArgument(plugin, true)).executes(this);
+        var command = Commands.argument("path", new LevelPathArgument(plugin))
+                .suggests(new LevelSuggestionProvider(plugin, true)).executes(this);
 
         addOptions(command, false, Set.of(
                 new Option("key", new KeyArgument()),
