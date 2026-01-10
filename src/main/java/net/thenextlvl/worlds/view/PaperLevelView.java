@@ -112,6 +112,10 @@ public class PaperLevelView implements LevelView {
         return world.key().equals(OVERWORLD);
     }
 
+    public boolean isEnd(World world) {
+        return world.key().equals(END);
+    }
+
     private @Nullable Path getLevelDataPath(Path level) {
         return Optional.ofNullable(getFile(level, "level.dat"))
                 .orElseGet(() -> getFile(level, "level.dat_old"));
@@ -120,7 +124,7 @@ public class PaperLevelView implements LevelView {
     public @Nullable CompoundTag getLevelDataFile(Path level) throws IOException {
         var path = getLevelDataPath(level);
         if (path == null) return null;
-        try (var inputStream = new NBTInputStream(
+        try (var inputStream = NBTInputStream.create(
                 Files.newInputStream(path, READ),
                 StandardCharsets.UTF_8
         )) {
