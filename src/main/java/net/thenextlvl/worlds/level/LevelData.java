@@ -504,6 +504,7 @@ public abstract class LevelData implements Level {
     }
 
     private static LevelStem getLevelStem(WorldsPlugin plugin, Path directory) {
+        if (Files.isDirectory(directory.resolve("region"))) return LevelStem.OVERWORLD;
         var end = plugin.levelView().hasEndDimension(directory);
         var nether = plugin.levelView().hasNetherDimension(directory);
         if (end && !nether) return LevelStem.END;
