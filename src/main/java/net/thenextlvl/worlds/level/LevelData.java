@@ -23,6 +23,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
 import java.util.Optional;
@@ -392,21 +393,21 @@ public abstract class LevelData implements Level {
     @Override
     public String toString() {
         return "LevelData{" +
-               "directory=" + directory +
-               ", key=" + key +
-               ", name='" + name + '\'' +
-               ", levelStem=" + levelStem +
-               ", generatorType=" + generatorType.key() +
-               ", generator=" + generator +
-               ", preset=" + preset +
-               ", enabled=" + enabled +
-               ", hardcore=" + hardcore +
-               ", worldKnown=" + worldKnown +
-               ", structures=" + structures +
-               ", bonusChest=" + bonusChest +
-               ", spawnChunkRadius=" + spawnChunkRadius +
-               ", seed=" + seed +
-               '}';
+                "directory=" + directory +
+                ", key=" + key +
+                ", name='" + name + '\'' +
+                ", levelStem=" + levelStem +
+                ", generatorType=" + generatorType.key() +
+                ", generator=" + generator +
+                ", preset=" + preset +
+                ", enabled=" + enabled +
+                ", hardcore=" + hardcore +
+                ", worldKnown=" + worldKnown +
+                ", structures=" + structures +
+                ", bonusChest=" + bonusChest +
+                ", spawnChunkRadius=" + spawnChunkRadius +
+                ", seed=" + seed +
+                '}';
     }
 
     public static Optional<Level.Builder> read(WorldsPlugin plugin, Path directory) throws IOException {
@@ -535,9 +536,9 @@ public abstract class LevelData implements Level {
 
     private static boolean isKnown(CompoundTag tag) {
         return tag.containsKey("worlds:dimension")
-               || tag.containsKey("worlds:enabled")
-               || tag.containsKey("worlds:generator")
-               || tag.containsKey("worlds:world_key");
+                || tag.containsKey("worlds:enabled")
+                || tag.containsKey("worlds:generator")
+                || tag.containsKey("worlds:world_key");
     }
 
     public static @Subst("pattern") String createKey(String name) {
