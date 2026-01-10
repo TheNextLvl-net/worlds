@@ -708,7 +708,7 @@ public class PaperLevelView implements LevelView {
         }
     }
 
-    private void copyDirectory(Path source, Path destination, @Nullable BiPredicate<Path, BasicFileAttributes> filter) throws IOException {
+    public void copyDirectory(Path source, Path destination, @Nullable BiPredicate<Path, BasicFileAttributes> filter) throws IOException {
         Files.walkFileTree(source, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attributes) throws IOException {
