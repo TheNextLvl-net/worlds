@@ -17,9 +17,11 @@ import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.argument.LevelPathArgument;
 import net.thenextlvl.worlds.command.argument.LevelStemArgument;
 import net.thenextlvl.worlds.command.brigadier.OptionCommand;
+import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Set;
 
@@ -38,13 +40,15 @@ final class WorldImportCommand extends OptionCommand {
 
     @Override
     protected RequiredArgumentBuilder<CommandSourceStack, Path> createCommand() {
-        var command = Commands.argument("path", new LevelPathArgument(plugin, true)).executes(this);
+        var command = Commands.argument("path", new LevelPathArgument(plugin))
+                .suggests(new LevelSuggestionProvider(plugin, true)).executes(this);
 
         addOptions(command, false, Set.of(
-                new Option("key", new KeyArgument()),
+                new Option("dimension", new LevelStemArgument(plugin)),
+                new Option("directory", new LevelPathArgument(plugin)),
                 new Option("generator", new GeneratorArgument(plugin)),
-                new Option("name", StringArgumentType.string()),
-                new Option("dimension", new LevelStemArgument(plugin))
+                new Option("key", new KeyArgument()),
+                new Option("name", StringArgumentType.string())
         ), null);
 
         return command;
@@ -61,21 +65,34 @@ final class WorldImportCommand extends OptionCommand {
             return 0;
         }
 
+        var dimension = tryGetArgument(context, "dimension", LevelStem.class).orElse(null);
+        var directory = tryGetArgument(context, "directory", Path.class).filter(dir -> !dir.equals(path)).orElse(null);
         var displayName = tryGetArgument(context, "name", String.class).orElse(null);
         var generator = tryGetArgument(context, "generator", Generator.class).orElse(null);
         var key = tryGetArgument(context, "key", Key.class).orElse(null);
-        var dimension = tryGetArgument(context, "dimension", LevelStem.class).orElse(null);
 
-        plugin.bundle().sendMessage(sender, "world.import",
-                Placeholder.parsed("world", path.toString()));
+        var name = displayName != null ? displayName : path.getFileName().toString();
 
-        var build = plugin.levelView().read(path).map(level ->
-                level.key(key).name(displayName).generator(generator).levelStem(dimension).build());
+        plugin.bundle().sendMessage(sender, "world.import", Placeholder.parsed("world", name));
+
+        if (directory != null) {
+            try {
+                plugin.levelView().copyDirectory(path, directory, null);
+            } catch (IOException e) {
+                plugin.getComponentLogger().warn("Failed to copy world {} to {}", path, directory, e);
+                plugin.bundle().sendMessage(sender, "world.import.failed", Placeholder.parsed("world", name));
+                return 0;
+            }
+        }
+
+        var build = plugin.levelView().read(path).map(level -> {
+            if (directory != null) level.directory(directory).worldKnown(false);
+            return level.key(key).name(displayName).generator(generator).levelStem(dimension).build();
+        });
         var world = build.filter(level -> !level.isWorldKnown()).map(Level::createAsync).orElse(null);
 
         if (world == null) {
-            plugin.bundle().sendMessage(sender, "world.import.failed",
-                    Placeholder.parsed("world", path.toString()));
+            plugin.bundle().sendMessage(sender, "world.import.failed", Placeholder.parsed("world", name));
             return 0;
         }
 
@@ -85,9 +102,9 @@ final class WorldImportCommand extends OptionCommand {
             if (!(sender instanceof Entity entity)) return;
             entity.teleportAsync(level.getSpawnLocation(), COMMAND);
         }).exceptionally(throwable -> {
-            plugin.bundle().sendMessage(sender, "world.import.failed",
-                    Placeholder.parsed("world", path.toString()));
-            plugin.getComponentLogger().warn("Failed to import world {}", path, throwable);
+            plugin.bundle().sendMessage(sender, "world.import.failed", Placeholder.parsed("world", name));
+            var t = throwable.getCause() != null ? throwable.getCause() : throwable;
+            plugin.getComponentLogger().warn("Failed to import world {}", name, t);
             return null;
         });
 
