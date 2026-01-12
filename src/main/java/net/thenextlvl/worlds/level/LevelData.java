@@ -51,6 +51,7 @@ public abstract class LevelData implements Level {
     protected final boolean worldKnown;
     protected final boolean structures;
     protected final boolean bonusChest;
+    protected final boolean ignoreLevelData;
     protected final long seed;
 
     protected LevelData(WorldsPlugin plugin, Builder builder) {
@@ -72,6 +73,7 @@ public abstract class LevelData implements Level {
         this.worldKnown = builder.worldKnown != null ? builder.worldKnown : false;
         this.structures = builder.structures != null ? builder.structures : plugin.getServer().getGenerateStructures();
         this.bonusChest = builder.bonusChest != null ? builder.bonusChest : false;
+        this.ignoreLevelData = builder.ignoreLevelData != null ? builder.ignoreLevelData : false;
         this.seed = builder.seed != null ? builder.seed : ThreadLocalRandom.current().nextLong();
     }
 
@@ -146,6 +148,11 @@ public abstract class LevelData implements Level {
     }
 
     @Override
+    public boolean ignoreLevelData() {
+        return this.ignoreLevelData;
+    }
+
+    @Override
     public long getSeed() {
         return seed;
     }
@@ -176,6 +183,7 @@ public abstract class LevelData implements Level {
         private @Nullable Boolean hardcore;
         private @Nullable Boolean structures;
         private @Nullable Boolean worldKnown;
+        private @Nullable Boolean ignoreLevelData;
         private @Nullable BiomeProvider biomeProvider;
         private @Nullable ChunkGenerator chunkGenerator;
         private @Nullable Generator generator;
@@ -273,6 +281,17 @@ public abstract class LevelData implements Level {
         @Override
         public Level.Builder generatorType(@Nullable GeneratorType type) {
             this.generatorType = type;
+            return this;
+        }
+
+        @Override
+        public @Nullable Boolean ignoreLevelData() {
+            return ignoreLevelData;
+        }
+
+        @Override
+        public Level.Builder ignoreLevelData(@Nullable Boolean ignoreLevelData) {
+            this.ignoreLevelData = ignoreLevelData;
             return this;
         }
 
