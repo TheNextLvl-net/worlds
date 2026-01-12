@@ -10,12 +10,15 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.api.generator.Generator;
+import net.thenextlvl.worlds.api.generator.GeneratorType;
 import net.thenextlvl.worlds.api.generator.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
+import net.thenextlvl.worlds.api.preset.Preset;
 import net.thenextlvl.worlds.command.argument.GeneratorArgument;
 import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.argument.LevelPathArgument;
 import net.thenextlvl.worlds.command.argument.LevelStemArgument;
+import net.thenextlvl.worlds.command.argument.WorldPresetArgument;
 import net.thenextlvl.worlds.command.brigadier.OptionCommand;
 import net.thenextlvl.worlds.command.suggestion.LevelSuggestionProvider;
 import org.bukkit.entity.Entity;
@@ -46,9 +49,10 @@ final class WorldImportCommand extends OptionCommand {
         addOptions(command, false, Set.of(
                 new Option("dimension", new LevelStemArgument(plugin)),
                 new Option("directory", new LevelPathArgument(plugin)),
-                new Option("generator", new GeneratorArgument(plugin)),
+                new Option("generator", new GeneratorArgument(plugin), "preset"),
                 new Option("key", new KeyArgument()),
-                new Option("name", StringArgumentType.string())
+                new Option("name", StringArgumentType.string()),
+                new Option("preset", new WorldPresetArgument(plugin), "generator")
         ), null);
 
         return command;
@@ -65,6 +69,7 @@ final class WorldImportCommand extends OptionCommand {
             return 0;
         }
 
+        var preset = tryGetArgument(context, "preset", Preset.class).orElse(null);
         var dimension = tryGetArgument(context, "dimension", LevelStem.class).orElse(null);
         var directory = tryGetArgument(context, "directory", Path.class).filter(dir -> !dir.equals(path)).orElse(null);
         var displayName = tryGetArgument(context, "name", String.class).orElse(null);
@@ -86,8 +91,18 @@ final class WorldImportCommand extends OptionCommand {
         }
 
         var build = plugin.levelView().read(path).map(level -> {
-            if (directory != null) level.directory(directory).worldKnown(false);
-            return level.key(key).name(displayName).generator(generator).levelStem(dimension).build();
+            if (directory != null) level
+                    .directory(directory)
+                    .worldKnown(false);
+            if (preset != null) level
+                    .generatorType(GeneratorType.FLAT)
+                    .ignoreLevelData(true)
+                    .preset(preset);
+            return level.key(key)
+                    .generator(generator)
+                    .levelStem(dimension)
+                    .name(displayName)
+                    .build();
         });
         var world = build.filter(level -> !level.isWorldKnown()).map(Level::createAsync).orElse(null);
 
