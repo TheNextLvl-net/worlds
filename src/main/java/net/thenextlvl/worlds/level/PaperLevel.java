@@ -127,7 +127,7 @@ final class PaperLevel extends LevelData {
         var levelData = PaperWorldLoader.getLevelData(levelStorageAccess);
         if (levelData.fatalError()) return CompletableFuture.failedFuture(new IOException("Failed to read level data"));
         /// Worlds end
-        Dynamic<?> dataTag = levelData.dataTag();
+        Dynamic<?> dataTag = ignoreLevelData ? null : levelData.dataTag(); /// Worlds - ignore level data
 
         if (dataTag != null) {
             LevelDataAndDimensions levelDataAndDimensions = LevelStorageSource.getLevelDataAndDimensions(
