@@ -19,9 +19,9 @@ public abstract class OptionCommand extends SimpleCommand {
         super(plugin, name, permission);
     }
 
-    protected record Option(String name, String argument, ArgumentType<?> type) {
+    public record Option(String name, ArgumentType<?> type, @Nullable String incompatible) {
         public Option(String name, ArgumentType<?> type) {
-            this(name, name, type);
+            this(name, type, null);
         }
     }
 
@@ -29,12 +29,15 @@ public abstract class OptionCommand extends SimpleCommand {
 
     protected void addOptions(ArgumentBuilder<CommandSourceStack, ?> parent, boolean fixed, Set<Option> options, @Nullable Consumer<ArgumentBuilder<CommandSourceStack, ?>> consumer) {
         options.forEach(option -> {
-            var argument = Commands.argument(option.argument, option.type).executes(this);
+            var argument = Commands.argument(option.name, option.type).executes(this);
             if (consumer != null) consumer.accept(argument);
 
             if (!fixed) {
                 var nextRemaining = new HashSet<>(options);
                 nextRemaining.remove(option);
+                if (option.incompatible() != null) nextRemaining.removeIf(o -> {
+                    return o.name().equals(option.incompatible());
+                });
                 addOptions(argument, false, nextRemaining, consumer);
             }
 
