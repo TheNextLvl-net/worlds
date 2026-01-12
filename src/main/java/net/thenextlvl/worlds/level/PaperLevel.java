@@ -124,14 +124,8 @@ final class PaperLevel extends LevelData {
         final WorldLoader.DataLoadContext context = console.worldLoaderContext;
         RegistryAccess.Frozen registryAccess = context.datapackDimensions();
         Registry<LevelStem> contextLevelStemRegistry = registryAccess.lookupOrThrow(Registries.LEVEL_STEM);
-        /// Worlds start - fail if dimension could not be read
-        final var levelData = PaperWorldLoader.getLevelData(levelStorageAccess);
-        if (levelData.fatalError()) return CompletableFuture.failedFuture(new IOException("Failed to read level data"));
-        /// Worlds end
-        final Dynamic<?> dataTag = ignoreLevelData ? null : levelData.dataTag(); /// Worlds - ignore level data
-
-        if (dataTag != null) {
-            final LevelDataAndDimensions levelDataAndDimensions = LevelStorageSource.getLevelDataAndDimensions(
+        if (dataTag != null && !ignoreLevelData) {
+            LevelDataAndDimensions levelDataAndDimensions = LevelStorageSource.getLevelDataAndDimensions(
                     dataTag, context.dataConfiguration(), contextLevelStemRegistry, context.datapackWorldgen()
             );
             primaryLevelData = (PrimaryLevelData) levelDataAndDimensions.worldData();
