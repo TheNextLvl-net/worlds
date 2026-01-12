@@ -165,7 +165,7 @@ final class PaperLevel extends LevelData {
         WorldLoader.DataLoadContext context = console.worldLoader;
         RegistryAccess.Frozen registryAccess = context.datapackDimensions();
         Registry<LevelStem> contextLevelStemRegistry = registryAccess.lookupOrThrow(Registries.LEVEL_STEM);
-        if (dataTag != null) {
+        if (dataTag != null && !ignoreLevelData) {
             LevelDataAndDimensions levelDataAndDimensions = LevelStorageSource.getLevelDataAndDimensions(
                     dataTag, context.dataConfiguration(), contextLevelStemRegistry, context.datapackWorldgen()
             );

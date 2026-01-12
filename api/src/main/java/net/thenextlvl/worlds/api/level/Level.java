@@ -136,6 +136,10 @@ public interface Level extends Keyed {
     @Contract(pure = true)
     boolean isWorldKnown();
 
+    @ApiStatus.Internal
+    @Contract(pure = true)
+    boolean ignoreLevelData();
+
     /**
      * Converts the current Level instance into a Builder, allowing modifications
      * to its configuration before creating or modifying a new Level instance.
@@ -441,6 +445,15 @@ public interface Level extends Keyed {
         @ApiStatus.Experimental
         @Contract(mutates = "this")
         Builder generatorType(@Nullable GeneratorType type);
+
+        @Nullable
+        @ApiStatus.Internal
+        @Contract(pure = true)
+        Boolean ignoreLevelData();
+
+        @ApiStatus.Internal
+        @Contract(mutates = "this")
+        Builder ignoreLevelData(@Nullable Boolean ignoreLevelData);
 
         @Nullable
         @ApiStatus.Internal
