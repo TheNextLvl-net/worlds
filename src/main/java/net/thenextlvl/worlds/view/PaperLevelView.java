@@ -227,11 +227,13 @@ public class PaperLevelView implements LevelView {
     @Override
     public CompletableFuture<Boolean> unloadAsync(World world, boolean save) {
         return saveLevelDataAsync(world).thenCompose(ignored -> {
+            plugin.getServer().allowPausing(plugin, false);
             return plugin.supplyGlobal(() -> {
                 var dragonBattle = world.getEnderDragonBattle();
                 if (!plugin.getServer().unloadWorld(world, save))
                     return CompletableFuture.completedFuture(false);
                 if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
+                plugin.getServer().allowPausing(plugin, true);
                 return CompletableFuture.completedFuture(true);
             });
         }).exceptionally(throwable -> {
