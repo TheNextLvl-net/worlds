@@ -172,7 +172,10 @@ public class PaperLevelView implements LevelView {
             if (e.getCause() instanceof ZipException) {
                 plugin.getComponentLogger().warn("Failed to read level data from {}", directory);
                 plugin.getComponentLogger().warn("Your level.dat is irrecoverably corrupted. Please delete it and recreate the world.");
-            } else plugin.getComponentLogger().warn("Failed to read level data from {}", directory, e);
+            } else {
+                plugin.getComponentLogger().warn("Failed to read level data from {}", directory, e);
+                WorldsPlugin.ERROR_TRACKER.trackError(e);
+            }
             return Optional.empty();
         }
     }
@@ -256,6 +259,7 @@ public class PaperLevelView implements LevelView {
                 level.noSave = oldSave;
                 return CompletableFuture.completedFuture(null);
             } catch (Exception e) {
+                WorldsPlugin.ERROR_TRACKER.trackError(e);
                 return CompletableFuture.failedFuture(e);
             }
         }).thenRun(() -> saveLevelDataAsync(world));
@@ -414,6 +418,7 @@ public class PaperLevelView implements LevelView {
             } catch (IOException ex) {
                 plugin.getComponentLogger().warn("Failed to delete temporary files for backup restoration", ex);
             }
+            WorldsPlugin.ERROR_TRACKER.trackError(e);
             throw new RuntimeException("Failed to restore backup from " + path + " to " + worldPath, e);
         }
     }
