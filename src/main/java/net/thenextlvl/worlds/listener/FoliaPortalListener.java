@@ -146,6 +146,7 @@ public final class FoliaPortalListener extends PortalListener {
             portalToAsync.setAccessible(access);
         } catch (Exception e) {
             plugin.getComponentLogger().error("Failed to find portalToAsync method for Entity class", e);
+            WorldsPlugin.ERROR_TRACKER.trackError(e);
         }
     }
 }
