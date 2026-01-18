@@ -34,6 +34,7 @@ public final class FoliaLevelView extends PaperLevelView {
                     level.getChunkSource().save(flush);
                     future.complete(null);
                 } catch (Exception e) {
+                    WorldsPlugin.ERROR_TRACKER.trackError(e);
                     future.completeExceptionally(e);
                 }
             });
@@ -78,6 +79,7 @@ public final class FoliaLevelView extends PaperLevelView {
                         handle.levelStorageAccess.close();
                     } catch (Exception e) {
                         plugin.getComponentLogger().error("Failed to properly close world after saving", e);
+                        WorldsPlugin.ERROR_TRACKER.trackError(e);
                     }
                     return CompletableFuture.completedFuture(null);
                 });
@@ -89,6 +91,7 @@ public final class FoliaLevelView extends PaperLevelView {
                     worlds.remove(world.getName().toLowerCase(Locale.ROOT));
                 } catch (NoSuchFieldException | IllegalAccessException e) {
                     plugin.getComponentLogger().error("Failed to remove world from memory", e);
+                    WorldsPlugin.ERROR_TRACKER.trackError(e);
                     return false;
                 }
 
