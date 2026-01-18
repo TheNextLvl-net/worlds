@@ -2,6 +2,7 @@ package net.thenextlvl.worlds;
 
 import ca.spottedleaf.moonrise.common.util.TickThread;
 import dev.faststats.bukkit.BukkitMetrics;
+import dev.faststats.core.ErrorTracker;
 import dev.faststats.core.chart.Chart;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -50,6 +51,8 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     public static final String ISSUES = "https://github.com/TheNextLvl-net/worlds/issues/new?template=bug_report.yml";
     public static final boolean RUNNING_FOLIA = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
 
+    public static final ErrorTracker ERROR_TRACKER = ErrorTracker.contextAware();
+
     private final GeneratorView generatorView = new PluginGeneratorView();
     private final PaperLevelView levelView = RUNNING_FOLIA ? new FoliaLevelView(this) : new PaperLevelView(this);
 
@@ -69,6 +72,7 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
     private final dev.faststats.core.Metrics fastStats = BukkitMetrics.factory()
             .token("978c4aa9ecf78ae2e9c0776601fd4c6c")
+            .errorTracker(ERROR_TRACKER)
             .addChart(addGeneratorChart())
             .addChart(addWorldsChart())
             .addChart(addEnvironmentsChart())
