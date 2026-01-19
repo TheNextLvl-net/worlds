@@ -38,7 +38,7 @@ dependencies {
     implementation("net.thenextlvl:i18n:1.1.0")
     implementation("net.thenextlvl:nbt:4.3.1")
 
-    implementation("dev.faststats.metrics:bukkit:0.10.0")
+    implementation("dev.faststats.metrics:bukkit:0.10.1")
     implementation("org.bstats:bstats-bukkit:3.1.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter")
