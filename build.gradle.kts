@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    paperweight.foliaDevBundle("1.21.11-R0.1-SNAPSHOT")
+    paperweight.foliaDevBundle("1.21.8-R0.1-SNAPSHOT")
 
     implementation(project(":api"))
 
@@ -62,7 +62,7 @@ tasks.shadowJar {
 paper {
     name = "Worlds"
     main = "net.thenextlvl.worlds.WorldsPlugin"
-    apiVersion = "1.21.11"
+    apiVersion = "1.21.5"
     description = "Create, delete and manage your worlds"
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
     website = "https://thenextlvl.net"
