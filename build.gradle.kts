@@ -35,7 +35,7 @@ dependencies {
 
     implementation("net.thenextlvl.version-checker:modrinth-paper:1.0.1")
     implementation("net.thenextlvl:i18n:1.1.0")
-    implementation("net.thenextlvl:nbt:4.3.2")
+    implementation("net.thenextlvl:nbt:4.3.3")
 
     implementation("dev.faststats.metrics:bukkit:0.11.1")
     implementation("org.bstats:bstats-bukkit:3.1.0")
