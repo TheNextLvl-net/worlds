@@ -42,6 +42,8 @@ public interface WorldsProvider extends Plugin {
      *
      * @param level the path representing the level to be built
      * @return a {@link Level.Builder} for configuring and creating the specified level
+     * @apiNote If the given path is not an immediate child of the {@link Server#getWorldContainer() world container},
+     * the level will not be loaded by default upon server startup.
      * @since 3.0.0
      */
     @Contract(value = "_ -> new", pure = true)
