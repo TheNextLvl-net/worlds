@@ -39,8 +39,8 @@ public interface WorldsProvider extends Plugin {
     /**
      * Creates a {@link Level.Builder} instance to configure and build a level from the specified directory.
      * The given level path will be resolved from the {@link Server#getWorldContainer() world container}.
-     * NOTE: The server will not look for levels to load within this directory, so you must load these
-     * levels yourself when the server restarts!
+     * @apiNote If the given path contains a directory (such as {@code plugin_worlds/my_world}) instead of just
+     * the level name ({@code my_world}), the level will not be loaded by default upon server startup.
      *
      * @param level the path representing the level to be built
      * @return a {@link Level.Builder} for configuring and creating the specified level
