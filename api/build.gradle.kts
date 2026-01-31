@@ -29,7 +29,7 @@ dependencies {
     compileOnly("net.thenextlvl:per-worlds:1.3.4")
 
     testImplementation("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
-    testImplementation("net.thenextlvl:nbt:4.3.3")
+    testImplementation("net.thenextlvl:nbt:4.3.4")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation(platform("org.junit:junit-bom:6.1.0-SNAPSHOT"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
