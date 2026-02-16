@@ -22,12 +22,12 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
 final class WorldUnloadCommand extends SimpleCommand {
-    private WorldUnloadCommand(WorldsPlugin plugin) {
+    private WorldUnloadCommand(final WorldsPlugin plugin) {
         super(plugin, "unload", "worlds.command.unload");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldUnloadCommand(plugin);
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
+        final var command = new WorldUnloadCommand(plugin);
         return command.create().then(worldArgument(plugin)
                 .suggests(new WorldSuggestionProvider<>(plugin, (context, world) ->
                         !plugin.levelView().isOverworld(world)))
@@ -43,9 +43,9 @@ final class WorldUnloadCommand extends SimpleCommand {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var world = context.getArgument("world", World.class);
-        var fallback = tryGetArgument(context, "fallback", World.class).orElse(null);
+    public int run(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        final var world = context.getArgument("world", World.class);
+        final var fallback = tryGetArgument(context, "fallback", World.class).orElse(null);
 
         if (plugin.levelView().isOverworld(world)) {
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.unload.disallowed");
@@ -55,7 +55,7 @@ final class WorldUnloadCommand extends SimpleCommand {
             return 0;
         }
 
-        var fallbackSpawn = fallback != null ? fallback.getSpawnLocation()
+        final var fallbackSpawn = fallback != null ? fallback.getSpawnLocation()
                 : plugin.levelView().getOverworld().getSpawnLocation();
 
         plugin.bundle().sendMessage(context.getSource().getSender(), "world.unload",
@@ -70,7 +70,7 @@ final class WorldUnloadCommand extends SimpleCommand {
             plugin.levelView().setEnabled(world, false);
             return plugin.levelView().unloadAsync(world, true);
         }).thenAccept(success -> {
-            var message = success ? "world.unload.success" : "world.unload.failed";
+            final var message = success ? "world.unload.success" : "world.unload.failed";
             plugin.bundle().sendMessage(context.getSource().getSender(), message,
                     Placeholder.parsed("world", world.getName()));
         });

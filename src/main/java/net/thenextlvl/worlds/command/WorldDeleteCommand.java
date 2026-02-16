@@ -18,12 +18,12 @@ import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
 final class WorldDeleteCommand extends SimpleCommand {
-    private WorldDeleteCommand(WorldsPlugin plugin) {
+    private WorldDeleteCommand(final WorldsPlugin plugin) {
         super(plugin, "delete", "worlds.command.delete");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldDeleteCommand(plugin);
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
+        final var command = new WorldDeleteCommand(plugin);
         return command.create().then(command.delete());
     }
 
@@ -35,8 +35,8 @@ final class WorldDeleteCommand extends SimpleCommand {
                 .executes(this::confirmationNeeded);
     }
 
-    private int confirmationNeeded(CommandContext<CommandSourceStack> context) {
-        var sender = context.getSource().getSender();
+    private int confirmationNeeded(final CommandContext<CommandSourceStack> context) {
+        final var sender = context.getSource().getSender();
         plugin.bundle().sendMessage(sender, "command.confirmation",
                 Placeholder.parsed("action", "/" + context.getInput()),
                 Placeholder.parsed("confirmation", "/" + context.getInput() + " --confirm"));
@@ -44,15 +44,15 @@ final class WorldDeleteCommand extends SimpleCommand {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var flags = context.getArgument("flags", CommandFlagsArgument.Flags.class);
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var flags = context.getArgument("flags", CommandFlagsArgument.Flags.class);
         if (!flags.contains("--confirm")) return confirmationNeeded(context);
-        var world = context.getArgument("world", World.class);
-        var schedule = flags.contains("--schedule");
+        final var world = context.getArgument("world", World.class);
+        final var schedule = flags.contains("--schedule");
         if (!schedule) plugin.bundle().sendMessage(context.getSource().getSender(), "world.delete",
                 Placeholder.parsed("world", world.getName()));
         plugin.levelView().deleteAsync(world, schedule).thenAccept(result -> {
-            var message = switch (result) {
+            final var message = switch (result) {
                 case SUCCESS -> "world.delete.success";
                 case SCHEDULED -> "world.delete.scheduled";
                 case REQUIRES_SCHEDULING -> "world.delete.disallowed";

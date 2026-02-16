@@ -19,11 +19,11 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public final class WorldCommand extends BrigadierCommand {
-    private WorldCommand(WorldsPlugin plugin) {
+    private WorldCommand(final WorldsPlugin plugin) {
         super(plugin, "world", "worlds.command");
     }
 
-    public static LiteralCommandNode<CommandSourceStack> create(WorldsPlugin plugin) {
+    public static LiteralCommandNode<CommandSourceStack> create(final WorldsPlugin plugin) {
         return new WorldCommand(plugin).create()
                 .then(SaveAllCommand.create(plugin))
                 .then(SaveOffCommand.create(plugin))
@@ -47,7 +47,7 @@ public final class WorldCommand extends BrigadierCommand {
                 .build();
     }
 
-    public static RequiredArgumentBuilder<CommandSourceStack, World> worldArgument(WorldsPlugin plugin) {
+    public static RequiredArgumentBuilder<CommandSourceStack, World> worldArgument(final WorldsPlugin plugin) {
         return Commands.argument("world", new WorldArgument(plugin))
                 .suggests(new WorldSuggestionProvider<>(plugin));
     }
@@ -56,7 +56,7 @@ public final class WorldCommand extends BrigadierCommand {
         return Commands.argument("key", new KeyArgument());
     }
 
-    public static RequiredArgumentBuilder<CommandSourceStack, Generator> generatorArgument(WorldsPlugin plugin) {
+    public static RequiredArgumentBuilder<CommandSourceStack, Generator> generatorArgument(final WorldsPlugin plugin) {
         return Commands.argument("generator", new GeneratorArgument(plugin));
     }
 }

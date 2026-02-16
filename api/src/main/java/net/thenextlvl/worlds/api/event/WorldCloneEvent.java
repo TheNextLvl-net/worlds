@@ -24,7 +24,7 @@ import java.util.function.BiPredicate;
  * @since 3.0.0
  */
 @NullMarked
-public class WorldCloneEvent extends WorldEvent {
+public final class WorldCloneEvent extends WorldEvent {
     private static final HandlerList handlerList = new HandlerList();
 
     private @Nullable BiPredicate<Path, BasicFileAttributes> fileFilter = null;
@@ -32,7 +32,7 @@ public class WorldCloneEvent extends WorldEvent {
     private final boolean full;
 
     @ApiStatus.Internal
-    public WorldCloneEvent(World world, Level clone, boolean full) {
+    public WorldCloneEvent(final World world, final Level clone, final boolean full) {
         super(world, false);
         this.clone = clone;
         this.full = full;
@@ -72,7 +72,7 @@ public class WorldCloneEvent extends WorldEvent {
      * @throws IllegalStateException if the event represents a non-{@link #isFullClone() full} clone operation
      */
     @Contract(mutates = "this")
-    public void addFileFilter(BiPredicate<Path, BasicFileAttributes> filter) throws IllegalStateException {
+    public void addFileFilter(final BiPredicate<Path, BasicFileAttributes> filter) throws IllegalStateException {
         Preconditions.checkState(full, "Cannot add file filter to non-full clone event");
         this.fileFilter = this.fileFilter != null ? this.fileFilter.and(filter) : filter;
     }

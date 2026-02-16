@@ -35,26 +35,26 @@ public final class WorldPresetArgument implements SimpleArgumentType<Preset, Str
 
     private final WorldsPlugin plugin;
 
-    public WorldPresetArgument(WorldsPlugin plugin) {
+    public WorldPresetArgument(final WorldsPlugin plugin) {
         this.plugin = plugin;
     }
 
     @Override
-    public Preset convert(StringReader reader, String type) {
-        var optional = identifiers.get(toIdentifier(type));
+    public Preset convert(final StringReader reader, final String type) {
+        final var optional = identifiers.get(toIdentifier(type));
         if (optional != null) return optional;
 
-        var file = plugin.presetsFolder().resolve(type + ".json");
+        final var file = plugin.presetsFolder().resolve(type + ".json");
         if (!Files.isRegularFile(file)) throw new IllegalStateException("No preset found");
 
 
-        try (var jsonReader = new JsonReader(new InputStreamReader(new BufferedInputStream(
+        try (final var jsonReader = new JsonReader(new InputStreamReader(new BufferedInputStream(
                 Files.newInputStream(file)
         ), StandardCharsets.UTF_8))) {
-            var root = JsonParser.parseReader(jsonReader);
+            final var root = JsonParser.parseReader(jsonReader);
             if (root.isJsonObject()) return Preset.deserialize(root.getAsJsonObject());
             throw new IllegalStateException("Not a valid preset");
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IllegalStateException("Not a valid preset", e);
         }
     }
@@ -65,17 +65,17 @@ public final class WorldPresetArgument implements SimpleArgumentType<Preset, Str
     }
 
     @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+    public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
         return CompletableFuture.runAsync(() -> {
-            var presets = new HashSet<>(identifiers.keySet());
+            final var presets = new HashSet<>(identifiers.keySet());
 
-            try (var directoryStream = Files.newDirectoryStream(plugin.presetsFolder(), "*.json")) {
-                for (var path : directoryStream) {
-                    var fileName = path.getFileName().toString();
-                    var suggestion = fileName.substring(0, fileName.length() - 5);
+            try (final var directoryStream = Files.newDirectoryStream(plugin.presetsFolder(), "*.json")) {
+                for (final var path : directoryStream) {
+                    final var fileName = path.getFileName().toString();
+                    final var suggestion = fileName.substring(0, fileName.length() - 5);
                     presets.add(suggestion);
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 plugin.getComponentLogger().warn("Failed to read presets from disk", e);
             }
             presets.stream().filter(s -> s.toLowerCase(Locale.ROOT).contains(builder.getRemainingLowerCase()))
@@ -87,7 +87,7 @@ public final class WorldPresetArgument implements SimpleArgumentType<Preset, Str
         }).thenApply(ignored -> builder.build());
     }
 
-    private static String toIdentifier(String name) {
+    private static String toIdentifier(final String name) {
         return name.toLowerCase(Locale.ROOT).replace(" ", "-").replace("'", "");
     }
 }

@@ -16,12 +16,12 @@ public record Structure(Key key) implements Keyed {
         return key().asString();
     }
 
-    public Structure(@KeyPattern String string) {
+    public Structure(@KeyPattern final String string) {
         this(Key.key(string));
     }
 
     @Contract(value = "_ -> new", pure = true)
-    public static Structure literal(@KeyPattern String structure) {
+    public static Structure literal(@KeyPattern final String structure) {
         return new Structure(Key.key(structure));
     }
 }

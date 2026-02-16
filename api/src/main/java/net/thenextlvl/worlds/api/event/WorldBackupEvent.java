@@ -13,11 +13,11 @@ import org.jspecify.annotations.NullMarked;
  * @since 3.0.0
  */
 @NullMarked
-public class WorldBackupEvent extends WorldEvent {
+public final class WorldBackupEvent extends WorldEvent {
     private static final HandlerList handlerList = new HandlerList();
 
     @ApiStatus.Internal
-    public WorldBackupEvent(World world) {
+    public WorldBackupEvent(final World world) {
         super(world, false);
     }
 

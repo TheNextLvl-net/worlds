@@ -25,22 +25,22 @@ public record Generator(Plugin plugin, @Nullable String id) {
         return id != null ? plugin.getName() + ":" + id : plugin.getName();
     }
 
-    public @Nullable ChunkGenerator generator(String worldName) {
+    public @Nullable ChunkGenerator generator(final String worldName) {
         return plugin.isEnabled() ? plugin.getDefaultWorldGenerator(worldName, id()) : null;
     }
 
-    public @Nullable BiomeProvider biomeProvider(String worldName) {
+    public @Nullable BiomeProvider biomeProvider(final String worldName) {
         return plugin.isEnabled() ? plugin.getDefaultBiomeProvider(worldName, id()) : null;
     }
 
     @Contract(value = "_, _ -> new", pure = true)
-    public static Generator of(WorldsProvider provider, String string) throws GeneratorException {
-        var split = string.split(":", 2);
+    public static Generator of(final WorldsProvider provider, final String string) throws GeneratorException {
+        final var split = string.split(":", 2);
 
-        var plugin = split[0];
-        var id = split.length > 1 ? split[1] : null;
+        final var plugin = split[0];
+        final var id = split.length > 1 ? split[1] : null;
 
-        var generator = provider.getServer().getPluginManager().getPlugin(plugin);
+        final var generator = provider.getServer().getPluginManager().getPlugin(plugin);
 
         if (generator == null)
             throw new GeneratorException(plugin, id, "Plugin not found");

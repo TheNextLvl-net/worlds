@@ -16,16 +16,16 @@ import java.util.concurrent.CompletableFuture;
 public final class BackupSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
     private final WorldsPlugin plugin;
 
-    public BackupSuggestionProvider(WorldsPlugin plugin) {
+    public BackupSuggestionProvider(final WorldsPlugin plugin) {
         this.plugin = plugin;
     }
 
     @Override
-    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        var world = context.getArgument("world", World.class);
+    public CompletableFuture<Suggestions> getSuggestions(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
+        final var world = context.getArgument("world", World.class);
         return CompletableFuture.runAsync(() -> plugin.levelView().listBackups(world)
                         .map(backup -> {
-                            var string = backup.getFileName().toString();
+                            final var string = backup.getFileName().toString();
                             return string.substring(0, string.lastIndexOf('.'));
                         })
                         .map(StringArgumentType::escapeIfRequired)

@@ -34,18 +34,18 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
 final class WorldCreateCommand extends OptionCommand {
-    private WorldCreateCommand(WorldsPlugin plugin) {
+    private WorldCreateCommand(final WorldsPlugin plugin) {
         super(plugin, "create", "worlds.command.create");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldCreateCommand(plugin);
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
+        final var command = new WorldCreateCommand(plugin);
         return command.create().then(command.createCommand());
     }
 
     @Override
     protected RequiredArgumentBuilder<CommandSourceStack, ?> createCommand() {
-        var name = Commands.argument("name", StringArgumentType.string());
+        final var name = Commands.argument("name", StringArgumentType.string());
 
         addOptions(name, true, Set.of(
                 new Option("generator", new GeneratorArgument(plugin)),
@@ -64,12 +64,12 @@ final class WorldCreateCommand extends OptionCommand {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var sender = context.getSource().getSender();
-        var level = buildLevel(context, sender);
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var sender = context.getSource().getSender();
+        final var level = buildLevel(context, sender);
         if (level == null) return 0;
 
-        var placeholder = Placeholder.parsed("world", level.getName());
+        final var placeholder = Placeholder.parsed("world", level.getName());
         if (plugin.getServer().getWorld(level.getName()) != null) {
             plugin.bundle().sendMessage(sender, "world.name.taken", placeholder);
             return 0;
@@ -81,7 +81,7 @@ final class WorldCreateCommand extends OptionCommand {
         plugin.bundle().sendMessage(sender, "world.create", placeholder);
         level.createAsync().thenAccept(world -> {
             plugin.bundle().sendMessage(sender, "world.create.success", placeholder);
-            if (!(sender instanceof Entity entity)) return;
+            if (!(sender instanceof final Entity entity)) return;
             entity.teleportAsync(world.getSpawnLocation(), COMMAND);
         }).exceptionally(throwable -> {
             plugin.getComponentLogger().warn("Failed to create world {} ({})", level.key(), level.getName(), throwable);
@@ -91,8 +91,8 @@ final class WorldCreateCommand extends OptionCommand {
         return SINGLE_SUCCESS;
     }
 
-    private @Nullable Level buildLevel(CommandContext<CommandSourceStack> context, CommandSender sender) {
-        var name = context.getArgument("name", String.class);
+    private @Nullable Level buildLevel(final CommandContext<CommandSourceStack> context, final CommandSender sender) {
+        final var name = context.getArgument("name", String.class);
         if (Path.of(name).getNameCount() != 1) {
             plugin.bundle().sendMessage(sender, "world.container.create");
             return null;
@@ -109,7 +109,7 @@ final class WorldCreateCommand extends OptionCommand {
                     .hardcore(tryGetArgument(context, "hardcore", Boolean.class).orElse(null))
                     .name(name)
                     .build();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             plugin.getComponentLogger().warn("Failed to create world {}", name, e);
             plugin.bundle().sendMessage(sender, "world.create.failed", Placeholder.parsed("world", name));
             return null;

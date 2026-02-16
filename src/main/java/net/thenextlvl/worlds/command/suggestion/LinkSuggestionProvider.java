@@ -18,13 +18,13 @@ public final class LinkSuggestionProvider<T> implements SuggestionProvider<T> {
     private final WorldsPlugin plugin;
     private final boolean unlink;
 
-    public LinkSuggestionProvider(WorldsPlugin plugin, boolean unlink) {
+    public LinkSuggestionProvider(final WorldsPlugin plugin, final boolean unlink) {
         this.plugin = plugin;
         this.unlink = unlink;
     }
 
     @Override
-    public CompletableFuture<Suggestions> getSuggestions(CommandContext<T> context, SuggestionsBuilder builder) {
+    public CompletableFuture<Suggestions> getSuggestions(final CommandContext<T> context, final SuggestionsBuilder builder) {
         plugin.linkProvider().getLinkTrees()
                 .filter(tree -> !unlink || !tree.isEmpty())
                 .map(LinkTree::getOverworld)
@@ -38,12 +38,12 @@ public final class LinkSuggestionProvider<T> implements SuggestionProvider<T> {
     public static class Unlinked<T> implements SuggestionProvider<T> {
         private final WorldsPlugin plugin;
 
-        public Unlinked(WorldsPlugin plugin) {
+        public Unlinked(final WorldsPlugin plugin) {
             this.plugin = plugin;
         }
 
         @Override
-        public CompletableFuture<Suggestions> getSuggestions(CommandContext<T> context, SuggestionsBuilder builder) {
+        public CompletableFuture<Suggestions> getSuggestions(final CommandContext<T> context, final SuggestionsBuilder builder) {
             plugin.getServer().getWorlds().stream()
                     .filter(world -> !world.getEnvironment().equals(Environment.NORMAL)
                             && !world.getEnvironment().equals(Environment.CUSTOM))
@@ -59,13 +59,13 @@ public final class LinkSuggestionProvider<T> implements SuggestionProvider<T> {
     public static class Linked<T> implements SuggestionProvider<T> {
         private final WorldsPlugin plugin;
 
-        public Linked(WorldsPlugin plugin) {
+        public Linked(final WorldsPlugin plugin) {
             this.plugin = plugin;
         }
 
         @Override
-        public CompletableFuture<Suggestions> getSuggestions(CommandContext<T> context, SuggestionsBuilder builder) {
-            var world = context.getLastChild().getArgument("world", World.class);
+        public CompletableFuture<Suggestions> getSuggestions(final CommandContext<T> context, final SuggestionsBuilder builder) {
+            final var world = context.getLastChild().getArgument("world", World.class);
             plugin.linkProvider().getLinkTree(world).ifPresent(tree -> {
                 tree.getPersistedNether().map(Key::asString)
                         .filter(s -> s.contains(builder.getRemaining()))

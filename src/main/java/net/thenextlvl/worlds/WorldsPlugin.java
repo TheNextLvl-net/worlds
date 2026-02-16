@@ -107,7 +107,7 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
 
     private void checkPerWorldsRemnants() {
         if (getServer().getPluginManager().getPlugin("PerWorlds") != null) return;
-        try (var files = Files.list(Path.of("plugins", "PerWorlds", "groups"))) {
+        try (final var files = Files.list(Path.of("plugins", "PerWorlds", "groups"))) {
             if (files.noneMatch(path -> {
                 return switch (path.getFileName().toString()) {
                     case "unowned", "unowned.dat", "unowned.dat_old" -> false;
@@ -117,12 +117,12 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
             getComponentLogger().warn("It looks like you have been using world groups before.");
             getComponentLogger().warn("World groups were provided by PerWorlds which is no longer inbuilt!");
             getComponentLogger().warn("If you want to continue using it you can download it from https://modrinth.com/project/lpfQmSV2");
-        } catch (IOException ignored) {
+        } catch (final IOException ignored) {
         }
     }
 
     private void warnVoidGeneratorPlugin() {
-        var names = Stream.of("VoidWorldGenerator", "VoidGen", "VoidGenerator", "VoidWorld", "VoidGenPlus",
+        final var names = Stream.of("VoidWorldGenerator", "VoidGen", "VoidGenerator", "VoidWorld", "VoidGenPlus",
                 "DeluxeVoidWorld", "CleanroomGenerator", "CompletelyEmpty");
         if (names.map(getServer().getPluginManager()::getPlugin).filter(Objects::nonNull).findAny().isEmpty()) return;
         getComponentLogger().warn("It appears you are using a plugin to generate void worlds");
@@ -146,12 +146,12 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     }
 
     @Override
-    public Level.Builder levelBuilder(Path directory) {
+    public Level.Builder levelBuilder(final Path directory) {
         return new LevelData.Builder(this, directory);
     }
 
     @Override
-    public Level.Builder levelBuilder(World world) {
+    public Level.Builder levelBuilder(final World world) {
         return levelView().read(world.getWorldFolder().toPath())
                 .orElseGet(() -> levelBuilder(world.getWorldFolder().toPath()))
                 .bonusChest(world.hasBonusChest())
@@ -173,14 +173,14 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
                 .name(world.getName());
     }
 
-    public <T> CompletableFuture<T> supplyGlobal(Supplier<CompletableFuture<T>> supplier) {
-        var foliaTickThread = RUNNING_FOLIA && Thread.currentThread().getClass().equals(TickThread.class);
+    public <T> CompletableFuture<T> supplyGlobal(final Supplier<CompletableFuture<T>> supplier) {
+        final var foliaTickThread = RUNNING_FOLIA && Thread.currentThread().getClass().equals(TickThread.class);
         if (foliaTickThread || getServer().isGlobalTickThread()) try {
             return supplier.get();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return CompletableFuture.failedFuture(e);
         }
-        var future = new CompletableFuture<T>();
+        final var future = new CompletableFuture<T>();
         getServer().getGlobalRegionScheduler().execute(this, () -> {
             supplier.get().thenAccept(future::complete).exceptionally(e -> {
                 future.completeExceptionally(e);
@@ -203,7 +203,7 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     private void createPresetsFolder() {
         try {
             Files.createDirectories(presetsFolder);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             getComponentLogger().warn("Failed to create presets folder", e);
         }
     }
@@ -213,7 +213,7 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     }
 
     private void registerListeners() {
-        var portalListener = RUNNING_FOLIA ? new FoliaPortalListener(this) : new PortalListener(this);
+        final var portalListener = RUNNING_FOLIA ? new FoliaPortalListener(this) : new PortalListener(this);
         getServer().getPluginManager().registerEvents(new TeleportListener(this), this);
         getServer().getPluginManager().registerEvents(new WorldListener(this), this);
         getServer().getPluginManager().registerEvents(portalListener, this);

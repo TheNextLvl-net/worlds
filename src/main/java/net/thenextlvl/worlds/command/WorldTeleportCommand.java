@@ -24,12 +24,12 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
 final class WorldTeleportCommand extends SimpleCommand {
-    WorldTeleportCommand(WorldsPlugin plugin) {
+    WorldTeleportCommand(final WorldsPlugin plugin) {
         super(plugin, "teleport", "worlds.command.teleport");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldTeleportCommand(plugin);
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
+        final var command = new WorldTeleportCommand(plugin);
         return command.create().then(worldArgument(plugin)
                 .then(command.teleportEntity())
                 .executes(command));
@@ -42,39 +42,39 @@ final class WorldTeleportCommand extends SimpleCommand {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var sender = context.getSource().getSender();
-        var entityResolver = tryGetArgument(context, "entities", EntitySelectorArgumentResolver.class).orElse(null);
+    public int run(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        final var sender = context.getSource().getSender();
+        final var entityResolver = tryGetArgument(context, "entities", EntitySelectorArgumentResolver.class).orElse(null);
 
-        if (entityResolver == null && !(sender instanceof Player player)) {
+        if (entityResolver == null && !(sender instanceof final Player player)) {
             plugin.bundle().sendMessage(sender, "command.sender");
             return 0;
         }
 
-        var position = tryGetArgument(context, "position", FinePositionResolver.class).orElse(null);
-        var world = context.getArgument("world", World.class);
+        final var position = tryGetArgument(context, "position", FinePositionResolver.class).orElse(null);
+        final var world = context.getArgument("world", World.class);
 
-        var entities = entityResolver != null ? entityResolver.resolve(context.getSource()) : List.of((Player) sender);
-        var location = position != null ? position.resolve(context.getSource()).toLocation(world) : world.getSpawnLocation();
+        final var entities = entityResolver != null ? entityResolver.resolve(context.getSource()) : List.of((Player) sender);
+        final var location = position != null ? position.resolve(context.getSource()).toLocation(world) : world.getSpawnLocation();
 
         entities.forEach(entity -> {
-            if (entity instanceof Player player && !player.hasPermission(plugin.levelView().getEntryPermission(world))) {
+            if (entity instanceof final Player player && !player.hasPermission(plugin.levelView().getEntryPermission(world))) {
                 plugin.bundle().sendMessage(entity, "world.entry.denied", Placeholder.parsed("world", world.getName()));
             } else entity.teleportAsync(location, COMMAND).thenAccept(success -> {
-                var message = success ? "world.teleport.self" : "world.teleport.failed";
+                final var message = success ? "world.teleport.self" : "world.teleport.failed";
                 plugin.bundle().sendMessage(entity, message, Placeholder.parsed("world", location.getWorld().getName()));
             });
         });
 
         if (entities.size() == 1 && entities.getFirst().equals(sender)) return SINGLE_SUCCESS;
 
-        var message = entities.size() == 1
+        final var message = entities.size() == 1
                 ? "world.teleport.other" : entities.isEmpty()
                 ? "world.teleport.none" : "world.teleport.others";
-        var entity = entities.isEmpty() ? null : entities.getFirst();
+        final var entity = entities.isEmpty() ? null : entities.getFirst();
 
 
-        Runnable runnable = () -> plugin.bundle().sendMessage(sender, message,
+        final Runnable runnable = () -> plugin.bundle().sendMessage(sender, message,
                 Placeholder.component("entity", entity != null ? entity.name() : Component.empty()),
                 Placeholder.parsed("entities", String.valueOf(entities.size())),
                 Placeholder.parsed("world", location.getWorld().getName()));
