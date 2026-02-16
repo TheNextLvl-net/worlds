@@ -93,6 +93,18 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         registerServices();
     }
 
+    @Override
+    public void onDisable() {
+        linkProvider.persistTrees();
+    }
+
+    @Override
+    public void onEnable() {
+        fastStats.ready();
+        warnVoidGeneratorPlugin();
+        registerListeners();
+    }
+
     private void checkPerWorldsRemnants() {
         if (getServer().getPluginManager().getPlugin("PerWorlds") != null) return;
         try (var files = Files.list(Path.of("plugins", "PerWorlds", "groups"))) {
@@ -107,17 +119,6 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
             getComponentLogger().warn("If you want to continue using it you can download it from https://modrinth.com/project/lpfQmSV2");
         } catch (IOException ignored) {
         }
-    }
-
-    @Override
-    public void onDisable() {
-        linkProvider.persistTrees();
-    }
-
-    @Override
-    public void onEnable() {
-        warnVoidGeneratorPlugin();
-        registerListeners();
     }
 
     private void warnVoidGeneratorPlugin() {
