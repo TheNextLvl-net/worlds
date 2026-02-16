@@ -204,6 +204,23 @@ public class PaperLevelView implements LevelView {
         }
     }
 
+    private String getOverworldName() {
+        final var properties = ((CraftServer) plugin.getServer()).getServer().getProperties();
+        return properties.levelName;
+    }
+
+    private Path getOverworldPath() {
+        return getWorldContainer().resolve(getOverworldName());
+    }
+
+    private Path getNetherPath() {
+        return getWorldContainer().resolve(getOverworldName() + "_nether");
+    }
+
+    private Path getEndPath() {
+        return getWorldContainer().resolve(getOverworldName() + "_the_end");
+    }
+
     @Override
     public boolean canLoad(Path level) {
         return plugin.getServer().getWorlds().stream()
