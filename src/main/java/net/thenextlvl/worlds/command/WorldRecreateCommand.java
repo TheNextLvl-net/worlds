@@ -30,18 +30,18 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
 final class WorldRecreateCommand extends OptionCommand {
-    private WorldRecreateCommand(WorldsPlugin plugin) {
+    private WorldRecreateCommand(final WorldsPlugin plugin) {
         super(plugin, "recreate", "worlds.command.recreate");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldRecreateCommand(plugin);
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
+        final var command = new WorldRecreateCommand(plugin);
         return command.create().then(command.createCommand());
     }
 
     @Override
     protected RequiredArgumentBuilder<CommandSourceStack, ?> createCommand() {
-        var name = Commands.argument("name", StringArgumentType.string());
+        final var name = Commands.argument("name", StringArgumentType.string());
 
         addOptions(name, false, Set.of(
                 new Option("bonus-chest", BoolArgumentType.bool()),
@@ -56,17 +56,17 @@ final class WorldRecreateCommand extends OptionCommand {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var sender = context.getSource().getSender();
-        var world = context.getArgument("world", World.class);
-        var name = context.getArgument("name", String.class);
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var sender = context.getSource().getSender();
+        final var world = context.getArgument("world", World.class);
+        final var name = context.getArgument("name", String.class);
 
         if (Path.of(name).getNameCount() != 1) {
             plugin.bundle().sendMessage(sender, "world.container.create");
             return 0;
         }
 
-        var builder = plugin.levelBuilder(world).directory(plugin.levelView().findFreePath(name));
+        final var builder = plugin.levelBuilder(world).directory(plugin.levelView().findFreePath(name));
 
         tryGetArgument(context, "bonus-chest", Boolean.class).ifPresent(builder::bonusChest);
         tryGetArgument(context, "dimension", LevelStem.class).ifPresent(builder::levelStem);
@@ -79,14 +79,14 @@ final class WorldRecreateCommand extends OptionCommand {
         tryGetArgument(context, "structures", Boolean.class).ifPresent(builder::structures);
         tryGetArgument(context, "type", GeneratorType.class).ifPresent(builder::generatorType);
 
-        var level = builder.name(name).build();
+        final var level = builder.name(name).build();
 
-        var placeholder = Placeholder.parsed("world", world.getName());
+        final var placeholder = Placeholder.parsed("world", world.getName());
 
         plugin.bundle().sendMessage(sender, "world.recreate", placeholder);
         level.createAsync().thenAccept(recreated -> {
             plugin.bundle().sendMessage(sender, "world.recreate.success", placeholder);
-            if (!(sender instanceof Entity entity)) return;
+            if (!(sender instanceof final Entity entity)) return;
             entity.teleportAsync(recreated.getSpawnLocation(), COMMAND);
         }).exceptionally(throwable -> {
             plugin.getComponentLogger().warn("Failed to recreate world {}", world.getName(), throwable);

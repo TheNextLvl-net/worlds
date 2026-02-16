@@ -20,12 +20,12 @@ import java.nio.file.Path;
 public final class WorldListener implements Listener {
     private final WorldsPlugin plugin;
 
-    public WorldListener(WorldsPlugin plugin) {
+    public WorldListener(final WorldsPlugin plugin) {
         this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onOverworldLoad(WorldLoadEvent event) {
+    public void onOverworldLoad(final WorldLoadEvent event) {
         registerEntryPermission(event.getWorld());
         if (!plugin.levelView().isOverworld(event.getWorld())) return;
         plugin.levelView().listLevels().stream()
@@ -33,9 +33,9 @@ public final class WorldListener implements Listener {
                 .forEach(this::loadLevel);
     }
 
-    private void registerEntryPermission(World world) {
-        var manager = plugin.getServer().getPluginManager();
-        var permission = plugin.levelView().getEntryPermission(world);
+    private void registerEntryPermission(final World world) {
+        final var manager = plugin.getServer().getPluginManager();
+        final var permission = plugin.levelView().getEntryPermission(world);
         if (manager.getPermission(permission) != null) return;
         manager.addPermission(new Permission(
                 permission,
@@ -44,8 +44,8 @@ public final class WorldListener implements Listener {
         ));
     }
 
-    private void loadLevel(Path path) {
-        var level = plugin.levelView().read(path).map(Level.Builder::build).orElse(null);
+    private void loadLevel(final Path path) {
+        final var level = plugin.levelView().read(path).map(Level.Builder::build).orElse(null);
         if (level == null || !level.isEnabled().equals(TriState.TRUE)) return;
 
         if (plugin.getServer().getWorld(level.key()) != null) {
@@ -62,7 +62,7 @@ public final class WorldListener implements Listener {
                 world.key().asString(), level.getGeneratorType().key().asString(),
                 world.getWorldFolder().getPath()
         )).exceptionally(throwable -> {
-            if (throwable.getCause() instanceof DirectoryLock.LockException lock) {
+            if (throwable.getCause() instanceof final DirectoryLock.LockException lock) {
                 plugin.getComponentLogger().error("Failed to start the minecraft server", lock);
                 plugin.getServer().shutdown();
             } else {
@@ -76,7 +76,7 @@ public final class WorldListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onWorldLoad(WorldLoadEvent event) {
+    public void onWorldLoad(final WorldLoadEvent event) {
         plugin.linkProvider().loadTree(event.getWorld())
                 .filter(LinkTree::isEmpty)
                 .filter(linkTree -> plugin.levelView().isOverworld(linkTree.getOverworld()))
@@ -87,12 +87,12 @@ public final class WorldListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onWorldLoad(WorldUnloadEvent event) {
+    public void onWorldLoad(final WorldUnloadEvent event) {
         plugin.linkProvider().unloadTree(event.getWorld());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onWorldSave(WorldSaveEvent event) {
+    public void onWorldSave(final WorldSaveEvent event) {
         plugin.linkProvider().persistTree(event.getWorld());
     }
 }

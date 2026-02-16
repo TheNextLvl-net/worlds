@@ -12,7 +12,7 @@ import java.util.Map;
 
 @NullMarked
 public final class LevelStemArgument extends TooltipSuggestionProvider implements SimpleArgumentType<LevelStem, String> {
-    public LevelStemArgument(WorldsPlugin plugin) {
+    public LevelStemArgument(final WorldsPlugin plugin) {
         super(plugin, Map.of(
                 "normal", "environment.normal",
                 "nether", "environment.nether",
@@ -21,7 +21,7 @@ public final class LevelStemArgument extends TooltipSuggestionProvider implement
     }
 
     @Override
-    public LevelStem convert(StringReader reader, String type) {
+    public LevelStem convert(final StringReader reader, final String type) {
         return switch (type) {
             case "normal", "overworld" -> LevelStem.OVERWORLD;
             case "nether" -> LevelStem.NETHER;

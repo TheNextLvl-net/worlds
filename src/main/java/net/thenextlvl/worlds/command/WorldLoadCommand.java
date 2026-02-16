@@ -20,12 +20,12 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
 final class WorldLoadCommand extends SimpleCommand {
-    private WorldLoadCommand(WorldsPlugin plugin) {
+    private WorldLoadCommand(final WorldsPlugin plugin) {
         super(plugin, "load", "worlds.command.load");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldLoadCommand(plugin);
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
+        final var command = new WorldLoadCommand(plugin);
         return command.create().then(command.load());
     }
 
@@ -35,10 +35,10 @@ final class WorldLoadCommand extends SimpleCommand {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var sender = context.getSource().getSender();
-        var path = context.getArgument("path", Path.class);
-        var container = plugin.levelView().getWorldContainer();
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var sender = context.getSource().getSender();
+        final var path = context.getArgument("path", Path.class);
+        final var container = plugin.levelView().getWorldContainer();
 
         if (!path.startsWith(container) || path.getNameCount() != container.getNameCount() + 1) {
             plugin.bundle().sendMessage(sender, "world.container.load");
@@ -47,8 +47,8 @@ final class WorldLoadCommand extends SimpleCommand {
 
         plugin.bundle().sendMessage(sender, "world.load", Placeholder.parsed("world", path.toString()));
 
-        var build = plugin.levelView().read(path).map(Level.Builder::build);
-        var future = build.filter(Level::isWorldKnown).map(Level::createAsync).orElse(null);
+        final var build = plugin.levelView().read(path).map(Level.Builder::build);
+        final var future = build.filter(Level::isWorldKnown).map(Level::createAsync).orElse(null);
 
         if (future == null) {
             plugin.bundle().sendMessage(sender, "world.load.failed", Placeholder.parsed("world", path.toString()));
@@ -58,7 +58,7 @@ final class WorldLoadCommand extends SimpleCommand {
         future.thenAccept(level -> {
             plugin.levelView().setEnabled(level, true);
             plugin.bundle().sendMessage(sender, "world.load.success", Placeholder.parsed("world", level.getName()));
-            if (!(sender instanceof Entity entity)) return;
+            if (!(sender instanceof final Entity entity)) return;
             entity.teleportAsync(level.getSpawnLocation(), COMMAND);
         }).exceptionally(throwable -> {
             plugin.getComponentLogger().warn("Failed to load world {}", path, throwable);

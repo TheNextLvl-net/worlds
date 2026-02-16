@@ -63,7 +63,7 @@ public record GeneratorType(Key key, String name) implements Keyed {
      * @since 3.4.0
      */
     @Contract(pure = true)
-    public static Optional<GeneratorType> getByName(String name) {
+    public static Optional<GeneratorType> getByName(final String name) {
         if (name.equals(AMPLIFIED.name())) return Optional.of(AMPLIFIED);
         if (name.equals(DEBUG.name())) return Optional.of(DEBUG);
         if (name.equals(FLAT.name())) return Optional.of(FLAT);

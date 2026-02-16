@@ -15,21 +15,21 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 final class WorldListCommand extends SimpleCommand {
-    private WorldListCommand(WorldsPlugin plugin) {
+    private WorldListCommand(final WorldsPlugin plugin) {
         super(plugin, "list", "worlds.command.list");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldListCommand(plugin);
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
+        final var command = new WorldListCommand(plugin);
         return command.create().executes(command);
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var sender = context.getSource().getSender();
-        var worlds = plugin.getServer().getWorlds();
+    public int run(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        final var sender = context.getSource().getSender();
+        final var worlds = plugin.getServer().getWorlds();
 
-        var joined = worlds.stream().map(world -> Component.text(world.getName())
+        final var joined = worlds.stream().map(world -> Component.text(world.getName())
                 .hoverEvent(HoverEvent.showText(plugin.bundle().component("world.list.hover", sender,
                         Placeholder.parsed("world", world.key().asString()))))
                 .clickEvent(ClickEvent.runCommand("/world teleport " + world.key().asString()))

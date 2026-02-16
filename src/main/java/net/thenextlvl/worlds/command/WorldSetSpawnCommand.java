@@ -17,16 +17,16 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public final class WorldSetSpawnCommand extends SimpleCommand {
-    private WorldSetSpawnCommand(WorldsPlugin plugin, String name) {
+    private WorldSetSpawnCommand(final WorldsPlugin plugin, final String name) {
         super(plugin, name, "minecraft.command.setworldspawn");
     }
 
-    static LiteralCommandNode<CommandSourceStack> create(WorldsPlugin plugin) {
+    static LiteralCommandNode<CommandSourceStack> create(final WorldsPlugin plugin) {
         return create(plugin, "setspawn");
     }
 
-    public static LiteralCommandNode<CommandSourceStack> create(WorldsPlugin plugin, String name) {
-        var command = new WorldSetSpawnCommand(plugin, name);
+    public static LiteralCommandNode<CommandSourceStack> create(final WorldsPlugin plugin, final String name) {
+        final var command = new WorldSetSpawnCommand(plugin, name);
         return command.create()
                 .then(command.positioned())
                 .executes(command)
@@ -40,15 +40,15 @@ public final class WorldSetSpawnCommand extends SimpleCommand {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var location = context.getSource().getLocation();
-        var resolver = tryGetArgument(context, "position", BlockPositionResolver.class).orElse(null);
-        var position = resolver != null ? resolver.resolve(context.getSource()) : location;
-        var rotationResolver = tryGetArgument(context, "rotation", RotationResolver.class).orElse(null);
-        var rotation = rotationResolver != null ? rotationResolver.resolve(context.getSource()) : Rotation.rotation(location.getYaw(), location.getPitch());
+    public int run(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        final var location = context.getSource().getLocation();
+        final var resolver = tryGetArgument(context, "position", BlockPositionResolver.class).orElse(null);
+        final var position = resolver != null ? resolver.resolve(context.getSource()) : location;
+        final var rotationResolver = tryGetArgument(context, "rotation", RotationResolver.class).orElse(null);
+        final var rotation = rotationResolver != null ? rotationResolver.resolve(context.getSource()) : Rotation.rotation(location.getYaw(), location.getPitch());
 
-        var success = location.getWorld().setSpawnLocation(position.toLocation(location.getWorld()).setRotation(rotation));
-        var message = success ? "world.spawn.set.success" : "world.spawn.set.failed";
+        final var success = location.getWorld().setSpawnLocation(position.toLocation(location.getWorld()).setRotation(rotation));
+        final var message = success ? "world.spawn.set.success" : "world.spawn.set.failed";
 
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
                 Formatter.number("x", position.blockX()),

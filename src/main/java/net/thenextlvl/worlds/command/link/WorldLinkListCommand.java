@@ -12,19 +12,19 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 final class WorldLinkListCommand extends SimpleCommand {
-    private WorldLinkListCommand(WorldsPlugin plugin) {
+    private WorldLinkListCommand(final WorldsPlugin plugin) {
         super(plugin, "list", "worlds.command.link.list");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldLinkListCommand(plugin);
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
+        final var command = new WorldLinkListCommand(plugin);
         return command.create().executes(command);
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var sender = context.getSource().getSender();
-        var links = plugin.linkProvider().getLinkTrees()
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var sender = context.getSource().getSender();
+        final var links = plugin.linkProvider().getLinkTrees()
                 .filter(tree -> !tree.isEmpty())
                 .map(LinkTree::toString)
                 .map(Component::text)

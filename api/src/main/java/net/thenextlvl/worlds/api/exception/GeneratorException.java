@@ -12,7 +12,7 @@ import org.jspecify.annotations.Nullable;
  * @since 2.0.0
  */
 @NullMarked
-public class GeneratorException extends RuntimeException {
+public final class GeneratorException extends RuntimeException {
     private final String plugin;
     private final @Nullable String id;
 
@@ -24,7 +24,7 @@ public class GeneratorException extends RuntimeException {
      * @param message the detailed error message describing the reason for the exception
      */
     @ApiStatus.Internal
-    public GeneratorException(String plugin, @Nullable String id, String message) {
+    public GeneratorException(final String plugin, @Nullable final String id, final String message) {
         super(message);
         this.plugin = plugin;
         this.id = id;

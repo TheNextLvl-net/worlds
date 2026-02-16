@@ -28,25 +28,25 @@ public final class WorldLinkProvider implements LinkProvider {
     private final Set<LinkTree> trees = new HashSet<>();
     private final WorldsPlugin plugin;
 
-    public WorldLinkProvider(WorldsPlugin plugin) {
+    public WorldLinkProvider(final WorldsPlugin plugin) {
         this.plugin = plugin;
     }
 
-    public void unloadTree(World world) {
+    public void unloadTree(final World world) {
         if (!world.getEnvironment().equals(World.Environment.NORMAL)
                 && !world.getEnvironment().equals(World.Environment.CUSTOM)) return;
         trees.removeIf(tree -> tree.getOverworld().equals(world));
     }
 
-    public Optional<LinkTree> loadTree(World world) {
+    public Optional<LinkTree> loadTree(final World world) {
         if (!world.getEnvironment().equals(World.Environment.NORMAL)
                 && !world.getEnvironment().equals(World.Environment.CUSTOM)) return Optional.empty();
 
-        var noneMatch = trees.stream().noneMatch(tree -> tree.getOverworld().equals(world));
+        final var noneMatch = trees.stream().noneMatch(tree -> tree.getOverworld().equals(world));
         Preconditions.checkState(noneMatch, "World tree is already loaded for %s", world.getName());
 
-        var tree = new WorldLinkTree(this, world);
-        var data = world.getPersistentDataContainer();
+        final var tree = new WorldLinkTree(this, world);
+        final var data = world.getPersistentDataContainer();
 
         Optional.ofNullable(data.get(OLD_LINK_NETHER, STRING)).map(Key::key).ifPresent(key -> {
             data.remove(OLD_LINK_NETHER);
@@ -67,11 +67,11 @@ public final class WorldLinkProvider implements LinkProvider {
         getLinkTrees().forEach(tree -> persistTree(tree.getOverworld()));
     }
 
-    public void persistTree(World world) {
+    public void persistTree(final World world) {
         if (!world.getEnvironment().equals(World.Environment.NORMAL)
                 && !world.getEnvironment().equals(World.Environment.CUSTOM)) return;
         getLinkTree(world).ifPresent(tree -> {
-            var container = world.getPersistentDataContainer();
+            final var container = world.getPersistentDataContainer();
             tree.getPersistedNether().map(Key::asString).ifPresentOrElse(
                     nether -> container.set(WorldLinkTree.LINK_NETHER, PersistentDataType.STRING, nether),
                     () -> container.remove(WorldLinkTree.LINK_NETHER));
@@ -87,17 +87,17 @@ public final class WorldLinkProvider implements LinkProvider {
     }
 
     @Override
-    public Optional<LinkTree> getLinkTree(Key key) {
+    public Optional<LinkTree> getLinkTree(final Key key) {
         return trees.stream().filter(tree -> tree.contains(key)).findAny();
     }
 
     @Override
-    public Optional<LinkTree> getLinkTree(World world) {
+    public Optional<LinkTree> getLinkTree(final World world) {
         return getLinkTree(world.key());
     }
 
     @Override
-    public Optional<World> getTarget(World world, PortalType type) {
+    public Optional<World> getTarget(final World world, final PortalType type) {
         return switch (type) {
             case NETHER -> switch (world.getEnvironment()) {
                 case NORMAL, THE_END, CUSTOM -> getLinkTree(world).flatMap(LinkTree::getNether);
@@ -112,7 +112,7 @@ public final class WorldLinkProvider implements LinkProvider {
     }
 
     @Override
-    public boolean link(World source, World target) {
+    public boolean link(final World source, final World target) {
         if (!source.getEnvironment().equals(Environment.NORMAL)
                 && !source.getEnvironment().equals(Environment.CUSTOM)) return false;
         return getLinkTree(source).map(linkTree -> switch (target.getEnvironment()) {
@@ -123,7 +123,7 @@ public final class WorldLinkProvider implements LinkProvider {
     }
 
     @Override
-    public boolean unlink(Key source, Key target) {
+    public boolean unlink(final Key source, final Key target) {
         return plugin.linkProvider().getLinkTree(source)
                 .filter(tree -> !tree.isEmpty())
                 .map(tree -> tree.remove(target))
@@ -131,17 +131,17 @@ public final class WorldLinkProvider implements LinkProvider {
     }
 
     @Override
-    public boolean unlink(World source, World target) {
+    public boolean unlink(final World source, final World target) {
         return unlink(source.key(), target.key());
     }
 
     @Override
-    public boolean hasLinkTree(Key key) {
+    public boolean hasLinkTree(final Key key) {
         return trees.stream().anyMatch(tree -> tree.contains(key));
     }
 
     @Override
-    public boolean hasLinkTree(World world) {
+    public boolean hasLinkTree(final World world) {
         return hasLinkTree(world.key());
     }
 

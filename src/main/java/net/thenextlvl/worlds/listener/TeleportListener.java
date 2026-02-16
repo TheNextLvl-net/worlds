@@ -12,13 +12,13 @@ import org.jspecify.annotations.NullMarked;
 public final class TeleportListener implements Listener {
     private final WorldsPlugin plugin;
 
-    public TeleportListener(WorldsPlugin plugin) {
+    public TeleportListener(final WorldsPlugin plugin) {
         this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerTeleport(PlayerTeleportEvent event) {
-        var world = event.getTo().getWorld();
+    public void onPlayerTeleport(final PlayerTeleportEvent event) {
+        final var world = event.getTo().getWorld();
         if (event.getFrom().getWorld().equals(world)) return;
         if (event.getPlayer().hasPermission(plugin.levelView().getEntryPermission(world))) return;
         plugin.bundle().sendMessage(event.getPlayer(), "world.entry.denied",

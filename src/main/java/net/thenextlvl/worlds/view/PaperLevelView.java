@@ -23,6 +23,7 @@ import net.thenextlvl.worlds.api.view.LevelView;
 import net.thenextlvl.worlds.level.LevelData;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.generator.WorldInfo;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -81,7 +82,7 @@ public class PaperLevelView implements LevelView {
     private final Map<Key, Runnable> regenerations = new ConcurrentHashMap<>();
     protected final WorldsPlugin plugin;
 
-    public PaperLevelView(WorldsPlugin plugin) {
+    public PaperLevelView(final WorldsPlugin plugin) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             backupRestorations.values().forEach(Runnable::run);
             deletions.values().forEach(Runnable::run);
@@ -102,33 +103,33 @@ public class PaperLevelView implements LevelView {
         return getWorld(END);
     }
 
-    private Optional<World> getWorld(Key key) {
+    private Optional<World> getWorld(final Key key) {
         return Optional.ofNullable(plugin.getServer().getWorld(key));
     }
 
-    public boolean isOverworld(World world) {
+    public boolean isOverworld(final World world) {
         return world.key().equals(OVERWORLD);
     }
 
-    public boolean isEnd(World world) {
+    public boolean isEnd(final World world) {
         return world.key().equals(END);
     }
 
-    private @Nullable Path getLevelDataPath(Path level) {
+    private @Nullable Path getLevelDataPath(final Path level) {
         return Optional.ofNullable(getFile(level, "level.dat"))
                 .orElseGet(() -> getFile(level, "level.dat_old"));
     }
 
-    public @Nullable CompoundTag getLevelDataFile(Path level) throws IOException {
-        var path = getLevelDataPath(level);
+    public @Nullable CompoundTag getLevelDataFile(final Path level) throws IOException {
+        final var path = getLevelDataPath(level);
         if (path == null) return null;
-        try (var inputStream = NBTInputStream.create(path)) {
+        try (final var inputStream = NBTInputStream.create(path)) {
             return inputStream.readTag().getAsCompound();
         }
     }
 
-    private static @Nullable Path getFile(Path level, String other) {
-        var resolved = level.resolve(other);
+    private static @Nullable Path getFile(final Path level, final String other) {
+        final var resolved = level.resolve(other);
         return Files.isRegularFile(resolved) ? resolved : null;
     }
 
@@ -140,12 +141,12 @@ public class PaperLevelView implements LevelView {
         var backupFolder = System.getenv("WORLDS_BACKUP_FOLDER");
         if (backupFolder == null) backupFolder = System.getProperty("worlds.backup.folder");
         if (backupFolder != null) return Path.of(backupFolder);
-        var parent = getWorldContainer().getParent();
+        final var parent = getWorldContainer().getParent();
         return parent != null ? parent.resolve("backups") : Path.of("backups");
     }
 
     @Override
-    public Path getBackupFolder(World world) {
+    public Path getBackupFolder(final World world) {
         return getBackupFolder().resolve(world.getName());
     }
 
@@ -155,20 +156,20 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public String getEntryPermission(World world) {
+    public String getEntryPermission(final World world) {
         return "worlds.enter." + world.key().asString();
     }
 
     @Override
-    public Optional<Level.Builder> read(Path directory) {
+    public Optional<Level.Builder> read(final Path directory) {
         try {
             return LevelData.read(plugin, directory);
-        } catch (GeneratorException e) {
-            var generator = e.getId() != null ? e.getPlugin() + ":" + e.getId() : e.getPlugin();
+        } catch (final GeneratorException e) {
+            final var generator = e.getId() != null ? e.getPlugin() + ":" + e.getId() : e.getPlugin();
             plugin.getComponentLogger().error("Skip loading dimension '{}'", directory.getFileName());
             plugin.getComponentLogger().error("Cannot use generator {}: {}", generator, e.getMessage());
             return Optional.empty();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             if (e.getCause() instanceof ZipException) {
                 plugin.getComponentLogger().warn("Failed to read level data from {}", directory);
                 plugin.getComponentLogger().warn("Your level.dat is irrecoverably corrupted. Please delete it and recreate the world.");
@@ -181,7 +182,7 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public Optional<JavaPlugin> getGenerator(World world) {
+    public Optional<JavaPlugin> getGenerator(final World world) {
         return Optional.ofNullable(world.getGenerator())
                 .map(chunkGenerator -> chunkGenerator.getClass().getClassLoader())
                 .filter(ConfiguredPluginClassLoader.class::isInstance)
@@ -197,9 +198,9 @@ public class PaperLevelView implements LevelView {
     }
 
     private @Unmodifiable Set<Path> listDirectories() {
-        try (var stream = Files.list(plugin.getServer().getWorldContainer().toPath())) {
+        try (final var stream = Files.list(plugin.getServer().getWorldContainer().toPath())) {
             return stream.filter(Files::isDirectory).collect(Collectors.toUnmodifiableSet());
-        } catch (IOException e) {
+        } catch (final IOException e) {
             return Set.of();
         }
     }
@@ -233,26 +234,26 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public boolean hasEndDimension(Path level) {
+    public boolean hasEndDimension(final Path level) {
         return Files.isDirectory(level.resolve("DIM1"));
     }
 
     @Override
-    public boolean hasNetherDimension(Path level) {
+    public boolean hasNetherDimension(final Path level) {
         return Files.isDirectory(level.resolve("DIM-1"));
     }
 
     @Override
-    public boolean isLevel(Path path) {
+    public boolean isLevel(final Path path) {
         return Files.isRegularFile(path.resolve("level.dat")) || Files.isRegularFile(path.resolve("level.dat_old"));
     }
 
     @Override
-    public CompletableFuture<Boolean> unloadAsync(World world, boolean save) {
+    public CompletableFuture<Boolean> unloadAsync(final World world, final boolean save) {
         return saveLevelDataAsync(world).thenCompose(ignored -> {
             plugin.getServer().allowPausing(plugin, false);
             return plugin.supplyGlobal(() -> {
-                var dragonBattle = world.getEnderDragonBattle();
+                final var dragonBattle = world.getEnderDragonBattle();
                 if (!plugin.getServer().unloadWorld(world, save))
                     return CompletableFuture.completedFuture(false);
                 if (dragonBattle != null) dragonBattle.getBossBar().removeAll();
@@ -269,16 +270,16 @@ public class PaperLevelView implements LevelView {
      * @see CraftWorld#save(boolean)
      */
     @Override
-    public CompletableFuture<@Nullable Void> saveAsync(World world, boolean flush) {
+    public CompletableFuture<@Nullable Void> saveAsync(final World world, final boolean flush) {
         return plugin.supplyGlobal(() -> {
             try {
-                var level = ((CraftWorld) world).getHandle();
-                var oldSave = level.noSave;
+                final var level = ((CraftWorld) world).getHandle();
+                final var oldSave = level.noSave;
                 level.noSave = false;
                 level.save(null, flush, false);
                 level.noSave = oldSave;
                 return CompletableFuture.completedFuture(null);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 WorldsPlugin.ERROR_TRACKER.trackError(e);
                 return CompletableFuture.failedFuture(e);
             }
@@ -290,8 +291,8 @@ public class PaperLevelView implements LevelView {
      * @see ServerLevel#saveLevelData(boolean)
      */
     @Override
-    public CompletableFuture<@Nullable Void> saveLevelDataAsync(World world) {
-        var level = ((CraftWorld) world).getHandle();
+    public CompletableFuture<@Nullable Void> saveLevelDataAsync(final World world) {
+        final var level = ((CraftWorld) world).getHandle();
         if (level.getDragonFight() != null) {
             level.serverLevelData.setEndDragonFightData(level.getDragonFight().saveData());
         }
@@ -304,23 +305,23 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public boolean isEnabled(World world) {
+    public boolean isEnabled(final World world) {
         return Boolean.TRUE.equals(world.getPersistentDataContainer().get(ENABLED_KEY, BOOLEAN));
     }
 
     @Override
-    public void setEnabled(World world, boolean enabled) {
+    public void setEnabled(final World world, final boolean enabled) {
         world.getPersistentDataContainer().set(ENABLED_KEY, BOOLEAN, enabled);
     }
 
     @Override
-    public CompletableFuture<Path> createBackupAsync(World world, @Nullable String name) {
+    public CompletableFuture<Path> createBackupAsync(final World world, @Nullable final String name) {
         return plugin.supplyGlobal(() -> {
             new WorldBackupEvent(world).callEvent();
             return saveAsync(world, true).thenComposeAsync(ignored -> {
                 try {
                     return CompletableFuture.completedFuture(backupInternal(world, name));
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     return CompletableFuture.failedFuture(e);
                 }
             });
@@ -328,7 +329,7 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public CompletableFuture<RestoringResult> restoreBackupAsync(World world, Path backupFile, boolean schedule) {
+    public CompletableFuture<RestoringResult> restoreBackupAsync(final World world, final Path backupFile, final boolean schedule) {
         if (!Files.isRegularFile(backupFile))
             return CompletableFuture.completedFuture(new RestoringResultImpl(null, DeletionResult.FAILED));
         return plugin.supplyGlobal(() -> {
@@ -343,17 +344,17 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public boolean cancelScheduledBackupRestoration(World world) {
+    public boolean cancelScheduledBackupRestoration(final World world) {
         return backupRestorations.remove(world.key()) != null;
     }
 
     @Override
-    public boolean isBackupRestorationScheduled(World world) {
+    public boolean isBackupRestorationScheduled(final World world) {
         return backupRestorations.containsKey(world.key());
     }
 
-    private RestoringResult scheduleRestoreBackup(World world, Path backupFile) {
-        var deletionResult = scheduleAction(world, ActionType.RESTORE_BACKUP, backupRestorations, path -> {
+    private RestoringResult scheduleRestoreBackup(final World world, final Path backupFile) {
+        final var deletionResult = scheduleAction(world, ActionType.RESTORE_BACKUP, backupRestorations, path -> {
             restore(path, backupFile);
         });
         return new RestoringResultImpl(null, deletionResult);
@@ -362,16 +363,16 @@ public class PaperLevelView implements LevelView {
     private record RestoringResultImpl(@Nullable World world, DeletionResult result) implements RestoringResult {
     }
 
-    private CompletableFuture<RestoringResult> restoreBackupInternal(World world, Path path) {
-        var players = world.getPlayers();
-        var fallback = getOverworld().getSpawnLocation();
+    private CompletableFuture<RestoringResult> restoreBackupInternal(final World world, final Path path) {
+        final var players = world.getPlayers();
+        final var fallback = getOverworld().getSpawnLocation();
         return CompletableFuture.allOf(players.stream()
                 .map(player -> player.teleportAsync(fallback, TeleportCause.PLUGIN).thenAccept(success -> {
                     if (!success) player.kick(plugin.bundle().component("world.unload.kicked", player));
                 }))
                 .toArray(CompletableFuture[]::new)
         ).thenCompose(ignored -> {
-            var worldPath = world.getWorldFolder().toPath();
+            final var worldPath = world.getWorldFolder().toPath();
             return unloadAsync(world, true).thenComposeAsync(success -> {
                 if (!success) return CompletableFuture.<RestoringResult>completedFuture(
                         new RestoringResultImpl(null, DeletionResult.UNLOAD_FAILED)
@@ -392,49 +393,49 @@ public class PaperLevelView implements LevelView {
         });
     }
 
-    private void restore(Path worldPath, Path path) {
+    private void restore(final Path worldPath, final Path path) {
         Path tempPath;
         do {
             tempPath = worldPath.resolveSibling("." + UUID.randomUUID());
         } while (Files.isDirectory(tempPath));
-        try (var input = new ZipInputStream(Files.newInputStream(path, StandardOpenOption.READ))) {
+        try (final var input = new ZipInputStream(Files.newInputStream(path, StandardOpenOption.READ))) {
             ZipEntry entry;
-            var root = tempPath.toAbsolutePath().normalize();
+            final var root = tempPath.toAbsolutePath().normalize();
             while ((entry = input.getNextEntry()) != null) {
-                Path resolved;
+                final Path resolved;
                 try {
                     resolved = resolveZipEntry(root, entry);
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     plugin.getComponentLogger().warn("Skipping suspicious zip entry: {}", entry.getName(), e);
                     continue;
                 }
                 if (entry.isDirectory()) {
                     Files.createDirectories(resolved);
                 } else {
-                    var parent = resolved.getParent();
+                    final var parent = resolved.getParent();
                     if (parent != null) Files.createDirectories(parent);
                     Files.copy(input, resolved);
                 }
             }
             Files.walkFileTree(worldPath, new SimpleFileVisitor<>() {
                 @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
                     Files.delete(file);
                     return FileVisitResult.CONTINUE;
                 }
 
                 @Override
-                public FileVisitResult postVisitDirectory(Path dir, @Nullable IOException exc) throws IOException {
+                public FileVisitResult postVisitDirectory(final Path dir, @Nullable final IOException exc) throws IOException {
                     if (exc != null) throw exc;
                     Files.delete(dir);
                     return FileVisitResult.CONTINUE;
                 }
             });
             Files.move(tempPath, worldPath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             try {
                 Files.deleteIfExists(tempPath);
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 plugin.getComponentLogger().warn("Failed to delete temporary files for backup restoration", ex);
             }
             WorldsPlugin.ERROR_TRACKER.trackError(e);
@@ -442,8 +443,8 @@ public class PaperLevelView implements LevelView {
         }
     }
 
-    private static Path resolveZipEntry(Path path, ZipEntry entry) throws IOException {
-        var target = path.resolve(entry.getName()).normalize();
+    private static Path resolveZipEntry(final Path path, final ZipEntry entry) throws IOException {
+        final var target = path.resolve(entry.getName()).normalize();
         if (!target.startsWith(path)) {
             throw new IOException("Zip entry outside target dir: " + entry.getName());
         }
@@ -451,13 +452,13 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public Stream<Path> listBackups(World world) {
+    public Stream<Path> listBackups(final World world) {
         try {
-            var files = Files.list(getBackupFolder(world));
+            final var files = Files.list(getBackupFolder(world));
             return files.filter(Files::isRegularFile)
                     .filter(path -> path.getFileName().toString().endsWith(".zip"))
                     .onClose(files::close);
-        } catch (IOException ignored) {
+        } catch (final IOException ignored) {
             return Stream.empty();
         }
     }
@@ -465,20 +466,20 @@ public class PaperLevelView implements LevelView {
     /**
      * @see LevelStorageSource.LevelStorageAccess#makeWorldBackup()
      */
-    private Path backupInternal(World world, @Nullable String name) throws IOException {
-        var backupPath = getBackupFolder(world);
+    private Path backupInternal(final World world, @Nullable final String name) throws IOException {
+        final var backupPath = getBackupFolder(world);
         Files.createDirectories(backupPath);
-        var availableName = name != null ? name + ".zip" : FileUtil.findAvailableName(backupPath, FORMATTER.format(Instant.now()), ".zip");
-        var path = backupPath.resolve(availableName);
+        final var availableName = name != null ? name + ".zip" : FileUtil.findAvailableName(backupPath, FORMATTER.format(Instant.now()), ".zip");
+        final var path = backupPath.resolve(availableName);
         if (name != null && Files.isRegularFile(path)) {
             throw new FileAlreadyExistsException(path.toString(), null, "A Backup named " + name + " already exists for " + world.key());
-        } else try (var output = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(
+        } else try (final var output = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(
                 path, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE
         )))) {
             Files.walkFileTree(world.getWorldFolder().toPath(), new SimpleFileVisitor<>() {
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
                     if (!file.endsWith("session.lock")) {
-                        var relative = world.getWorldFolder().toPath().relativize(file).toString().replace('\\', '/');
+                        final var relative = world.getWorldFolder().toPath().relativize(file).toString().replace('\\', '/');
                         output.putNextEntry(new ZipEntry(relative));
                         Files.copy(file, output);
                         output.closeEntry();
@@ -490,21 +491,21 @@ public class PaperLevelView implements LevelView {
         return path;
     }
 
-    public String findFreeName(String name) {
-        var usedNames = plugin.getServer().getWorlds().stream()
+    public String findFreeName(final String name) {
+        final var usedNames = plugin.getServer().getWorlds().stream()
                 .map(WorldInfo::getName)
                 .collect(Collectors.toSet());
         return findFreeName(usedNames, name);
     }
 
     @SuppressWarnings("PatternValidation")
-    public Key findFreeKey(Key key) {
+    public Key findFreeKey(final Key key) {
         return findFreeKey(key.namespace(), key.value());
     }
 
     @SuppressWarnings("PatternValidation")
-    public Key findFreeKey(@KeyPattern.Namespace String namespace, @KeyPattern.Value String value) {
-        var usedValues = plugin.getServer().getWorlds().stream()
+    public Key findFreeKey(@KeyPattern.Namespace final String namespace, @KeyPattern.Value final String value) {
+        final var usedValues = plugin.getServer().getWorlds().stream()
                 .map(World::key)
                 .filter(key -> key.namespace().equals(namespace))
                 .map(Key::value)
@@ -512,23 +513,23 @@ public class PaperLevelView implements LevelView {
         return Key.key(namespace, findFreeValue(usedValues, value));
     }
 
-    public Path findFreePath(String name) {
-        var usedPaths = listDirectories().stream()
+    public Path findFreePath(final String name) {
+        final var usedPaths = listDirectories().stream()
                 .map(Path::getFileName)
                 .map(Path::toString)
                 .collect(Collectors.toSet());
         return Path.of(findFreeName(usedPaths, name));
     }
 
-    public static String findFreeName(Set<String> usedNames, String name) {
+    public static String findFreeName(final Set<String> usedNames, final String name) {
         if (!usedNames.contains(name)) return name;
 
         var baseName = name;
         int suffix = 1;
         String candidate = baseName + " (1)";
 
-        var pattern = Pattern.compile("^(.+) \\((\\d+)\\)$");
-        var matcher = pattern.matcher(name);
+        final var pattern = Pattern.compile("^(.+) \\((\\d+)\\)$");
+        final var matcher = pattern.matcher(name);
 
         if (matcher.matches()) {
             baseName = matcher.group(1);
@@ -544,15 +545,15 @@ public class PaperLevelView implements LevelView {
         return candidate;
     }
 
-    public static String findFreeValue(Set<String> usedValues, String value) {
+    public static String findFreeValue(final Set<String> usedValues, final String value) {
         if (!usedValues.contains(value)) return value;
 
         var baseValue = value;
         int suffix = 1;
         String candidate = baseValue + "_1";
 
-        var pattern = Pattern.compile("^(.+) \\((\\d+)\\)$");
-        var matcher = pattern.matcher(value);
+        final var pattern = Pattern.compile("^(.+) \\((\\d+)\\)$");
+        final var matcher = pattern.matcher(value);
 
         if (matcher.matches()) {
             baseValue = matcher.group(1);
@@ -569,78 +570,78 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public CompletableFuture<World> cloneAsync(World world, Consumer<Level.Builder> builder, boolean full) {
+    public CompletableFuture<World> cloneAsync(final World world, final Consumer<Level.Builder> builder, final boolean full) {
         return plugin.supplyGlobal(() -> cloneInternal(world, builder, full));
     }
 
-    private CompletableFuture<World> cloneInternal(World world, Consumer<Level.Builder> builder, boolean full) {
-        var levelBuilder = plugin.levelBuilder(world);
+    private CompletableFuture<World> cloneInternal(final World world, final Consumer<Level.Builder> builder, final boolean full) {
+        final var levelBuilder = plugin.levelBuilder(world);
 
         levelBuilder.name(findFreeName(world.getName()));
         levelBuilder.key(findFreeKey(world.key()));
         levelBuilder.directory(findFreePath(world.getWorldFolder().getName()));
 
         builder.accept(levelBuilder);
-        var clone = levelBuilder.build();
+        final var clone = levelBuilder.build();
 
         try {
             Preconditions.checkArgument(plugin.getServer().getWorld(clone.key()) == null, "World with key %s already exists", clone.key());
             Preconditions.checkArgument(plugin.getServer().getWorld(clone.getName()) == null, "World with name %s already exists", clone.getName());
             Preconditions.checkState(!Files.isDirectory(clone.getDirectory()), "Target directory already exists");
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             return CompletableFuture.failedFuture(e);
         }
 
-        var event = new WorldCloneEvent(world, clone, full);
+        final var event = new WorldCloneEvent(world, clone, full);
         event.callEvent();
 
         return full ? saveAsync(world, true).thenCompose(ignored -> {
             try {
                 copyDirectory(world.getWorldFolder().toPath(), clone.getDirectory(), event.getFileFilter());
                 return clone.createAsync();
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 return CompletableFuture.failedFuture(e);
             }
         }) : clone.createAsync();
     }
 
     @Override
-    public CompletableFuture<DeletionResult> deleteAsync(World world, boolean schedule) {
+    public CompletableFuture<DeletionResult> deleteAsync(final World world, final boolean schedule) {
         return plugin.supplyGlobal(() -> schedule ? CompletableFuture.completedFuture(scheduleDeletion(world)) : deleteNow(world));
     }
 
     @Override
-    public boolean cancelScheduledDeletion(World world) {
+    public boolean cancelScheduledDeletion(final World world) {
         return deletions.remove(world.key()) != null;
     }
 
     @Override
-    public boolean isDeletionScheduled(World world) {
+    public boolean isDeletionScheduled(final World world) {
         return deletions.containsKey(world.key());
     }
 
     @Override
-    public CompletableFuture<DeletionResult> regenerateAsync(World world, boolean schedule, Consumer<Level.Builder> builder) {
+    public CompletableFuture<DeletionResult> regenerateAsync(final World world, final boolean schedule, final Consumer<Level.Builder> builder) {
         return plugin.supplyGlobal(() -> schedule ? CompletableFuture.completedFuture(scheduleRegeneration(world)) : regenerateNow(world, builder));
     }
 
     @Override
-    public boolean cancelScheduledRegeneration(World world) {
+    public boolean cancelScheduledRegeneration(final World world) {
         return regenerations.remove(world.key()) != null;
     }
 
     @Override
-    public boolean isRegenerationScheduled(World world) {
+    public boolean isRegenerationScheduled(final World world) {
         return regenerations.containsKey(world.key());
     }
 
-    private CompletableFuture<DeletionResult> deleteNow(World world) {
+    private CompletableFuture<DeletionResult> deleteNow(final World world) {
         if (isOverworld(world)) return CompletableFuture.completedFuture(DeletionResult.REQUIRES_SCHEDULING);
 
         if (!new WorldDeleteEvent(world).callEvent())
             return CompletableFuture.completedFuture(DeletionResult.FAILED);
 
-        var fallback = getOverworld().getSpawnLocation();
+        final var fallback = getOverworld().getSpawnLocation();
         return CompletableFuture.allOf(world.getPlayers().stream()
                 .map(player -> player.teleportAsync(fallback, TeleportCause.PLUGIN).thenAccept(success -> {
                     if (!success) player.kick(plugin.bundle().component("world.unload.kicked", player));
@@ -657,31 +658,31 @@ public class PaperLevelView implements LevelView {
         }));
     }
 
-    private DeletionResult scheduleDeletion(World world) {
+    private DeletionResult scheduleDeletion(final World world) {
         return scheduleAction(world, ActionType.DELETE, deletions, this::delete);
     }
 
-    private DeletionResult scheduleAction(World world, ActionType type, Map<Key, Runnable> map, Consumer<Path> consumer) {
+    private DeletionResult scheduleAction(final World world, final ActionType type, final Map<Key, Runnable> map, final Consumer<Path> consumer) {
         if (map.containsKey(world.key())) return DeletionResult.SCHEDULED;
 
-        var event = new WorldActionScheduledEvent(world, type);
+        final var event = new WorldActionScheduledEvent(world, type);
         if (!event.callEvent()) return DeletionResult.FAILED;
 
-        var action = event.getAction() == null ? consumer : event.getAction().andThen(consumer);
+        final var action = event.getAction() == null ? consumer : event.getAction().andThen(consumer);
 
-        var path = world.getWorldFolder().toPath();
+        final var path = world.getWorldFolder().toPath();
         map.put(world.key(), () -> action.accept(path));
         return DeletionResult.SCHEDULED;
     }
 
-    private CompletableFuture<DeletionResult> regenerateNow(World world, Consumer<Level.Builder> consumer) {
+    private CompletableFuture<DeletionResult> regenerateNow(final World world, final Consumer<Level.Builder> consumer) {
         if (isOverworld(world)) return CompletableFuture.completedFuture(DeletionResult.REQUIRES_SCHEDULING);
 
         if (!new WorldRegenerateEvent(world).callEvent())
             return CompletableFuture.completedFuture(DeletionResult.FAILED);
 
-        var players = world.getPlayers();
-        var fallback = getOverworld().getSpawnLocation();
+        final var players = world.getPlayers();
+        final var fallback = getOverworld().getSpawnLocation();
         return CompletableFuture.allOf(players.stream()
                 .map(player -> player.teleportAsync(fallback, TeleportCause.PLUGIN).thenAccept(success -> {
                     if (!success) player.kick(plugin.bundle().component("world.unload.kicked", player));
@@ -693,7 +694,7 @@ public class PaperLevelView implements LevelView {
 
                 regenerate(world.getWorldFolder().toPath());
                 regenerations.remove(world.key());
-                var builder = plugin.levelBuilder(world);
+                final var builder = plugin.levelBuilder(world);
                 consumer.accept(builder);
                 return builder.build().createAsync().thenAccept(regenerated -> {
                     players.forEach(player -> player.teleportAsync(regenerated.getSpawnLocation(), TeleportCause.PLUGIN));
@@ -708,11 +709,11 @@ public class PaperLevelView implements LevelView {
         }));
     }
 
-    private DeletionResult scheduleRegeneration(World world) {
+    private DeletionResult scheduleRegeneration(final World world) {
         return scheduleAction(world, ActionType.REGENERATE, regenerations, this::regenerate);
     }
 
-    private void regenerate(Path level) {
+    private void regenerate(final Path level) {
         delete(level.resolve("DIM-1"));
         delete(level.resolve("DIM1"));
         delete(level.resolve("advancements"));
@@ -724,22 +725,22 @@ public class PaperLevelView implements LevelView {
         delete(level.resolve("stats"));
     }
 
-    private void delete(Path path) {
+    private void delete(final Path path) {
         try {
             if (!Files.isDirectory(path)) Files.deleteIfExists(path);
-            else try (var files = Files.list(path)) {
+            else try (final var files = Files.list(path)) {
                 files.forEach(this::delete);
                 Files.deleteIfExists(path);
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             plugin.getComponentLogger().warn("Failed to delete {}", path, e);
         }
     }
 
-    public void copyDirectory(Path source, Path destination, @Nullable BiPredicate<Path, BasicFileAttributes> filter) throws IOException {
+    public void copyDirectory(final Path source, final Path destination, @Nullable final BiPredicate<Path, BasicFileAttributes> filter) throws IOException {
         Files.walkFileTree(source, new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attributes) throws IOException {
+            public FileVisitResult preVisitDirectory(final Path path, final BasicFileAttributes attributes) throws IOException {
                 if (SKIP_DIRECTORIES.contains(path.getFileName().toString())) return FileVisitResult.SKIP_SUBTREE;
                 if (filter != null && !filter.test(path, attributes)) return FileVisitResult.SKIP_SUBTREE;
                 Files.createDirectories(destination.resolve(source.relativize(path)));
@@ -747,7 +748,7 @@ public class PaperLevelView implements LevelView {
             }
 
             @Override
-            public FileVisitResult visitFile(Path path, BasicFileAttributes attributes) throws IOException {
+            public FileVisitResult visitFile(final Path path, final BasicFileAttributes attributes) throws IOException {
                 if (SKIP_FILES.contains(path.getFileName().toString())) return FileVisitResult.CONTINUE;
                 if (filter != null && !filter.test(path, attributes)) return FileVisitResult.CONTINUE;
                 Files.copy(path, destination.resolve(source.relativize(path)));
@@ -755,7 +756,7 @@ public class PaperLevelView implements LevelView {
             }
 
             @Override
-            public FileVisitResult visitFileFailed(Path path, IOException exc) {
+            public FileVisitResult visitFileFailed(final Path path, final IOException exc) {
                 plugin.getComponentLogger().warn("Failed to copy file: {}", path, exc);
                 return FileVisitResult.CONTINUE;
             }

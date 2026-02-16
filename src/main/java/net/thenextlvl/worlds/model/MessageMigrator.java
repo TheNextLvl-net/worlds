@@ -27,7 +27,7 @@ public final class MessageMigrator implements ResourceMigrator {
     );
 
     @Override
-    public @Nullable Migration migrate(Locale locale, String key, String message) {
+    public @Nullable Migration migrate(final Locale locale, final String key, final String message) {
         return rules.stream().filter(rule -> rule.key().equals(key))
                 .filter(rule -> rule.locale().equals(locale))
                 .filter(rule -> message.contains(rule.match()))

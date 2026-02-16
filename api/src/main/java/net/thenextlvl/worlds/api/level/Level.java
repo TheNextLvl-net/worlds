@@ -400,7 +400,7 @@ public interface Level extends Keyed {
          */
         @Contract(mutates = "this")
         @Deprecated(forRemoval = true, since = "3.3.1")
-        Builder spawnChunkRadius(@Nullable Integer radius);
+        Builder spawnChunkRadius(@Nullable final Integer radius);
 
         /**
          * Retrieves the world seed used for generation, if available.

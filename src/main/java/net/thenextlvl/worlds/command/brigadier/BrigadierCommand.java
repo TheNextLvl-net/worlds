@@ -16,7 +16,7 @@ public abstract class BrigadierCommand {
     private final String permission;
     private final String name;
 
-    protected BrigadierCommand(WorldsPlugin plugin, String name, String permission) {
+    protected BrigadierCommand(final WorldsPlugin plugin, final String name, final String permission) {
         this.plugin = plugin;
         this.permission = permission;
         this.name = name;
@@ -26,14 +26,14 @@ public abstract class BrigadierCommand {
         return Commands.literal(name).requires(this::canUse);
     }
 
-    protected boolean canUse(CommandSourceStack source) {
+    protected boolean canUse(final CommandSourceStack source) {
         return source.getSender().hasPermission(permission);
     }
 
-    protected <T> Optional<T> tryGetArgument(CommandContext<CommandSourceStack> context, String name, Class<T> type) {
+    protected <T> Optional<T> tryGetArgument(final CommandContext<CommandSourceStack> context, final String name, final Class<T> type) {
         try {
             return Optional.of(context.getArgument(name, type));
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             if (e.getMessage().equals("No such argument '" + name + "' exists on this command"))
                 return Optional.empty();
             throw e;

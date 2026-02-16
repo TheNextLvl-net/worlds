@@ -15,25 +15,25 @@ import java.util.function.Consumer;
 
 @NullMarked
 public abstract class OptionCommand extends SimpleCommand {
-    protected OptionCommand(WorldsPlugin plugin, String name, String permission) {
+    protected OptionCommand(final WorldsPlugin plugin, final String name, final String permission) {
         super(plugin, name, permission);
     }
 
     public record Option(String name, ArgumentType<?> type, @Nullable String incompatible) {
-        public Option(String name, ArgumentType<?> type) {
+        public Option(final String name, final ArgumentType<?> type) {
             this(name, type, null);
         }
     }
 
     protected abstract RequiredArgumentBuilder<CommandSourceStack, ?> createCommand();
 
-    protected void addOptions(ArgumentBuilder<CommandSourceStack, ?> parent, boolean fixed, Set<Option> options, @Nullable Consumer<ArgumentBuilder<CommandSourceStack, ?>> consumer) {
+    protected void addOptions(final ArgumentBuilder<CommandSourceStack, ?> parent, final boolean fixed, final Set<Option> options, @Nullable final Consumer<ArgumentBuilder<CommandSourceStack, ?>> consumer) {
         options.forEach(option -> {
-            var argument = Commands.argument(option.name, option.type).executes(this);
+            final var argument = Commands.argument(option.name, option.type).executes(this);
             if (consumer != null) consumer.accept(argument);
 
             if (!fixed) {
-                var nextRemaining = new HashSet<>(options);
+                final var nextRemaining = new HashSet<>(options);
                 nextRemaining.remove(option);
                 if (option.incompatible() != null) nextRemaining.removeIf(o -> {
                     return o.name().equals(option.incompatible());
