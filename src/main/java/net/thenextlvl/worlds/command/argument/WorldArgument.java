@@ -15,13 +15,13 @@ import org.jspecify.annotations.NullMarked;
 public final class WorldArgument implements SimpleArgumentType<World, Key> {
     private final WorldsPlugin plugin;
 
-    public WorldArgument(WorldsPlugin plugin) {
+    public WorldArgument(final WorldsPlugin plugin) {
         this.plugin = plugin;
     }
 
     @Override
-    public World convert(StringReader reader, Key type) throws CommandSyntaxException {
-        var world = plugin.getServer().getWorld(type);
+    public World convert(final StringReader reader, final Key type) throws CommandSyntaxException {
+        final var world = plugin.getServer().getWorld(type);
         if (world != null) return world;
         throw new ComponentCommandExceptionType(
                 Component.text("Unknown dimension: '" + type + "'")

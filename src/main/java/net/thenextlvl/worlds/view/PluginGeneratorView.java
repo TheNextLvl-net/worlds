@@ -12,27 +12,27 @@ import java.lang.invoke.MethodType;
 @NullMarked
 public final class PluginGeneratorView implements GeneratorView {
     @Override
-    public boolean hasGenerator(Plugin plugin) {
+    public boolean hasGenerator(final Plugin plugin) {
         return hasChunkGenerator(plugin.getClass()) || hasBiomeProvider(plugin.getClass());
     }
 
     @Override
-    public boolean hasChunkGenerator(Class<? extends Plugin> clazz) {
+    public boolean hasChunkGenerator(final Class<? extends Plugin> clazz) {
         return overridesMethod(clazz, "getDefaultWorldGenerator", ChunkGenerator.class);
     }
 
     @Override
-    public boolean hasBiomeProvider(Class<? extends Plugin> clazz) {
+    public boolean hasBiomeProvider(final Class<? extends Plugin> clazz) {
         return overridesMethod(clazz, "getDefaultBiomeProvider", BiomeProvider.class);
     }
 
-    private boolean overridesMethod(Class<?> clazz, String methodName, Class<?> returnType) {
+    private boolean overridesMethod(final Class<?> clazz, final String methodName, final Class<?> returnType) {
         try {
-            var lookup = MethodHandles.lookup();
-            var methodType = MethodType.methodType(returnType, String.class, String.class);
-            var virtual = lookup.findVirtual(clazz, methodName, methodType);
+            final var lookup = MethodHandles.lookup();
+            final var methodType = MethodType.methodType(returnType, String.class, String.class);
+            final var virtual = lookup.findVirtual(clazz, methodName, methodType);
             return lookup.revealDirect(virtual).getDeclaringClass().equals(clazz);
-        } catch (NoSuchMethodException | IllegalAccessException e) {
+        } catch (final NoSuchMethodException | IllegalAccessException e) {
             return false;
         }
     }

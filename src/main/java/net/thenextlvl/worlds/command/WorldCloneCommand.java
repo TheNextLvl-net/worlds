@@ -22,18 +22,18 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
 final class WorldCloneCommand extends OptionCommand {
-    private WorldCloneCommand(WorldsPlugin plugin) {
+    private WorldCloneCommand(final WorldsPlugin plugin) {
         super(plugin, "clone", "worlds.command.clone");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldCloneCommand(plugin);
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
+        final var command = new WorldCloneCommand(plugin);
         return command.create().then(command.createCommand());
     }
 
     @Override
     protected RequiredArgumentBuilder<CommandSourceStack, ?> createCommand() {
-        var world = worldArgument(plugin);
+        final var world = worldArgument(plugin);
 
         addOptions(world, false, Set.of(
                 new Option("full", BoolArgumentType.bool()),
@@ -45,20 +45,20 @@ final class WorldCloneCommand extends OptionCommand {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var world = context.getArgument("world", World.class);
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var world = context.getArgument("world", World.class);
 
-        var full = tryGetArgument(context, "full", Boolean.class).orElse(true);
+        final var full = tryGetArgument(context, "full", Boolean.class).orElse(true);
 
-        var sender = context.getSource().getSender();
-        var placeholder = Placeholder.parsed("world", world.getName());
+        final var sender = context.getSource().getSender();
+        final var placeholder = Placeholder.parsed("world", world.getName());
 
         plugin.bundle().sendMessage(sender, "world.clone", placeholder);
         plugin.levelView().cloneAsync(world, builder -> {
             tryGetArgument(context, "name", String.class).ifPresent(builder::name);
             tryGetArgument(context, "key", Key.class).ifPresent(builder::key);
         }, full).thenAccept(clone -> {
-            if (sender instanceof Player player) player.teleportAsync(clone.getSpawnLocation(), COMMAND);
+            if (sender instanceof final Player player) player.teleportAsync(clone.getSpawnLocation(), COMMAND);
             plugin.bundle().sendMessage(sender, "world.clone.success", placeholder);
         }).exceptionally(throwable -> {
             plugin.getComponentLogger().warn("Failed to clone world {}", world.getName(), throwable);

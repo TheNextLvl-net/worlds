@@ -7,7 +7,7 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public abstract class SimpleCommand extends BrigadierCommand implements Command<CommandSourceStack> {
-    protected SimpleCommand(WorldsPlugin plugin, String name, String permission) {
+    protected SimpleCommand(final WorldsPlugin plugin, final String name, final String permission) {
         super(plugin, name, permission);
     }
 }

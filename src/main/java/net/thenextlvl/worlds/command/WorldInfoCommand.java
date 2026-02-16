@@ -26,24 +26,24 @@ import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
 final class WorldInfoCommand extends SimpleCommand {
-    private WorldInfoCommand(WorldsPlugin plugin) {
+    private WorldInfoCommand(final WorldsPlugin plugin) {
         super(plugin, "info", "worlds.command.info");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldInfoCommand(plugin);
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
+        final var command = new WorldInfoCommand(plugin);
         return command.create()
                 .then(worldArgument(plugin).executes(command))
                 .executes(command);
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var sender = context.getSource().getSender();
-        var world = tryGetArgument(context, "world", World.class)
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var sender = context.getSource().getSender();
+        final var world = tryGetArgument(context, "world", World.class)
                 .orElseGet(() -> context.getSource().getLocation().getWorld());
-        var path = world.getWorldFolder().toPath();
-        var root = plugin.levelView().read(path).map(Level.Builder::build);
+        final var path = world.getWorldFolder().toPath();
+        final var root = plugin.levelView().read(path).map(Level.Builder::build);
         plugin.bundle().sendMessage(sender, "world.info.name",
                 Placeholder.parsed("world", world.key().asString()),
                 Placeholder.parsed("name", world.getName()));
@@ -60,35 +60,35 @@ final class WorldInfoCommand extends SimpleCommand {
         plugin.bundle().sendMessage(sender, "world.info.seed",
                 Placeholder.parsed("seed", String.valueOf(world.getSeed())));
         try {
-            var bytes = getSize(path);
-            var kb = bytes / 1024d;
-            var mb = kb / 1024d;
-            var gb = mb / 1024d;
+            final var bytes = getSize(path);
+            final var kb = bytes / 1024d;
+            final var mb = kb / 1024d;
+            final var gb = mb / 1024d;
             plugin.bundle().sendMessage(sender, "world.info.size",
                     Formatter.number("size", gb >= 1 ? gb : mb >= 1 ? mb : kb >= 1 ? kb : bytes),
                     Formatter.choice("unit", gb >= 1 ? 0 : mb >= 1 ? 1 : kb >= 1 ? 2 : 3));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             plugin.getComponentLogger().warn("Failed to get world size for {}", world.key(), e);
         }
         return SINGLE_SUCCESS;
     }
 
-    private long getSize(Path path) throws IOException {
-        var size = new AtomicLong(0);
+    private long getSize(final Path path) throws IOException {
+        final var size = new AtomicLong(0);
         Files.walkFileTree(path, new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+            public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
                 size.addAndGet(attrs.size());
                 return FileVisitResult.CONTINUE;
             }
 
             @Override
-            public FileVisitResult visitFileFailed(Path file, IOException exc) {
+            public FileVisitResult visitFileFailed(final Path file, final IOException exc) {
                 return FileVisitResult.CONTINUE;
             }
 
             @Override
-            public FileVisitResult postVisitDirectory(Path dir, @Nullable IOException exc) {
+            public FileVisitResult postVisitDirectory(final Path dir, @Nullable final IOException exc) {
                 return FileVisitResult.CONTINUE;
             }
         });

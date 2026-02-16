@@ -41,7 +41,7 @@ public class Preset {
         this(null);
     }
 
-    public Preset(@Nullable String name) {
+    public Preset(@Nullable final String name) {
         this.name = name;
     }
 
@@ -62,13 +62,13 @@ public class Preset {
      */
     @Contract(pure = true)
     @SuppressWarnings("PatternValidation")
-    public static Preset parse(String presetCode) {
-        var strings = presetCode.split(";", 2);
-        var layers = Arrays.stream(strings[0].split(",")).map(layer -> {
-            var parameters = layer.split("\\*", 2);
-            var material = parameters.length == 1 ? parameters[0] : parameters[1];
-            var height = parameters.length == 1 ? 1 : Integer.parseInt(parameters[0]);
-            var matched = Material.matchMaterial(material);
+    public static Preset parse(final String presetCode) {
+        final var strings = presetCode.split(";", 2);
+        final var layers = Arrays.stream(strings[0].split(",")).map(layer -> {
+            final var parameters = layer.split("\\*", 2);
+            final var material = parameters.length == 1 ? parameters[0] : parameters[1];
+            final var height = parameters.length == 1 ? 1 : Integer.parseInt(parameters[0]);
+            final var matched = Material.matchMaterial(material);
             if (matched != null) return new Layer(matched, height);
             throw new IllegalArgumentException("Invalid material: " + material);
         }).collect(Collectors.toCollection(LinkedHashSet::new));
@@ -105,7 +105,7 @@ public class Preset {
      * @since 2.0.4
      */
     @Contract(value = "_ -> this", mutates = "this")
-    public Preset biome(Biome biome) {
+    public Preset biome(final Biome biome) {
         this.biome = biome;
         return this;
     }
@@ -129,7 +129,7 @@ public class Preset {
      * @since 2.0.4
      */
     @Contract(value = "_ -> this", mutates = "this")
-    public Preset lakes(boolean lakes) {
+    public Preset lakes(final boolean lakes) {
         this.lakes = lakes;
         return this;
     }
@@ -153,7 +153,7 @@ public class Preset {
      * @since 2.0.4
      */
     @Contract(value = "_ -> this", mutates = "this")
-    public Preset features(boolean features) {
+    public Preset features(final boolean features) {
         this.features = features;
         return this;
     }
@@ -177,7 +177,7 @@ public class Preset {
      * @since 2.0.4
      */
     @Contract(value = "_ -> this", mutates = "this")
-    public Preset decoration(boolean decoration) {
+    public Preset decoration(final boolean decoration) {
         this.decoration = decoration;
         return this;
     }
@@ -201,7 +201,7 @@ public class Preset {
      * @since 2.0.4
      */
     @Contract(value = "_ -> this", mutates = "this")
-    public Preset layers(Set<Layer> layers) {
+    public Preset layers(final Set<Layer> layers) {
         this.layers = new LinkedHashSet<>(layers);
         return this;
     }
@@ -225,7 +225,7 @@ public class Preset {
      * @since 2.0.4
      */
     @Contract(value = "_ -> this", mutates = "this")
-    public Preset structures(Set<Structure> structures) {
+    public Preset structures(final Set<Structure> structures) {
         this.structures = new LinkedHashSet<>(structures);
         return this;
     }
@@ -238,7 +238,7 @@ public class Preset {
      * @since 2.0.4
      */
     @Contract(value = "_ -> this", mutates = "this")
-    public Preset addLayer(Layer layer) {
+    public Preset addLayer(final Layer layer) {
         layers.add(layer);
         return this;
     }
@@ -251,7 +251,7 @@ public class Preset {
      * @since 2.0.4
      */
     @Contract(value = "_ -> this", mutates = "this")
-    public Preset addStructure(Structure structure) {
+    public Preset addStructure(final Structure structure) {
         structures.add(structure);
         return this;
     }
@@ -269,7 +269,7 @@ public class Preset {
      */
     @Contract(pure = true)
     public String toPresetCode() {
-        var layers = this.layers.stream()
+        final var layers = this.layers.stream()
                 .map(Layer::toString)
                 .collect(Collectors.joining(","));
         return layers + ";" + biome();
@@ -284,16 +284,16 @@ public class Preset {
      */
     @Contract(value = " -> new", pure = true)
     public JsonObject serialize() {
-        var root = new JsonObject();
-        var layers = new JsonArray();
-        var structures = new JsonArray();
+        final var root = new JsonObject();
+        final var layers = new JsonArray();
+        final var structures = new JsonArray();
         root.addProperty("name", name);
         root.addProperty("biome", biome.key().asString());
         root.addProperty("lakes", lakes);
         root.addProperty("features", features);
         root.addProperty("decoration", decoration);
         this.layers.forEach(layer -> {
-            var object = new JsonObject();
+            final var object = new JsonObject();
             object.addProperty("block", layer.block().key().asString());
             object.addProperty("height", layer.height());
             layers.add(object);
@@ -315,17 +315,17 @@ public class Preset {
      */
     @SuppressWarnings("PatternValidation")
     @Contract(value = "_ -> new", pure = true)
-    public static Preset deserialize(JsonObject object) throws IllegalArgumentException {
+    public static Preset deserialize(final JsonObject object) throws IllegalArgumentException {
         Preconditions.checkArgument(object.has("layers"), "Missing layers");
-        var preset = new Preset(object.has("name") ? object.get("name").getAsString() : null);
+        final var preset = new Preset(object.has("name") ? object.get("name").getAsString() : null);
         if (object.has("biome")) preset.biome(Biome.literal(object.get("biome").getAsString()));
         if (object.has("lakes")) preset.lakes(object.get("lakes").getAsBoolean());
         if (object.has("features")) preset.features(object.get("features").getAsBoolean());
         if (object.has("decoration")) preset.decoration(object.get("decoration").getAsBoolean());
         object.getAsJsonArray("layers").forEach(layer -> {
-            var layerObject = layer.getAsJsonObject();
-            var material = Material.matchMaterial(layerObject.get("block").getAsString());
-            var height = layerObject.get("height").getAsInt();
+            final var layerObject = layer.getAsJsonObject();
+            final var material = Material.matchMaterial(layerObject.get("block").getAsString());
+            final var height = layerObject.get("height").getAsInt();
             if (material != null) preset.addLayer(new Layer(material, height));
         });
         if (object.has("structure_overrides")) object.getAsJsonArray("structure_overrides")
@@ -336,20 +336,20 @@ public class Preset {
     @Override
     public String toString() {
         return "Preset{" +
-               "name='" + name + '\'' +
-               ", biome=" + biome +
-               ", lakes=" + lakes +
-               ", features=" + features +
-               ", decoration=" + decoration +
-               ", layers=" + layers +
-               ", structures=" + structures +
-               '}';
+                "name='" + name + '\'' +
+                ", biome=" + biome +
+                ", lakes=" + lakes +
+                ", features=" + features +
+                ", decoration=" + decoration +
+                ", layers=" + layers +
+                ", structures=" + structures +
+                '}';
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        Preset preset = (Preset) o;
+        final Preset preset = (Preset) o;
         return lakes == preset.lakes && features == preset.features && decoration == preset.decoration && Objects.equals(name, preset.name) && Objects.equals(biome, preset.biome) && Objects.equals(layers, preset.layers) && Objects.equals(structures, preset.structures);
     }
 

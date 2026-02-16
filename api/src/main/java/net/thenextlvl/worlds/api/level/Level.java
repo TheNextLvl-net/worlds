@@ -405,7 +405,7 @@ public interface Level extends Keyed {
          */
         @Contract(mutates = "this")
         @Deprecated(forRemoval = true, since = "3.3.1")
-        default Builder spawnChunkRadius(@Nullable Integer radius) {
+        default Builder spawnChunkRadius(@Nullable final Integer radius) {
             return this;
         }
 

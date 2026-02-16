@@ -18,12 +18,12 @@ import java.util.concurrent.CompletableFuture;
 public final class GeneratorArgument implements SimpleArgumentType<Generator, String> {
     private final WorldsPlugin plugin;
 
-    public GeneratorArgument(WorldsPlugin plugin) {
+    public GeneratorArgument(final WorldsPlugin plugin) {
         this.plugin = plugin;
     }
 
     @Override
-    public Generator convert(StringReader reader, String type) {
+    public Generator convert(final StringReader reader, final String type) {
         return Generator.of(plugin, type);
     }
 
@@ -33,7 +33,7 @@ public final class GeneratorArgument implements SimpleArgumentType<Generator, St
     }
 
     @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+    public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
         Arrays.stream(plugin.getServer().getPluginManager().getPlugins())
                 .filter(Plugin::isEnabled)
                 .filter(plugin.generatorView()::hasGenerator)

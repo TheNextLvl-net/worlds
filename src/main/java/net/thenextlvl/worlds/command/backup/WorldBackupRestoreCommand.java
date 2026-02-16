@@ -23,12 +23,12 @@ import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
 final class WorldBackupRestoreCommand extends SimpleCommand {
-    private WorldBackupRestoreCommand(WorldsPlugin plugin) {
+    private WorldBackupRestoreCommand(final WorldsPlugin plugin) {
         super(plugin, "restore", "worlds.command.backup.restore");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldBackupRestoreCommand(plugin);
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
+        final var command = new WorldBackupRestoreCommand(plugin);
         return command.create().then(command.restore());
     }
 
@@ -39,15 +39,15 @@ final class WorldBackupRestoreCommand extends SimpleCommand {
                 .then(x(Commands.literal("latest")));
     }
 
-    private ArgumentBuilder<CommandSourceStack, ?> x(ArgumentBuilder<CommandSourceStack, ?> command) {
+    private ArgumentBuilder<CommandSourceStack, ?> x(final ArgumentBuilder<CommandSourceStack, ?> command) {
         return command.then(Commands.argument("flags", new CommandFlagsArgument(
                         Set.of("--confirm", "--schedule")
                 )).executes(this))
                 .executes(this::confirmationNeeded);
     }
 
-    private int confirmationNeeded(CommandContext<CommandSourceStack> context) {
-        var sender = context.getSource().getSender();
+    private int confirmationNeeded(final CommandContext<CommandSourceStack> context) {
+        final var sender = context.getSource().getSender();
         plugin.bundle().sendMessage(sender, "command.confirmation",
                 Placeholder.parsed("action", "/" + context.getInput()),
                 Placeholder.parsed("confirmation", "/" + context.getInput() + " --confirm"));
@@ -55,22 +55,22 @@ final class WorldBackupRestoreCommand extends SimpleCommand {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var flags = context.getArgument("flags", CommandFlagsArgument.Flags.class);
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var flags = context.getArgument("flags", CommandFlagsArgument.Flags.class);
         if (!flags.contains("--confirm")) return confirmationNeeded(context);
-        var world = context.getArgument("world", World.class);
-        var backup = tryGetArgument(context, "backup", String.class);
-        var schedule = flags.contains("--schedule");
+        final var world = context.getArgument("world", World.class);
+        final var backup = tryGetArgument(context, "backup", String.class);
+        final var schedule = flags.contains("--schedule");
         if (!schedule) plugin.bundle().sendMessage(context.getSource().getSender(), "world.backup.restore",
                 Placeholder.parsed("world", world.getName()));
-        
-        var path = backup.map(name -> plugin.levelView().getBackupFolder(world).resolve(name + ".zip")).or(() -> {
+
+        final var path = backup.map(name -> plugin.levelView().getBackupFolder(world).resolve(name + ".zip")).or(() -> {
             return plugin.levelView().listBackups(world).min((first, second) -> {
                 try {
-                    var time1 = Files.readAttributes(first, BasicFileAttributes.class).creationTime();
-                    var time2 = Files.readAttributes(second, BasicFileAttributes.class).creationTime();
+                    final var time1 = Files.readAttributes(first, BasicFileAttributes.class).creationTime();
+                    final var time2 = Files.readAttributes(second, BasicFileAttributes.class).creationTime();
                     return time2.compareTo(time1);
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     return 0;
                 }
             });
@@ -82,11 +82,11 @@ final class WorldBackupRestoreCommand extends SimpleCommand {
             return 0;
         }
 
-        var string = path.getFileName().toString();
-        var backupName = backup.orElse(string.substring(0, string.lastIndexOf('.')));
-        
+        final var string = path.getFileName().toString();
+        final var backupName = backup.orElse(string.substring(0, string.lastIndexOf('.')));
+
         plugin.levelView().restoreBackupAsync(world, path, schedule).thenAccept(result -> {
-            var message = switch (result.result()) {
+            final var message = switch (result.result()) {
                 case SUCCESS -> "world.backup.restore.success";
                 case SCHEDULED -> "world.backup.restore.scheduled";
                 case REQUIRES_SCHEDULING -> "world.backup.restore.disallowed";

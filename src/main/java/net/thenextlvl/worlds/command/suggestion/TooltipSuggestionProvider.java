@@ -17,25 +17,25 @@ public abstract class TooltipSuggestionProvider implements SuggestionProvider<Co
     private final Map<String, String> tooltips;
     protected final WorldsPlugin plugin;
 
-    protected TooltipSuggestionProvider(WorldsPlugin plugin, Map<String, String> tooltips) {
+    protected TooltipSuggestionProvider(final WorldsPlugin plugin, final Map<String, String> tooltips) {
         this.tooltips = tooltips;
         this.plugin = plugin;
     }
 
     @Override
-    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        var sender = context.getSource().getSender();
+    public CompletableFuture<Suggestions> getSuggestions(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
+        final var sender = context.getSource().getSender();
         tooltips.entrySet().stream()
                 .filter(entry -> entry.getKey().contains(builder.getRemaining()))
                 .forEach(entry -> {
-                    var component = plugin.bundle().component(entry.getValue(), sender);
+                    final var component = plugin.bundle().component(entry.getValue(), sender);
                     builder.suggest(entry.getKey(), MessageComponentSerializer.message().serialize(component));
                 });
         return builder.buildFuture();
     }
 
     @SuppressWarnings("unchecked")
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+    public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
         return getSuggestions((CommandContext<CommandSourceStack>) context, builder);
     }
 }

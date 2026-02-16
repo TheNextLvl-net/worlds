@@ -19,13 +19,13 @@ public final class LevelSuggestionProvider implements SuggestionProvider<Command
     private final WorldsPlugin plugin;
     private final boolean unknownLevels;
 
-    public LevelSuggestionProvider(WorldsPlugin plugin, boolean unknownLevels) {
+    public LevelSuggestionProvider(final WorldsPlugin plugin, final boolean unknownLevels) {
         this.unknownLevels = unknownLevels;
         this.plugin = plugin;
     }
 
     @Override
-    public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+    public CompletableFuture<Suggestions> getSuggestions(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
         return CompletableFuture.runAsync(() -> plugin.levelView().listLevels().stream()
                 .filter(plugin.levelView()::canLoad)
                 .map(plugin.levelView()::read)
@@ -33,8 +33,8 @@ public final class LevelSuggestionProvider implements SuggestionProvider<Command
                 .filter(Objects::nonNull)
                 .filter(level -> unknownLevels ? !level.isWorldKnown() : level.isWorldKnown() && level.isEnabled().equals(TriState.FALSE))
                 .forEach(level -> {
-                    var name = level.getDirectory().getFileName().toString();
-                    var escaped = StringArgumentType.escapeIfRequired(name);
+                    final var name = level.getDirectory().getFileName().toString();
+                    final var escaped = StringArgumentType.escapeIfRequired(name);
                     if (!escaped.contains(builder.getRemaining())) return;
                     builder.suggest(escaped, () -> level.key().asString());
                 })
@@ -42,7 +42,7 @@ public final class LevelSuggestionProvider implements SuggestionProvider<Command
     }
 
     @SuppressWarnings("unchecked")
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+    public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
         return getSuggestions((CommandContext<CommandSourceStack>) context, builder);
     }
 }

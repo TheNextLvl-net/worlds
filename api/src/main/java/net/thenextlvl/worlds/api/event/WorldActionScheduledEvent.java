@@ -26,7 +26,7 @@ import java.util.function.Consumer;
  * @since 3.0.0
  */
 @NullMarked
-public class WorldActionScheduledEvent extends WorldEvent implements Cancellable {
+public final class WorldActionScheduledEvent extends WorldEvent implements Cancellable {
     private static final HandlerList handlerList = new HandlerList();
 
     private @Nullable Consumer<Path> action = null;
@@ -34,7 +34,7 @@ public class WorldActionScheduledEvent extends WorldEvent implements Cancellable
     private final ActionType actionType;
 
     @ApiStatus.Internal
-    public WorldActionScheduledEvent(World world, ActionType actionType) {
+    public WorldActionScheduledEvent(final World world, final ActionType actionType) {
         super(world, false);
         this.actionType = actionType;
     }
@@ -55,7 +55,7 @@ public class WorldActionScheduledEvent extends WorldEvent implements Cancellable
      * @param action the action to be performed
      */
     @Contract(mutates = "this")
-    public void addAction(Consumer<Path> action) {
+    public void addAction(final Consumer<Path> action) {
         this.action = this.action != null ? this.action.andThen(action) : action;
     }
 
@@ -72,7 +72,7 @@ public class WorldActionScheduledEvent extends WorldEvent implements Cancellable
 
     @Override
     @Contract(mutates = "this")
-    public void setCancelled(boolean cancel) {
+    public void setCancelled(final boolean cancel) {
         this.cancelled = cancel;
     }
 

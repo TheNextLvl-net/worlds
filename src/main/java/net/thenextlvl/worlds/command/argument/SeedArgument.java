@@ -8,10 +8,10 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class SeedArgument implements SimpleArgumentType<Long, String> {
     @Override
-    public Long convert(StringReader reader, String type) {
+    public Long convert(final StringReader reader, final String type) {
         try {
             return Long.parseLong(type);
-        } catch (NumberFormatException ignored) {
+        } catch (final NumberFormatException ignored) {
             return (long) type.hashCode();
         }
     }

@@ -7,7 +7,7 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class ComponentCommandExceptionType extends SimpleCommandExceptionType {
-    public ComponentCommandExceptionType(Component component) {
+    public ComponentCommandExceptionType(final Component component) {
         super(MessageComponentSerializer.message().serialize(component));
     }
 }

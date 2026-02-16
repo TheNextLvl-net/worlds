@@ -12,7 +12,7 @@ import java.util.Map;
 
 @NullMarked
 public final class GeneratorTypeArgument extends TooltipSuggestionProvider implements SimpleArgumentType<GeneratorType, String> {
-    public GeneratorTypeArgument(WorldsPlugin plugin) {
+    public GeneratorTypeArgument(final WorldsPlugin plugin) {
         super(plugin, Map.of(
                 GeneratorType.AMPLIFIED.name(), "world.type.amplified",
                 GeneratorType.DEBUG.name(), "world.type.debug",
@@ -24,7 +24,7 @@ public final class GeneratorTypeArgument extends TooltipSuggestionProvider imple
     }
 
     @Override
-    public GeneratorType convert(StringReader reader, String type) {
+    public GeneratorType convert(final StringReader reader, final String type) {
         return GeneratorType.getByName(type).orElseThrow(() ->
                 new IllegalArgumentException("Unknown dimension type"));
     }

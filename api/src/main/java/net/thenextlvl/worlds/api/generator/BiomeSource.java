@@ -25,7 +25,7 @@ public interface BiomeSource extends Keyed {
      * @return a new CheckerboardColumnBiomeSource configured with the specified biomes
      */
     @Contract(value = "_ -> new", pure = true)
-    static CheckerboardColumnBiomeSource checkerboard(Set<Key> biomes) {
+    static CheckerboardColumnBiomeSource checkerboard(final Set<Key> biomes) {
         return new CheckerboardColumnBiomeSource(biomes);
     }
 
@@ -37,7 +37,7 @@ public interface BiomeSource extends Keyed {
      * @return a new FixedBiomeSource configured with the specified biome
      */
     @Contract(value = "_ -> new", pure = true)
-    static FixedBiomeSource fixed(Key biome) {
+    static FixedBiomeSource fixed(final Key biome) {
         return new FixedBiomeSource(biome);
     }
 
@@ -56,7 +56,7 @@ public interface BiomeSource extends Keyed {
          *
          * @param biome the biome to use for the world
          */
-        private FixedBiomeSource(Key biome) {
+        private FixedBiomeSource(final Key biome) {
             this.biome = biome;
         }
 
@@ -92,7 +92,7 @@ public interface BiomeSource extends Keyed {
          *
          * @param biomes the set of biomes to use for the checkerboard pattern
          */
-        private CheckerboardColumnBiomeSource(Set<Key> biomes) {
+        private CheckerboardColumnBiomeSource(final Set<Key> biomes) {
             this.biomes = Set.copyOf(biomes);
         }
 

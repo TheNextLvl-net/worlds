@@ -20,7 +20,7 @@ public final class WorldLinkTree implements LinkTree {
     private @Nullable Key nether = null;
     private @Nullable Key end = null;
 
-    public WorldLinkTree(WorldLinkProvider provider, World overworld) {
+    public WorldLinkTree(final WorldLinkProvider provider, final World overworld) {
         this.provider = provider;
         this.overworld = overworld;
     }
@@ -41,12 +41,12 @@ public final class WorldLinkTree implements LinkTree {
     }
 
     @Override
-    public boolean setNether(@Nullable World world) {
+    public boolean setNether(@Nullable final World world) {
         if (world != null && !world.getEnvironment().equals(Environment.NETHER)) return false;
         return setNether(world != null ? world.key() : null);
     }
 
-    boolean setNether(@Nullable Key key) {
+    boolean setNether(@Nullable final Key key) {
         if (key != null && getLinkProvider().hasLinkTree(key)) return false;
         this.nether = key;
         return true;
@@ -63,7 +63,7 @@ public final class WorldLinkTree implements LinkTree {
     }
 
     @Override
-    public boolean setEnd(@Nullable World world) {
+    public boolean setEnd(@Nullable final World world) {
         if (world != null && !world.getEnvironment().equals(Environment.THE_END)) return false;
         return setEnd(world != null ? world.key() : null);
     }
@@ -73,24 +73,24 @@ public final class WorldLinkTree implements LinkTree {
         return nether == null && end == null;
     }
 
-    boolean setEnd(@Nullable Key key) {
+    boolean setEnd(@Nullable final Key key) {
         if (key != null && getLinkProvider().hasLinkTree(key)) return false;
         this.end = key;
         return true;
     }
 
     @Override
-    public boolean contains(Key key) {
+    public boolean contains(final Key key) {
         return key.equals(overworld.key()) || key.equals(nether) || key.equals(end);
     }
 
     @Override
-    public boolean contains(World world) {
+    public boolean contains(final World world) {
         return contains(world.key());
     }
 
     @Override
-    public boolean remove(Key key) {
+    public boolean remove(final Key key) {
         if (key.equals(end)) {
             this.end = null;
             return true;
@@ -102,12 +102,12 @@ public final class WorldLinkTree implements LinkTree {
     }
 
     @Override
-    public boolean remove(World world) {
+    public boolean remove(final World world) {
         return remove(world.key());
     }
 
     @Override
-    public Optional<World> getWorld(Environment environment) {
+    public Optional<World> getWorld(final Environment environment) {
         return switch (environment) {
             case NORMAL -> Optional.of(getOverworld());
             case NETHER -> getNether();
