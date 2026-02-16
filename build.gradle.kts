@@ -19,7 +19,6 @@ tasks.compileJava {
 }
 
 group = "net.thenextlvl.worlds"
-version = "3.12.2"
 
 repositories {
     mavenCentral()
