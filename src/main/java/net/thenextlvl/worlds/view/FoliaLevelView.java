@@ -29,6 +29,11 @@ public final class FoliaLevelView extends PaperLevelView {
             futures.add(future);
 
             final var location = region.getCenterChunk();
+            if (location == null) {
+                plugin.getComponentLogger().warn("Skip saving empty region {}", region);
+                future.complete(null);
+                return;
+            }
             plugin.getServer().getRegionScheduler().run(plugin, world, location.x, location.z, task -> {
                 try {
                     level.getChunkSource().save(flush);
