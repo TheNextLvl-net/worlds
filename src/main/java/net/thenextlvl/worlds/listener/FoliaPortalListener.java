@@ -33,9 +33,37 @@ public final class FoliaPortalListener extends PortalListener {
     private static final int SEARCH_RADIUS_NETHER = 16;
 
     private final Map<UUID, PortalProcessor> portalProcessors = new ConcurrentHashMap<>();
+    private final Map<UUID, TickCounter> tickCounters = new ConcurrentHashMap<>();
 
-    public FoliaPortalListener(WorldsPlugin plugin) {
+    public FoliaPortalListener(final WorldsPlugin plugin) {
         super(plugin);
+    }
+
+    /**
+     * Count the number of ticks since the last event was processed.
+     * <p>
+     * This is required since the {@link EntityPortalEnterEvent} is fired for each portal block the entity is touching.
+     */
+    private class TickCounter {
+        private int lastTick;
+        private int current;
+
+        public TickCounter() {
+            final var currentTick = plugin.getServer().getCurrentTick();
+            this.lastTick = currentTick - 1;
+            this.current = currentTick;
+        }
+
+        public TickCounter update() {
+            final var currentTick = plugin.getServer().getCurrentTick();
+            this.lastTick = this.current;
+            this.current = currentTick;
+            return this;
+        }
+
+        public boolean hasTickChanged() {
+            return this.lastTick != this.current;
+        }
     }
 
     /**
@@ -43,39 +71,59 @@ public final class FoliaPortalListener extends PortalListener {
      */
     @SuppressWarnings("JavadocReference")
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onNetherPortalEnter(EntityPortalEnterEvent event) {
+    public void onNetherPortalEnter(final EntityPortalEnterEvent event) {
         if (!event.getPortalType().equals(PortalType.NETHER)) return;
 
         event.setCancelled(true);
-        var location = event.getLocation();
 
-        var block = (CraftBlock) location.getBlock();
-        if (!(block.getNMS().getBlock() instanceof NetherPortalBlock portal)) return;
+        if (!tickCounters.compute(event.getEntity().getUniqueId(), (uuid, counter) -> {
+            return counter != null ? counter.update() : new TickCounter();
+        }).hasTickChanged()) return;
 
-        var handle = ((CraftEntity) event.getEntity()).getHandle();
+        final var location = event.getLocation();
+
+        final var block = (CraftBlock) location.getBlock();
+        if (!(block.getNMS().getBlock() instanceof final NetherPortalBlock portal)) return;
+
+        final var handle = ((CraftEntity) event.getEntity()).getHandle();
         setAsInsidePortal(handle, portal, block.getPosition());
 
         handlePortal(block.getPosition(), handle);
+
+        final var portalProcessor = portalProcessors.get(event.getEntity().getUniqueId());
+        final var time = portalProcessor != null ? portalProcessor.getPortalTime() : 0;
+
+        event.getEntity().getScheduler().runDelayed(plugin, scheduledTask -> {
+            portalProcessors.computeIfPresent(event.getEntity().getUniqueId(), (uuid, processor) -> {
+                if (processor.isSamePortal(portal) && processor.getPortalTime() > time) return processor;
+                return null;
+            });
+        }, () -> {
+            portalProcessors.remove(event.getEntity().getUniqueId());
+            tickCounters.remove(event.getEntity().getUniqueId());
+        }, 2);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onEntityRemove(EntityRemoveEvent event) {
+    public void onEntityRemove(final EntityRemoveEvent event) {
         portalProcessors.remove(event.getEntity().getUniqueId());
+        tickCounters.remove(event.getEntity().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerQuit(PlayerQuitEvent event) {
+    public void onPlayerQuit(final PlayerQuitEvent event) {
         portalProcessors.remove(event.getPlayer().getUniqueId());
+        tickCounters.remove(event.getPlayer().getUniqueId());
     }
 
     /**
-     * @see net.minecraft.world.entity.Entity#setAsInsidePortal(Portal, BlockPos)
+     * @see Entity#setAsInsidePortal(Portal, BlockPos)
      */
-    private void setAsInsidePortal(net.minecraft.world.entity.Entity entity, Portal portal, BlockPos pos) {
+    private void setAsInsidePortal(final Entity entity, final Portal portal, final BlockPos pos) {
         if (entity.isOnPortalCooldown()) {
             entity.setPortalCooldown();
         } else {
-            var process = portalProcessors.get(entity.getUUID());
+            final var process = portalProcessors.get(entity.getUUID());
             if (process == null || !process.isSamePortal(portal)) {
                 portalProcessors.put(entity.getUUID(), new PortalProcessor(portal, pos.immutable()));
             } else if (!process.isInsidePortalThisTick()) {
@@ -86,17 +134,17 @@ public final class FoliaPortalListener extends PortalListener {
     }
 
     /**
-     * @see net.minecraft.world.entity.Entity#handlePortal()
+     * @see Entity#handlePortal()
      */
     @SuppressWarnings("resource")
-    private void handlePortal(BlockPos position, net.minecraft.world.entity.Entity entity) {
-        if (!(entity.level() instanceof ServerLevel serverLevel)) return;
-        var processor = portalProcessors.get(entity.getUUID());
+    private void handlePortal(final BlockPos position, final Entity entity) {
+        if (!(entity.level() instanceof final ServerLevel serverLevel)) return;
+        final var processor = portalProcessors.get(entity.getUUID());
         if (processor == null) return;
 
         processPortalCooldown(entity);
         if (processor.processPortalTeleportation(serverLevel, entity, entity.canUsePortal(false))) {
-            var profilerFiller = Profiler.get();
+            final var profilerFiller = Profiler.get();
             profilerFiller.push("portal");
             entity.setPortalCooldown();
 
@@ -104,19 +152,22 @@ public final class FoliaPortalListener extends PortalListener {
                 try {
                     performPlayerTeleport(entity, processor, position);
                 } finally {
+                    portalProcessors.remove(entity.getUUID());
+                    tickCounters.remove(entity.getUUID());
                     profilerFiller.pop();
                 }
             }, null);
         } else if (processor.hasExpired()) {
             portalProcessors.remove(entity.getUUID());
+            tickCounters.remove(entity.getUUID());
         }
     }
 
     /**
-     * @see net.minecraft.world.entity.Entity#processPortalCooldown()
+     * @see Entity#processPortalCooldown()
      */
     @SuppressWarnings("JavadocReference")
-    private void processPortalCooldown(net.minecraft.world.entity.Entity entity) {
+    private void processPortalCooldown(final Entity entity) {
         if (entity.isOnPortalCooldown()) entity.portalCooldown--;
     }
 
@@ -124,28 +175,26 @@ public final class FoliaPortalListener extends PortalListener {
      * @see Entity#netherPortalLogicAsync(BlockPos)
      */
     @SuppressWarnings("unchecked")
-    private <T extends Enum<T>> void performPlayerTeleport(net.minecraft.world.entity.Entity entity, PortalProcessor processor, BlockPos position) {
-        var readyEvent = new EntityPortalReadyEvent(entity.getBukkitEntity(), null, PortalType.NETHER);
+    private <T extends Enum<T>> void performPlayerTeleport(final Entity entity, final PortalProcessor processor, final BlockPos position) {
+        final var readyEvent = new EntityPortalReadyEvent(entity.getBukkitEntity(), null, PortalType.NETHER);
         onEntityPortal(readyEvent);
 
-        portalProcessors.remove(entity.getUUID());
-
-        var targetWorld = readyEvent.getTargetWorld();
+        final var targetWorld = readyEvent.getTargetWorld();
         if (targetWorld != null) try {
-            var level = ((CraftWorld) targetWorld).getHandle();
-            var portalType = Arrays.stream(net.minecraft.world.entity.Entity.class.getDeclaredClasses())
+            final var level = ((CraftWorld) targetWorld).getHandle();
+            final var portalType = Arrays.stream(Entity.class.getDeclaredClasses())
                     .filter(c -> c.getSimpleName().equals("PortalType"))
                     .findAny().orElseThrow(() -> new IllegalStateException("PortalType class not found"));
 
-            var portalToAsync = net.minecraft.world.entity.Entity.class.getDeclaredMethod(
+            final var portalToAsync = Entity.class.getDeclaredMethod(
                     "portalToAsync", ServerLevel.class, BlockPos.class, boolean.class, portalType, Consumer.class
             );
-            var access = portalToAsync.canAccess(entity);
+            final var access = portalToAsync.canAccess(entity);
             if (!access) portalToAsync.setAccessible(true);
-            var nether = Enum.valueOf((Class<T>) portalType, "NETHER");
+            final var nether = Enum.valueOf((Class<T>) portalType, "NETHER");
             portalToAsync.invoke(entity, level, position, true, nether, null);
             portalToAsync.setAccessible(access);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             plugin.getComponentLogger().error("Failed to find portalToAsync method for Entity class", e);
             WorldsPlugin.ERROR_TRACKER.trackError(e);
         }
