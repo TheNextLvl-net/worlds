@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 
 @NullMarked
 public final class FoliaLevelView extends PaperLevelView {
-    public FoliaLevelView(WorldsPlugin plugin) {
+    public FoliaLevelView(final WorldsPlugin plugin) {
         super(plugin);
     }
 
@@ -46,9 +46,9 @@ public final class FoliaLevelView extends PaperLevelView {
      * @see CraftServer#unloadWorld(World, boolean)
      */
     @Override
-    public CompletableFuture<Boolean> unloadAsync(World world, boolean save) {
-        var handle = ((CraftWorld) world).getHandle();
-        var server = ((CraftServer) plugin.getServer());
+    public CompletableFuture<Boolean> unloadAsync(final World world, final boolean save) {
+        final var handle = ((CraftWorld) world).getHandle();
+        final var server = ((CraftServer) plugin.getServer());
 
         if (server.getServer().getLevel(handle.dimension()) == null)
             return CompletableFuture.completedFuture(false);
@@ -64,7 +64,7 @@ public final class FoliaLevelView extends PaperLevelView {
         }).thenCompose(success -> {
             if (!success) return CompletableFuture.completedFuture(false);
 
-            var saving = save ? saveAsync(world, true) : CompletableFuture.completedFuture(null);
+            final var saving = save ? saveAsync(world, true) : CompletableFuture.completedFuture(null);
 
             return saving.handle((result, throwable) -> {
                 if (throwable != null) {
@@ -76,7 +76,7 @@ public final class FoliaLevelView extends PaperLevelView {
                         handle.getChunkSource().close(false);
                         FeatureHooks.closeEntityManager(handle, save);
                         handle.levelStorageAccess.close();
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         plugin.getComponentLogger().error("Failed to properly close world after saving", e);
                         WorldsPlugin.ERROR_TRACKER.trackError(e);
                     }
@@ -84,11 +84,11 @@ public final class FoliaLevelView extends PaperLevelView {
                 });
             }).thenCompose(self -> self).thenApply(ignored -> {
                 try {
-                    var field = server.getClass().getDeclaredField("worlds");
+                    final var field = server.getClass().getDeclaredField("worlds");
                     field.trySetAccessible();
-                    @SuppressWarnings("unchecked") var worlds = (Map<String, World>) field.get(server);
+                    @SuppressWarnings("unchecked") final var worlds = (Map<String, World>) field.get(server);
                     worlds.remove(world.getName().toLowerCase(Locale.ROOT));
-                } catch (NoSuchFieldException | IllegalAccessException e) {
+                } catch (final NoSuchFieldException | IllegalAccessException e) {
                     plugin.getComponentLogger().error("Failed to remove world from memory", e);
                     WorldsPlugin.ERROR_TRACKER.trackError(e);
                     return false;
