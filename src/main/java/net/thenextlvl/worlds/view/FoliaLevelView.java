@@ -30,6 +30,7 @@ public final class FoliaLevelView extends PaperLevelView {
 
             final var location = region.getCenterChunk();
             if (location == null) {
+                plugin.getComponentLogger().warn("Skip saving empty region {}", region);
                 future.complete(null);
                 return;
             }
