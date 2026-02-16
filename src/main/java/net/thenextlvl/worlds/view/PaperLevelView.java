@@ -222,10 +222,13 @@ public class PaperLevelView implements LevelView {
     }
 
     @Override
-    public boolean canLoad(Path level) {
+    public boolean canLoad(final Path level) {
+        final var endPath = getEndPath();
+        final var netherPath = getNetherPath();
         return plugin.getServer().getWorlds().stream()
                 .map(World::getWorldFolder)
                 .map(File::toPath)
+                .filter(path -> !path.equals(netherPath) && !path.equals(endPath))
                 .noneMatch(level::equals);
     }
 
