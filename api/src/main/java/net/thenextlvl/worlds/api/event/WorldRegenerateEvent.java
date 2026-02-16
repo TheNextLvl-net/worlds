@@ -17,13 +17,13 @@ import org.jspecify.annotations.NullMarked;
  * @since 2.0.0
  */
 @NullMarked
-public class WorldRegenerateEvent extends WorldEvent implements Cancellable {
+public final class WorldRegenerateEvent extends WorldEvent implements Cancellable {
     private static final HandlerList handlerList = new HandlerList();
 
     private boolean cancelled = false;
 
     @ApiStatus.Internal
-    public WorldRegenerateEvent(World world) {
+    public WorldRegenerateEvent(final World world) {
         super(world, false);
     }
 
@@ -35,7 +35,7 @@ public class WorldRegenerateEvent extends WorldEvent implements Cancellable {
 
     @Override
     @Contract(mutates = "this")
-    public void setCancelled(boolean cancel) {
+    public void setCancelled(final boolean cancel) {
         this.cancelled = cancel;
     }
 

@@ -13,27 +13,27 @@ import java.util.concurrent.CompletableFuture;
 
 @NullMarked
 public final class SaveAllCommand extends BrigadierCommand {
-    private SaveAllCommand(WorldsPlugin plugin) {
+    private SaveAllCommand(final WorldsPlugin plugin) {
         super(plugin, "save-all", "worlds.command.save-all");
     }
 
-    public static LiteralCommandNode<CommandSourceStack> create(WorldsPlugin plugin) {
-        var command = new SaveAllCommand(plugin);
+    public static LiteralCommandNode<CommandSourceStack> create(final WorldsPlugin plugin) {
+        final var command = new SaveAllCommand(plugin);
         return command.create()
                 .then(Commands.literal("flush").executes(command::flush))
                 .executes(command::saveAll)
                 .build();
     }
 
-    private int flush(CommandContext<CommandSourceStack> context) {
+    private int flush(final CommandContext<CommandSourceStack> context) {
         return saveAll(context.getSource(), true);
     }
 
-    private int saveAll(CommandContext<CommandSourceStack> context) {
+    private int saveAll(final CommandContext<CommandSourceStack> context) {
         return saveAll(context.getSource(), false);
     }
 
-    private int saveAll(CommandSourceStack source, boolean flush) {
+    private int saveAll(final CommandSourceStack source, final boolean flush) {
         plugin.bundle().sendMessage(source.getSender(), "world.save.all");
         CompletableFuture.allOf(plugin.getServer().getWorlds().stream().map(world -> {
             return plugin.levelView().saveAsync(world, flush);

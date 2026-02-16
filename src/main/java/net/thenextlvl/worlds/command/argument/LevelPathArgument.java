@@ -12,12 +12,12 @@ import java.nio.file.Path;
 public final class LevelPathArgument implements SimpleArgumentType<Path, String> {
     private final WorldsPlugin plugin;
 
-    public LevelPathArgument(WorldsPlugin plugin) {
+    public LevelPathArgument(final WorldsPlugin plugin) {
         this.plugin = plugin;
     }
 
     @Override
-    public Path convert(StringReader reader, String type) {
+    public Path convert(final StringReader reader, final String type) {
         return plugin.getServer().getWorldContainer().toPath().resolve(type);
     }
 

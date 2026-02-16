@@ -11,7 +11,7 @@ import org.jspecify.annotations.NullMarked;
  */
 @NullMarked
 public record Biome(Key key) implements Keyed {
-    public Biome(org.bukkit.block.Biome biome) {
+    public Biome(final org.bukkit.block.Biome biome) {
         this(biome.key());
     }
 
@@ -21,7 +21,7 @@ public record Biome(Key key) implements Keyed {
     }
 
     @Contract(value = "_ -> new", pure = true)
-    public static Biome literal(@KeyPattern String string) {
+    public static Biome literal(@KeyPattern final String string) {
         return new Biome(Key.key(string));
     }
 }

@@ -156,7 +156,7 @@ public interface LevelView {
      */
     @Contract(mutates = "io,param1")
     @Deprecated(forRemoval = true, since = "3.2.0")
-    default boolean unload(World world, boolean save) {
+    default boolean unload(final World world, final boolean save) {
         return unloadAsync(world, save).join();
     }
 
@@ -181,7 +181,7 @@ public interface LevelView {
      */
     @Contract(mutates = "io,param1")
     @Deprecated(forRemoval = true, since = "3.2.0")
-    default void save(World world, boolean flush) {
+    default void save(final World world, final boolean flush) {
         saveAsync(world, flush).join();
     }
 
@@ -205,8 +205,8 @@ public interface LevelView {
      */
     @Contract(mutates = "io,param1")
     @Deprecated(forRemoval = true, since = "3.2.0")
-    default void saveLevelData(World world, boolean async) {
-        var future = saveLevelDataAsync(world);
+    default void saveLevelData(final World world, final boolean async) {
+        final var future = saveLevelDataAsync(world);
         if (!async) future.join();
     }
 
@@ -251,7 +251,7 @@ public interface LevelView {
     @Contract(mutates = "io,param1")
     @SuppressWarnings("RedundantThrows")
     @Deprecated(forRemoval = true, since = "3.3.1")
-    default long backup(World world) throws IOException {
+    default long backup(final World world) throws IOException {
         return backupAsync(world).join();
     }
 
@@ -267,11 +267,11 @@ public interface LevelView {
      */
     @Contract(mutates = "io,param1")
     @Deprecated(forRemoval = true, since = "3.7.0")
-    default CompletableFuture<Long> backupAsync(World world) {
+    default CompletableFuture<Long> backupAsync(final World world) {
         return createBackupAsync(world).thenApply(path -> {
             try {
                 return Files.size(path);
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new RuntimeException("Failed to calculate backup size for " + path, e);
             }
         });
@@ -287,7 +287,7 @@ public interface LevelView {
      * @since 3.7.0
      */
     @Contract(mutates = "io,param1")
-    default CompletableFuture<Path> createBackupAsync(World world) {
+    default CompletableFuture<Path> createBackupAsync(final World world) {
         return createBackupAsync(world, null);
     }
 
@@ -376,7 +376,7 @@ public interface LevelView {
     @Contract(mutates = "io,param1")
     @SuppressWarnings("RedundantThrows")
     @Deprecated(forRemoval = true, since = "3.2.0")
-    default Optional<World> clone(World world, Consumer<Level.Builder> builder, boolean full) throws IllegalArgumentException, IllegalStateException, IOException {
+    default Optional<World> clone(final World world, final Consumer<Level.Builder> builder, final boolean full) throws IllegalArgumentException, IllegalStateException, IOException {
         return Optional.of(cloneAsync(world, builder, full).join());
     }
 
@@ -417,7 +417,7 @@ public interface LevelView {
      */
     @Contract(mutates = "io,param1")
     @Deprecated(forRemoval = true, since = "3.2.0")
-    default DeletionResult delete(World world, boolean schedule) {
+    default DeletionResult delete(final World world, final boolean schedule) {
         return deleteAsync(world, schedule).join();
     }
 
@@ -467,7 +467,7 @@ public interface LevelView {
      */
     @Contract(mutates = "io,param1")
     @Deprecated(forRemoval = true, since = "3.2.0")
-    default DeletionResult regenerate(World world, boolean schedule) {
+    default DeletionResult regenerate(final World world, final boolean schedule) {
         return regenerateAsync(world, schedule).join();
     }
 
@@ -483,7 +483,7 @@ public interface LevelView {
      * @since 3.2.0
      */
     @Contract(mutates = "io,param1")
-    default CompletableFuture<DeletionResult> regenerateAsync(World world, boolean schedule) {
+    default CompletableFuture<DeletionResult> regenerateAsync(final World world, final boolean schedule) {
         return regenerateAsync(world, schedule, builder -> {
         });
     }

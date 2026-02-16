@@ -18,12 +18,12 @@ import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
 final class WorldLinkRemoveCommand extends SimpleCommand {
-    private WorldLinkRemoveCommand(WorldsPlugin plugin) {
+    private WorldLinkRemoveCommand(final WorldsPlugin plugin) {
         super(plugin, "remove", "worlds.command.link.remove");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldLinkRemoveCommand(plugin);
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
+        final var command = new WorldLinkRemoveCommand(plugin);
         return command.create().then(command.remove());
     }
 
@@ -32,11 +32,11 @@ final class WorldLinkRemoveCommand extends SimpleCommand {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var world = context.getArgument("world", World.class);
-        var destination = context.getArgument("destination", Key.class);
-        var removed = plugin.linkProvider().unlink(world.key(), destination);
-        var message = removed ? "world.unlink.success" : "world.unlink.failed";
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var world = context.getArgument("world", World.class);
+        final var destination = context.getArgument("destination", Key.class);
+        final var removed = plugin.linkProvider().unlink(world.key(), destination);
+        final var message = removed ? "world.unlink.success" : "world.unlink.failed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message, Placeholder.parsed("relative", destination.key().asString()), Placeholder.parsed("world", world.getName()));
         return removed ? SINGLE_SUCCESS : 0;
     }

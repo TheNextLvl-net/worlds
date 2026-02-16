@@ -19,12 +19,12 @@ import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
 final class WorldRegenerateCommand extends SimpleCommand {
-    private WorldRegenerateCommand(WorldsPlugin plugin) {
+    private WorldRegenerateCommand(final WorldsPlugin plugin) {
         super(plugin, "regenerate", "worlds.command.regenerate");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldRegenerateCommand(plugin);
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
+        final var command = new WorldRegenerateCommand(plugin);
         return command.create().then(command.regenerate());
     }
 
@@ -36,8 +36,8 @@ final class WorldRegenerateCommand extends SimpleCommand {
                 .executes(this::confirmationNeeded);
     }
 
-    private int confirmationNeeded(CommandContext<CommandSourceStack> context) {
-        var sender = context.getSource().getSender();
+    private int confirmationNeeded(final CommandContext<CommandSourceStack> context) {
+        final var sender = context.getSource().getSender();
         plugin.bundle().sendMessage(sender, "command.confirmation",
                 Placeholder.parsed("action", "/" + context.getInput()),
                 Placeholder.parsed("confirmation", "/" + context.getInput() + " --confirm"));
@@ -45,17 +45,17 @@ final class WorldRegenerateCommand extends SimpleCommand {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var flags = context.getArgument("flags", CommandFlagsArgument.Flags.class);
+    public int run(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        final var flags = context.getArgument("flags", CommandFlagsArgument.Flags.class);
         if (!flags.contains("--confirm")) return confirmationNeeded(context);
-        var world = context.getArgument("world", World.class);
-        var schedule = flags.contains("--schedule");
+        final var world = context.getArgument("world", World.class);
+        final var schedule = flags.contains("--schedule");
         if (!schedule) plugin.bundle().sendMessage(context.getSource().getSender(), "world.regenerate",
                 Placeholder.parsed("world", world.getName()));
         plugin.levelView().regenerateAsync(world, schedule, builder -> {
             if (flags.contains("--seed")) builder.seed(null);
         }).thenAccept(result -> {
-            var message = switch (result) {
+            final var message = switch (result) {
                 case SUCCESS -> "world.regenerate.success";
                 case SCHEDULED -> "world.regenerate.scheduled";
                 case REQUIRES_SCHEDULING -> "world.regenerate.disallowed";

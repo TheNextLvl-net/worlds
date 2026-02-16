@@ -12,12 +12,12 @@ import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
 public final class SaveOffCommand extends SimpleCommand {
-    private SaveOffCommand(WorldsPlugin plugin) {
+    private SaveOffCommand(final WorldsPlugin plugin) {
         super(plugin, "save-off", "worlds.command.save-off");
     }
 
-    public static LiteralCommandNode<CommandSourceStack> create(WorldsPlugin plugin) {
-        var command = new SaveOffCommand(plugin);
+    public static LiteralCommandNode<CommandSourceStack> create(final WorldsPlugin plugin) {
+        final var command = new SaveOffCommand(plugin);
         return command.create()
                 .then(worldArgument(plugin).executes(command))
                 .executes(command)
@@ -25,11 +25,11 @@ public final class SaveOffCommand extends SimpleCommand {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var world = tryGetArgument(context, "world", World.class)
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var world = tryGetArgument(context, "world", World.class)
                 .orElseGet(() -> context.getSource().getLocation().getWorld());
-        var autoSave = world.isAutoSave();
-        var message = autoSave ? "world.save.off" : "world.save.already-off";
+        final var autoSave = world.isAutoSave();
+        final var message = autoSave ? "world.save.off" : "world.save.already-off";
         if (autoSave) world.setAutoSave(false);
         plugin.bundle().sendMessage(context.getSource().getSender(), message);
         return autoSave ? SINGLE_SUCCESS : 0;

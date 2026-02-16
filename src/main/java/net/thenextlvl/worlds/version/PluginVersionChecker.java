@@ -8,7 +8,7 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public final class PluginVersionChecker extends PaperModrinthVersionChecker<SemanticVersion> {
-    public PluginVersionChecker(Plugin plugin) {
+    public PluginVersionChecker(final Plugin plugin) {
         super(plugin, "gBIw3Gvy");
     }
 
@@ -18,7 +18,7 @@ public final class PluginVersionChecker extends PaperModrinthVersionChecker<Sema
     }
 
     @Override
-    public SemanticVersion parseVersion(String version) {
+    public SemanticVersion parseVersion(final String version) {
         return SemanticVersion.parse(version);
     }
 }

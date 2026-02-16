@@ -17,12 +17,12 @@ import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
 final class WorldLinkCreateCommand extends SimpleCommand {
-    private WorldLinkCreateCommand(WorldsPlugin plugin) {
+    private WorldLinkCreateCommand(final WorldsPlugin plugin) {
         super(plugin, "create", "worlds.command.link.create");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldLinkCreateCommand(plugin);
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
+        final var command = new WorldLinkCreateCommand(plugin);
         return command.create().then(command.createArgument());
     }
 
@@ -35,11 +35,11 @@ final class WorldLinkCreateCommand extends SimpleCommand {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var world = context.getArgument("world", World.class);
-        var destination = context.getArgument("destination", World.class);
-        var link = plugin.linkProvider().link(world, destination);
-        var message = link ? "world.link.success" : "world.link.failed";
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var world = context.getArgument("world", World.class);
+        final var destination = context.getArgument("destination", World.class);
+        final var link = plugin.linkProvider().link(world, destination);
+        final var message = link ? "world.link.success" : "world.link.failed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
                 Placeholder.parsed("source", world.key().asString()),
                 Placeholder.parsed("destination", destination.key().asString()));

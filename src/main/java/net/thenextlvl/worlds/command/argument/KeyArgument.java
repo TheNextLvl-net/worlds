@@ -20,14 +20,14 @@ public final class KeyArgument implements CustomArgumentType<Key, Key> {
 
     @Override
     @SuppressWarnings("PatternValidation")
-    public Key parse(StringReader reader) throws CommandSyntaxException {
-        int cursor = reader.getCursor();
+    public Key parse(final StringReader reader) throws CommandSyntaxException {
+        final int cursor = reader.getCursor();
 
         try {
-            var greedy = readGreedy(reader);
+            final var greedy = readGreedy(reader);
             if (greedy.contains(":")) return Key.key(greedy);
             else return Key.key("worlds", greedy);
-        } catch (InvalidKeyException e) {
+        } catch (final InvalidKeyException e) {
             reader.setCursor(cursor);
             throw ERROR_INVALID.createWithContext(reader);
         }
@@ -38,8 +38,8 @@ public final class KeyArgument implements CustomArgumentType<Key, Key> {
         return ArgumentTypes.key();
     }
 
-    private String readGreedy(StringReader reader) {
-        var cursor = reader.getCursor();
+    private String readGreedy(final StringReader reader) {
+        final var cursor = reader.getCursor();
 
         while (reader.canRead() && isAllowedInKey(reader.peek())) {
             reader.skip();
@@ -48,7 +48,7 @@ public final class KeyArgument implements CustomArgumentType<Key, Key> {
         return reader.getString().substring(cursor, reader.getCursor());
     }
 
-    private boolean isAllowedInKey(char character) {
+    private boolean isAllowedInKey(final char character) {
         return Key.allowedInNamespace(character) || Key.allowedInValue(character) || character == ':';
     }
 }

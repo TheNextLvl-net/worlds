@@ -19,14 +19,14 @@ import java.nio.file.Path;
  * @since 3.7.0
  */
 @NullMarked
-public class WorldBackupRestoreEvent extends WorldEvent implements Cancellable {
+public final class WorldBackupRestoreEvent extends WorldEvent implements Cancellable {
     private static final HandlerList handlerList = new HandlerList();
 
     private boolean cancelled = false;
     private final Path backupFile;
 
     @ApiStatus.Internal
-    public WorldBackupRestoreEvent(World world, Path backupFile) {
+    public WorldBackupRestoreEvent(final World world, final Path backupFile) {
         super(world, false);
         this.backupFile = backupFile;
     }
@@ -44,7 +44,7 @@ public class WorldBackupRestoreEvent extends WorldEvent implements Cancellable {
 
     @Override
     @Contract(mutates = "this")
-    public void setCancelled(boolean cancel) {
+    public void setCancelled(final boolean cancel) {
         this.cancelled = cancel;
     }
 

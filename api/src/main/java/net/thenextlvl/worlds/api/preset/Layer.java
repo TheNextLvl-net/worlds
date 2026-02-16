@@ -11,15 +11,15 @@ import org.jspecify.annotations.NullMarked;
  */
 @NullMarked
 public record Layer(Key block, int height) {
-    public Layer(Material material, int height) {
+    public Layer(final Material material, final int height) {
         this(material.key(), height);
     }
 
-    public Layer(BlockType blockType, int height) {
+    public Layer(final BlockType blockType, final int height) {
         this(blockType.key(), height);
     }
 
-    public Layer(@KeyPattern String block, int height) {
+    public Layer(@KeyPattern final String block, final int height) {
         this(Key.key(block), height);
     }
 

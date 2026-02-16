@@ -8,11 +8,11 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public final class WorldLinkCommand extends BrigadierCommand {
-    WorldLinkCommand(WorldsPlugin plugin) {
+    WorldLinkCommand(final WorldsPlugin plugin) {
         super(plugin, "link", "worlds.command.link");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
         return new WorldLinkCommand(plugin).create()
                 .then(WorldLinkCreateCommand.create(plugin))
                 .then(WorldLinkListCommand.create(plugin))

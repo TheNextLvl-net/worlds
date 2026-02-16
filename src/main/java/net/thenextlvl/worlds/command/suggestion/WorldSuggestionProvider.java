@@ -18,17 +18,17 @@ public final class WorldSuggestionProvider<S> implements SuggestionProvider<S> {
     private final Plugin plugin;
     private final BiPredicate<CommandContext<S>, World> filter;
 
-    public WorldSuggestionProvider(Plugin plugin) {
+    public WorldSuggestionProvider(final Plugin plugin) {
         this(plugin, (context, world) -> true);
     }
 
-    public WorldSuggestionProvider(Plugin plugin, BiPredicate<CommandContext<S>, World> filter) {
+    public WorldSuggestionProvider(final Plugin plugin, final BiPredicate<CommandContext<S>, World> filter) {
         this.plugin = plugin;
         this.filter = filter;
     }
 
     @Override
-    public CompletableFuture<Suggestions> getSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+    public CompletableFuture<Suggestions> getSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
         plugin.getServer().getWorlds().stream()
                 .filter(world -> filter.test(context, world))
                 .map(Keyed::key)

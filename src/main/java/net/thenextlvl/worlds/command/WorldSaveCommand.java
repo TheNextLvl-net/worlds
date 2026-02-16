@@ -15,28 +15,28 @@ import static net.thenextlvl.worlds.command.WorldCommand.worldArgument;
 
 @NullMarked
 final class WorldSaveCommand extends BrigadierCommand {
-    private WorldSaveCommand(WorldsPlugin plugin) {
+    private WorldSaveCommand(final WorldsPlugin plugin) {
         super(plugin, "save", "worlds.command.save");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldSaveCommand(plugin);
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
+        final var command = new WorldSaveCommand(plugin);
         return command.create().then(worldArgument(plugin)
                 .then(Commands.literal("flush").executes(command::flush))
                 .executes(command::save));
     }
 
-    public int flush(CommandContext<CommandSourceStack> context) {
+    public int flush(final CommandContext<CommandSourceStack> context) {
         return save(context, true);
     }
 
-    private int save(CommandContext<CommandSourceStack> context) {
+    private int save(final CommandContext<CommandSourceStack> context) {
         return save(context, false);
     }
 
-    private int save(CommandContext<CommandSourceStack> context, boolean flush) {
-        var world = context.getArgument("world", World.class);
-        var placeholder = Placeholder.parsed("world", world.getName());
+    private int save(final CommandContext<CommandSourceStack> context, final boolean flush) {
+        final var world = context.getArgument("world", World.class);
+        final var placeholder = Placeholder.parsed("world", world.getName());
         plugin.bundle().sendMessage(context.getSource().getSender(), "world.save", placeholder);
         plugin.levelView().saveAsync(world, flush).thenAccept(ignored -> {
             plugin.bundle().sendMessage(context.getSource().getSender(), "world.save.success", placeholder);

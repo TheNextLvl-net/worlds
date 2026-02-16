@@ -14,16 +14,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class PresetsTest {
     @ParameterizedTest
     @MethodSource("unparsedPresets")
-    public void testPreset(Preset preset, String unparsed) {
-        var parsed = Preset.parse(unparsed);
+    public void testPreset(final Preset preset, final String unparsed) {
+        final var parsed = Preset.parse(unparsed);
         assertEquals(parsed.toPresetCode(), unparsed, "Parsed preset does not match unparsed preset");
     }
-    
+
     @ParameterizedTest
     @MethodSource("presets")
-    public void testPresetSerialization(Preset preset) {
-        var serialize = preset.serialize();
-        var deserialize = Preset.deserialize(serialize);
+    public void testPresetSerialization(final Preset preset) {
+        final var serialize = preset.serialize();
+        final var deserialize = Preset.deserialize(serialize);
         assertEquals(preset, deserialize, "Deserialized preset does not match original");
     }
 

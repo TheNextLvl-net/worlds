@@ -14,22 +14,22 @@ import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @NullMarked
 final class WorldSpawnCommand extends SimpleCommand {
-    private WorldSpawnCommand(WorldsPlugin plugin) {
+    private WorldSpawnCommand(final WorldsPlugin plugin) {
         super(plugin, "spawn", "worlds.command.spawn");
     }
 
-    public static ArgumentBuilder<CommandSourceStack, ?> create(WorldsPlugin plugin) {
-        var command = new WorldSpawnCommand(plugin);
+    public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
+        final var command = new WorldSpawnCommand(plugin);
         return command.create()
                 .requires(source -> source.getSender() instanceof Player && command.canUse(source))
                 .executes(command);
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var player = (Player) context.getSource().getSender();
+    public int run(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        final var player = (Player) context.getSource().getSender();
         player.teleportAsync(player.getWorld().getSpawnLocation(), COMMAND).thenAccept(success -> {
-            var message = success ? "world.teleport.self" : "world.teleport.failed";
+            final var message = success ? "world.teleport.self" : "world.teleport.failed";
             plugin.bundle().sendMessage(player, message, Placeholder.parsed("world", player.getWorld().getName()));
         });
         return SINGLE_SUCCESS;

@@ -16,14 +16,14 @@ import java.util.concurrent.CompletableFuture;
 @NullMarked
 public final class CommandFlagsArgument implements SimpleArgumentType<CommandFlagsArgument.Flags, String> {
     private final Set<String> flags;
-    
-    public CommandFlagsArgument(Set<String> flags) {
+
+    public CommandFlagsArgument(final Set<String> flags) {
         this.flags = flags;
     }
 
     @Override
-    public Flags convert(StringReader reader, String type) {
-        var split = type.split(" ");
+    public Flags convert(final StringReader reader, final String type) {
+        final var split = type.split(" ");
         if (Arrays.stream(split).anyMatch(s -> !flags.contains(s)))
             throw new IllegalArgumentException("unrecognized flag");
         return new Flags(split);
@@ -35,9 +35,9 @@ public final class CommandFlagsArgument implements SimpleArgumentType<CommandFla
     }
 
     @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        var index = builder.getRemaining().lastIndexOf(' ') + 1;
-        var substring = builder.getRemaining().substring(index);
+    public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
+        final var index = builder.getRemaining().lastIndexOf(' ') + 1;
+        final var substring = builder.getRemaining().substring(index);
         flags.stream()
                 .filter(flag -> !builder.getRemaining().contains(flag))
                 .filter(flag -> flag.startsWith(substring))
@@ -46,7 +46,7 @@ public final class CommandFlagsArgument implements SimpleArgumentType<CommandFla
     }
 
     public static final class Flags extends HashSet<String> {
-        private Flags(String... flags) {
+        private Flags(final String... flags) {
             super(Set.of(flags));
         }
     }

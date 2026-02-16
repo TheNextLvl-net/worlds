@@ -54,7 +54,7 @@ public abstract class LevelData implements Level {
     protected final boolean ignoreLevelData;
     protected final long seed;
 
-    protected LevelData(WorldsPlugin plugin, Builder builder) {
+    protected LevelData(final WorldsPlugin plugin, final Builder builder) {
         this.plugin = plugin;
         this.directory = builder.directory;
         this.name = builder.name != null ? builder.name : directory.getFileName().toString();
@@ -197,13 +197,13 @@ public abstract class LevelData implements Level {
         private Path directory;
         private TriState enabled = TriState.NOT_SET;
 
-        public Builder(WorldsPlugin plugin, Path directory) {
+        public Builder(final WorldsPlugin plugin, final Path directory) {
             this.plugin = plugin;
             this.directory = validate(directory);
         }
 
-        private Path validate(Path directory) {
-            var container = plugin.getServer().getWorldContainer().toPath();
+        private Path validate(final Path directory) {
+            final var container = plugin.getServer().getWorldContainer().toPath();
             return directory.startsWith(container) ? directory : container.resolve(directory);
         }
 
@@ -213,7 +213,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level.Builder directory(Path directory) {
+        public Level.Builder directory(final Path directory) {
             this.directory = validate(directory);
             return this;
         }
@@ -224,7 +224,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level.Builder key(@Nullable Key key) {
+        public Level.Builder key(@Nullable final Key key) {
             this.key = key;
             return this;
         }
@@ -235,7 +235,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level.Builder name(@Nullable String name) {
+        public Level.Builder name(@Nullable final String name) {
             this.name = name;
             return this;
         }
@@ -246,7 +246,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level.Builder biomeProvider(@Nullable BiomeProvider provider) {
+        public Level.Builder biomeProvider(@Nullable final BiomeProvider provider) {
             this.biomeProvider = provider;
             return this;
         }
@@ -257,7 +257,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level.Builder chunkGenerator(@Nullable ChunkGenerator generator) {
+        public Level.Builder chunkGenerator(@Nullable final ChunkGenerator generator) {
             this.chunkGenerator = generator;
             return this;
         }
@@ -268,7 +268,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level.Builder levelStem(@Nullable LevelStem levelStem) {
+        public Level.Builder levelStem(@Nullable final LevelStem levelStem) {
             this.levelStem = levelStem;
             return this;
         }
@@ -279,7 +279,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level.Builder generatorType(@Nullable GeneratorType type) {
+        public Level.Builder generatorType(@Nullable final GeneratorType type) {
             this.generatorType = type;
             return this;
         }
@@ -290,7 +290,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level.Builder ignoreLevelData(@Nullable Boolean ignoreLevelData) {
+        public Level.Builder ignoreLevelData(@Nullable final Boolean ignoreLevelData) {
             this.ignoreLevelData = ignoreLevelData;
             return this;
         }
@@ -301,7 +301,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level.Builder generator(@Nullable Generator generator) {
+        public Level.Builder generator(@Nullable final Generator generator) {
             this.generator = generator;
             return this;
         }
@@ -312,7 +312,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level.Builder preset(@Nullable Preset preset) {
+        public Level.Builder preset(@Nullable final Preset preset) {
             this.preset = preset;
             return this;
         }
@@ -323,7 +323,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level.Builder enabled(TriState enabled) {
+        public Level.Builder enabled(final TriState enabled) {
             this.enabled = enabled;
             return this;
         }
@@ -334,7 +334,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level.Builder hardcore(@Nullable Boolean hardcore) {
+        public Level.Builder hardcore(@Nullable final Boolean hardcore) {
             this.hardcore = hardcore;
             return this;
         }
@@ -345,7 +345,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level.Builder structures(@Nullable Boolean structures) {
+        public Level.Builder structures(@Nullable final Boolean structures) {
             this.structures = structures;
             return this;
         }
@@ -356,7 +356,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level.Builder bonusChest(@Nullable Boolean bonusChest) {
+        public Level.Builder bonusChest(@Nullable final Boolean bonusChest) {
             this.bonusChest = bonusChest;
             return this;
         }
@@ -367,7 +367,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level.Builder worldKnown(@Nullable Boolean worldKnown) {
+        public Level.Builder worldKnown(@Nullable final Boolean worldKnown) {
             this.worldKnown = worldKnown;
             return this;
         }
@@ -378,7 +378,7 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public Level.Builder seed(@Nullable Long seed) {
+        public Level.Builder seed(@Nullable final Long seed) {
             this.seed = seed;
             return this;
         }
@@ -408,43 +408,43 @@ public abstract class LevelData implements Level {
                 '}';
     }
 
-    public static Optional<Level.Builder> read(WorldsPlugin plugin, Path directory) throws IOException {
-        var container = plugin.getServer().getWorldContainer().toPath();
-        var level = directory.startsWith(container) ? directory : container.resolve(directory);
+    public static Optional<Level.Builder> read(final WorldsPlugin plugin, final Path directory) throws IOException {
+        final var container = plugin.getServer().getWorldContainer().toPath();
+        final var level = directory.startsWith(container) ? directory : container.resolve(directory);
 
-        var levelData = plugin.levelView().getLevelDataFile(level);
+        final var levelData = plugin.levelView().getLevelDataFile(level);
         if (levelData == null) return Optional.empty();
 
-        var data = levelData.<CompoundTag>optional("Data");
-        var name = data.flatMap(tag -> tag.optional("LevelName").map(Tag::getAsString))
+        final var data = levelData.<CompoundTag>optional("Data");
+        final var name = data.flatMap(tag -> tag.optional("LevelName").map(Tag::getAsString))
                 .orElseGet(() -> level.getFileName().toString());
-        var pdc = data.flatMap(tag -> tag.optional("BukkitValues").map(Tag::getAsCompound));
-        var worldKnown = pdc.map(LevelData::isKnown).orElse(false);
-        var key = pdc.flatMap(tag -> tag.optional("worlds:world_key")
+        final var pdc = data.flatMap(tag -> tag.optional("BukkitValues").map(Tag::getAsCompound));
+        final var worldKnown = pdc.map(LevelData::isKnown).orElse(false);
+        final var key = pdc.flatMap(tag -> tag.optional("worlds:world_key")
                 .map(Tag::getAsString).map(Key::key)).orElseGet(() -> Key.key("worlds", createKey(name)));
-        var levelStem = pdc.flatMap(tag -> tag.optional("worlds:dimension").map(Tag::getAsString))
+        final var levelStem = pdc.flatMap(tag -> tag.optional("worlds:dimension").map(Tag::getAsString))
                 .map(Key::key).map(LevelStem::of).orElseGet(() -> getLevelStem(plugin, level));
-        var enabled = pdc.flatMap(tag -> tag.optional("worlds:enabled").map(Tag::getAsBoolean)
+        final var enabled = pdc.flatMap(tag -> tag.optional("worlds:enabled").map(Tag::getAsBoolean)
                 .map(TriState::byBoolean)).orElse(TriState.NOT_SET);
-        var chunkGenerator = pdc.flatMap(tag -> tag.optional("worlds:generator").map(Tag::getAsString)).map(serialized ->
+        final var chunkGenerator = pdc.flatMap(tag -> tag.optional("worlds:generator").map(Tag::getAsString)).map(serialized ->
                 Generator.of(plugin, serialized)).orElse(null);
-        var settings = data.flatMap(tag -> tag.<CompoundTag>optional("WorldGenSettings"));
-        var dimensions = settings.flatMap(tag -> tag.<CompoundTag>optional("dimensions"));
-        var dimension = dimensions.flatMap(tag -> tag.<CompoundTag>optional(levelStem.dimensionType().key().asString()));
-        var generator = dimension.flatMap(tag -> tag.<CompoundTag>optional("generator"));
-        var hardcore = settings.flatMap(tag -> tag.<ByteTag>optional("hardcore"))
+        final var settings = data.flatMap(tag -> tag.<CompoundTag>optional("WorldGenSettings"));
+        final var dimensions = settings.flatMap(tag -> tag.<CompoundTag>optional("dimensions"));
+        final var dimension = dimensions.flatMap(tag -> tag.<CompoundTag>optional(levelStem.dimensionType().key().asString()));
+        final var generator = dimension.flatMap(tag -> tag.<CompoundTag>optional("generator"));
+        final var hardcore = settings.flatMap(tag -> tag.<ByteTag>optional("hardcore"))
                 .map(ByteTag::getAsBoolean).orElse(plugin.getServer().isHardcore());
-        var seed = settings.flatMap(tag -> tag.<LongTag>optional("seed"))
+        final var seed = settings.flatMap(tag -> tag.<LongTag>optional("seed"))
                 .map(LongTag::getAsLong).orElse(ThreadLocalRandom.current().nextLong());
-        var structures = settings.flatMap(tag -> tag.<ByteTag>optional("generate_features"))
+        final var structures = settings.flatMap(tag -> tag.<ByteTag>optional("generate_features"))
                 .map(ByteTag::getAsBoolean).orElse(plugin.getServer().getGenerateStructures());
-        var bonusChest = settings.flatMap(tag -> tag.<ByteTag>optional("bonus_chest"))
+        final var bonusChest = settings.flatMap(tag -> tag.<ByteTag>optional("bonus_chest"))
                 .map(ByteTag::getAsBoolean).orElse(false);
-        var worldPreset = generator.flatMap(LevelData::getWorldPreset);
-        var preset = worldPreset.filter(type -> type.equals(GeneratorType.FLAT))
+        final var worldPreset = generator.flatMap(LevelData::getWorldPreset);
+        final var preset = worldPreset.filter(type -> type.equals(GeneratorType.FLAT))
                 .flatMap(worldType -> generator.flatMap(LevelData::getFlatPreset))
                 .orElse(null);
-        var generatorType = worldPreset.orElse(GeneratorType.NORMAL);
+        final var generatorType = worldPreset.orElse(GeneratorType.NORMAL);
 
         return Optional.of(new Builder(plugin, level)
                 .key(key)
@@ -462,12 +462,12 @@ public abstract class LevelData implements Level {
     }
 
     @SuppressWarnings("PatternValidation")
-    private static Optional<Preset> getFlatPreset(CompoundTag generator) {
-        var settings = generator.<CompoundTag>optional("settings");
+    private static Optional<Preset> getFlatPreset(final CompoundTag generator) {
+        final var settings = generator.<CompoundTag>optional("settings");
 
         if (settings.isEmpty()) return Optional.empty();
 
-        var preset = new Preset(null);
+        final var preset = new Preset(null);
 
         settings.flatMap(tag -> tag.<Tag>optional("biome"))
                 .map(Tag::getAsString)
@@ -484,8 +484,8 @@ public abstract class LevelData implements Level {
 
         settings.flatMap(tag -> tag.<ListTag<CompoundTag>>optional("layers"))
                 .map(tag -> tag.stream().map(layer -> {
-                    var block = layer.optional("block").orElseThrow().getAsString();
-                    var height = layer.optional("height").orElseThrow().getAsInt();
+                    final var block = layer.optional("block").orElseThrow().getAsString();
+                    final var height = layer.optional("height").orElseThrow().getAsInt();
                     return new Layer(block, height);
                 }).collect(Collectors.toCollection(LinkedHashSet::new)))
                 .ifPresent(preset::layers);
@@ -505,14 +505,14 @@ public abstract class LevelData implements Level {
         return Optional.of(preset);
     }
 
-    private static Optional<GeneratorType> getWorldPreset(CompoundTag generator) {
-        var settings = generator.optional("settings").filter(Tag::isString).map(Tag::getAsString);
+    private static Optional<GeneratorType> getWorldPreset(final CompoundTag generator) {
+        final var settings = generator.optional("settings").filter(Tag::isString).map(Tag::getAsString);
         if (settings.filter(s -> s.equals(GeneratorType.LARGE_BIOMES.key().asString())).isPresent())
             return Optional.of(GeneratorType.LARGE_BIOMES);
         if (settings.filter(s -> s.equals(GeneratorType.AMPLIFIED.key().asString())).isPresent())
             return Optional.of(GeneratorType.AMPLIFIED);
 
-        var generatorType = generator.optional("type").map(Tag::getAsString);
+        final var generatorType = generator.optional("type").map(Tag::getAsString);
         if (generatorType.filter(s -> s.equals(GeneratorType.DEBUG.key().asString())).isPresent())
             return Optional.of(GeneratorType.DEBUG);
         if (generatorType.filter(s -> s.equals(GeneratorType.FLAT.key().asString())).isPresent())
@@ -523,23 +523,23 @@ public abstract class LevelData implements Level {
         return Optional.empty();
     }
 
-    private static LevelStem getLevelStem(WorldsPlugin plugin, Path directory) {
+    private static LevelStem getLevelStem(final WorldsPlugin plugin, final Path directory) {
         if (Files.isDirectory(directory.resolve("region"))) return LevelStem.OVERWORLD;
-        var end = plugin.levelView().hasEndDimension(directory);
-        var nether = plugin.levelView().hasNetherDimension(directory);
+        final var end = plugin.levelView().hasEndDimension(directory);
+        final var nether = plugin.levelView().hasNetherDimension(directory);
         if (end && !nether) return LevelStem.END;
         if (nether && !end) return LevelStem.NETHER;
         return LevelStem.OVERWORLD;
     }
 
-    private static boolean isKnown(CompoundTag tag) {
+    private static boolean isKnown(final CompoundTag tag) {
         return tag.containsKey("worlds:dimension")
                 || tag.containsKey("worlds:enabled")
                 || tag.containsKey("worlds:generator")
                 || tag.containsKey("worlds:world_key");
     }
 
-    public static @Subst("pattern") String createKey(String name) {
+    public static @Subst("pattern") String createKey(final String name) {
         return name.toLowerCase()
                 .replaceAll("[^a-z0-9_\\-./ ]+", "")
                 .replace(" ", "_");

@@ -29,8 +29,8 @@ public class FreeNameTest {
 
     @ParameterizedTest
     @MethodSource("usedNames")
-    public void testFreeName(String name, String expectedName) {
-        var freeName = PaperLevelView.findFreeName(usedNames.keySet(), name);
+    public void testFreeName(final String name, final String expectedName) {
+        final var freeName = PaperLevelView.findFreeName(usedNames.keySet(), name);
         Assertions.assertEquals(expectedName, freeName, "Unexpected name for '" + name + "'");
     }
 

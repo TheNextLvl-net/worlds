@@ -30,12 +30,12 @@ public class PortalListener implements Listener {
     private final PortalCooldown cooldown = new PortalCooldown();
     protected final WorldsPlugin plugin;
 
-    public PortalListener(WorldsPlugin plugin) {
+    public PortalListener(final WorldsPlugin plugin) {
         this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onEntityPortal(EntityPortalReadyEvent event) {
+    public void onEntityPortal(final EntityPortalReadyEvent event) {
         plugin.linkProvider().getTarget(event.getEntity().getWorld(), event.getPortalType())
                 .ifPresentOrElse(event::setTargetWorld, () -> event.setTargetWorld(null));
     }
@@ -45,17 +45,17 @@ public class PortalListener implements Listener {
      * @see net.minecraft.world.entity.Entity#handlePortal()
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onEntityPortalEnter(EntityPortalEnterEvent event) {
+    public void onEntityPortalEnter(final EntityPortalEnterEvent event) {
         if (!event.getPortalType().equals(PortalType.ENDER)) return;
 
         event.setCancelled(true);
 
         if (!cooldown.start(plugin, event.getEntity())) return;
 
-        var readyEvent = new EntityPortalReadyEvent(event.getEntity(), null, PortalType.ENDER);
+        final var readyEvent = new EntityPortalReadyEvent(event.getEntity(), null, PortalType.ENDER);
         onEntityPortal(readyEvent);
 
-        var targetWorld = readyEvent.getTargetWorld();
+        final var targetWorld = readyEvent.getTargetWorld();
         if (targetWorld == null) return;
 
         if (plugin.levelView().isOverworld(event.getEntity().getWorld()) && plugin.levelView().isEnd(targetWorld)) {
@@ -64,14 +64,14 @@ public class PortalListener implements Listener {
         }
 
         if (targetWorld.getEnvironment().equals(World.Environment.THE_END)) {
-            var spawn = new Location(targetWorld, 100.5, 49, 0.5, 90, 0);
+            final var spawn = new Location(targetWorld, 100.5, 49, 0.5, 90, 0);
             plugin.getServer().getRegionScheduler().run(plugin, spawn, scheduledTask -> {
                 generateEndPlatform(targetWorld, event.getEntity());
                 event.getEntity().teleportAsync(spawn, END_PORTAL);
             });
-        } else if (event.getEntity() instanceof CraftPlayer player) {
-            Consumer<@Nullable Location> teleport = location -> player.getScheduler().run(plugin, scheduledTask -> {
-                var level = ((CraftWorld) player.getWorld()).getHandle();
+        } else if (event.getEntity() instanceof final CraftPlayer player) {
+            final Consumer<@Nullable Location> teleport = location -> player.getScheduler().run(plugin, scheduledTask -> {
+                final var level = ((CraftWorld) player.getWorld()).getHandle();
 
                 if (WorldsPlugin.RUNNING_FOLIA || level.paperConfig().misc.disableEndCredits) {
                     player.getHandle().seenCredits = true;
@@ -82,7 +82,7 @@ public class PortalListener implements Listener {
                 player.teleportAsync(Objects.requireNonNullElseGet(location, targetWorld::getSpawnLocation), END_PORTAL);
             }, null);
 
-            var potentialLocation = player.getPotentialRespawnLocation();
+            final var potentialLocation = player.getPotentialRespawnLocation();
             if (WorldsPlugin.RUNNING_FOLIA && potentialLocation != null) {
                 plugin.getServer().getRegionScheduler().run(plugin, potentialLocation, task -> {
                     teleport.accept(player.getRespawnLocation(true));
@@ -94,9 +94,9 @@ public class PortalListener implements Listener {
         }, null);
     }
 
-    private void generateEndPlatform(World world, Entity entity) {
-        var handle = ((CraftWorld) world).getHandle();
-        var entityHandle = WorldsPlugin.RUNNING_FOLIA ? null : ((CraftEntity) entity).getHandle();
+    private void generateEndPlatform(final World world, final Entity entity) {
+        final var handle = ((CraftWorld) world).getHandle();
+        final var entityHandle = WorldsPlugin.RUNNING_FOLIA ? null : ((CraftEntity) entity).getHandle();
         EndPlatformFeature.createEndPlatform(handle, new BlockPos(100, 49, 0), true, entityHandle);
     }
 }
