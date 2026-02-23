@@ -25,3 +25,5 @@ void or custom flat maps. Simply pick a predefined preset, or create your own!
 [Latest version supporting 1.19/1.20.4 (Java 17)](https://github.com/TheNextLvl-net/worlds/releases/tag/v1.1.3)
 
 For further information check out the [Wiki](https://thenextlvl.net/docs/worlds)
+
+[![Usage](https://faststats.dev/embed/cba4a875-ad2e-4408-b73b-92b117ddc34f?w=1012)](https://faststats.dev/project/worlds)
