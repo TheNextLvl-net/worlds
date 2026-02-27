@@ -3,7 +3,7 @@ package net.thenextlvl.worlds;
 import ca.spottedleaf.moonrise.common.util.TickThread;
 import dev.faststats.bukkit.BukkitMetrics;
 import dev.faststats.core.ErrorTracker;
-import dev.faststats.core.chart.Chart;
+import dev.faststats.core.data.Metric;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
@@ -73,9 +73,9 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     private final dev.faststats.core.Metrics fastStats = BukkitMetrics.factory()
             .token("978c4aa9ecf78ae2e9c0776601fd4c6c")
             .errorTracker(ERROR_TRACKER)
-            .addChart(addGeneratorChart())
-            .addChart(addWorldsChart())
-            .addChart(addEnvironmentsChart())
+            .addMetric(addGeneratorChart())
+            .addMetric(addWorldsChart())
+            .addMetric(addEnvironmentsChart())
             .create(this);
 
     private final Metrics metrics = new Metrics(this, 19652);
@@ -228,20 +228,20 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
         }));
     }
 
-    private Chart<?> addGeneratorChart() {
-        return Chart.stringArray("generators", () -> Arrays.stream(getServer().getPluginManager().getPlugins())
+    private Metric<?> addGeneratorChart() {
+        return Metric.stringArray("generators", () -> Arrays.stream(getServer().getPluginManager().getPlugins())
                 .filter(Plugin::isEnabled)
                 .filter(plugin -> generatorView().hasGenerator(plugin))
                 .map(Plugin::getName)
                 .toArray(String[]::new));
     }
 
-    private Chart<?> addWorldsChart() {
-        return Chart.number("worlds", () -> getServer().getWorlds().size());
+    private Metric<?> addWorldsChart() {
+        return Metric.number("worlds", () -> getServer().getWorlds().size());
     }
 
-    private Chart<?> addEnvironmentsChart() {
-        return Chart.stringArray("environments", () -> getServer().getWorlds().stream()
+    private Metric<?> addEnvironmentsChart() {
+        return Metric.stringArray("environments", () -> getServer().getWorlds().stream()
                 .map(world -> switch (world.getEnvironment()) {
                     case NORMAL -> "Overworld";
                     case NETHER -> "Nether";
