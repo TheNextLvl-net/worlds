@@ -70,7 +70,7 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
             .build();
 
     private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
-    private final dev.faststats.core.Metrics fastStats = BukkitMetrics.factory()
+    private final BukkitMetrics fastStats = BukkitMetrics.factory()
             .token("978c4aa9ecf78ae2e9c0776601fd4c6c")
             .errorTracker(ERROR_TRACKER)
             .addMetric(addGeneratorChart())
