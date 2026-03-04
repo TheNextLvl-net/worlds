@@ -7,6 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.util.TriState;
 import net.thenextlvl.worlds.WorldsPlugin;
 import net.thenextlvl.worlds.command.argument.CommandFlagsArgument;
 import net.thenextlvl.worlds.command.brigadier.SimpleCommand;
@@ -53,7 +54,7 @@ final class WorldRegenerateCommand extends SimpleCommand {
         if (!schedule) plugin.bundle().sendMessage(context.getSource().getSender(), "world.regenerate",
                 Placeholder.parsed("world", world.getName()));
         plugin.levelView().regenerateAsync(world, schedule, builder -> {
-            if (flags.contains("--seed")) builder.seed(null);
+            if (flags.contains("--seed")) builder.seed(null).initialized(TriState.FALSE);
         }).thenAccept(result -> {
             final var message = switch (result) {
                 case SUCCESS -> "world.regenerate.success";

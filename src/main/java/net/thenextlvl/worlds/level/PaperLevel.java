@@ -232,6 +232,13 @@ final class PaperLevel extends LevelData {
         );
         /// Worlds end
 
+        /// Worlds start - set initialized flag
+        switch (initialized) {
+            case TRUE -> primaryLevelData.setInitialized(true);
+            case FALSE -> primaryLevelData.setInitialized(false);
+        }
+        /// Worlds end
+
         console.addLevel(serverLevel);
         console.initWorld(serverLevel, primaryLevelData, primaryLevelData.worldGenOptions());
 

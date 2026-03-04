@@ -47,6 +47,7 @@ public abstract class LevelData implements Level {
     protected final @Nullable Preset preset;
 
     protected final TriState enabled;
+    protected final TriState initialized;
     protected final boolean hardcore;
     protected final boolean worldKnown;
     protected final boolean structures;
@@ -74,6 +75,7 @@ public abstract class LevelData implements Level {
         this.structures = builder.structures != null ? builder.structures : plugin.getServer().getGenerateStructures();
         this.bonusChest = builder.bonusChest != null ? builder.bonusChest : false;
         this.ignoreLevelData = builder.ignoreLevelData != null ? builder.ignoreLevelData : false;
+        this.initialized = builder.initialized;
         this.seed = builder.seed != null ? builder.seed : ThreadLocalRandom.current().nextLong();
     }
 
@@ -153,6 +155,11 @@ public abstract class LevelData implements Level {
     }
 
     @Override
+    public TriState initialized() {
+        return initialized;
+    }
+
+    @Override
     public long getSeed() {
         return seed;
     }
@@ -171,6 +178,7 @@ public abstract class LevelData implements Level {
                 .enabled(enabled)
                 .hardcore(hardcore)
                 .worldKnown(worldKnown)
+                .initialized(initialized)
                 .structures(structures)
                 .bonusChest(bonusChest)
                 .seed(seed);
@@ -179,12 +187,12 @@ public abstract class LevelData implements Level {
     public static class Builder implements Level.Builder {
         private final WorldsPlugin plugin;
 
+        private @Nullable BiomeProvider biomeProvider;
         private @Nullable Boolean bonusChest;
         private @Nullable Boolean hardcore;
+        private @Nullable Boolean ignoreLevelData;
         private @Nullable Boolean structures;
         private @Nullable Boolean worldKnown;
-        private @Nullable Boolean ignoreLevelData;
-        private @Nullable BiomeProvider biomeProvider;
         private @Nullable ChunkGenerator chunkGenerator;
         private @Nullable Generator generator;
         private @Nullable GeneratorType generatorType;
@@ -196,6 +204,7 @@ public abstract class LevelData implements Level {
 
         private Path directory;
         private TriState enabled = TriState.NOT_SET;
+        private TriState initialized = TriState.NOT_SET;
 
         public Builder(final WorldsPlugin plugin, final Path directory) {
             this.plugin = plugin;
@@ -325,6 +334,17 @@ public abstract class LevelData implements Level {
         @Override
         public Level.Builder enabled(final TriState enabled) {
             this.enabled = enabled;
+            return this;
+        }
+
+        @Override
+        public TriState initialized() {
+            return initialized;
+        }
+
+        @Override
+        public Level.Builder initialized(final TriState initialized) {
+            this.initialized = initialized;
             return this;
         }
 
