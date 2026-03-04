@@ -142,6 +142,10 @@ public interface Level extends Keyed {
     @Contract(pure = true)
     boolean ignoreLevelData();
 
+    @ApiStatus.Internal
+    @Contract(pure = true)
+    TriState initialized();
+
     /**
      * Converts the current Level instance into a Builder, allowing modifications
      * to its configuration before creating or modifying a new Level instance.
@@ -478,5 +482,13 @@ public interface Level extends Keyed {
         @ApiStatus.Internal
         @Contract(mutates = "this")
         Builder enabled(TriState enabled);
+
+        @ApiStatus.Internal
+        @Contract(pure = true)
+        TriState initialized();
+
+        @ApiStatus.Internal
+        @Contract(mutates = "this")
+        Builder initialized(TriState initialized);
     }
 }
