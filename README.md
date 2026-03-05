@@ -26,4 +26,4 @@ void or custom flat maps. Simply pick a predefined preset, or create your own!
 
 For further information check out the [Wiki](https://thenextlvl.net/docs/worlds)
 
-[![Usage](https://faststats.dev/embed/cba4a875-ad2e-4408-b73b-92b117ddc34f?w=1012)](https://faststats.dev/project/worlds)
+[![Usage](https://faststats.dev/embed/default:a9a9dede-a7fb-48cb-ac06-3a1bbdcdbcf7:servers-and-players?w=1012)](https://faststats.dev/project/worlds)
