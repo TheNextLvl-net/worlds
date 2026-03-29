@@ -55,7 +55,8 @@ tasks.test {
 
 tasks.shadowJar {
     archiveBaseName.set("worlds")
-    relocate("org.bstats", "net.thenextlvl.worlds.bstats")
+    relocate("org.bstats", "net.thenextlvl.worlds.metrics.bstats")
+    relocate("dev.faststats", "net.thenextlvl.worlds.metrics.faststats")
 }
 
 paper {
