@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    paperweight.foliaDevBundle("1.21.11-R0.1-SNAPSHOT")
+    paperweight.foliaDevBundle("26.1.1.build.14-alpha")
 
     implementation(project(":api"))
 
