@@ -37,6 +37,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
 
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -51,7 +52,9 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider {
     public static final String ISSUES = "https://github.com/TheNextLvl-net/worlds/issues/new?template=bug_report.yml";
     public static final boolean RUNNING_FOLIA = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
 
-    public static final ErrorTracker ERROR_TRACKER = ErrorTracker.contextAware();
+    public static final ErrorTracker ERROR_TRACKER = ErrorTracker.contextAware()
+            .ignoreError(IllegalStateException.class, "World mismatch: expected .* but got .*")
+            .ignoreErrorType(AccessDeniedException.class);
 
     private final GeneratorView generatorView = new PluginGeneratorView();
     private final PaperLevelView levelView = RUNNING_FOLIA ? new FoliaLevelView(this) : new PaperLevelView(this);
