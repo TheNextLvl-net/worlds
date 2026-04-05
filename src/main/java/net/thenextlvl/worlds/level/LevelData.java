@@ -52,6 +52,7 @@ public abstract class LevelData implements Level {
     protected final boolean worldKnown;
     protected final boolean structures;
     protected final boolean bonusChest;
+    protected final int spawnChunkRadius;
     protected final boolean ignoreLevelData;
     protected final long seed;
 
@@ -76,6 +77,7 @@ public abstract class LevelData implements Level {
         this.bonusChest = builder.bonusChest != null ? builder.bonusChest : false;
         this.ignoreLevelData = builder.ignoreLevelData != null ? builder.ignoreLevelData : false;
         this.initialized = builder.initialized;
+        this.spawnChunkRadius = builder.spawnChunkRadius != null ? builder.spawnChunkRadius : plugin.getServer().getSpawnRadius();
         this.seed = builder.seed != null ? builder.seed : ThreadLocalRandom.current().nextLong();
     }
 
@@ -160,6 +162,11 @@ public abstract class LevelData implements Level {
     }
 
     @Override
+    public int getSpawnChunkRadius() {
+        return spawnChunkRadius;
+    }
+
+    @Override
     public long getSeed() {
         return seed;
     }
@@ -181,7 +188,8 @@ public abstract class LevelData implements Level {
                 .initialized(initialized)
                 .structures(structures)
                 .bonusChest(bonusChest)
-                .seed(seed);
+                .seed(seed)
+                .spawnChunkRadius(spawnChunkRadius);
     }
 
     public static class Builder implements Level.Builder {
@@ -196,6 +204,7 @@ public abstract class LevelData implements Level {
         private @Nullable ChunkGenerator chunkGenerator;
         private @Nullable Generator generator;
         private @Nullable GeneratorType generatorType;
+        private @Nullable Integer spawnChunkRadius;
         private @Nullable Key key;
         private @Nullable LevelStem levelStem;
         private @Nullable Long seed;
@@ -393,6 +402,17 @@ public abstract class LevelData implements Level {
         }
 
         @Override
+        public @Nullable Integer spawnChunkRadius() {
+            return spawnChunkRadius;
+        }
+
+        @Override
+        public Level.Builder spawnChunkRadius(@Nullable final Integer radius) {
+            this.spawnChunkRadius = radius;
+            return this;
+        }
+
+        @Override
         public @Nullable Long seed() {
             return seed;
         }
@@ -424,6 +444,7 @@ public abstract class LevelData implements Level {
                 ", worldKnown=" + worldKnown +
                 ", structures=" + structures +
                 ", bonusChest=" + bonusChest +
+                ", spawnChunkRadius=" + spawnChunkRadius +
                 ", seed=" + seed +
                 '}';
     }
