@@ -44,6 +44,7 @@ public class PortalListener implements Listener {
      * @see net.minecraft.world.level.block.EndPortalBlock#getPortalDestination(ServerLevel, net.minecraft.world.entity.Entity, BlockPos)
      * @see net.minecraft.world.entity.Entity#handlePortal()
      */
+    @SuppressWarnings("JavadocReference")
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityPortalEnter(final EntityPortalEnterEvent event) {
         if (!event.getPortalType().equals(PortalType.ENDER)) return;
@@ -85,9 +86,9 @@ public class PortalListener implements Listener {
             final var potentialLocation = player.getPotentialRespawnLocation();
             if (WorldsPlugin.RUNNING_FOLIA && potentialLocation != null) {
                 plugin.getServer().getRegionScheduler().run(plugin, potentialLocation, task -> {
-                    teleport.accept(player.getRespawnLocation(true));
+                    teleport.accept(player.getRespawnLocation());
                 });
-            } else teleport.accept(player.getRespawnLocation(true));
+            } else teleport.accept(player.getRespawnLocation());
 
         } else event.getEntity().getScheduler().run(plugin, task -> {
             event.getEntity().teleportAsync(targetWorld.getSpawnLocation(), END_PORTAL);
