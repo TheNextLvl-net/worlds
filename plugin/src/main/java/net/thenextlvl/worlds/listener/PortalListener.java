@@ -1,0 +1,89 @@
+package net.thenextlvl.worlds.listener;
+
+import io.papermc.paper.event.entity.EntityPortalReadyEvent;
+import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.model.PortalCooldown;
+import org.bukkit.Location;
+import org.bukkit.PortalType;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPortalEnterEvent;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Objects;
+import java.util.function.Consumer;
+
+import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.END_PORTAL;
+
+@NullMarked
+public class PortalListener implements Listener {
+    private final PortalCooldown cooldown = new PortalCooldown();
+    protected final WorldsPlugin plugin;
+
+    public PortalListener(final WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityPortal(final EntityPortalReadyEvent event) {
+        plugin.linkProvider().getTarget(event.getEntity().getWorld(), event.getPortalType())
+                .ifPresentOrElse(event::setTargetWorld, () -> event.setTargetWorld(null));
+    }
+
+    /**
+     * @see net.minecraft.world.level.block.EndPortalBlock#getPortalDestination(ServerLevel, net.minecraft.world.entity.Entity, BlockPos)
+     * @see net.minecraft.world.entity.Entity#handlePortal()
+     */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityPortalEnter(final EntityPortalEnterEvent event) {
+        if (!event.getPortalType().equals(PortalType.ENDER)) return;
+
+        event.setCancelled(true);
+
+        if (!cooldown.start(plugin, event.getEntity())) return;
+
+        final var readyEvent = new EntityPortalReadyEvent(event.getEntity(), null, PortalType.ENDER);
+        onEntityPortal(readyEvent);
+
+        final var targetWorld = readyEvent.getTargetWorld();
+        if (targetWorld == null) return;
+
+        if (plugin.levelView().isOverworld(event.getEntity().getWorld()) && plugin.levelView().isEnd(targetWorld)) {
+            event.setCancelled(false); // Don't handle overworld to end teleportation to allow gravity block duping
+            return;
+        }
+
+        if (targetWorld.getEnvironment().equals(World.Environment.THE_END)) {
+            final var spawn = new Location(targetWorld, 100.5, 49, 0.5, 90, 0);
+            plugin.getServer().getRegionScheduler().run(plugin, spawn, scheduledTask -> {
+                generateEndPlatform(targetWorld, event.getEntity());
+                event.getEntity().teleportAsync(spawn, END_PORTAL);
+            });
+        } else if (event.getEntity() instanceof final Player player) {
+            final Consumer<@Nullable Location> teleport = location -> player.getScheduler().run(plugin, scheduledTask -> {
+                plugin.handler().handleEndCredits(player);
+
+                player.teleportAsync(Objects.requireNonNullElseGet(location, targetWorld::getSpawnLocation), END_PORTAL);
+            }, null);
+
+            final var potentialLocation = plugin.handler().getRespawnLocation(player, false);
+            if (WorldsPlugin.RUNNING_FOLIA && potentialLocation != null) {
+                plugin.getServer().getRegionScheduler().run(plugin, potentialLocation, task -> {
+                    teleport.accept(plugin.handler().getRespawnLocation(player, false));
+                });
+            } else teleport.accept(plugin.handler().getRespawnLocation(player, true));
+
+        } else event.getEntity().getScheduler().run(plugin, task -> {
+            event.getEntity().teleportAsync(targetWorld.getSpawnLocation(), END_PORTAL);
+        }, null);
+    }
+
+    private void generateEndPlatform(final World world, final Entity entity) {
+        plugin.handler().generateEndPlatform(world, entity);
+    }
+}
