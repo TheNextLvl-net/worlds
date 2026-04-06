@@ -1,3 +1,3 @@
 dependencies {
-    paperweight.foliaDevBundle("1.21.11-R0.1-SNAPSHOT")
+    paperweight.foliaDevBundle("26.1.1.build.29-alpha")
 }

@@ -3,5 +3,5 @@ java {
 }
 
 dependencies {
-    paperweight.paperDevBundle("26.1.1.build.20-alpha")
+    paperweight.paperDevBundle("26.1.1.build.29-alpha")
 }
