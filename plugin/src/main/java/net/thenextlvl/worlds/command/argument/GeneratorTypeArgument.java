@@ -4,7 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.generator.GeneratorType;
+import net.thenextlvl.worlds.experimental.GeneratorType;
 import net.thenextlvl.worlds.command.suggestion.TooltipSuggestionProvider;
 import org.jspecify.annotations.NullMarked;
 

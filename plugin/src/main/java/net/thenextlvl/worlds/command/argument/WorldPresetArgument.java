@@ -9,8 +9,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.preset.Preset;
-import net.thenextlvl.worlds.api.preset.Presets;
+import net.thenextlvl.worlds.preset.Preset;
+import net.thenextlvl.worlds.preset.v2.SimplePresets;
 import org.jspecify.annotations.NullMarked;
 
 import java.io.BufferedInputStream;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @NullMarked
 public final class WorldPresetArgument implements SimpleArgumentType<Preset, String> {
-    private static final Map<String, Preset> identifiers = Presets.presets().stream()
+    private static final Map<String, Preset> identifiers = SimplePresets.presets().stream()
             .filter(preset -> preset.name() != null).collect(Collectors.toMap(
                     preset -> toIdentifier(Objects.requireNonNull(preset.name(), "Preset name cannot be null")),
                     preset -> preset

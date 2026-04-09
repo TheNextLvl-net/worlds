@@ -9,6 +9,7 @@ allprojects {
     version = rootProject.version
 
     apply { plugin("java") }
+    apply { plugin("java-library") }
 
     java.disableAutoTargetJvm()
 

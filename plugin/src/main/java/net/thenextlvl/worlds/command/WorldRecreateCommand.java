@@ -10,10 +10,10 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.generator.Generator;
-import net.thenextlvl.worlds.api.generator.GeneratorType;
-import net.thenextlvl.worlds.api.generator.LevelStem;
-import net.thenextlvl.worlds.api.preset.Preset;
+import net.thenextlvl.worlds.v4.generator.SimpleGenerator;
+import net.thenextlvl.worlds.experimental.GeneratorType;
+import net.thenextlvl.worlds.LevelStem;
+import net.thenextlvl.worlds.preset.Preset;
 import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.argument.LevelStemArgument;
 import net.thenextlvl.worlds.command.argument.SeedArgument;
@@ -70,7 +70,7 @@ final class WorldRecreateCommand extends OptionCommand {
 
         tryGetArgument(context, "bonus-chest", Boolean.class).ifPresent(builder::bonusChest);
         tryGetArgument(context, "dimension", LevelStem.class).ifPresent(builder::levelStem);
-        tryGetArgument(context, "generator", Generator.class).ifPresent(builder::generator);
+        tryGetArgument(context, "generator", SimpleGenerator.class).ifPresent(builder::generator);
         tryGetArgument(context, "hardcore", Boolean.class).ifPresent(builder::hardcore);
         tryGetArgument(context, "key", Key.class).ifPresentOrElse(builder::key, () ->
                 builder.key(plugin.levelView().findFreeKey(world.key())));

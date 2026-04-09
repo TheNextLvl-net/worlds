@@ -7,6 +7,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PortalProcessor;
 import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.Portal;
+import net.thenextlvl.worlds.WorldsAccess;
 import net.thenextlvl.worlds.versions.PluginAccess;
 import net.thenextlvl.worlds.versions.PortalHandler;
 import org.bukkit.Location;
@@ -107,7 +108,7 @@ public final class FoliaPortalListener extends PortalHandler<PortalProcessor> {
      */
     @SuppressWarnings("unchecked")
     private <T extends Enum<T>> void performPlayerTeleport(final Entity entity, final PortalProcessor processor, final BlockPos position) {
-        plugin.linkProvider().getTarget(entity.getBukkitEntity().getWorld(), PortalType.NETHER).ifPresent(world -> {
+        WorldsAccess.access().getTarget(entity.getBukkitEntity().getWorld(), PortalType.NETHER).ifPresent(world -> {
             try {
                 final var level = ((CraftWorld) world).getHandle();
                 final var portalType = Arrays.stream(Entity.class.getDeclaredClasses())

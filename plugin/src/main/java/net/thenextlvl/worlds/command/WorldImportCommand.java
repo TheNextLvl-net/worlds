@@ -9,11 +9,11 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.generator.Generator;
-import net.thenextlvl.worlds.api.generator.GeneratorType;
-import net.thenextlvl.worlds.api.generator.LevelStem;
+import net.thenextlvl.worlds.v4.generator.SimpleGenerator;
+import net.thenextlvl.worlds.experimental.GeneratorType;
+import net.thenextlvl.worlds.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
-import net.thenextlvl.worlds.api.preset.Preset;
+import net.thenextlvl.worlds.preset.Preset;
 import net.thenextlvl.worlds.command.argument.GeneratorArgument;
 import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.argument.LevelPathArgument;
@@ -73,7 +73,7 @@ final class WorldImportCommand extends OptionCommand {
         final var dimension = tryGetArgument(context, "dimension", LevelStem.class).orElse(null);
         final var directory = tryGetArgument(context, "directory", Path.class).filter(dir -> !dir.equals(path)).orElse(null);
         final var displayName = tryGetArgument(context, "name", String.class).orElse(null);
-        final var generator = tryGetArgument(context, "generator", Generator.class).orElse(null);
+        final var generator = tryGetArgument(context, "generator", SimpleGenerator.class).orElse(null);
         final var key = tryGetArgument(context, "key", Key.class).orElse(null);
 
         final var name = displayName != null ? displayName : path.getFileName().toString();

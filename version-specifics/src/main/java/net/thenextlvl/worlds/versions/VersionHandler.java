@@ -1,9 +1,10 @@
 package net.thenextlvl.worlds.versions;
 
-import net.thenextlvl.worlds.api.generator.DimensionType;
-import net.thenextlvl.worlds.api.generator.Generator;
-import net.thenextlvl.worlds.api.level.Level;
-import net.thenextlvl.worlds.api.view.LevelView;
+import net.thenextlvl.worlds.Level;
+import net.thenextlvl.worlds.WorldsAccess;
+import net.thenextlvl.worlds.experimental.DimensionType;
+import net.thenextlvl.worlds.generator.Generator;
+import net.thenextlvl.worlds.LevelStem;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -57,7 +58,7 @@ public abstract class VersionHandler {
 
     public abstract @Nullable Boolean hasBonusChest(final World world);
 
-    public abstract CompletableFuture<World> createAsync(Level level, LevelView levelView);
+    public abstract CompletableFuture<World> createAsync(Level level);
 
     public abstract String findAvailableName(Path path, String name, String format) throws IOException;
 
@@ -68,12 +69,12 @@ public abstract class VersionHandler {
         return World.Environment.CUSTOM;
     }
 
-    protected void persistWorld(final LevelView levelView, final World world, final net.thenextlvl.worlds.api.generator.LevelStem dimension, final boolean enabled) {
+    protected void persistWorld(final World world, final LevelStem dimension, final boolean enabled) {
         final var worldKey = new NamespacedKey("worlds", "world_key");
         final var dimensionKey = new NamespacedKey("worlds", "dimension");
         world.getPersistentDataContainer().set(worldKey, STRING, world.key().asString());
         world.getPersistentDataContainer().set(dimensionKey, STRING, dimension.dimensionType().key().asString());
-        levelView.setEnabled(world, enabled);
+        WorldsAccess.access().setEnabled(world, enabled);
     }
 
     protected void persistGenerator(final World world, final Generator generator) {

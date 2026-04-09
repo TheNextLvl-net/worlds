@@ -8,14 +8,14 @@ import net.thenextlvl.nbt.tag.ListTag;
 import net.thenextlvl.nbt.tag.LongTag;
 import net.thenextlvl.nbt.tag.Tag;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.generator.Generator;
-import net.thenextlvl.worlds.api.generator.GeneratorType;
-import net.thenextlvl.worlds.api.generator.LevelStem;
+import net.thenextlvl.worlds.v4.generator.SimpleGenerator;
+import net.thenextlvl.worlds.experimental.GeneratorType;
+import net.thenextlvl.worlds.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
-import net.thenextlvl.worlds.api.preset.Biome;
-import net.thenextlvl.worlds.api.preset.Layer;
-import net.thenextlvl.worlds.api.preset.Preset;
-import net.thenextlvl.worlds.api.preset.Structure;
+import net.thenextlvl.worlds.preset.Biome;
+import net.thenextlvl.worlds.preset.Layer;
+import net.thenextlvl.worlds.preset.Preset;
+import net.thenextlvl.worlds.preset.Structure;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.intellij.lang.annotations.Subst;
@@ -43,7 +43,7 @@ public abstract class LevelData implements Level {
     protected final @Nullable ChunkGenerator chunkGenerator;
     protected final @Nullable BiomeProvider biomeProvider;
 
-    protected final @Nullable Generator generator;
+    protected final @Nullable SimpleGenerator generator;
     protected final @Nullable Preset preset;
 
     protected final TriState enabled;
@@ -120,7 +120,7 @@ public abstract class LevelData implements Level {
     }
 
     @Override
-    public Optional<Generator> getGenerator() {
+    public Optional<SimpleGenerator> getGenerator() {
         return Optional.ofNullable(generator);
     }
 
@@ -194,7 +194,7 @@ public abstract class LevelData implements Level {
         private @Nullable Boolean structures;
         private @Nullable Boolean worldKnown;
         private @Nullable ChunkGenerator chunkGenerator;
-        private @Nullable Generator generator;
+        private @Nullable SimpleGenerator generator;
         private @Nullable GeneratorType generatorType;
         private @Nullable Key key;
         private @Nullable LevelStem levelStem;
@@ -305,12 +305,12 @@ public abstract class LevelData implements Level {
         }
 
         @Override
-        public @Nullable Generator generator() {
+        public @Nullable SimpleGenerator generator() {
             return generator;
         }
 
         @Override
-        public Level.Builder generator(@Nullable final Generator generator) {
+        public Level.Builder generator(@Nullable final SimpleGenerator generator) {
             this.generator = generator;
             return this;
         }
@@ -447,7 +447,7 @@ public abstract class LevelData implements Level {
         final var enabled = pdc.flatMap(tag -> tag.optional("worlds:enabled").map(Tag::getAsBoolean)
                 .map(TriState::byBoolean)).orElse(TriState.NOT_SET);
         final var chunkGenerator = pdc.flatMap(tag -> tag.optional("worlds:generator").map(Tag::getAsString)).map(serialized ->
-                Generator.of(plugin, serialized)).orElse(null);
+                SimpleGenerator.of(plugin, serialized)).orElse(null);
         final var settings = data.flatMap(tag -> tag.<CompoundTag>optional("WorldGenSettings"));
         final var dimensions = settings.flatMap(tag -> tag.<CompoundTag>optional("dimensions"));
         final var dimension = dimensions.flatMap(tag -> tag.<CompoundTag>optional(levelStem.dimensionType().key().asString()));

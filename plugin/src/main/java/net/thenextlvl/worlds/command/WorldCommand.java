@@ -6,7 +6,6 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.generator.Generator;
 import net.thenextlvl.worlds.command.argument.GeneratorArgument;
 import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.argument.WorldArgument;
@@ -56,7 +55,7 @@ public final class WorldCommand extends BrigadierCommand {
         return Commands.argument("key", new KeyArgument());
     }
 
-    public static RequiredArgumentBuilder<CommandSourceStack, Generator> generatorArgument(final WorldsPlugin plugin) {
+    public static RequiredArgumentBuilder<CommandSourceStack, SimpleGenerator> generatorArgument(final WorldsPlugin plugin) {
         return Commands.argument("generator", new GeneratorArgument(plugin));
     }
 }

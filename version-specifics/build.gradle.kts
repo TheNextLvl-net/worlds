@@ -10,7 +10,6 @@ dependencies {
 
 subprojects {
     apply(plugin = "io.papermc.paperweight.userdev")
-    apply(plugin = "java-library")
 
     dependencies {
         "compileOnly"("dev.faststats.metrics:core:0.21.0")

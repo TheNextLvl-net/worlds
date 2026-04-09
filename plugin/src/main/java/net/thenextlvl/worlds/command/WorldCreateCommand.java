@@ -10,11 +10,11 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.worlds.WorldsPlugin;
-import net.thenextlvl.worlds.api.generator.Generator;
-import net.thenextlvl.worlds.api.generator.GeneratorType;
-import net.thenextlvl.worlds.api.generator.LevelStem;
+import net.thenextlvl.worlds.v4.generator.SimpleGenerator;
+import net.thenextlvl.worlds.experimental.GeneratorType;
+import net.thenextlvl.worlds.LevelStem;
 import net.thenextlvl.worlds.api.level.Level;
-import net.thenextlvl.worlds.api.preset.Preset;
+import net.thenextlvl.worlds.preset.Preset;
 import net.thenextlvl.worlds.command.argument.GeneratorArgument;
 import net.thenextlvl.worlds.command.argument.GeneratorTypeArgument;
 import net.thenextlvl.worlds.command.argument.KeyArgument;
@@ -99,7 +99,7 @@ final class WorldCreateCommand extends OptionCommand {
         } else try {
             return plugin.levelBuilder(plugin.levelView().findFreePath(name))
                     .levelStem(tryGetArgument(context, "dimension", LevelStem.class).orElse(null))
-                    .generator(tryGetArgument(context, "generator", Generator.class).orElse(null))
+                    .generator(tryGetArgument(context, "generator", SimpleGenerator.class).orElse(null))
                     .key(tryGetArgument(context, "key", Key.class).orElse(null))
                     .preset(tryGetArgument(context, "preset", Preset.class).orElse(null))
                     .seed(tryGetArgument(context, "seed", Long.class).orElse(null))

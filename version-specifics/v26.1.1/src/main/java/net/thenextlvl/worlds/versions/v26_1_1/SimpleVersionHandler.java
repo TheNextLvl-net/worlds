@@ -42,8 +42,7 @@ import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraft.world.level.storage.SavedDataStorage;
-import net.thenextlvl.worlds.api.preset.Presets;
-import net.thenextlvl.worlds.api.view.LevelView;
+import net.thenextlvl.worlds.preset.Preset;
 import net.thenextlvl.worlds.versions.PluginAccess;
 import net.thenextlvl.worlds.versions.VersionHandler;
 import org.bukkit.Location;
@@ -153,7 +152,7 @@ public final class SimpleVersionHandler extends VersionHandler {
      * @see CraftServer#createWorld(org.bukkit.WorldCreator)
      */
     @Override
-    public CompletableFuture<World> createAsync(final net.thenextlvl.worlds.api.level.Level level, final LevelView levelView) {
+    public CompletableFuture<World> createAsync(final net.thenextlvl.worlds.Level level) {
         final var server = ((CraftServer) plugin.getServer());
         final var console = server.getServer();
 
@@ -180,11 +179,11 @@ public final class SimpleVersionHandler extends VersionHandler {
         /// Worlds start - find generator and biome provider
         final var chunkGenerator = level.getChunkGenerator()
                 .orElseGet(() -> level.getGenerator()
-                        .map(generator -> generator.generator(name))
+                        .flatMap(generator -> generator.generator(name))
                         .orElseGet(() -> server.getGenerator(name)));
         var biomeProvider = level.getBiomeProvider()
                 .orElseGet(() -> level.getGenerator()
-                        .map(generator -> generator.biomeProvider(name))
+                        .flatMap(generator -> generator.biomeProvider(name))
                         .orElseGet(() -> server.getBiomeProvider(name)));
         /// Worlds end
 
@@ -212,7 +211,7 @@ public final class SimpleVersionHandler extends VersionHandler {
         if (worldGenSettings == null) {
             final WorldOptions worldOptions = new WorldOptions(level.getSeed(), level.hasStructures(), level.hasBonusChest());
 
-            final var generatorSettings = level.getPreset().orElse(Presets.CLASSIC_FLAT).serialize(); /// Worlds - serialize preset
+            final var generatorSettings = level.getPreset().orElse(Preset.CLASSIC_FLAT).serialize(); /// Worlds - serialize preset
             final DedicatedServerProperties.WorldDimensionData properties = new DedicatedServerProperties.WorldDimensionData(generatorSettings, level.getGeneratorType().presetName().asString());
             final WorldDimensions worldDimensions = properties.create(context.datapackWorldgen());
 
@@ -268,7 +267,7 @@ public final class SimpleVersionHandler extends VersionHandler {
                 customStem,
                 primaryLevelData.isDebugWorld(),
                 biomeZoomSeed,
-                level.getLevelStem() == net.thenextlvl.worlds.api.generator.LevelStem.OVERWORLD ? list : ImmutableList.of(),
+                level.getLevelStem() == net.thenextlvl.worlds.LevelStem.OVERWORLD ? list : ImmutableList.of(),
                 true,
                 actualDimension,
                 toBukkit(level.getLevelStem().dimensionType()),
@@ -403,7 +402,7 @@ public final class SimpleVersionHandler extends VersionHandler {
         serverLevel.setSpawnSettings(true);
 
         /// Worlds start - persist world extra data
-        persistWorld(levelView, serverLevel.getWorld(), level.getLevelStem(), level.isEnabled().toBooleanOrElse(true));
+        persistWorld(serverLevel.getWorld(), level.getLevelStem(), level.isEnabled().toBooleanOrElse(true));
         level.getGenerator().ifPresent(generator -> persistGenerator(serverLevel.getWorld(), generator));
         /// Worlds end
 
@@ -450,11 +449,11 @@ public final class SimpleVersionHandler extends VersionHandler {
         return builder.buildKeepingLast();
     }
 
-    private ResourceKey<LevelStem> resolveDimensionKey(final net.thenextlvl.worlds.api.level.Level level) {
-        if (level.getLevelStem().equals(net.thenextlvl.worlds.api.generator.LevelStem.OVERWORLD))
+    private ResourceKey<LevelStem> resolveDimensionKey(final net.thenextlvl.worlds.Level level) {
+        if (level.getLevelStem().equals(net.thenextlvl.worlds.LevelStem.OVERWORLD))
             return LevelStem.OVERWORLD;
-        if (level.getLevelStem().equals(net.thenextlvl.worlds.api.generator.LevelStem.NETHER)) return LevelStem.NETHER;
-        if (level.getLevelStem().equals(net.thenextlvl.worlds.api.generator.LevelStem.END)) return LevelStem.END;
+        if (level.getLevelStem().equals(net.thenextlvl.worlds.LevelStem.NETHER)) return LevelStem.NETHER;
+        if (level.getLevelStem().equals(net.thenextlvl.worlds.LevelStem.END)) return LevelStem.END;
         throw new IllegalArgumentException("Illegal dimension (" + level.getLevelStem() + ")");
     }
 

@@ -7,10 +7,7 @@ import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.i18n.ComponentBundle;
-import net.thenextlvl.worlds.api.WorldsProvider;
-import net.thenextlvl.worlds.api.generator.LevelStem;
-import net.thenextlvl.worlds.api.level.Level;
-import net.thenextlvl.worlds.api.view.GeneratorView;
+import net.thenextlvl.worlds.generator.GeneratorView;
 import net.thenextlvl.worlds.command.SaveAllCommand;
 import net.thenextlvl.worlds.command.SaveOffCommand;
 import net.thenextlvl.worlds.command.SaveOnCommand;
@@ -28,7 +25,6 @@ import net.thenextlvl.worlds.versions.PluginAccess;
 import net.thenextlvl.worlds.versions.VersionHandler;
 import net.thenextlvl.worlds.view.FoliaLevelView;
 import net.thenextlvl.worlds.view.PaperLevelView;
-import net.thenextlvl.worlds.view.PluginGeneratorView;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
@@ -48,7 +44,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @NullMarked
-public final class WorldsPlugin extends JavaPlugin implements WorldsProvider, PluginAccess {
+public final class WorldsPlugin extends JavaPlugin implements PluginAccess {
     public static final String ISSUES = "https://github.com/TheNextLvl-net/worlds/issues/new?template=bug_report.yml";
     public static final boolean RUNNING_FOLIA = ServerBuildInfo.buildInfo().isBrandCompatible(Key.key("papermc", "folia"));
 
@@ -58,7 +54,7 @@ public final class WorldsPlugin extends JavaPlugin implements WorldsProvider, Pl
             .ignoreError(IllegalStateException.class, "World mismatch: expected .* but got .*")
             .ignoreErrorType(AccessDeniedException.class);
 
-    private final GeneratorView generatorView = new PluginGeneratorView();
+    private final GeneratorView generatorView = new net.thenextlvl.worlds.v4.generator.SimpleGeneratorView();
     private final PaperLevelView levelView = versionHandler.foliaSupport()
             .<PaperLevelView>map(support -> new FoliaLevelView(this, support))
             .orElseGet(() -> new PaperLevelView(this));
