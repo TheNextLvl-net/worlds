@@ -11,20 +11,21 @@ import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.Set;
+import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
 
-public interface Level extends Keyed {
-    @Contract(pure = true)
+public sealed interface Level extends Keyed permits SimpleLevel {
     Path getDirectory();
-
+    
     @Contract(pure = true)
     String getName();
+
+    @Contract(pure = true)
+    Environment getEnvironment();
 
     @Contract(pure = true)
     long getSeed();
@@ -53,15 +54,9 @@ public interface Level extends Keyed {
     @Contract(pure = true)
     Optional<Preset> getPreset();
 
-    @Unmodifiable
-    @Contract(pure = true)
-    Set<World> getDimensions();
+    CompletableFuture<World> create();
 
     // todo: Stuff that has to go
-
-    @ApiStatus.Experimental
-    @Contract(pure = true)
-    LevelStem getLevelStem();
 
     @ApiStatus.Experimental
     TriState isEnabled();
@@ -74,82 +69,70 @@ public interface Level extends Keyed {
 
     // todo end
 
-    @Unmodifiable
-    @Contract(pure = true)
-    Set<Key> getDimensionKeys();
-
-    @Contract(pure = true)
-    Optional<World> getDimension(Key key);
-
-    @Contract(mutates = "this")
-    CompletableFuture<World> createDimension(Key key, LevelStem stem);
-
-    @Contract(mutates = "this")
-    CompletableFuture<World> loadDimension(Key key);
-
     @Contract(pure = true)
     Builder toBuilder();
 
-    interface Builder {
+    static Builder builder(final Key key) {
+        return new SimpleLevel.Builder(key);
+    }
 
+    sealed interface Builder permits SimpleLevel.Builder {
         @Contract(pure = true)
-        Path directory();
+        Key key();
 
         @Contract(mutates = "this")
-        Builder directory(Path directory);
+        Builder key(Key key);
 
-        @Nullable
         @Contract(pure = true)
-        String name();
+        Optional<String> name();
 
         @Contract(mutates = "this")
         Builder name(@Nullable String name);
 
-        @Nullable
         @Contract(pure = true)
-        Long seed();
+        Optional<Environment> environment();
+
+        @Contract(mutates = "this")
+        Builder environment(@Nullable Environment environment);
+
+        @Contract(pure = true)
+        OptionalLong seed();
 
         @Contract(mutates = "this")
         Builder seed(@Nullable Long seed);
 
-        @Nullable
         @Contract(pure = true)
-        Boolean hardcore();
+        Optional<Boolean> hardcore();
 
         @Contract(mutates = "this")
         Builder hardcore(@Nullable Boolean hardcore);
 
-        @Nullable
         @Contract(pure = true)
-        Boolean structures();
+        Optional<Boolean> structures();
 
         @Contract(mutates = "this")
         Builder structures(@Nullable Boolean structures);
 
-        @Nullable
         @Contract(pure = true)
-        Boolean bonusChest();
+        Optional<Boolean> bonusChest();
 
         @Contract(mutates = "this")
         Builder bonusChest(@Nullable Boolean bonusChest);
 
-        @Nullable
         @Contract(pure = true)
-        GeneratorType generatorType();
+        Optional<GeneratorType> generatorType();
 
         @Contract(mutates = "this")
         Builder generatorType(@Nullable GeneratorType generatorType);
 
-        @Nullable
         @Contract(pure = true)
-        Generator generator();
+        Optional<Generator> generator();
 
         @Contract(mutates = "this")
         Builder generator(@Nullable Generator generator);
 
-        @Nullable
         @Contract(pure = true)
-        Preset preset();
+        Optional<Preset> preset();
 
         @Contract(mutates = "this")
         Builder preset(@Nullable Preset preset);

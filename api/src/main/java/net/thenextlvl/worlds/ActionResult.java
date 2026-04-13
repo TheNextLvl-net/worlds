@@ -1,14 +1,13 @@
 package net.thenextlvl.worlds;
 
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.Nullable;
 
-@ApiStatus.NonExtendable
-public interface ActionResult<T> {
-    @Nullable
+import java.util.Optional;
+
+public sealed interface ActionResult<T> permits SimpleActionResult {
     @Contract(pure = true)
-    T result();
+    Optional<T> result();
 
     @Contract(pure = true)
     Status status();
@@ -16,6 +15,10 @@ public interface ActionResult<T> {
     @Contract(pure = true)
     default boolean isSuccess() {
         return status() == Status.SUCCESS || status() == Status.SCHEDULED;
+    }
+
+    static <T> ActionResult<T> result(@Nullable final T result, final Status status) {
+        return new SimpleActionResult<T>(result, status);
     }
 
     enum Status {

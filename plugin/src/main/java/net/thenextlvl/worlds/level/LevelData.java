@@ -182,7 +182,7 @@ public abstract class LevelData implements Level {
                 .structures(structures)
                 .bonusChest(bonusChest)
                 .seed(seed);
-    }
+    }   
 
     public static class Builder implements Level.Builder {
         private final WorldsPlugin plugin;

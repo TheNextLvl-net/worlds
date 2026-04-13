@@ -4,26 +4,31 @@ import net.thenextlvl.binder.StaticBinder;
 import org.bukkit.PortalType;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public interface WorldsAccess extends WorldOperations, Plugin {
+@ApiStatus.NonExtendable
+public interface WorldsAccess extends Plugin {
     @Contract(pure = true)
     static WorldsAccess access() {
-        return StaticBinder.getInstance(WorldsAccess.class.getClassLoader()).find(WorldsAccess.class);
+        final class Cache {
+            private static final WorldsAccess INSTANCE = StaticBinder.getInstance(WorldsAccess.class.getClassLoader()).find(WorldsAccess.class);
+        }
+        return Cache.INSTANCE;
     }
     // todo: Stuff that has to go
-    
-    Optional<World> getTarget(World world, PortalType type);
-    
-    // todo end
 
-    @Contract(value = "_ -> new", pure = true)
-    Level.Builder levelBuilder(Path directory);
+    Optional<World> getTarget(World world, PortalType type);
+
+    // todo end
+    
+    Path getWorldContainer();
 
     @Contract(pure = true)
     Level getLevel(World world);
@@ -43,6 +48,11 @@ public interface WorldsAccess extends WorldOperations, Plugin {
     @Contract(value = "_ -> new", pure = true)
     Optional<Level.Builder> read(Path directory);
 
+    @Contract(value = "_ -> new", pure = true)
+    CompletableFuture<ActionResult<World>> load(Path directory);
+
+    CompletableFuture<World> create(Level level);
+
     @Contract(mutates = "param1")
     CompletableFuture<Boolean> unload(World world, boolean save);
 
@@ -50,12 +60,16 @@ public interface WorldsAccess extends WorldOperations, Plugin {
     CompletableFuture<Boolean> save(World world, boolean flush);
 
     @Contract(mutates = "param1")
-    default CompletableFuture<ActionResult<World>> clone(final World world, final boolean full) {
-        return clone(world, getLevel(world), full);
-    }
+    CompletableFuture<ActionResult<World>> clone(World world, boolean full);
 
     @Contract(mutates = "param1")
-    CompletableFuture<ActionResult<World>> clone(World world, Level level, boolean full);
+    CompletableFuture<ActionResult<Void>> delete(World world);
+
+    @Contract(mutates = "param1")
+    CompletableFuture<ActionResult<World>> regenerate(World world);
+
+    @Contract(mutates = "param1")
+    CompletableFuture<ActionResult<World>> regenerate(World world, Consumer<Level.Builder> builder);
 
     @Contract(pure = true)
     boolean isEnabled(World world);

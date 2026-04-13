@@ -1,10 +1,9 @@
 package net.thenextlvl.worlds.versions;
 
+import net.thenextlvl.worlds.Environment;
 import net.thenextlvl.worlds.Level;
 import net.thenextlvl.worlds.WorldsAccess;
-import net.thenextlvl.worlds.experimental.DimensionType;
 import net.thenextlvl.worlds.generator.Generator;
-import net.thenextlvl.worlds.LevelStem;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -62,18 +61,18 @@ public abstract class VersionHandler {
 
     public abstract String findAvailableName(Path path, String name, String format) throws IOException;
 
-    protected World.Environment toBukkit(final DimensionType type) {
-        if (type.equals(DimensionType.OVERWORLD)) return World.Environment.NORMAL;
-        if (type.equals(DimensionType.THE_NETHER)) return World.Environment.NETHER;
-        if (type.equals(DimensionType.THE_END)) return World.Environment.THE_END;
+    protected World.Environment toBukkit(final Environment environment) {
+        if (environment.equals(Environment.OVERWORLD)) return World.Environment.NORMAL;
+        if (environment.equals(Environment.THE_NETHER)) return World.Environment.NETHER;
+        if (environment.equals(Environment.THE_END)) return World.Environment.THE_END;
         return World.Environment.CUSTOM;
     }
 
-    protected void persistWorld(final World world, final LevelStem dimension, final boolean enabled) {
+    protected void persistWorld(final World world, final Environment environment, final boolean enabled) {
         final var worldKey = new NamespacedKey("worlds", "world_key");
         final var dimensionKey = new NamespacedKey("worlds", "dimension");
         world.getPersistentDataContainer().set(worldKey, STRING, world.key().asString());
-        world.getPersistentDataContainer().set(dimensionKey, STRING, dimension.dimensionType().key().asString());
+        world.getPersistentDataContainer().set(dimensionKey, STRING, environment.key().asString());
         WorldsAccess.access().setEnabled(world, enabled);
     }
 

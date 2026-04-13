@@ -87,24 +87,24 @@ public sealed interface Preset permits SimplePreset {
      * Layers are serialized into a comma-separated string, followed by a semicolon
      * and the biome string representation.
      * <p>
-     * This is a lossy conversion. If you want to save this preset, use {@link #serialize()}.
+     * This is a lossy conversion. If you want to save this preset, use {@link #toJson()}.
      *
      * @return a {@code String} containing the serialized layers and biome information of the preset
      * @since 4.0.0
      */
     @Contract(pure = true)
-    String toPresetCode();
+    String asString();
 
     /**
      * Serialize this preset into a JSON object.
      * <a href="https://minecraft.wiki/w/Superflat#Multiplayer">Wiki</a>
      *
      * @return the serialized preset as a JsonObject
-     * @see #deserialize(JsonObject)
+     * @see #fromJson(JsonObject)
      * @since 4.0.0
      */
     @Contract(value = " -> new", pure = true)
-    JsonObject serialize();
+    JsonObject toJson();
 
     /**
      * Creates a new {@link Builder} pre-populated with the values of this preset.
@@ -125,14 +125,14 @@ public sealed interface Preset permits SimplePreset {
      * If the material is invalid or the format is incorrect,
      * an {@code IllegalArgumentException} is thrown.
      *
-     * @param presetCode the preset code string to parse in the expected format
+     * @param string the preset code string to parse in the expected format
      * @return a {@code Preset} object configured with the layers and biome described in the preset code
      * @throws IllegalArgumentException if the preset code contains invalid materials or does not adhere to the required format
      * @since 4.0.0
      */
     @Contract(value = "_ -> new", pure = true)
-    static Preset parse(final String presetCode) {
-        return SimplePreset.parse(presetCode);
+    static Preset fromString(final String string) {
+        return SimplePreset.fromString(string);
     }
 
     /**
@@ -142,12 +142,12 @@ public sealed interface Preset permits SimplePreset {
      * @param json the JSON object to deserialize
      * @return the deserialized preset
      * @throws IllegalArgumentException if no layers are provided
-     * @see #serialize()
+     * @see #toJson()
      * @since 4.0.0
      */
     @Contract(value = "_ -> new", pure = true)
-    static Preset deserialize(final JsonObject json) {
-        return SimplePreset.deserialize(json);
+    static Preset fromJson(final JsonObject json) {
+        return SimplePreset.fromJson(json);
     }
 
     /**

@@ -15,6 +15,7 @@ module net.thenextlvl.worlds {
     requires net.kyori.examination.api;
     requires net.thenextlvl.binder;
     requires org.bukkit;
+    requires org.slf4j;
 
     requires static org.jetbrains.annotations;
     requires static org.jspecify;

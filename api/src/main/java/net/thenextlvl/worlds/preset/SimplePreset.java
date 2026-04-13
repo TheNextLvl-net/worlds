@@ -71,7 +71,7 @@ final class SimplePreset implements Preset {
     }
 
     @Override
-    public String toPresetCode() {
+    public String asString() {
         final var layers = this.layers.stream()
                 .map(Layer::toString)
                 .collect(Collectors.joining(","));
@@ -79,7 +79,7 @@ final class SimplePreset implements Preset {
     }
 
     @Override
-    public JsonObject serialize() {
+    public JsonObject toJson() {
         final var root = new JsonObject();
         final var layers = new JsonArray();
         final var structures = new JsonArray();
@@ -185,7 +185,7 @@ final class SimplePreset implements Preset {
     }
 
     @SuppressWarnings("PatternValidation")
-    public static Preset parse(final String presetCode) {
+    public static Preset fromString(final String presetCode) {
         final var strings = presetCode.split(";", 2);
         final var layers = Arrays.stream(strings[0].split(",")).map(layer -> {
             final var parameters = layer.split("\\*", 2);
@@ -199,7 +199,7 @@ final class SimplePreset implements Preset {
     }
 
     @SuppressWarnings("PatternValidation")
-    public static Preset deserialize(final JsonObject object) throws IllegalArgumentException {
+    public static Preset fromJson(final JsonObject object) throws IllegalArgumentException {
         Preconditions.checkArgument(object.has("layers"), "Missing layers");
         final var preset = Preset.builder().name(object.has("name") ? object.get("name").getAsString() : null);
         if (object.has("biome")) preset.biome(Biome.literal(object.get("biome").getAsString()));

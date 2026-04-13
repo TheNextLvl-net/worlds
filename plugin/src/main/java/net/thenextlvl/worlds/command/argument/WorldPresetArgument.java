@@ -52,7 +52,7 @@ public final class WorldPresetArgument implements SimpleArgumentType<Preset, Str
                 Files.newInputStream(file)
         ), StandardCharsets.UTF_8))) {
             final var root = JsonParser.parseReader(jsonReader);
-            if (root.isJsonObject()) return Preset.deserialize(root.getAsJsonObject());
+            if (root.isJsonObject()) return Preset.fromJson(root.getAsJsonObject());
             throw new IllegalStateException("Not a valid preset");
         } catch (final IOException e) {
             throw new IllegalStateException("Not a valid preset", e);

@@ -47,6 +47,7 @@ import net.minecraft.world.level.storage.LevelDataAndDimensions;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraft.world.level.validation.ContentValidationException;
+import net.thenextlvl.worlds.Environment;
 import net.thenextlvl.worlds.experimental.GeneratorType;
 import net.thenextlvl.worlds.preset.Preset;
 import net.thenextlvl.worlds.versions.PluginAccess;
@@ -240,7 +241,7 @@ public class SimpleVersionHandler extends VersionHandler {
             final WorldOptions worldOptions = new WorldOptions(level.getSeed(), level.hasStructures(), level.hasBonusChest());
             WorldDimensions worldDimensions;
 
-            final var generatorSettings = level.getPreset().orElse(Preset.CLASSIC_FLAT).serialize(); /// Worlds - serialize preset
+            final var generatorSettings = level.getPreset().orElse(Preset.CLASSIC_FLAT).toJson(); /// Worlds - serialize preset
             final DedicatedServerProperties.WorldDimensionData properties = new DedicatedServerProperties.WorldDimensionData(generatorSettings, level.getGeneratorType().presetName().asString());
             levelSettings = new LevelSettings(
                     name,
@@ -281,7 +282,7 @@ public class SimpleVersionHandler extends VersionHandler {
         );
         final LevelStem customStem = contextLevelStemRegistry.getValueOrThrow(dimensionType);
 
-        final WorldInfo worldInfo = new CraftWorldInfo(primaryLevelData, levelStorageAccess, toBukkit(level.getLevelStem().dimensionType()), customStem.type().value(), customStem.generator(), server.getHandle().getServer().registryAccess());
+        final WorldInfo worldInfo = new CraftWorldInfo(primaryLevelData, levelStorageAccess, toBukkit(level.getEnvironment()), customStem.type().value(), customStem.generator(), server.getHandle().getServer().registryAccess());
         if (biomeProvider == null && chunkGenerator != null) {
             biomeProvider = chunkGenerator.getDefaultBiomeProvider(worldInfo);
         }
@@ -305,10 +306,10 @@ public class SimpleVersionHandler extends VersionHandler {
                 customStem,
                 primaryLevelData.isDebugWorld(),
                 seed,
-                level.getLevelStem() == net.thenextlvl.worlds.LevelStem.OVERWORLD ? list : ImmutableList.of(), ///  Worlds
+                level.getEnvironment() == Environment.OVERWORLD ? list : ImmutableList.of(), ///  Worlds
                 true,
                 console.overworld().getRandomSequences(),
-                toBukkit(level.getLevelStem().dimensionType()),
+                toBukkit(level.getEnvironment()),
                 chunkGenerator, biomeProvider
         );
 
@@ -331,7 +332,7 @@ public class SimpleVersionHandler extends VersionHandler {
         serverLevel.setSpawnSettings(true);
 
         /// Worlds start - persist world extra data
-        persistWorld(serverLevel.getWorld(), level.getLevelStem(), level.isEnabled().toBooleanOrElse(true));
+        persistWorld(serverLevel.getWorld(), level.getEnvironment(), level.isEnabled().toBooleanOrElse(true));
         level.getGenerator().ifPresent(generator -> persistGenerator(serverLevel.getWorld(), generator));
         /// Worlds end
 
@@ -379,11 +380,10 @@ public class SimpleVersionHandler extends VersionHandler {
     }
 
     private ResourceKey<LevelStem> resolveDimensionKey(final net.thenextlvl.worlds.Level level) {
-        if (level.getLevelStem().equals(net.thenextlvl.worlds.LevelStem.OVERWORLD))
-            return LevelStem.OVERWORLD;
-        if (level.getLevelStem().equals(net.thenextlvl.worlds.LevelStem.NETHER)) return LevelStem.NETHER;
-        if (level.getLevelStem().equals(net.thenextlvl.worlds.LevelStem.END)) return LevelStem.END;
-        throw new IllegalArgumentException("Illegal dimension (" + level.getLevelStem() + ")");
+        if (level.getEnvironment().equals(Environment.OVERWORLD)) return LevelStem.OVERWORLD;
+        if (level.getEnvironment().equals(Environment.THE_NETHER)) return LevelStem.NETHER;
+        if (level.getEnvironment().equals(Environment.THE_END)) return LevelStem.END;
+        throw new IllegalArgumentException("Illegal dimension (" + level.getEnvironment() + ")");
     }
 
     @Override
