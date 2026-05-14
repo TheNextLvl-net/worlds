@@ -3,8 +3,10 @@ package net.thenextlvl.worlds.listener;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.worlds.Dimension;
 import net.thenextlvl.worlds.Level;
+import net.thenextlvl.worlds.WorldOperationException;
 import net.thenextlvl.worlds.WorldRegistry;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.command.CommandFailureHandler;
 import net.thenextlvl.worlds.generator.Generator;
 import net.thenextlvl.worlds.generator.GeneratorException;
 import org.bukkit.World;
@@ -133,11 +135,14 @@ public final class WorldListener implements Listener {
         return data.key();
     }
 
+    // fixme: this is a pain
     private <T> @Nullable T handleCreationException(final Throwable throwable, final Key key) {
         final var t = throwable.getCause() != null ? throwable.getCause() : throwable;
         if (plugin.handler().isDirectoryLockException(t)) {
             plugin.getComponentLogger().error("Failed to start the minecraft server", t);
             plugin.getServer().shutdown();
+        } else if (t instanceof WorldOperationException || t instanceof GeneratorException) {
+            CommandFailureHandler.handle(plugin, plugin.getServer().getConsoleSender(), t);
         } else {
             plugin.getComponentLogger().error("An unexpected error occurred while loading the level {}", key, t);
             plugin.getComponentLogger().error("Please report the error above on GitHub: {}", WorldsPlugin.ISSUES);
