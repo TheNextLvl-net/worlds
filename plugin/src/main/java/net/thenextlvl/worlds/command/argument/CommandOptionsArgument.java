@@ -93,6 +93,17 @@ public final class CommandOptionsArgument implements CustomArgumentType<CommandO
     }
 
     public static final class Options extends HashSet<String> {
+        private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER = Map.ofEntries(
+                Map.entry(boolean.class, Boolean.class),
+                Map.entry(byte.class, Byte.class),
+                Map.entry(short.class, Short.class),
+                Map.entry(char.class, Character.class),
+                Map.entry(int.class, Integer.class),
+                Map.entry(long.class, Long.class),
+                Map.entry(float.class, Float.class),
+                Map.entry(double.class, Double.class)
+        );
+
         private final Map<String, Object> arguments = new LinkedHashMap<>();
 
         private void put(final String option, final Object argument) {
@@ -100,9 +111,15 @@ public final class CommandOptionsArgument implements CustomArgumentType<CommandO
             arguments.put(option, argument);
         }
 
+        @SuppressWarnings("unchecked")
         public <T> Optional<T> getArgument(final String option, final Class<T> type) {
             final var argument = arguments.get(option);
-            return argument != null ? Optional.of(type.cast(argument)) : Optional.empty();
+
+            if (argument == null) return Optional.empty();
+
+            if (PRIMITIVE_TO_WRAPPER.getOrDefault(type, type).isAssignableFrom(argument.getClass()))
+                return Optional.of((T) argument);
+            throw new IllegalArgumentException("Argument '" + option + "' is defined as " + argument.getClass().getSimpleName() + ", not " + type);
         }
     }
 
