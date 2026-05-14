@@ -124,7 +124,7 @@ final class WorldCreateCommand extends BrigadierCommand {
 
         final var options = tryGetArgument(context, "options", CommandOptionsArgument.Options.class)
                 .orElseGet(CommandOptionsArgument.Options::new);
-        final var bonusChest = options.getArgument("bonus-chest", boolean.class).orElse(null);
+        final var bonusChest = options.getArgument("bonus-chest", Boolean.class).orElse(null);
         final var dimension = options.getArgument("dimension", Dimension.class).orElse(null);
         final var hardcore = options.getArgument("hardcore", Boolean.class).orElse(null);
         final var seed = options.getArgument("seed", Long.class).orElse(null);
