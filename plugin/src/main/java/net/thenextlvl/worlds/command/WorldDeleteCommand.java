@@ -60,12 +60,12 @@ final class WorldDeleteCommand extends SimpleCommand {
             return SINGLE_SUCCESS;
         }
 
+        if (!schedule) plugin.bundle().sendMessage(context.getSource().getSender(), "world.delete",
+                Placeholder.parsed("world", world.key().asString()));
         final var future = !schedule ? plugin.delete(world)
                 : CompletableFuture.completedFuture(plugin.getScheduler().schedule(
                 new OperationScheduler.DeleteOperation(world.key())
         ));
-        if (!schedule) plugin.bundle().sendMessage(context.getSource().getSender(), "world.delete",
-                Placeholder.parsed("world", world.key().asString()));
         future.thenAccept(success -> {
             if (success) {
                 final var message = schedule ? "world.delete.scheduled" : "world.delete.success";
