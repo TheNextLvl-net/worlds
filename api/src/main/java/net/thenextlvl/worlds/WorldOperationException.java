@@ -2,10 +2,13 @@ package net.thenextlvl.worlds;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.translation.Translatable;
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 
+// todo: replace with a more robust solution
+@ApiStatus.Internal
 public final class WorldOperationException extends RuntimeException {
     private final Reason reason;
     private final @Nullable String key;
