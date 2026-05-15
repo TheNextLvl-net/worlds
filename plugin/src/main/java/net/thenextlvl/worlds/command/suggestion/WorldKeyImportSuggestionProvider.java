@@ -8,13 +8,14 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.worlds.WorldsPlugin;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 @NullMarked
-// todo: make this more readable
 public final class WorldKeyImportSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
     private final WorldsPlugin plugin;
 
@@ -31,37 +32,34 @@ public final class WorldKeyImportSuggestionProvider implements SuggestionProvide
 
     private void suggestModern(final SuggestionsBuilder builder) {
         try (final var entries = plugin.modernWorldRegistry().listEntries(plugin.getServer().getWorldContainer().toPath())) {
-            entries.forEach(entry -> {
-                if (entry.getValue().keyImportable()) suggest(builder, entry.getValue().key());
-                else suggest(builder, entry.getKey());
-            });
+            entries.map(entry -> entry.getValue().keyImportable()
+                            ? suggestion(entry.getValue().key())
+                            : suggestion(entry.getKey()))
+                    .filter(Objects::nonNull)
+                    .filter(suggestion -> suggestion.contains(builder.getRemaining()))
+                    .forEach(builder::suggest);
         } catch (final IOException ignored) {
         }
     }
 
     private void suggestLegacyPaths(final SuggestionsBuilder builder) {
         try (final var paths = plugin.legacyWorldRegistry().listPaths(plugin.getServer().getWorldContainer().toPath())) {
-            paths.forEach(path -> suggest(builder, path));
+            paths.map(this::suggestion)
+                    .filter(suggestion -> suggestion.contains(builder.getRemaining()))
+                    .forEach(builder::suggest);
         } catch (final IOException ignored) {
         }
     }
 
-    private void suggest(final SuggestionsBuilder builder, final Key key) {
-        if (plugin.getWorldRegistry().isRegistered(key)) return;
-        final var suggestion = key.asString();
-        if (suggestion.contains(builder.getRemaining())) builder.suggest(suggestion);
-    }
-
-    private void suggest(final SuggestionsBuilder builder, final Path path) {
-        final var suggestion = escape(suggestion(path.toAbsolutePath().normalize()));
-        if (suggestion.contains(builder.getRemaining())) builder.suggest(suggestion);
-    }
-
-    private String escape(final String string) {
-        return "\"" + string + "\"";
+    private @Nullable String suggestion(final Key key) {
+        return plugin.getWorldRegistry().isRegistered(key) ? null : key.asString();
     }
 
     private String suggestion(final Path path) {
+        return "\"" + relativeSuggestion(path.toAbsolutePath().normalize()) + "\"";
+    }
+
+    private String relativeSuggestion(final Path path) {
         final var directory = Path.of("").toAbsolutePath().normalize();
         return path.startsWith(directory) ? directory.relativize(path).toString() : path.toString();
     }
