@@ -39,6 +39,7 @@ public final class WorldPathKeyImportSuggestionProvider implements SuggestionPro
                 : plugin.getServer().getWorldContainer().toPath().resolve(input)
         ).toAbsolutePath().normalize();
         return plugin.legacyWorldRegistry().read(source).map(LegacyWorldRegistry.LegacyWorldData::key)
-                .or(() -> plugin.modernWorldRegistry().read(source).map(ModernWorldRegistry.ModernWorldData::key));
+                .or(() -> plugin.modernWorldRegistry().read(source).map(ModernWorldRegistry.ModernWorldData::key))
+                .or(() -> plugin.levelView().lenientKey(source));
     }
 }
