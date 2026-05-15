@@ -134,15 +134,10 @@ final class WorldListCommand extends SimpleCommand {
 
         private Component component(final WorldsPlugin plugin, final CommandSender sender, final boolean last) {
             final var key = key().asString();
-            final var placeholders = dimension != null
-                    ? new TagResolver[]{
+            final var placeholders = new TagResolver[]{
                     Placeholder.parsed("tree", last ? "└" : "├"),
                     Placeholder.component("world", label()),
-                    Placeholder.parsed("dimension", WorldListCommand.displayDimension(dimension)),
-            } : new TagResolver[]{
-                    Placeholder.parsed("tree", last ? "└" : "├"),
-                    Placeholder.component("world", label()),
-                    Placeholder.parsed("dimension", "unknown"),
+                    Placeholder.parsed("dimension", displayDimension()),
             };
             final var suffix = state.equals(State.UNIMPORTED) ? " " : "";
             return plugin.bundle().component(state.translationKey, sender, placeholders)
@@ -170,6 +165,10 @@ final class WorldListCommand extends SimpleCommand {
 
         private Component label() {
             return Component.text(key.value());
+        }
+
+        private String displayDimension() {
+            return dimension != null ? WorldListCommand.displayDimension(dimension) : "unknown";
         }
 
         @Override
