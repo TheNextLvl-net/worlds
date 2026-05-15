@@ -18,7 +18,6 @@ import net.thenextlvl.worlds.command.argument.GeneratorArgument;
 import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.brigadier.SimpleCommand;
 import net.thenextlvl.worlds.command.suggestion.WorldKeyImportSuggestionProvider;
-import net.thenextlvl.worlds.command.suggestion.WorldPathImportSuggestionProvider;
 import net.thenextlvl.worlds.command.suggestion.WorldPathKeyImportSuggestionProvider;
 import net.thenextlvl.worlds.generator.Generator;
 import net.thenextlvl.worlds.generator.GeneratorType;
@@ -27,6 +26,7 @@ import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -41,11 +41,11 @@ final class WorldImportCommand extends SimpleCommand {
 
     public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
         final var command = new WorldImportCommand(plugin);
+        final var importSuggestions = new WorldKeyImportSuggestionProvider(plugin);
 
-        final var key = Commands.argument("key", new KeyArgument())
-                .suggests(new WorldKeyImportSuggestionProvider(plugin));
+        final var key = Commands.argument("key", new KeyArgument());
         final var path = Commands.argument("path", StringArgumentType.string())
-                .suggests(new WorldPathImportSuggestionProvider(plugin));
+                .suggests(importSuggestions);
         final var pathKey = Commands.argument("key", new KeyArgument())
                 .suggests(new WorldPathKeyImportSuggestionProvider(plugin));
         return command.create()
@@ -115,46 +115,67 @@ final class WorldImportCommand extends SimpleCommand {
 
     private Path resolveSource(final String input) {
         final var path = Path.of(input);
-        if (path.isAbsolute() || path.getNameCount() != 1) throw new WorldOperationException(
-                WorldOperationException.Reason.WORLD_NOT_FOUND
-        ).path(path);
-        return plugin.getServer().getWorldContainer().toPath().resolve(path).normalize();
+        return path.isAbsolute()
+                ? path
+                : plugin.getServer().getWorldContainer().toPath().resolve(path);
     }
 
-    // todo: sorry future me but you have to clean up this mess :)
-    private void prepareSource(final Path source, final Level.Builder builder) {
+    private void prepareSource(final Path input, final Level.Builder builder) {
+        final var source = input.toAbsolutePath().normalize();
         if (!Files.isDirectory(source)) throw new WorldOperationException(
                 WorldOperationException.Reason.WORLD_NOT_FOUND
         ).path(source);
 
-        final var level = builder.build();
-        final var target = level.getDirectory();
-        final var normalizedSource = source.toAbsolutePath().normalize();
-        if (normalizedSource.equals(plugin.getServer().getLevelDirectory().toAbsolutePath().normalize()))
+        final var target = plugin.resolveLevelDirectory(builder.key()).toAbsolutePath().normalize();
+
+        ensureNotLoaded(source);
+        ensureTargetAvailable(source, target);
+
+        if (Files.isRegularFile(source.resolve("level.dat"))
+                || Files.isRegularFile(source.resolve("level.dat_old"))) {
+            builder.legacyName(source.getFileName().toString());
+            return;
+        }
+
+        if (!Files.isDirectory(source.resolve("region"))) {
+            throw new WorldOperationException(WorldOperationException.Reason.WORLD_NOT_FOUND).path(source);
+        }
+
+        prepareManagedSource(source, target);
+    }
+
+    private void ensureNotLoaded(final Path source) {
+        if (source.equals(plugin.getServer().getLevelDirectory().toAbsolutePath().normalize()))
             throw new WorldOperationException(WorldOperationException.Reason.WORLD_DIRECTORY_LOADED).path(source);
         if (plugin.getServer().getWorlds().stream()
                 .map(world -> world.getWorldPath().toAbsolutePath().normalize())
-                .anyMatch(normalizedSource::equals))
+                .anyMatch(source::equals))
             throw new WorldOperationException(WorldOperationException.Reason.WORLD_DIRECTORY_LOADED).path(source);
-        if (plugin.listLevels().map(path -> path.toAbsolutePath().normalize()).anyMatch(normalizedSource::equals))
+        if (plugin.listLevels().map(path -> path.toAbsolutePath().normalize()).anyMatch(source::equals))
             throw new WorldOperationException(WorldOperationException.Reason.WORLD_PATH_EXISTS).path(source);
-        if (Files.exists(target) && !normalizedSource.equals(target.toAbsolutePath().normalize()))
-            throw new WorldOperationException(
-                    Files.isDirectory(target)
-                            ? WorldOperationException.Reason.WORLD_PATH_EXISTS
-                            : WorldOperationException.Reason.TARGET_PATH_IS_FILE
+    }
+
+    private void ensureTargetAvailable(final Path source, final Path target) {
+        if (Files.exists(target) && !source.equals(target)) {
+            throw new WorldOperationException(Files.isDirectory(target)
+                    ? WorldOperationException.Reason.WORLD_PATH_EXISTS
+                    : WorldOperationException.Reason.TARGET_PATH_IS_FILE
             ).path(target);
-
-        if (!isLegacyWorld(source)) throw new WorldOperationException(
-                WorldOperationException.Reason.WORLD_NOT_FOUND
-        ).path(source);
-
-        builder.legacyName(source.getFileName().toString());
+        }
     }
 
-    private boolean isLegacyWorld(final Path source) {
-        return Files.isRegularFile(source.resolve("level.dat"))
-                || Files.isRegularFile(source.resolve("level.dat_old"));
+    private void prepareManagedSource(final Path source, final Path target) {
+        if (!source.equals(target)) try {
+            Files.createDirectories(target.getParent());
+            if (isInServerRoot(source)) Files.move(source, target);
+            else plugin.levelView().copyDirectory(source, target, null);
+        } catch (final IOException e) {
+            throw new WorldOperationException(WorldOperationException.Reason.INTERNAL_ERROR, e).path(target);
+        }
     }
 
+    private boolean isInServerRoot(final Path source) {
+        final var root = plugin.getServer().getWorldContainer().toPath().toAbsolutePath().normalize();
+        return source.startsWith(root);
+    }
 }
