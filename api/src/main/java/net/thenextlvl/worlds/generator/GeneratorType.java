@@ -4,7 +4,6 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;
 import net.thenextlvl.worlds.preset.Preset;
 import org.jetbrains.annotations.Contract;
-import org.jspecify.annotations.NullMarked;
 
 import java.util.stream.Stream;
 
@@ -17,8 +16,7 @@ import java.util.stream.Stream;
  *
  * @since 4.0.0
  */
-@NullMarked
-public sealed interface GeneratorType extends Keyed permits SimpleGeneratorType {
+public sealed interface GeneratorType extends Keyed permits GeneratorType.Flat, GeneratorType.SingleBiome, SimpleGeneratorType {
     /**
      * Represents the "amplified" generator type.
      * <a href="https://minecraft.wiki/w/Amplified">Wiki</a>
@@ -41,7 +39,7 @@ public sealed interface GeneratorType extends Keyed permits SimpleGeneratorType 
      *
      * @since 4.0.0
      */
-    Flat FLAT = new Flat(Preset.CLASSIC_FLAT);
+    Flat FLAT = new SimpleGeneratorType.Flat(Preset.CLASSIC_FLAT);
 
     /**
      * Represents the "large_biomes" generator type.
@@ -65,7 +63,7 @@ public sealed interface GeneratorType extends Keyed permits SimpleGeneratorType 
      *
      * @since 4.0.0
      */
-    SingleBiome SINGLE_BIOME = new SingleBiome(Key.key("minecraft", "plains"));
+    SingleBiome SINGLE_BIOME = new SimpleGeneratorType.SingleBiome(Key.key("minecraft", "plains"));
 
     /**
      * Returns the name of the generator type.
@@ -105,14 +103,7 @@ public sealed interface GeneratorType extends Keyed permits SimpleGeneratorType 
      *
      * @since 4.0.0
      */
-    final class Flat extends SimpleGeneratorType {
-        private final Preset preset;
-
-        private Flat(final Preset preset) {
-            super(Key.key("minecraft", "flat"), "flat");
-            this.preset = preset;
-        }
-
+    sealed interface Flat extends GeneratorType permits SimpleGeneratorType.Flat {
         /**
          * Creates a flat generator configuration with the specified preset.
          *
@@ -121,9 +112,7 @@ public sealed interface GeneratorType extends Keyed permits SimpleGeneratorType 
          * @since 4.0.0
          */
         @Contract(value = "_ -> new", pure = true)
-        public Flat with(final Preset preset) {
-            return new Flat(preset);
-        }
+        Flat with(final Preset preset);
 
         /**
          * Gets the preset used by this flat generator type.
@@ -132,16 +121,7 @@ public sealed interface GeneratorType extends Keyed permits SimpleGeneratorType 
          * @since 4.0.0
          */
         @Contract(pure = true)
-        public Preset preset() {
-            return preset;
-        }
-
-        @Override
-        public String toString() {
-            return "Flat{" +
-                    "preset=" + preset +
-                    '}';
-        }
+        Preset preset();
     }
 
     /**
@@ -150,14 +130,7 @@ public sealed interface GeneratorType extends Keyed permits SimpleGeneratorType 
      *
      * @since 4.0.0
      */
-    final class SingleBiome extends SimpleGeneratorType {
-        private final Key biome;
-
-        private SingleBiome(final Key biome) {
-            super(Key.key("minecraft", "fixed"), "single-biome");
-            this.biome = biome;
-        }
-
+    sealed interface SingleBiome extends GeneratorType permits SimpleGeneratorType.SingleBiome {
         /**
          * Creates a single-biome generator configuration with the specified biome.
          *
@@ -166,9 +139,7 @@ public sealed interface GeneratorType extends Keyed permits SimpleGeneratorType 
          * @since 4.0.0
          */
         @Contract(value = "_ -> new", pure = true)
-        public SingleBiome with(final Key biome) {
-            return new SingleBiome(biome);
-        }
+        SingleBiome with(final Key biome);
 
         /**
          * Gets the biome used by this single-biome generator type.
@@ -177,15 +148,6 @@ public sealed interface GeneratorType extends Keyed permits SimpleGeneratorType 
          * @since 4.0.0
          */
         @Contract(pure = true)
-        public Key biome() {
-            return biome;
-        }
-
-        @Override
-        public String toString() {
-            return "SingleBiome{" +
-                    "biome=" + biome +
-                    '}';
-        }
+        Key biome();
     }
 }
