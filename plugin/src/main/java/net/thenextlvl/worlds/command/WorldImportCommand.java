@@ -87,10 +87,10 @@ final class WorldImportCommand extends SimpleCommand {
                 .generatorType(GeneratorType.FLAT.with(Preset.THE_VOID))
                 .ignoreLevelData(true);
 
-        final var source = tryGetArgument(context, "path", String.class)
-                .map(this::resolveSource);
-        if (source.isPresent()) try {
-            prepareSource(source.get(), builder);
+        try {
+            tryGetArgument(context, "path", String.class)
+                    .map(this::resolveSource)
+                    .ifPresent(path -> prepareSource(path, builder));
         } catch (final RuntimeException e) {
             CommandFailureHandler.handle(plugin, sender, e, placeholder);
             return 0;
