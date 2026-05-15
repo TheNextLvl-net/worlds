@@ -109,13 +109,14 @@ public class PaperLevelView {
         final var dimensions = plugin.getDimensionsRoot().toAbsolutePath().normalize();
         final var absolute = directory.toAbsolutePath().normalize();
         final var relative = absolute.startsWith(dimensions) ? dimensions.relativize(absolute) : directory;
+        if (relative.getNameCount() < 2) return Optional.empty();
 
-        if (relative.getNameCount() != 2) return Optional.empty();
+        final var shortened = lastTwoSegments(relative);
 
-        final var namespace = relative.getName(0).toString();
+        final var namespace = shortened.getName(0).toString();
         if (!namespace.matches("[a-z0-9_\\-.]+")) return Optional.empty();
 
-        final var value = relative.getName(1).toString();
+        final var value = shortened.getName(1).toString();
         if (!value.matches("[a-z0-9_\\-./]+")) return Optional.empty();
 
         return Optional.of(Key.key(namespace, value));
@@ -125,16 +126,22 @@ public class PaperLevelView {
         final var dimensions = plugin.getDimensionsRoot().toAbsolutePath().normalize();
         final var absolute = directory.toAbsolutePath().normalize();
         final var relative = absolute.startsWith(dimensions) ? dimensions.relativize(absolute) : directory;
+        if (relative.getNameCount() < 2) return Optional.empty();
 
-        if (relative.getNameCount() != 2) return Optional.empty();
+        final var shortened = lastTwoSegments(relative);
 
-        final var namespace = createKey(relative.getName(0).toString());
-        if (namespace.isBlank() || !namespace.matches("[a-z0-9_\\-.]+")) return Optional.empty();
+        final var namespace = createKey(shortened.getName(0).toString());
+        if (!namespace.matches("[a-z0-9_\\-.]+")) return Optional.empty();
 
-        final var value = createKey(relative.getName(1).toString());
-        if (value.isBlank() || !value.matches("[a-z0-9_\\-./]+")) return Optional.empty();
+        final var value = createKey(shortened.getName(1).toString());
+        if (!value.matches("[a-z0-9_\\-./]+")) return Optional.empty();
 
         return Optional.of(Key.key(namespace, value));
+    }
+
+    private Path lastTwoSegments(final Path path) {
+        final var count = path.getNameCount();
+        return count > 2 ? path.subpath(count - 2, count) : path;
     }
     // todo: cleanup end
 

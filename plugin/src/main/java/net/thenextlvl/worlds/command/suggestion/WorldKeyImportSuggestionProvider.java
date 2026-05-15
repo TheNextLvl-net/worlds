@@ -7,14 +7,14 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.worlds.WorldsPlugin;
-import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
-import java.util.Objects;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @NullMarked
+// todo: make this more readable
 public final class WorldKeyImportSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
     private final WorldsPlugin plugin;
 
@@ -24,20 +24,45 @@ public final class WorldKeyImportSuggestionProvider implements SuggestionProvide
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
-        return CompletableFuture.runAsync(() -> {
-            final var loaded = plugin.getServer().getWorlds().stream()
-                    .map(World::getWorldPath)
-                    .collect(Collectors.toSet());
-            final var managed = plugin.listLevels().toList();
-            plugin.levelView().listLevelFolders()
-                    .filter(path -> !loaded.contains(path))
-                    .filter(path -> !managed.contains(path))
-                    .map(path -> plugin.levelView().key(path).orElse(null))
-                    .filter(Objects::nonNull)
-                    .filter(key -> !plugin.getWorldRegistry().isRegistered(key))
-                    .map(Key::asString)
-                    .filter(s -> s.contains(builder.getRemaining()))
-                    .forEach(builder::suggest);
-        }).thenApply(ignored -> builder.build());
+        suggestModern(builder);
+        suggestLegacyPaths(builder);
+        return builder.buildFuture();
+    }
+
+    private void suggestModern(final SuggestionsBuilder builder) {
+        try (final var entries = plugin.modernWorldRegistry().listEntries(plugin.getServer().getWorldContainer().toPath())) {
+            entries.forEach(entry -> {
+                if (entry.getValue().keyImportable()) suggest(builder, entry.getValue().key());
+                else suggest(builder, entry.getKey());
+            });
+        } catch (final IOException ignored) {
+        }
+    }
+
+    private void suggestLegacyPaths(final SuggestionsBuilder builder) {
+        try (final var paths = plugin.legacyWorldRegistry().listPaths(plugin.getServer().getWorldContainer().toPath())) {
+            paths.forEach(path -> suggest(builder, path));
+        } catch (final IOException ignored) {
+        }
+    }
+
+    private void suggest(final SuggestionsBuilder builder, final Key key) {
+        if (plugin.getWorldRegistry().isRegistered(key)) return;
+        final var suggestion = key.asString();
+        if (suggestion.contains(builder.getRemaining())) builder.suggest(suggestion);
+    }
+
+    private void suggest(final SuggestionsBuilder builder, final Path path) {
+        final var suggestion = escape(suggestion(path.toAbsolutePath().normalize()));
+        if (suggestion.contains(builder.getRemaining())) builder.suggest(suggestion);
+    }
+
+    private String escape(final String string) {
+        return "\"" + string + "\"";
+    }
+
+    private String suggestion(final Path path) {
+        final var directory = Path.of("").toAbsolutePath().normalize();
+        return path.startsWith(directory) ? directory.relativize(path).toString() : path.toString();
     }
 }

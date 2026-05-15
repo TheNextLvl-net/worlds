@@ -6,47 +6,19 @@ import net.thenextlvl.nbt.tag.Tag;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 
 @NullMarked
-public final class LegacyWorldRegistry {
-    private final Map<Path, LegacyWorldData> worlds = new ConcurrentHashMap<>();
+public final class LegacyWorldRegistry extends UnimportedWorldRegistry<LegacyWorldRegistry.LegacyWorldData> {
     private final WorldsPlugin plugin;
 
     public LegacyWorldRegistry(final WorldsPlugin plugin) {
         this.plugin = plugin;
     }
 
-    public Stream<Path> listPaths(final Path path) throws IOException {
-        return listEntries(path).map(Map.Entry::getKey);
-    }
-
-    @SuppressWarnings("resource")
-    public Stream<Map.Entry<Path, LegacyWorldData>> listEntries(final Path path) throws IOException {
-        return Files.list(path)
-                .map(path1 -> read(path1).map(data -> Map.entry(path1, data)).orElse(null))
-                .filter(Objects::nonNull);
-    }
-
-    public Optional<LegacyWorldData> read(final Path path) {
-        worlds.keySet().removeIf(p -> !Files.isDirectory(p));
-        final var normalized = path.toAbsolutePath().normalize();
-        if (isLegacyWorld(normalized)) {
-            final var legacyWorldData = worlds.computeIfAbsent(normalized, this::readLegacyWorld);
-            return Optional.ofNullable(legacyWorldData);
-        }
-        worlds.remove(normalized);
-        return Optional.empty();
-    }
-
-    private boolean isLegacyWorld(final Path path) {
+    @Override
+    protected boolean isWorld(final Path path) {
         return Files.isRegularFile(path.resolve("level.dat"))
                 || Files.isRegularFile(path.resolve("level.dat_old"));
     }
@@ -59,7 +31,8 @@ public final class LegacyWorldRegistry {
         return null;
     }
 
-    private @Nullable LegacyWorldData readLegacyWorld(final Path path) {
+    @Override
+    protected @Nullable LegacyWorldData readWorld(final Path path) {
         final var data = resolveLevelDat(path);
         if (data == null) return null;
         try (final var input = NBTInputStream.create(data)) {
