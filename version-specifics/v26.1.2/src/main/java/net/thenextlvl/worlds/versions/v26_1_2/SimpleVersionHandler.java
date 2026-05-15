@@ -56,6 +56,7 @@ import net.minecraft.world.level.storage.SavedDataStorage;
 import net.thenextlvl.worlds.Dimension;
 import net.thenextlvl.worlds.Level;
 import net.thenextlvl.worlds.WorldOperationException;
+import net.thenextlvl.worlds.event.WorldFolderMigrateEvent;
 import net.thenextlvl.worlds.generator.GeneratorType;
 import net.thenextlvl.worlds.versions.PluginAccess;
 import net.thenextlvl.worlds.versions.VersionHandler;
@@ -229,6 +230,13 @@ public final class SimpleVersionHandler extends VersionHandler {
         // Worlds - legacy world migration
         final var legacyName = level.legacyName().orElse(null);
         if (legacyName != null) try {
+            new WorldFolderMigrateEvent(
+                    key,
+                    directory,
+                    plugin.getServer().getWorldContainer().toPath().resolve(legacyName),
+                    name,
+                    legacyName
+            ).callEvent();
             WorldFolderMigration.migrateApiWorld(
                     console.storageSource,
                     console.registryAccess(),
