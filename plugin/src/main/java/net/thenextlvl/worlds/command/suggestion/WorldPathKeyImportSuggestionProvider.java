@@ -33,10 +33,11 @@ public final class WorldPathKeyImportSuggestionProvider implements SuggestionPro
         return builder.buildFuture();
     }
 
-    // todo: make this more readable
     private Optional<Key> suggestedKey(final CommandContext<?> context) {
-        final var path = Path.of(context.getArgument("path", String.class));
-        final var source = plugin.getServer().getWorldContainer().toPath().resolve(path).normalize();
+        final var input = Path.of(context.getArgument("path", String.class));
+        final var source = (input.isAbsolute() ? input
+                : plugin.getServer().getWorldContainer().toPath().resolve(input)
+        ).toAbsolutePath().normalize();
         return plugin.legacyWorldRegistry().read(source).map(LegacyWorldRegistry.LegacyWorldData::key)
                 .or(() -> plugin.modernWorldRegistry().read(source).map(ModernWorldRegistry.ModernWorldData::key));
     }
