@@ -133,7 +133,9 @@ final class WorldImportCommand extends SimpleCommand {
 
         if (Files.isRegularFile(source.resolve("level.dat"))
                 || Files.isRegularFile(source.resolve("level.dat_old"))) {
-            builder.legacyName(source.getFileName().toString());
+            final var legacyName = source.getFileName().toString();
+            prepareLegacySource(source, legacyName);
+            builder.legacyName(legacyName);
             return;
         }
 
@@ -166,6 +168,21 @@ final class WorldImportCommand extends SimpleCommand {
 
     private void prepareManagedSource(final Path source, final Path target) {
         if (!source.equals(target)) try {
+            Files.createDirectories(target.getParent());
+            if (isInServerRoot(source)) Files.move(source, target);
+            else plugin.levelView().copyDirectory(source, target, null);
+        } catch (final IOException e) {
+            throw new WorldOperationException(WorldOperationException.Reason.INTERNAL_ERROR, e).path(target);
+        }
+    }
+
+    private void prepareLegacySource(final Path source, final String legacyName) {
+        final var target = plugin.getServer().getWorldContainer().toPath()
+                .resolve(legacyName).toAbsolutePath().normalize();
+        if (source.equals(target)) return;
+        ensureTargetAvailable(source, target);
+
+        try {
             Files.createDirectories(target.getParent());
             if (isInServerRoot(source)) Files.move(source, target);
             else plugin.levelView().copyDirectory(source, target, null);
