@@ -24,6 +24,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
@@ -111,26 +112,42 @@ public class PaperLevelView {
         return key(directory, true);
     }
 
-    @SuppressWarnings("PatternValidation")
     private Optional<Key> key(final Path directory, final boolean lenient) {
         final var dimensions = plugin.getDimensionsRoot().toAbsolutePath().normalize();
         final var absolute = directory.toAbsolutePath().normalize();
-        final var relative = absolute.startsWith(dimensions) ? dimensions.relativize(absolute) : directory;
+        final var relative = relativeLevelPath(absolute, dimensions, directory);
+        return parseKey(relative, lenient);
+    }
+
+    private Path relativeLevelPath(final Path absolute, final Path dimensions, final Path fallback) {
+        if (absolute.startsWith(dimensions)) return dimensions.relativize(absolute);
+
+        final var container = plugin.getServer().getWorldContainer().toPath().toAbsolutePath().normalize();
+        return absolute.startsWith(container) ? container.relativize(absolute) : fallback;
+    }
+
+    @SuppressWarnings("PatternValidation")
+    static Optional<Key> parseKey(final Path relative, final boolean lenient) {
         if (relative.getNameCount() < 2) return Optional.empty();
 
-        final var count = relative.getNameCount();
-        final var shortened = count > 2 ? relative.subpath(count - 2, count) : relative;
-
-        final var namespace = keySegment(shortened, 0, lenient);
+        final var namespace = keySegment(relative, 0, lenient);
         if (!namespace.matches("[a-z0-9_\\-.]+")) return Optional.empty();
 
-        final var value = keySegment(shortened, 1, lenient);
+        final var value = keyValue(relative, lenient);
         if (!value.matches("[a-z0-9_\\-./]+")) return Optional.empty();
 
         return Optional.of(Key.key(namespace, value));
     }
 
-    private String keySegment(final Path path, final int index, final boolean lenient) {
+    private static String keyValue(final Path path, final boolean lenient) {
+        final var joiner = new StringJoiner("/");
+        for (var index = 1; index < path.getNameCount(); index++) {
+            joiner.add(keySegment(path, index, lenient));
+        }
+        return joiner.toString();
+    }
+
+    private static String keySegment(final Path path, final int index, final boolean lenient) {
         final var segment = path.getName(index).toString();
         return lenient ? createKey(segment) : segment;
     }
