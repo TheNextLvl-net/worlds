@@ -4,6 +4,7 @@ import net.kyori.adventure.key.Key;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 
 import java.nio.file.Path;
 
@@ -40,6 +41,7 @@ public final class WorldFolderMigrateEvent extends Event {
      * @return the key of the world being migrated
      * @since 4.2.0
      */
+    @Contract(pure = true)
     public Key getWorldKey() {
         return worldKey;
     }
@@ -50,6 +52,7 @@ public final class WorldFolderMigrateEvent extends Event {
      * @return the new world folder
      * @since 4.2.0
      */
+    @Contract(pure = true)
     public Path getNewFolder() {
         return newFolder;
     }
@@ -60,6 +63,7 @@ public final class WorldFolderMigrateEvent extends Event {
      * @return the old world folder
      * @since 4.2.0
      */
+    @Contract(pure = true)
     public Path getOldFolder() {
         return oldFolder;
     }
@@ -75,6 +79,7 @@ public final class WorldFolderMigrateEvent extends Event {
      * @see #getWorldKey()
      * @since 4.2.0
      */
+    @Contract(pure = true)
     public String getNewWorldName() {
         return newWorldName;
     }
@@ -85,6 +90,7 @@ public final class WorldFolderMigrateEvent extends Event {
      * @return the name of the world before migration
      * @since 4.2.0
      */
+    @Contract(pure = true)
     public String getOldWorldName() {
         return oldWorldName;
     }
