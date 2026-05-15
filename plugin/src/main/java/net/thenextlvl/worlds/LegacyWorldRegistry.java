@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
@@ -23,12 +24,15 @@ public final class LegacyWorldRegistry {
         this.plugin = plugin;
     }
 
-    public Stream<Path> listPaths(final Path path) {
-        try (final var files = Files.list(path)) {
-            return files.filter(p -> read(p).isPresent()).toList().stream();
-        } catch (final IOException e) {
-            return Stream.empty();
-        }
+    public Stream<Path> listPaths(final Path path) throws IOException {
+        return listEntries(path).map(Map.Entry::getKey);
+    }
+
+    @SuppressWarnings("resource")
+    public Stream<Map.Entry<Path, LegacyWorldData>> listEntries(final Path path) throws IOException {
+        return Files.list(path)
+                .map(path1 -> read(path1).map(data -> Map.entry(path1, data)).orElse(null))
+                .filter(Objects::nonNull);
     }
 
     public Optional<LegacyWorldData> read(final Path path) {

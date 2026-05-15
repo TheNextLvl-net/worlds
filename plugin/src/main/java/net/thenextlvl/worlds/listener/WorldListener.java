@@ -2,6 +2,7 @@ package net.thenextlvl.worlds.listener;
 
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.worlds.Dimension;
+import net.thenextlvl.worlds.LegacyWorldRegistry;
 import net.thenextlvl.worlds.Level;
 import net.thenextlvl.worlds.WorldOperationException;
 import net.thenextlvl.worlds.WorldRegistry;
@@ -21,9 +22,6 @@ import org.jspecify.annotations.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
 
 public final class WorldListener implements Listener {
     private final WorldsPlugin plugin;
@@ -43,10 +41,9 @@ public final class WorldListener implements Listener {
         }
 
         if (!plugin.levelView().isOverworld(event.getWorld())) return;
-        final var migrating = migrateLegacyWorlds();
+        migrateLegacyWorlds();
         plugin.getWorldRegistry().entrySet()
                 .filter(entry -> entry.getValue().enabled())
-                .filter(entry -> !migrating.contains(entry.getKey()))
                 .forEach(entry -> loadLevel(entry.getKey(), entry.getValue()));
     }
 
@@ -74,41 +71,26 @@ public final class WorldListener implements Listener {
         )).exceptionally(throwable -> handleCreationException(throwable, key));
     }
 
-    private Set<Key> migrateLegacyWorlds() {
-        final var migrating = new HashSet<Key>();
+    private void migrateLegacyWorlds() {
         final var root = plugin.getServer().getWorldContainer().toPath();
-        if (!Files.isDirectory(root)) return migrating;
-        try (final var files = Files.list(root)) {
-            files.filter(Files::isDirectory)
-                    .filter(path -> !path.equals(plugin.getServer().getLevelDirectory()))
-                    .map(this::migrateLegacyWorld)
-                    .filter(Objects::nonNull)
-                    .forEach(migrating::add);
-        } catch (final IOException e) {
-            plugin.getComponentLogger().warn("Failed to scan legacy worlds in {}", root, e);
+        if (!Files.isDirectory(root)) return;
+        try (final var entries = plugin.legacyWorldRegistry().listEntries(root)) {
+            entries.forEach(entry -> migrateLegacyWorld(entry.getKey(), entry.getValue()));
+        } catch (final IOException ignored) {
         }
-        return migrating;
     }
 
-    private @Nullable Key migrateLegacyWorld(final Path path) {
-        final var data = plugin.legacyWorldRegistry().read(path).orElse(null);
-        if (data == null) return null;
-
-        // todo: does this make sense? it works I guess; no time to double check. future me problem now :)
-        final var existing = plugin.getServer().getWorld(data.key());
-        if (existing != null) {
-            if (!plugin.getWorldRegistry().isRegistered(data.key()))
-                plugin.getComponentLogger().warn("Refusing to migrate legacy world {}, a world with the same key ({}) already exists", path, data.key());
-            return null;
-        }
-        // todo end
-
+    private void migrateLegacyWorld(final Path path, final LegacyWorldRegistry.LegacyWorldData data) {
         try {
             final var generator = data.generator() != null ? Generator.fromString(data.generator()) : null;
-            if (!plugin.getWorldRegistry().registerIfAbsent(
-                    data.key(), data.dimension(), data.enabled(), generator
-            )) return null;
-            if (!data.enabled()) return null;
+            if (!plugin.getWorldRegistry().registerIfAbsent(data.key(), data.dimension(), data.enabled(), generator)) {
+                plugin.getComponentLogger().warn("Refusing to migrate legacy world {}, a world with the same key ({}) is already registered", path, data.key());
+                return;
+            }
+            if (!data.enabled()) {
+                plugin.getComponentLogger().warn("Skip migrating disabled legacy world {}", path);
+                return;
+            }
 
             plugin.handler().warnAndDelayStartupMigration();
 
@@ -118,12 +100,10 @@ public final class WorldListener implements Listener {
                     .legacyName(path.getFileName().toString())
                     .build();
 
-            level.create().thenAccept(world -> {
-                plugin.getComponentLogger().debug(
-                        "Migrated legacy world {} ({}) from {}",
-                        world.key().asString(), level.getGeneratorType().key().asString(), path
-                );
-            }).exceptionally(throwable -> handleCreationException(throwable, level.key()));
+            level.create().thenAccept(world -> plugin.getComponentLogger().info(
+                    "Migrated legacy world {} ({}) from {}",
+                    world.key().asString(), level.getGeneratorType(), path
+            )).exceptionally(throwable -> handleCreationException(throwable, level.key()));
         } catch (final GeneratorException e) {
             plugin.getComponentLogger().warn("Failed to migrate legacy world {}", data.key());
             plugin.getComponentLogger().warn("{}: {}", e.getClass().getName(), e.getMessage());
@@ -132,7 +112,6 @@ public final class WorldListener implements Listener {
             plugin.getComponentLogger().error("Please report the error above on GitHub: {}", WorldsPlugin.ISSUES);
             WorldsPlugin.ERROR_TRACKER.trackError(e);
         }
-        return data.key();
     }
 
     // fixme: this is a pain
