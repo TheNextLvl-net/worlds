@@ -20,4 +20,12 @@ non-sealed class SimpleGeneratorType implements GeneratorType {
     public Key key() {
         return key;
     }
+
+    @Override
+    public String toString() {
+        return "SimpleGeneratorType{" +
+                "key=" + key +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

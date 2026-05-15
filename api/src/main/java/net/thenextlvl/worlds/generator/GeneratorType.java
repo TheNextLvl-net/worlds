@@ -135,6 +135,13 @@ public sealed interface GeneratorType extends Keyed permits SimpleGeneratorType 
         public Preset preset() {
             return preset;
         }
+
+        @Override
+        public String toString() {
+            return "Flat{" +
+                    "preset=" + preset +
+                    '}';
+        }
     }
 
     /**
@@ -172,6 +179,13 @@ public sealed interface GeneratorType extends Keyed permits SimpleGeneratorType 
         @Contract(pure = true)
         public Key biome() {
             return biome;
+        }
+
+        @Override
+        public String toString() {
+            return "SingleBiome{" +
+                    "biome=" + biome +
+                    '}';
         }
     }
 }
