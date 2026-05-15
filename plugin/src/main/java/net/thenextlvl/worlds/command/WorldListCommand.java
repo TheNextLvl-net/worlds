@@ -18,14 +18,15 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @NullMarked
-// todo: make this more readable
 final class WorldListCommand extends SimpleCommand {
     private WorldListCommand(final WorldsPlugin plugin) {
         super(plugin, "list", "worlds.command.list");
@@ -39,36 +40,63 @@ final class WorldListCommand extends SimpleCommand {
     @Override
     public int run(final CommandContext<CommandSourceStack> context) {
         final var sender = context.getSource().getSender();
-        final var worlds = plugin.getServer().getWorlds();
 
-        final var entries = new ArrayList<WorldListEntry>();
-        worlds.forEach(world -> entries.add(new WorldListEntry(world.key(), plugin.handler().getDimension(world), State.LOADED, null)));
-        plugin.getWorldRegistry().entrySet()
-                .filter(entry -> plugin.getServer().getWorld(entry.getKey()) == null)
-                .forEach(entry -> entries.add(new WorldListEntry(entry.getKey(), entry.getValue().dimension(), State.UNLOADED, null)));
-
-        try (final var unimported = listUnimported()) {
-            unimported.forEach(entries::add);
-        } catch (final IOException ignored) {
-        }
-
+        final var entries = collectEntries();
         plugin.bundle().sendMessage(sender, "world.list.header",
                 Placeholder.parsed("worlds", String.valueOf(count(entries, State.LOADED))),
                 Placeholder.parsed("unloaded", String.valueOf(count(entries, State.UNLOADED))),
                 Placeholder.parsed("unimported", String.valueOf(count(entries, State.UNIMPORTED))));
-        entries.stream()
-                .sorted()
-                .collect(Collectors.groupingBy(this::namespace, TreeMap::new, Collectors.toList()))
-                .forEach((key, value) -> {
-                    plugin.bundle().sendMessage(sender, "world.list.namespace",
-                            Placeholder.parsed("namespace", key),
-                            Placeholder.parsed("amount", String.valueOf(value.size())));
-                    for (var index = 0; index < value.size(); index++) {
-                        final var world = value.get(index);
-                        sender.sendMessage(world.component(plugin, sender, index == value.size() - 1));
-                    }
-                });
+        groupedByNamespace(entries).forEach((namespace, worlds) -> sendNamespace(sender, namespace, worlds));
         return SINGLE_SUCCESS;
+    }
+
+    private List<WorldListEntry> collectEntries() {
+        return Stream.concat(Stream.concat(loadedEntries(), unloadedEntries()), unimportedEntries().stream())
+                .toList();
+    }
+
+    private Stream<WorldListEntry> loadedEntries() {
+        return plugin.getServer().getWorlds().stream()
+                .map(world -> new WorldListEntry(
+                        world.key(),
+                        plugin.handler().getDimension(world),
+                        State.LOADED,
+                        null
+                ));
+    }
+
+    private Stream<WorldListEntry> unloadedEntries() {
+        return plugin.getWorldRegistry().entrySet()
+                .filter(entry -> plugin.getServer().getWorld(entry.getKey()) == null)
+                .map(entry -> new WorldListEntry(
+                        entry.getKey(),
+                        entry.getValue().dimension(),
+                        State.UNLOADED,
+                        null
+                ));
+    }
+
+    private List<WorldListEntry> unimportedEntries() {
+        try (final var unimported = listUnimported()) {
+            return unimported.toList();
+        } catch (final IOException ignored) {
+            return List.of();
+        }
+    }
+
+    private Map<String, List<WorldListEntry>> groupedByNamespace(final List<WorldListEntry> entries) {
+        return entries.stream()
+                .sorted()
+                .collect(Collectors.groupingBy(this::namespace, TreeMap::new, Collectors.toList()));
+    }
+
+    private void sendNamespace(final CommandSender sender, final String namespace, final List<WorldListEntry> worlds) {
+        plugin.bundle().sendMessage(sender, "world.list.namespace",
+                Placeholder.parsed("namespace", namespace),
+                Placeholder.parsed("amount", String.valueOf(worlds.size())));
+        IntStream.range(0, worlds.size())
+                .mapToObj(index -> worlds.get(index).component(plugin, sender, index == worlds.size() - 1))
+                .forEach(sender::sendMessage);
     }
 
     private String namespace(final WorldListEntry entry) {
@@ -91,12 +119,10 @@ final class WorldListCommand extends SimpleCommand {
         return Stream.concat(legacy, modern);
     }
 
-    private long count(final Iterable<WorldListEntry> entries, final State state) {
-        var count = 0;
-        for (final var entry : entries) {
-            if (entry.state == state) count++;
-        }
-        return count;
+    private long count(final List<WorldListEntry> entries, final State state) {
+        return entries.stream()
+                .filter(entry -> entry.state() == state)
+                .count();
     }
 
     static String displayDimension(final Dimension dimension) {
