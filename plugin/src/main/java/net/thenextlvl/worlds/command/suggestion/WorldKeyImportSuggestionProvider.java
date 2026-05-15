@@ -29,7 +29,7 @@ public final class WorldKeyImportSuggestionProvider implements SuggestionProvide
                     .map(World::getWorldPath)
                     .collect(Collectors.toSet());
             final var managed = plugin.listLevels().toList();
-            plugin.levelView().listLevelFolders().stream()
+            plugin.levelView().listLevelFolders()
                     .filter(path -> !loaded.contains(path))
                     .filter(path -> !managed.contains(path))
                     .map(path -> plugin.levelView().key(path).orElse(null))

@@ -143,10 +143,9 @@ public class PaperLevelView {
                 .map(plugin::resolveLevelDirectory);
     }
 
-    public @Unmodifiable Set<Path> listLevelFolders() {
+    public Stream<Path> listLevelFolders() {
         return listDirectories().stream()
-                .filter(path -> Files.isDirectory(path.resolve("region")))
-                .collect(Collectors.toUnmodifiableSet());
+                .filter(path -> Files.isDirectory(path.resolve("region")));
     }
 
     private @Unmodifiable Set<Path> listDirectories() {
