@@ -356,7 +356,7 @@ public final class WorldsPlugin extends JavaPlugin implements PluginAccess, Worl
             if (!success) return CompletableFuture.failedFuture(new WorldOperationException(
                     WorldOperationException.Reason.UNLOAD_FAILED
             ).key(world.key()));
-            levelView.delete(world.getWorldPath());
+            levelView.delete(world.getWorldPath(), world.key());
             worldRegistry.unregister(world.key());
             getScheduler().cancel(world.key());
             return CompletableFuture.completedFuture(true);

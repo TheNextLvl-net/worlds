@@ -17,6 +17,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -264,8 +265,48 @@ public class PaperLevelView {
     }
 
     public void delete(final Path level, final Key key) {
-        if (key.equals(OVERWORLD)) deleteOverworld(level);
-        else delete(level);
+        if (key.equals(OVERWORLD)) {
+            deleteOverworld(level);
+        } else {
+            delete(level, protectedLevels(level, key));
+            deleteEmptyParents(level);
+        }
+    }
+
+    private Set<Path> protectedLevels(final Path level, final Key key) {
+        final var normalized = level.toAbsolutePath().normalize();
+        final var registered = plugin.getWorldRegistry().worlds()
+                .filter(world -> !world.equals(key))
+                .map(plugin::resolveLevelDirectory);
+        final var loaded = plugin.getServer().getWorlds().stream()
+                .filter(world -> !world.key().equals(key))
+                .map(World::getWorldPath);
+        return Stream.concat(registered, loaded)
+                .map(path -> path.toAbsolutePath().normalize())
+                .filter(path -> path.startsWith(normalized))
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
+    private void deleteEmptyParents(final Path level) {
+        final var root = plugin.getDimensionsRoot().toAbsolutePath().normalize();
+        deleteEmptyParents(level.toAbsolutePath().normalize(), root);
+    }
+
+    private void deleteEmptyParents(final Path path, final Path root) {
+        final var parent = path.getParent();
+        if (parent == null || !parent.startsWith(root)) return;
+        if (deleteIfEmpty(parent)) deleteEmptyParents(parent, root);
+    }
+
+    private boolean deleteIfEmpty(final Path path) {
+        try {
+            return Files.deleteIfExists(path);
+        } catch (final DirectoryNotEmptyException ignored) {
+            return false;
+        } catch (final IOException e) {
+            plugin.getComponentLogger().warn("Failed to delete {}", path, e);
+            return false;
+        }
     }
 
     private void deleteOverworld(final Path level) {
@@ -277,7 +318,7 @@ public class PaperLevelView {
                 minecraft.resolve("world_gen_settings.dat"),
                 paper.resolve("metadata.dat"),
                 paper.resolve("level_overrides.dat")
-        ));
+        ).stream().map(path -> path.toAbsolutePath().normalize()).collect(Collectors.toUnmodifiableSet()));
     }
 
     public void delete(final Path path) {
@@ -286,7 +327,7 @@ public class PaperLevelView {
 
     private void delete(final Path path, final Set<Path> skipped) {
         try {
-            if (skipped.contains(path)) return;
+            if (skipped.contains(path.toAbsolutePath().normalize())) return;
             if (!Files.isDirectory(path)) Files.deleteIfExists(path);
             else try (final var files = Files.list(path)) {
                 files.forEach(file -> delete(file, skipped));
