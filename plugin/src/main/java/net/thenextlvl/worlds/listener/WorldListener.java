@@ -82,13 +82,13 @@ public final class WorldListener implements Listener {
 
     private void migrateLegacyWorld(final Path path, final LegacyWorldRegistry.LegacyWorldData data) {
         try {
-            final var generator = data.generator() != null ? Generator.fromString(data.generator()) : null;
-            if (!plugin.getWorldRegistry().registerIfAbsent(data.key(), data.dimension(), data.enabled(), generator)) {
-                plugin.getComponentLogger().warn("Refusing to migrate legacy world {}, a world with the same key ({}) is already registered", path, data.key());
-                return;
-            }
             if (!data.enabled()) {
                 plugin.getComponentLogger().warn("Skip migrating disabled legacy world {}", path);
+                return;
+            }
+            final var generator = data.generator() != null ? Generator.fromString(data.generator()) : null;
+            if (!plugin.getWorldRegistry().registerIfAbsent(data.key(), data.dimension(), true, generator)) {
+                plugin.getComponentLogger().warn("Refusing to migrate legacy world {}, a world with the same key ({}) is already registered", path, data.key());
                 return;
             }
 
