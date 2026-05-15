@@ -20,12 +20,11 @@ public final class WorldLoadSuggestionProvider implements SuggestionProvider<Com
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
-        return CompletableFuture.runAsync(() -> {
-            plugin.getWorldRegistry().entrySet()
-                    .filter(entry -> !entry.getValue().enabled())
-                    .map(entry -> entry.getKey().asString())
-                    .filter(s -> s.contains(builder.getRemaining()))
-                    .forEach(builder::suggest);
-        }).thenApply(ignored -> builder.build());
+        plugin.getWorldRegistry().entrySet()
+                .filter(entry -> plugin.getServer().getWorld(entry.getKey()) == null)
+                .map(entry -> entry.getKey().asString())
+                .filter(s -> s.contains(builder.getRemaining()))
+                .forEach(builder::suggest);
+        return builder.buildFuture();
     }
 }

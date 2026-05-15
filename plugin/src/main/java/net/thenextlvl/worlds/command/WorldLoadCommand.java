@@ -1,7 +1,6 @@
 package net.thenextlvl.worlds.command;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -24,12 +23,9 @@ final class WorldLoadCommand extends SimpleCommand {
 
     public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
         final var command = new WorldLoadCommand(plugin);
-        return command.create().then(command.load());
-    }
-
-    private RequiredArgumentBuilder<CommandSourceStack, Key> load() {
-        return Commands.argument("key", new KeyArgument())
-                .suggests(new WorldLoadSuggestionProvider(plugin)).executes(this);
+        final var key = Commands.argument("key", new KeyArgument())
+                .suggests(new WorldLoadSuggestionProvider(plugin));
+        return command.create().then(key.executes(command));
     }
 
     @Override
