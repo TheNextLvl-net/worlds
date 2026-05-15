@@ -103,47 +103,37 @@ public class PaperLevelView {
                 .generator(entry.generator());
     }
 
-    // todo: sorry future me but you have to clean up this duplicate code :)
-    @SuppressWarnings("PatternValidation")
     public Optional<Key> key(final Path directory) {
-        final var dimensions = plugin.getDimensionsRoot().toAbsolutePath().normalize();
-        final var absolute = directory.toAbsolutePath().normalize();
-        final var relative = absolute.startsWith(dimensions) ? dimensions.relativize(absolute) : directory;
-        if (relative.getNameCount() < 2) return Optional.empty();
-
-        final var shortened = lastTwoSegments(relative);
-
-        final var namespace = shortened.getName(0).toString();
-        if (!namespace.matches("[a-z0-9_\\-.]+")) return Optional.empty();
-
-        final var value = shortened.getName(1).toString();
-        if (!value.matches("[a-z0-9_\\-./]+")) return Optional.empty();
-
-        return Optional.of(Key.key(namespace, value));
+        return key(directory, false);
     }
 
     public Optional<Key> lenientKey(final Path directory) {
+        return key(directory, true);
+    }
+
+    @SuppressWarnings("PatternValidation")
+    private Optional<Key> key(final Path directory, final boolean lenient) {
         final var dimensions = plugin.getDimensionsRoot().toAbsolutePath().normalize();
         final var absolute = directory.toAbsolutePath().normalize();
         final var relative = absolute.startsWith(dimensions) ? dimensions.relativize(absolute) : directory;
         if (relative.getNameCount() < 2) return Optional.empty();
 
-        final var shortened = lastTwoSegments(relative);
+        final var count = relative.getNameCount();
+        final var shortened = count > 2 ? relative.subpath(count - 2, count) : relative;
 
-        final var namespace = createKey(shortened.getName(0).toString());
+        final var namespace = keySegment(shortened, 0, lenient);
         if (!namespace.matches("[a-z0-9_\\-.]+")) return Optional.empty();
 
-        final var value = createKey(shortened.getName(1).toString());
+        final var value = keySegment(shortened, 1, lenient);
         if (!value.matches("[a-z0-9_\\-./]+")) return Optional.empty();
 
         return Optional.of(Key.key(namespace, value));
     }
 
-    private Path lastTwoSegments(final Path path) {
-        final var count = path.getNameCount();
-        return count > 2 ? path.subpath(count - 2, count) : path;
+    private String keySegment(final Path path, final int index, final boolean lenient) {
+        final var segment = path.getName(index).toString();
+        return lenient ? createKey(segment) : segment;
     }
-    // todo: cleanup end
 
     public Stream<Path> listLevels() {
         return plugin.getWorldRegistry().worlds()
