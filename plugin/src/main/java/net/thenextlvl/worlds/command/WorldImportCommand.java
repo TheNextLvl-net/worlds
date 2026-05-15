@@ -96,11 +96,11 @@ final class WorldImportCommand extends SimpleCommand {
             return 0;
         }
         final var build = builder.build();
+        plugin.getWorldRegistry().register(build, true);
 
         plugin.bundle().sendMessage(sender, "world.import", placeholder);
 
         build.create().thenAccept(level -> {
-            plugin.getWorldRegistry().register(build, true);
             plugin.bundle().sendMessage(sender, "world.import.success",
                     Placeholder.parsed("world", level.key().asString()));
             if (!(sender instanceof final Entity entity)) return;
