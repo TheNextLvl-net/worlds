@@ -3,6 +3,7 @@ package net.thenextlvl.worlds;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.nbt.NBTInputStream;
 import net.thenextlvl.nbt.tag.Tag;
+import net.thenextlvl.worlds.view.PaperLevelView;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -36,24 +37,20 @@ public final class LegacyWorldRegistry extends UnimportedWorldRegistry<LegacyWor
         final var data = resolveLevelDat(path);
         if (data == null) return null;
         try (final var input = NBTInputStream.create(data)) {
-            final var pdc = input.readTag()
-                    .optional("Data").map(Tag::getAsCompound)
-                    .flatMap(tag -> tag.optional("BukkitValues").map(Tag::getAsCompound))
-                    .orElse(null);
-            if (pdc == null) return null;
+            final var root = input.readTag().optional("Data").map(Tag::getAsCompound);
 
-            final var enabled = pdc.optional("worlds:enabled").map(Tag::getAsBoolean).orElse(null);
-            if (enabled == null) return null;
+            final var name = root.flatMap(tag -> tag.optional("LevelName").map(Tag::getAsString))
+                    .orElse(path.getFileName().toString());
 
-            final var key = pdc.optional("worlds:world_key").map(Tag::getAsString).map(Key::key).orElse(null);
-            if (key == null) return null;
+            final var pdc = root.flatMap(tag -> tag.optional("BukkitValues").map(Tag::getAsCompound));
 
-            final var dimension = pdc.optional("worlds:dimension")
-                    .map(Tag::getAsString)
-                    .map(this::dimension)
-                    .orElse(Dimension.OVERWORLD);
-            final var generator = pdc.optional("worlds:generator")
-                    .map(Tag::getAsString)
+            final var enabled = pdc.flatMap(tag -> tag.optional("worlds:enabled").map(Tag::getAsBoolean)).orElse(false);
+            final var key = pdc.flatMap(tag -> tag.optional("worlds:world_key").map(Tag::getAsString).map(Key::key))
+                    .orElseGet(() -> plugin.levelView().findFreeKey("worlds", PaperLevelView.createKey(name)));
+
+            final var dimension = pdc.flatMap(tag -> tag.optional("worlds:dimension").map(Tag::getAsString))
+                    .map(this::dimension).orElse(Dimension.OVERWORLD);
+            final var generator = pdc.flatMap(tag -> tag.optional("worlds:generator").map(Tag::getAsString))
                     .orElse(null);
             return new LegacyWorldData(key, dimension, enabled, generator);
         } catch (final Exception e) {
