@@ -182,7 +182,8 @@ final class WorldListCommand extends SimpleCommand {
                     .append("\" ")
                     .append(key().asString());
             plugin.legacyWorldRegistry().read(importPath).ifPresent(data -> {
-                command.append(" dimension ").append(data.dimension().key().asString());
+                final var dimension = data.dimension();
+                if (dimension != null) command.append(" dimension ").append(dimension.key().asString());
                 final var generator = data.generator();
                 if (generator != null) command.append(" generator ").append(generator);
             });

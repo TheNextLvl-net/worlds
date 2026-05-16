@@ -49,7 +49,7 @@ public final class LegacyWorldRegistry extends UnimportedWorldRegistry<LegacyWor
                     .orElseGet(() -> plugin.levelView().findFreeKey("worlds", PaperLevelView.createKey(name)));
 
             final var dimension = pdc.flatMap(tag -> tag.optional("worlds:dimension").map(Tag::getAsString))
-                    .map(this::dimension).orElse(Dimension.OVERWORLD);
+                    .map(this::dimension).orElse(null);
             final var generator = pdc.flatMap(tag -> tag.optional("worlds:generator").map(Tag::getAsString))
                     .orElse(null);
             return new LegacyWorldData(key, dimension, enabled, generator);
@@ -68,6 +68,6 @@ public final class LegacyWorldRegistry extends UnimportedWorldRegistry<LegacyWor
         };
     }
 
-    public record LegacyWorldData(Key key, Dimension dimension, boolean enabled, @Nullable String generator) {
+    public record LegacyWorldData(Key key, @Nullable Dimension dimension, boolean enabled, @Nullable String generator) {
     }
 }

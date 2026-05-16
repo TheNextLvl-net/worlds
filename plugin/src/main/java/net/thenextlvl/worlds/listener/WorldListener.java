@@ -86,19 +86,20 @@ public final class WorldListener implements Listener {
                 plugin.getComponentLogger().warn("Skip migrating disabled legacy world {}", path);
                 return;
             }
+            
             final var generator = data.generator() != null ? Generator.fromString(data.generator()) : null;
-            if (!plugin.getWorldRegistry().registerIfAbsent(data.key(), data.dimension(), true, generator)) {
-                plugin.getComponentLogger().warn("Refusing to migrate legacy world {}, a world with the same key ({}) is already registered", path, data.key());
-                return;
-            }
-
-            plugin.handler().warnAndDelayStartupMigration();
-
             final var level = Level.builder(data.key())
                     .dimension(data.dimension())
                     .generator(generator)
                     .legacyName(path.getFileName().toString())
                     .build();
+            
+            if (!plugin.getWorldRegistry().registerIfAbsent(level.key(), level.getDimension(), true, generator)) {
+                plugin.getComponentLogger().warn("Refusing to migrate legacy world {}, a world with the same key ({}) is already registered", path, level.key());
+                return;
+            }
+
+            plugin.handler().warnAndDelayStartupMigration();
 
             level.create().thenAccept(world -> plugin.getComponentLogger().info(
                     "Migrated legacy world {} ({}) from {}",
