@@ -12,10 +12,8 @@ import java.util.stream.Stream;
 
 @NullMarked
 public final class ModernWorldRegistry extends UnimportedWorldRegistry<ModernWorldRegistry.ModernWorldData> {
-    private final WorldsPlugin plugin;
-
     public ModernWorldRegistry(final WorldsPlugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
     }
 
     @Override

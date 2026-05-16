@@ -12,10 +12,8 @@ import java.nio.file.Path;
 
 @NullMarked
 public final class LegacyWorldRegistry extends UnimportedWorldRegistry<LegacyWorldRegistry.LegacyWorldData> {
-    private final WorldsPlugin plugin;
-
     public LegacyWorldRegistry(final WorldsPlugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
     }
 
     @Override

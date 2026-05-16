@@ -15,6 +15,11 @@ import java.util.stream.Stream;
 @NullMarked
 public abstract class UnimportedWorldRegistry<T> {
     private final Map<Path, T> worlds = new ConcurrentHashMap<>();
+    protected final WorldsPlugin plugin;
+
+    protected UnimportedWorldRegistry(final WorldsPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     public Stream<Path> listPaths(final Path path) throws IOException {
         return listEntries(path).map(Map.Entry::getKey);
