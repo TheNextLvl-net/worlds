@@ -34,6 +34,8 @@ public abstract class UnimportedWorldRegistry<T> {
     public Optional<T> read(final Path path) {
         worlds.keySet().removeIf(p -> !Files.isDirectory(p));
         final var normalized = path.toAbsolutePath().normalize();
+        if (normalized.equals(plugin.getServer().getLevelDirectory().toAbsolutePath().normalize()))
+            return Optional.empty();
         if (isWorld(normalized)) {
             final var data = worlds.computeIfAbsent(normalized, this::readWorld);
             return Optional.ofNullable(data);
