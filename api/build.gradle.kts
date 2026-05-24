@@ -12,7 +12,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
 
     testImplementation("io.papermc.paper:paper-api:26.1.2.build.+")
-    testImplementation("net.thenextlvl:nbt:4.3.4")
+    testImplementation("net.thenextlvl:nbt:4.3.6")
 }
 
 tasks.withType<Javadoc>().configureEach {
