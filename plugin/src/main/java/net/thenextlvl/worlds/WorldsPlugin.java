@@ -45,6 +45,7 @@ import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -92,7 +93,7 @@ public final class WorldsPlugin extends JavaPlugin implements PluginAccess, Worl
             .errorTracker(ERROR_TRACKER)
             .addMetric(addGeneratorChart())
             .addMetric(addWorldsChart())
-            .addMetric(addEnvironmentsChart())
+            .addMetric(addDimensionsChart())
             .create(this);
 
     private final Metrics metrics = new Metrics(this, 19652);
@@ -209,15 +210,15 @@ public final class WorldsPlugin extends JavaPlugin implements PluginAccess, Worl
         return Metric.number("worlds", () -> getServer().getWorlds().size());
     }
 
-    private Metric<?> addEnvironmentsChart() {
-        return Metric.stringArray("environments", () -> getServer().getWorlds().stream()
-                .map(world -> switch (world.getEnvironment()) {
-                    case NORMAL -> "Overworld";
-                    case NETHER -> "Nether";
-                    case THE_END -> "End";
-                    case CUSTOM -> "Custom";
-                })
-                .toArray(String[]::new));
+    private Metric<?> addDimensionsChart() {
+        return Metric.numberMap("dimensions", () -> {
+            final var dimensions = new HashMap<String, Integer>();
+            for (final var world : getServer().getWorlds()) {
+                final var dimension = getDimension(world);
+                dimensions.compute(dimension.key().asString(), (key, value) -> value == null ? 1 : value + 1);
+            }
+            return dimensions;
+        });
     }
 
     public VersionHandler handler() {
