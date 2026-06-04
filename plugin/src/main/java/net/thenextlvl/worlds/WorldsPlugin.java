@@ -1,8 +1,8 @@
 package net.thenextlvl.worlds;
 
-import dev.faststats.bukkit.BukkitMetrics;
-import dev.faststats.core.ErrorTracker;
-import dev.faststats.core.data.Metric;
+import dev.faststats.ErrorTracker;
+import dev.faststats.bukkit.BukkitContext;
+import dev.faststats.data.Metric;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
@@ -88,13 +88,14 @@ public final class WorldsPlugin extends JavaPlugin implements PluginAccess, Worl
             .build();
 
     private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
-    private final BukkitMetrics fastStats = BukkitMetrics.factory()
-            .token("978c4aa9ecf78ae2e9c0776601fd4c6c")
-            .errorTracker(ERROR_TRACKER)
-            .addMetric(addGeneratorChart())
-            .addMetric(addWorldsChart())
-            .addMetric(addDimensionsChart())
-            .create(this);
+    private final BukkitContext context = new BukkitContext.Factory(this, "978c4aa9ecf78ae2e9c0776601fd4c6c")
+            .errorTrackerService(ERROR_TRACKER)
+            .metrics(factory -> factory
+                    .addMetric(addGeneratorChart())
+                    .addMetric(addWorldsChart())
+                    .addMetric(addDimensionsChart())
+                    .create())
+            .create();
 
     private final Metrics metrics = new Metrics(this, 19652);
 
@@ -120,11 +121,17 @@ public final class WorldsPlugin extends JavaPlugin implements PluginAccess, Worl
 
     @Override
     public void onEnable() {
-        fastStats.ready();
+        context.ready();
         worldRegistry.read();
         worldOperationScheduler.load();
         worldOperationScheduler.runScheduledOperations();
         registerListeners();
+    }
+
+    @Override
+    public void onDisable() {
+        context.shutdown();
+        metrics.shutdown();
     }
 
     public Path presetsFolder() {
