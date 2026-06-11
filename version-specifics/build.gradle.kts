@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    compileOnly("dev.faststats.metrics:bukkit:0.25.2")
+    compileOnly("dev.faststats.metrics:bukkit:0.26.0")
     compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
     compileOnly(project(":api"))
 }
@@ -12,7 +12,7 @@ subprojects {
     apply(plugin = "io.papermc.paperweight.userdev")
 
     dependencies {
-        "compileOnly"("dev.faststats.metrics:bukkit:0.25.2")
+        "compileOnly"("dev.faststats.metrics:bukkit:0.26.0")
         "compileOnly"(project(":api"))
         "compileOnlyApi"(project(":version-specifics"))
     }
