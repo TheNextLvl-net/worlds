@@ -27,7 +27,6 @@ import net.thenextlvl.worlds.model.MessageMigrator;
 import net.thenextlvl.worlds.version.PluginVersionChecker;
 import net.thenextlvl.worlds.versions.PluginAccess;
 import net.thenextlvl.worlds.versions.VersionHandler;
-import net.thenextlvl.worlds.versions.v26_1_2.SimpleVersionHandler;
 import net.thenextlvl.worlds.view.FoliaLevelView;
 import net.thenextlvl.worlds.view.PaperLevelView;
 import org.bstats.bukkit.Metrics;
@@ -108,7 +107,9 @@ public final class WorldsPlugin extends JavaPlugin implements PluginAccess, Worl
     private VersionHandler selectImplementation() {
         final var s = ServerBuildInfo.buildInfo().minecraftVersionId();
         if (s.contains("26.1.2")) {
-            return new SimpleVersionHandler(this);
+            return new net.thenextlvl.worlds.versions.v26_1_2.SimpleVersionHandler(this);
+        } else if (s.equals("26.2")) {
+            return new net.thenextlvl.worlds.versions.v26_2.SimpleVersionHandler(this);
         }
         throw new IllegalStateException("No implementation found for version: " + s + ", check for an update.");
     }
