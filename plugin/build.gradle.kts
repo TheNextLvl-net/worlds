@@ -15,6 +15,7 @@ dependencies {
 
     implementation(project(":version-specifics"))
     implementation(project(":version-specifics:v26.1.2"))
+    implementation(project(":version-specifics:v26.2"))
 
     implementation("net.thenextlvl.version-checker:modrinth-paper:1.0.1")
     implementation("net.thenextlvl:i18n:1.2.0")
