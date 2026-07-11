@@ -1,3 +1,5 @@
+[![Font generator](https://raw.githubusercontent.com/TheNextLvl-net/worlds/refs/heads/main/assets/banner.png)](https://www.textstudio.com/)
+
 ## Worlds – World Management for Paper & Folia
 
 Worlds is a modern, lightweight world management plugin designed for **Paper** and **Folia** servers.  
