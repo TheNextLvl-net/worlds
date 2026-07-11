@@ -28,8 +28,6 @@ void or custom flat maps. Simply pick a predefined preset, or create your own!
 
 <summary>Download</summary>
 
-[Download now on Modrinth](https://modrinth.com/project/gBIw3Gvy)
-
 [Latest version supporting 1.20.6 (Java 21)](https://github.com/TheNextLvl-net/worlds/releases/tag/v1.2.5)  
 [Latest version supporting 1.19/1.20.4 (Java 19)](https://github.com/TheNextLvl-net/worlds/releases/tag/v1.1.6)  
 [Latest version supporting 1.19/1.20.4 (Java 17)](https://github.com/TheNextLvl-net/worlds/releases/tag/v1.1.3)
