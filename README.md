@@ -1,4 +1,8 @@
-[![Font generator](https://raw.githubusercontent.com/TheNextLvl-net/worlds/refs/heads/main/assets/banner.png)](https://www.textstudio.com/)
+![Banner](https://raw.githubusercontent.com/TheNextLvl-net/worlds/refs/heads/main/assets/banner.png)
+
+[![Discord](https://tr7zw.github.io/uikit/social_buttons_icon/Discord-Button-64.png)](https://thenextlvl.net/discord)
+[![Modrinth](https://tr7zw.github.io/uikit/social_buttons_icon/Modrinth-Button-64.png)](https://modrinth.com/project/gBIw3Gvy)
+[![GitHub](https://tr7zw.github.io/uikit/social_buttons_icon/Github-Button-64.png)](https://github.com/TheNextLvl-net/worlds)
 
 ## Worlds – World Management for Paper & Folia
 
