@@ -6,7 +6,7 @@
   <a href="https://github.com/TheNextLvl-net/worlds"><img src="https://tr7zw.github.io/uikit/social_buttons_icon/Github-Button-64.png"></img></a>
 </p>
 
-## Worlds – World Management for Paper & Folia
+## The best world management plugin for Paper & Folia
 
 Worlds is a modern, lightweight world management plugin designed for **Paper** and **Folia** servers.  
 It brings seamless world handling with **customization presets**, eliminating the need for extra plugins just to create
@@ -24,11 +24,17 @@ void or custom flat maps. Simply pick a predefined preset, or create your own!
 - **World Keys** – Worlds are referenced by unique keys, improving compatibility with client mods
 - **World Linking** – Restore vanilla Nether and End portal behavior for custom worlds
 
+<details>
+
+<summary>Download</summary>
+
 [Download now on Modrinth](https://modrinth.com/project/gBIw3Gvy)
 
 [Latest version supporting 1.20.6 (Java 21)](https://github.com/TheNextLvl-net/worlds/releases/tag/v1.2.5)  
 [Latest version supporting 1.19/1.20.4 (Java 19)](https://github.com/TheNextLvl-net/worlds/releases/tag/v1.1.6)  
 [Latest version supporting 1.19/1.20.4 (Java 17)](https://github.com/TheNextLvl-net/worlds/releases/tag/v1.1.3)
+
+</details>
 
 For further information check out the [Wiki](https://thenextlvl.net/docs/worlds)
 
