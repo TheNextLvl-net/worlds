@@ -1,8 +1,10 @@
-![Banner](https://raw.githubusercontent.com/TheNextLvl-net/worlds/refs/heads/main/assets/banner.png)
+[![Banner](https://raw.githubusercontent.com/TheNextLvl-net/worlds/refs/heads/main/assets/banner.png)](https://thenextlvl.net/docs/worlds)
 
-[![Discord](https://tr7zw.github.io/uikit/social_buttons_icon/Discord-Button-64.png)](https://thenextlvl.net/discord)
-[![Modrinth](https://tr7zw.github.io/uikit/social_buttons_icon/Modrinth-Button-64.png)](https://modrinth.com/project/gBIw3Gvy)
-[![GitHub](https://tr7zw.github.io/uikit/social_buttons_icon/Github-Button-64.png)](https://github.com/TheNextLvl-net/worlds)
+<p align="center" style="text-align: center;">
+  <a href="https://thenextlvl.net/discord"><img src="https://tr7zw.github.io/uikit/social_buttons_icon/Discord-Button-64.png"></img></a>
+  <a href="https://modrinth.com/project/gBIw3Gvy"><img src="https://tr7zw.github.io/uikit/social_buttons_icon/Modrinth-Button-64.png"></img></a>
+  <a href="https://github.com/TheNextLvl-net/worlds"><img src="https://tr7zw.github.io/uikit/social_buttons_icon/Github-Button-64.png"></img></a>
+</p>
 
 ## Worlds – World Management for Paper & Folia
 
@@ -31,3 +33,4 @@ void or custom flat maps. Simply pick a predefined preset, or create your own!
 For further information check out the [Wiki](https://thenextlvl.net/docs/worlds)
 
 [![Usage](https://faststats.dev/embed/default:a9a9dede-a7fb-48cb-ac06-3a1bbdcdbcf7:servers-and-players?w=1012)](https://faststats.dev/project/worlds)
+
