@@ -107,7 +107,7 @@ public final class SimpleWorldRegistry implements WorldRegistry {
         }
     }
 
-    public void save() {
+    private void save() {
         try (final var output = NBTOutputStream.create(path)) {
             final var root = CompoundTag.builder();
             entries.forEach((key, entry) -> {

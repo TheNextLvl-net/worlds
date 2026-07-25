@@ -123,7 +123,6 @@ public final class WorldsPlugin extends JavaPlugin implements PluginAccess, Worl
     @Override
     public void onEnable() {
         context.ready();
-        worldRegistry.read();
         worldOperationScheduler.load();
         worldOperationScheduler.runScheduledOperations();
         registerListeners();
@@ -244,7 +243,7 @@ public final class WorldsPlugin extends JavaPlugin implements PluginAccess, Worl
     }
 
     @Override
-    public WorldRegistry getWorldRegistry() {
+    public SimpleWorldRegistry getWorldRegistry() {
         return worldRegistry;
     }
 

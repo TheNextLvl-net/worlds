@@ -41,6 +41,7 @@ public final class WorldListener implements Listener {
         }
 
         if (!plugin.levelView().isOverworld(event.getWorld())) return;
+        plugin.getWorldRegistry().read();
         migrateLegacyWorlds();
         plugin.getWorldRegistry().entrySet()
                 .filter(entry -> entry.getValue().enabled())
