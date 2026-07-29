@@ -90,7 +90,7 @@ import java.util.stream.Stream;
 
 public final class SimpleVersionHandler extends VersionHandler {
     public SimpleVersionHandler(final PluginAccess plugin) {
-        super(plugin, null, false);
+        super(plugin, plugin.isRunningFolia() ? new SimpleFoliaSupport(plugin) : null, true);
     }
 
     @Override
