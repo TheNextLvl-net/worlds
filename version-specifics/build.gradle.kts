@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     compileOnly("dev.faststats.metrics:bukkit:0.30.1")
-    compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
+    compileOnly("io.papermc.paper:paper-api:26.3.rc.3.+")
     compileOnly(project(":api"))
 }
 
