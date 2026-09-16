@@ -222,7 +222,7 @@ public final class SimpleVersionHandler extends VersionHandler {
         final ResourceKey<net.minecraft.world.level.Level> dimensionKey = Registries.levelStemToLevel(resourceKey);
         final WorldLoader.DataLoadContext context = console.worldLoaderContext;
         final RegistryAccess.Frozen registryAccess = console.registryAccess();
-        Registry<LevelStem> levelStemRegistry = registryAccess.lookupOrThrow(Registries.LEVEL_STEM);
+        final Registry<LevelStem> levelStemRegistry = registryAccess.lookupOrThrow(Registries.LEVEL_STEM);
         final LevelStem configuredStem = levelStemRegistry.getValue(actualDimension);
         if (configuredStem == null) {
             return CompletableFuture.failedFuture(new WorldOperationException(
@@ -268,7 +268,6 @@ public final class SimpleVersionHandler extends VersionHandler {
                 : LevelStorageSource.readExistingSavedData(console.storageSource, dimensionKey, registryAccess, WorldGenSettings.TYPE)
                 .result()
                 .orElse(null);
-        RegistryAccess contextRegistryAccess = registryAccess;
         if (worldGenSettings == null) {
             final WorldOptions worldOptions = new WorldOptions(level.getSeed(), level.hasStructures(), level.hasBonusChest());
 
@@ -283,12 +282,18 @@ public final class SimpleVersionHandler extends VersionHandler {
             // Worlds end
             final var levelType = getGeneratorTypeName(level.getGeneratorType()).asString(); // Worlds - get actual level type name
             final DedicatedServerProperties.WorldDimensionData properties = new DedicatedServerProperties.WorldDimensionData(generatorSettings, levelType);
-            WorldDimensions worldDimensions = properties.create(registryAccess);
+            final WorldDimensions presetDimensions = properties.create(context.datapackWorldgen());
+            
+            // Worlds start - create and replace generators and biome sources
+            WorldDimensions worldDimensions = new WorldDimensions(presetDimensions.bake(
+                    context.datapackDimensions().lookupOrThrow(Registries.LEVEL_STEM)
+            ).dimensions());
 
-            // Worlds start - replace generators and biome source
-            if (level.getGeneratorType().is(GeneratorType.FLAT) || level.getGeneratorType().is(GeneratorType.DEBUG)) {
-                worldDimensions = replaceGenerator(LevelStem.NETHER, registryAccess, worldDimensions.dimensions(), worldDimensions.overworld());
-                worldDimensions = replaceGenerator(LevelStem.END, registryAccess, worldDimensions.dimensions(), worldDimensions.overworld());
+            if (generatorType.is(GeneratorType.FLAT) || generatorType.is(GeneratorType.DEBUG)) {
+                final var generator = presetDimensions.overworld();
+                worldDimensions = replaceGenerator(LevelStem.OVERWORLD, registryAccess, worldDimensions.dimensions(), generator);
+                worldDimensions = replaceGenerator(LevelStem.NETHER, registryAccess, worldDimensions.dimensions(), generator);
+                worldDimensions = replaceGenerator(LevelStem.END, registryAccess, worldDimensions.dimensions(), generator);
             }
 
             if (generatorType instanceof final GeneratorType.SingleBiome singleBiome) {
@@ -296,15 +301,13 @@ public final class SimpleVersionHandler extends VersionHandler {
             }
             // Worlds end
 
-            final WorldDimensions.Complete complete = worldDimensions.bake(levelStemRegistry);
-            if (complete.dimensions().getValue(actualDimension) == null) {
+            if (worldDimensions.get(actualDimension).isEmpty()) {
                 return CompletableFuture.failedFuture(new WorldOperationException(
                         WorldOperationException.Reason.MISSING_LEVEL_STEM
                 )); // Worlds - complete exceptionally
             }
 
             worldGenSettings = new WorldGenSettings(worldOptions, worldDimensions);
-            contextRegistryAccess = complete.dimensionsRegistryAccess();
             loadedWorldData.levelOverrides().setHardcore(level.isHardcore());
             loadedWorldData = new PaperWorldLoader.LoadedWorldData(
                     loadedWorldData.bukkitName(),
@@ -323,10 +326,8 @@ public final class SimpleVersionHandler extends VersionHandler {
 
         final WorldGenSettings genSettingsFinal = worldGenSettings;
 
-        levelStemRegistry = contextRegistryAccess.lookupOrThrow(Registries.LEVEL_STEM);
-
         if (console.options.has("forceUpgrade")) {
-            Main.forceUpgrade(console.storageSource, DataFixers.getDataFixer(), console.options.has("eraseCache"), () -> true, contextRegistryAccess, console.options.has("recreateRegionFiles"));
+            Main.forceUpgrade(console.storageSource, DataFixers.getDataFixer(), console.options.has("eraseCache"), () -> true, registryAccess, console.options.has("recreateRegionFiles"));
         }
 
         final long biomeZoomSeed = BiomeManager.obfuscateSeed(genSettingsFinal.options().seed());
@@ -342,7 +343,17 @@ public final class SimpleVersionHandler extends VersionHandler {
 
         final var environment = toEnvironment(level.getDimension()); // Worlds - get environment from dimension
 
-        final WorldInfo worldInfo = new CraftWorldInfo(loadedWorldData.bukkitName(), CraftNamespacedKey.fromMinecraft(dimensionKey.identifier()), genSettingsFinal.options().seed(), primaryLevelData.enabledFeatures(), environment, customStem.type().value(), customStem.generator(), registryAccess, loadedWorldData.uuid());
+        final WorldInfo worldInfo = new CraftWorldInfo(
+                loadedWorldData.bukkitName(),
+                CraftNamespacedKey.fromMinecraft(dimensionKey.identifier()),
+                genSettingsFinal.options().seed(),
+                primaryLevelData.enabledFeatures(),
+                environment,
+                customStem.type().value(),
+                customStem.generator(),
+                registryAccess,
+                loadedWorldData.uuid()
+        );
         if (biomeProvider == null && chunkGenerator != null) {
             biomeProvider = chunkGenerator.getDefaultBiomeProvider(worldInfo);
         }
