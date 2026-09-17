@@ -9,8 +9,8 @@ plugins {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
-    testImplementation("io.papermc.paper:paper-api:26.1.2.build.+")
+    compileOnly("io.papermc.paper:paper-api:26.3.rc.3.+")
+    testImplementation("io.papermc.paper:paper-api:26.3.rc.3.+")
     implementation(project(":api"))
 
     implementation(project(":version-specifics"))
