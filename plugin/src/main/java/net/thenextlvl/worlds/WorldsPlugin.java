@@ -108,8 +108,10 @@ public final class WorldsPlugin extends JavaPlugin implements PluginAccess, Worl
         final var s = ServerBuildInfo.buildInfo().minecraftVersionId();
         if (s.contains("26.1.2")) {
             return new net.thenextlvl.worlds.versions.v26_1_2.SimpleVersionHandler(this);
-        } else if (s.equals("26.2")) {
+        } else if ("26.2".equals(s)) {
             return new net.thenextlvl.worlds.versions.v26_2.SimpleVersionHandler(this);
+        } else if ("26.3".equals(s)) {
+            return new net.thenextlvl.worlds.versions.v26_3.SimpleVersionHandler(this);
         }
         throw new IllegalStateException("No implementation found for version: " + s + ", check for an update.");
     }
