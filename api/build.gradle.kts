@@ -9,9 +9,9 @@ java {
 
 dependencies {
     api("net.thenextlvl:static-binder:0.1.3")
-    compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
+    compileOnly("io.papermc.paper:paper-api:26.3.rc.3.+")
 
-    testImplementation("io.papermc.paper:paper-api:26.1.2.build.+")
+    testImplementation("io.papermc.paper:paper-api:26.3.rc.3.+")
     testImplementation("net.thenextlvl:nbt:4.3.6")
 }
 
