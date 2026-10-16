@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.JsonOps;
 import io.papermc.paper.FeatureHooks;
 import io.papermc.paper.math.Rotation;
+import io.papermc.paper.world.flag.PaperFeatureFlagProviderImpl;
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import io.papermc.paper.world.PaperWorldLoader;
 import io.papermc.paper.world.migration.WorldFolderMigration;
@@ -62,6 +63,7 @@ import net.thenextlvl.worlds.event.WorldFolderMigrateEvent;
 import net.thenextlvl.worlds.generator.GeneratorType;
 import net.thenextlvl.worlds.versions.PluginAccess;
 import net.thenextlvl.worlds.versions.VersionHandler;
+import org.bukkit.FeatureFlag;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -85,6 +87,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -530,6 +533,11 @@ public final class SimpleVersionHandler extends VersionHandler {
         final var handle = ((CraftWorld) world).getHandle();
         final var identifier = handle.getTypeKey().identifier();
         return new Dimension(fromIdentifier(identifier));
+    }
+
+    @Override
+    public Set<FeatureFlag> getEnabledFeatures() {
+        return PaperFeatureFlagProviderImpl.fromNms(MinecraftServer.getServer().getWorldData().enabledFeatures());
     }
 
     @Override

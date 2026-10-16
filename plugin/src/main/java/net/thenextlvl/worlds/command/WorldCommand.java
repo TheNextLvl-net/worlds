@@ -31,6 +31,7 @@ public final class WorldCommand extends BrigadierCommand {
                 .then(WorldCloneCommand.create(plugin))
                 .then(WorldCreateCommand.create(plugin))
                 .then(WorldDeleteCommand.create(plugin))
+                .then(WorldGameRuleCommand.create(plugin))
                 .then(WorldHelpCommand.create(plugin))
                 .then(WorldImportCommand.create(plugin))
                 .then(WorldInfoCommand.create(plugin))
