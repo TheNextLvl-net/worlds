@@ -1,3 +1,3 @@
 dependencies {
-    paperweight.paperDevBundle("26.3.+")
+    paperweight.foliaDevBundle("26.3.+")
 }
