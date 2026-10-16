@@ -3,6 +3,7 @@ package net.thenextlvl.worlds.versions;
 import net.thenextlvl.worlds.Dimension;
 import net.thenextlvl.worlds.Level;
 import net.thenextlvl.worlds.generator.GeneratorType;
+import org.bukkit.FeatureFlag;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -13,6 +14,7 @@ import org.jspecify.annotations.Nullable;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -61,6 +63,8 @@ public abstract class VersionHandler {
     public abstract Dimension getDimension(World world);
 
     public abstract void warnAndDelayStartupMigration();
+
+    public abstract Set<FeatureFlag> getEnabledFeatures();
 
     public Optional<FoliaSupport> foliaSupport() {
         return Optional.ofNullable(foliaSupport);

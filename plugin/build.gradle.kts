@@ -50,6 +50,7 @@ paper {
                 "worlds.command.clone",
                 "worlds.command.create",
                 "worlds.command.delete",
+                "worlds.command.gamerule",
                 "worlds.command.import",
                 "worlds.command.info",
                 "worlds.command.list",
@@ -94,6 +95,7 @@ paper {
         register("worlds.command.clone") { children = listOf("worlds.command") }
         register("worlds.command.create") { children = listOf("worlds.command") }
         register("worlds.command.delete") { children = listOf("worlds.command") }
+        register("worlds.command.gamerule") { children = listOf("worlds.command") }
         register("worlds.command.import") { children = listOf("worlds.command") }
         register("worlds.command.info") { children = listOf("worlds.command") }
         register("worlds.command.list") { children = listOf("worlds.command") }
