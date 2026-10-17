@@ -10,14 +10,19 @@ import io.papermc.paper.registry.data.dialog.type.DialogType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.thenextlvl.worlds.Level;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.command.CommandFailureHandler;
+import net.thenextlvl.worlds.view.PaperLevelView;
 import org.bukkit.Difficulty;
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
+
+import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 public class WorldSetupDialog {
     public static final Dialog INSTANCE = Dialog.create(builder -> builder.empty()
@@ -35,26 +40,25 @@ public class WorldSetupDialog {
 
                                 var plugin = JavaPlugin.getPlugin(WorldsPlugin.class);
 
-                                plugin.bundle().sendMessage(audience, "world.create",
-                                        Placeholder.parsed("world", validatedName));
-                                plugin.levelBuilder(Path.of(validatedName))
-                                        .name(validatedName)
+                                var key = plugin.levelView().findFreeKey("worlds", PaperLevelView.createKey(validatedName));
+                                var placeholder = Placeholder.parsed("world", key.asString());
+
+                                plugin.bundle().sendMessage(audience, "world.create", placeholder);
+                                var level = Level.builder(key)
                                         .hardcore(hardcore)
                                         // .cheats(cheats)
-                                        .build()
-                                        .createAsync()
-                                        .thenAccept(world -> {
-                                            world.setDifficulty(difficulty);
-                                            plugin.bundle().sendMessage(audience, "world.create.success",
-                                                    Placeholder.parsed("world", world.getName()));
-                                            if (!(audience instanceof Player player)) return;
-                                            player.teleportAsync(world.getSpawnLocation());
-                                        }).exceptionally(throwable -> {
-                                            plugin.getComponentLogger().warn("Failed to create world {}", validatedName, throwable);
-                                            plugin.bundle().sendMessage(audience, "world.create.failed",
-                                                    Placeholder.parsed("world", validatedName));
-                                            return null;
-                                        });
+                                        .build();
+                                level.create().thenAccept(world -> {
+                                    plugin.getWorldRegistry().register(level, true);
+                                    world.setDifficulty(difficulty);
+                                    plugin.bundle().sendMessage(audience, "world.create.success", placeholder);
+                                    if (!(audience instanceof Entity entity)) return;
+                                    entity.teleportAsync(world.getSpawnLocation(), COMMAND);
+                                }).exceptionally(throwable -> {
+                                    if (audience instanceof CommandSender sender)
+                                        CommandFailureHandler.handle(plugin, sender, throwable, placeholder);
+                                    return null;
+                                });
 
                             }, ClickCallback.Options.builder().uses(ClickCallback.UNLIMITED_USES).build())).build(),
                     ActionButton.builder(Component.text("Cancel")).build()
