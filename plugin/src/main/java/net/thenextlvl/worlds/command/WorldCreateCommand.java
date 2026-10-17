@@ -22,10 +22,12 @@ import net.thenextlvl.worlds.command.argument.KeyArgument;
 import net.thenextlvl.worlds.command.argument.SeedArgument;
 import net.thenextlvl.worlds.command.argument.WorldPresetArgument;
 import net.thenextlvl.worlds.command.brigadier.BrigadierCommand;
+import net.thenextlvl.worlds.dialog.WorldSetupDialog;
 import net.thenextlvl.worlds.generator.Generator;
 import net.thenextlvl.worlds.generator.GeneratorType;
 import net.thenextlvl.worlds.preset.Preset;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -41,7 +43,16 @@ final class WorldCreateCommand extends BrigadierCommand {
 
     public static ArgumentBuilder<CommandSourceStack, ?> create(final WorldsPlugin plugin) {
         final var command = new WorldCreateCommand(plugin);
-        return command.create().then(command.createCommand());
+        return command.create().then(command.createCommand()).executes(command::showDialog);
+    }
+
+    private int showDialog(final CommandContext<CommandSourceStack> context) {
+        if (!(context.getSource().getSender() instanceof final Player player)) {
+            plugin.bundle().sendMessage(context.getSource().getSender(), "command.sender");
+            return 0;
+        }
+        player.showDialog(WorldSetupDialog.create(plugin, player));
+        return Command.SINGLE_SUCCESS;
     }
 
     private RequiredArgumentBuilder<CommandSourceStack, ?> createCommand() {

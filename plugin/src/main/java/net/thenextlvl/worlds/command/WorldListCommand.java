@@ -16,7 +16,6 @@ import org.bukkit.command.CommandSender;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
@@ -77,11 +76,9 @@ final class WorldListCommand extends SimpleCommand {
     }
 
     private List<WorldListEntry> unimportedEntries() {
-        try (final var unimported = listUnimported()) {
-            return unimported.toList();
-        } catch (final IOException ignored) {
-            return List.of();
-        }
+        return UnimportedWorlds.list(plugin).stream()
+                .map(entry -> new WorldListEntry(entry.key(), entry.dimension(), State.UNIMPORTED, entry.path()))
+                .toList();
     }
 
     private Map<String, List<WorldListEntry>> groupedByNamespace(final List<WorldListEntry> entries) {
@@ -108,15 +105,6 @@ final class WorldListCommand extends SimpleCommand {
         final var parent = entry.importPath().toAbsolutePath().normalize().getParent();
         if (parent == null || parent.equals(root)) return ".";
         return root.relativize(parent).toString();
-    }
-
-    private Stream<WorldListEntry> listUnimported() throws IOException {
-        final var root = plugin.getServer().getWorldContainer().toPath();
-        final var legacy = plugin.legacyWorldRegistry().listEntries(root)
-                .map(entry -> new WorldListEntry(entry.getValue().key(), entry.getValue().dimension(), State.UNIMPORTED, entry.getKey()));
-        final var modern = plugin.modernWorldRegistry().listEntries(root)
-                .map(entry -> new WorldListEntry(entry.getValue().key(), null, State.UNIMPORTED, entry.getKey()));
-        return Stream.concat(legacy, modern);
     }
 
     private long count(final List<WorldListEntry> entries, final State state) {
@@ -174,20 +162,7 @@ final class WorldListCommand extends SimpleCommand {
 
         private String command(final WorldsPlugin plugin) {
             if (!state.equals(State.UNIMPORTED) || importPath == null) return state.command + key().asString();
-            final var root = plugin.getServer().getWorldContainer().toPath().toAbsolutePath().normalize();
-            final var path = root.relativize(importPath.toAbsolutePath().normalize()).toString();
-            final var command = new StringBuilder(state.command)
-                    .append("\"")
-                    .append(path.replace("\\", "\\\\").replace("\"", "\\\""))
-                    .append("\" ")
-                    .append(key().asString());
-            plugin.legacyWorldRegistry().read(importPath).ifPresent(data -> {
-                final var dimension = data.dimension();
-                if (dimension != null) command.append(" dimension ").append(dimension.key().asString());
-                final var generator = data.generator();
-                if (generator != null) command.append(" generator ").append(generator);
-            });
-            return command.toString();
+            return "/" + UnimportedWorlds.importCommand(plugin, importPath, key());
         }
 
         private Component label() {
