@@ -137,7 +137,7 @@ public class PaperLevelView {
         final var value = keyValue(relative, lenient);
         if (!value.matches("[a-z0-9_\\-./]+")) return Optional.empty();
 
-        return Optional.of(Key.key(namespace, value));
+        return Optional.of(Key.key(namespace, value)).filter(PaperLevelView::isValidLevelKey);
     }
 
     private static String keyValue(final Path path, final boolean lenient) {
@@ -242,16 +242,50 @@ public class PaperLevelView {
         }
 
         while (usedValues.contains(candidate)) {
-            candidate = baseValue + "_" + suffix++;
+            candidate = baseValue + "_" + suffix;
+            suffix++;
         }
 
         return candidate;
     }
 
     public static @Subst("pattern") String createKey(final String name) {
-        return name.toLowerCase()
+        final var value = name.toLowerCase()
                 .replaceAll("[^a-z0-9_\\-./ ]+", "")
                 .replace(" ", "_");
+        final var joiner = new StringJoiner("/");
+        for (final var segment : value.split("/")) {
+            final var trimmed = segment.replaceAll("\\.+$", "");
+            if (isValidPathSegment(trimmed)) joiner.add(trimmed);
+        }
+        return joiner.toString();
+    }
+
+    private static final Pattern RESERVED_SEGMENT = Pattern.compile(
+            "(?:clock\\$|con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\\..*)?", Pattern.CASE_INSENSITIVE
+    );
+
+    /**
+     * Checks whether the given key can be resolved to a level directory.
+     * <p>
+     * Minecraft rejects identifiers whose namespace or path contain empty, {@code .} or {@code ..}
+     * segments, leading/trailing slashes or reserved file names when resolving them against a folder.
+     *
+     * @param key the key to check
+     * @return whether the key can safely be used as a level key
+     */
+    public static boolean isValidLevelKey(final Key key) {
+        if (!isValidPathSegment(key.namespace())) return false;
+        if (key.value().startsWith("/") || key.value().endsWith("/")) return false;
+        for (final var segment : key.value().split("/", -1)) {
+            if (!isValidPathSegment(segment)) return false;
+        }
+        return true;
+    }
+
+    private static boolean isValidPathSegment(final String segment) {
+        return !segment.isEmpty() && !"..".equals(segment) && !segment.endsWith(".")
+                && !RESERVED_SEGMENT.matcher(segment).matches();
     }
 
     public void regenerate(final Path level, final long seed) {

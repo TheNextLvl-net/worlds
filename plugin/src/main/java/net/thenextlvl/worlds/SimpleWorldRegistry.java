@@ -1,11 +1,13 @@
 package net.thenextlvl.worlds;
 
+import net.kyori.adventure.key.InvalidKeyException;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.nbt.NBTInputStream;
 import net.thenextlvl.nbt.NBTOutputStream;
 import net.thenextlvl.nbt.tag.CompoundTag;
 import net.thenextlvl.nbt.tag.Tag;
 import net.thenextlvl.worlds.generator.Generator;
+import net.thenextlvl.worlds.view.PaperLevelView;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -96,11 +98,23 @@ public final class SimpleWorldRegistry implements WorldRegistry {
         try (final var input = NBTInputStream.create(path)) {
             final var root = input.readTag();
             root.forEach((key, tag) -> {
+                final Key parsed;
+                try {
+                    parsed = Key.key(key);
+                } catch (final InvalidKeyException e) {
+                    plugin.getComponentLogger().warn("Skipping managed world with invalid key '{}' in {}: {}", key, path, e.getMessage());
+                    return;
+                }
+                if (!PaperLevelView.isValidLevelKey(parsed)) {
+                    plugin.getComponentLogger().warn("Skipping managed world with invalid key '{}' in {}", key, path);
+                    plugin.getComponentLogger().warn("Keys must not contain empty, '.' or '..' path segments or leading/trailing slashes");
+                    return;
+                }
                 final var object = tag.getAsCompound();
                 final var enabled = object.optional("enabled").map(Tag::getAsBoolean).orElse(false);
                 final var dimension = object.optional("dimension").map(Tag::getAsString).map(this::fromString).orElse(Dimension.OVERWORLD);
                 final var generator = object.optional("generator").map(Tag::getAsString).map(Generator::fromString).orElse(null);
-                entries.put(Key.key(key), new Entry(dimension, enabled, generator));
+                entries.put(parsed, new Entry(dimension, enabled, generator));
             });
         } catch (final Exception e) {
             plugin.getComponentLogger().warn("Failed to read managed worlds from {}", path, e);

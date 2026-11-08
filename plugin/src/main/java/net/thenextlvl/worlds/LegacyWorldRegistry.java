@@ -1,5 +1,6 @@
 package net.thenextlvl.worlds;
 
+import net.kyori.adventure.key.InvalidKeyException;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.nbt.NBTInputStream;
 import net.thenextlvl.nbt.tag.Tag;
@@ -9,6 +10,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 @NullMarked
 public final class LegacyWorldRegistry extends UnimportedWorldRegistry<LegacyWorldRegistry.LegacyWorldData> {
@@ -31,6 +33,7 @@ public final class LegacyWorldRegistry extends UnimportedWorldRegistry<LegacyWor
     }
 
     @Override
+    @SuppressWarnings("PatternValidation")
     protected @Nullable LegacyWorldData readWorld(final Path path) {
         final var data = resolveLevelDat(path);
         if (data == null) return null;
@@ -43,8 +46,9 @@ public final class LegacyWorldRegistry extends UnimportedWorldRegistry<LegacyWor
             final var pdc = root.flatMap(tag -> tag.optional("BukkitValues").map(Tag::getAsCompound));
 
             final var enabled = pdc.flatMap(tag -> tag.optional("worlds:enabled").map(Tag::getAsBoolean)).orElse(false);
-            final var key = pdc.flatMap(tag -> tag.optional("worlds:world_key").map(Tag::getAsString).map(Key::key))
-                    .orElseGet(() -> plugin.levelView().findFreeKey("worlds", PaperLevelView.createKey(name)));
+            final var key = pdc.flatMap(tag -> tag.optional("worlds:world_key").map(Tag::getAsString))
+                    .flatMap(this::parseKey)
+                    .orElseGet(() -> plugin.levelView().findFreeKey("worlds", createKey(name, path)));
 
             final var dimension = pdc.flatMap(tag -> tag.optional("worlds:dimension").map(Tag::getAsString))
                     .map(this::dimension).orElse(null);
@@ -55,6 +59,22 @@ public final class LegacyWorldRegistry extends UnimportedWorldRegistry<LegacyWor
             plugin.getComponentLogger().warn("Failed to read legacy world data from {}", path, e);
             return null;
         }
+    }
+
+    @SuppressWarnings("PatternValidation")
+    private Optional<Key> parseKey(final String key) {
+        try {
+            return Optional.of(Key.key(key)).filter(PaperLevelView::isValidLevelKey);
+        } catch (final InvalidKeyException e) {
+            return Optional.empty();
+        }
+    }
+
+    private String createKey(final String name, final Path path) {
+        final var key = PaperLevelView.createKey(name);
+        if (!key.isEmpty()) return key;
+        final var fallback = PaperLevelView.createKey(String.valueOf(path.getFileName()));
+        return fallback.isEmpty() ? "world" : fallback;
     }
 
     private @Nullable Dimension dimension(final String key) {

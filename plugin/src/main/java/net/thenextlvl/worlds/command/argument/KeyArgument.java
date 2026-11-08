@@ -10,6 +10,7 @@ import net.kyori.adventure.key.InvalidKeyException;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.thenextlvl.worlds.command.brigadier.ComponentCommandExceptionType;
+import net.thenextlvl.worlds.view.PaperLevelView;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
@@ -25,8 +26,10 @@ public final class KeyArgument implements CustomArgumentType<Key, Key> {
 
         try {
             final var greedy = readGreedy(reader);
-            if (greedy.contains(":")) return Key.key(greedy);
-            else return Key.key("worlds", greedy);
+            final var key = greedy.contains(":") ? Key.key(greedy) : Key.key("worlds", greedy);
+            if (PaperLevelView.isValidLevelKey(key)) return key;
+            reader.setCursor(cursor);
+            throw ERROR_INVALID.createWithContext(reader);
         } catch (final InvalidKeyException e) {
             reader.setCursor(cursor);
             throw ERROR_INVALID.createWithContext(reader);
