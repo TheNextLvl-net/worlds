@@ -14,6 +14,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.thenextlvl.worlds.WorldsPlugin;
+import net.thenextlvl.worlds.view.PaperLevelView;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -79,7 +80,8 @@ final class DialogSupport {
     @SuppressWarnings("PatternValidation")
     static Optional<Key> parseKey(final String input) {
         try {
-            return Optional.of(input.contains(":") ? Key.key(input) : Key.key("worlds", input));
+            return Optional.of(input.contains(":") ? Key.key(input) : Key.key("worlds", input))
+                    .filter(PaperLevelView::isValidLevelKey);
         } catch (final InvalidKeyException e) {
             return Optional.empty();
         }
