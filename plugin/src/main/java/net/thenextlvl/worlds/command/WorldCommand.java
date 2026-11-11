@@ -1,6 +1,8 @@
 package net.thenextlvl.worlds.command;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -12,8 +14,10 @@ import net.thenextlvl.worlds.command.argument.WorldArgument;
 import net.thenextlvl.worlds.command.backup.WorldBackupCommand;
 import net.thenextlvl.worlds.command.brigadier.BrigadierCommand;
 import net.thenextlvl.worlds.command.suggestion.WorldSuggestionProvider;
+import net.thenextlvl.worlds.dialog.WorldListDialog;
 import net.thenextlvl.worlds.generator.Generator;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
@@ -23,7 +27,9 @@ public final class WorldCommand extends BrigadierCommand {
     }
 
     public static LiteralCommandNode<CommandSourceStack> create(final WorldsPlugin plugin) {
-        return new WorldCommand(plugin).create()
+        final var command = new WorldCommand(plugin);
+        return command.create()
+                .executes(command::showDialog)
                 .then(SaveAllCommand.create(plugin))
                 .then(SaveOffCommand.create(plugin))
                 .then(SaveOnCommand.create(plugin))
@@ -45,6 +51,16 @@ public final class WorldCommand extends BrigadierCommand {
                 .then(WorldTeleportCommand.create(plugin))
                 .then(WorldUnloadCommand.create(plugin))
                 .build();
+    }
+
+    private int showDialog(final CommandContext<CommandSourceStack> context) {
+        final var sender = context.getSource().getSender();
+        if (!(sender instanceof final Player player) || !player.hasPermission("worlds.command.list")) {
+            plugin.bundle().sendMessage(sender, "command.sender");
+            return 0;
+        }
+        player.showDialog(WorldListDialog.create(plugin, player));
+        return Command.SINGLE_SUCCESS;
     }
 
     public static RequiredArgumentBuilder<CommandSourceStack, World> worldArgument(final WorldsPlugin plugin) {
