@@ -22,8 +22,22 @@ dependencies {
     implementation("net.thenextlvl:i18n:1.2.0")
     implementation("net.thenextlvl:nbt:4.3.6")
 
-    implementation("dev.faststats.metrics:bukkit:0.31.0")
+    implementation("dev.faststats.metrics:bukkit:0.32.1")
     implementation("org.bstats:bstats-bukkit:3.2.1")
+}
+
+val faststatsToken = providers.environmentVariable("FASTSTATS_TOKEN")
+    .orElse(providers.gradleProperty("faststats.token"))
+    .orElse(providers.fileContents(layout.projectDirectory.file("faststats.token")).asText.map { it.trim() })
+    .orElse("")
+tasks.processResources {
+    val token = faststatsToken
+    inputs.property("faststatsToken", token)
+    doLast {
+        val file = destinationDir.resolve("META-INF/faststats/Worlds.token")
+        file.parentFile.mkdirs()
+        file.writeText(token.get())
+    }
 }
 
 tasks.shadowJar {

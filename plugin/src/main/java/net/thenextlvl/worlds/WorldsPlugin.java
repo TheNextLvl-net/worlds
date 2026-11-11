@@ -87,7 +87,7 @@ public final class WorldsPlugin extends JavaPlugin implements PluginAccess, Worl
             .build();
 
     private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
-    private final BukkitContext context = new BukkitContext.Factory(this, "978c4aa9ecf78ae2e9c0776601fd4c6c")
+    private final BukkitContext context = new BukkitContext.Factory(this)
             .errorTrackerService(ERROR_TRACKER)
             .metrics(factory -> factory
                     .addMetric(addGeneratorChart())
