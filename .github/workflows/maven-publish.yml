@@ -19,6 +19,4 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
       - name: Publish with Gradle to Repository
-        env:
-          FASTSTATS_TOKEN: ${{ secrets.FASTSTATS_TOKEN }}
         run: ./gradlew publish
