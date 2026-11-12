@@ -1,7 +1,8 @@
 package net.thenextlvl.worlds;
 
 import dev.faststats.ErrorTracker;
-import dev.faststats.bukkit.BukkitContext;
+import dev.faststats.FastStatsContext;
+import dev.faststats.bukkit.FastStatsBukkit;
 import dev.faststats.data.Metric;
 import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -87,14 +88,14 @@ public final class WorldsPlugin extends JavaPlugin implements PluginAccess, Worl
             .build();
 
     private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
-    private final BukkitContext context = new BukkitContext.Factory(this)
+    private final FastStatsContext context = FastStatsBukkit.builder(this)
             .errorTrackerService(ERROR_TRACKER)
             .metrics(factory -> factory
                     .addMetric(addGeneratorChart())
                     .addMetric(addWorldsChart())
                     .addMetric(addDimensionsChart())
                     .create())
-            .create();
+            .build();
 
     private final Metrics metrics = new Metrics(this, 19652);
 
