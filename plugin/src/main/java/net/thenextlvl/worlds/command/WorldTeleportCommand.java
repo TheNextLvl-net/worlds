@@ -70,7 +70,7 @@ final class WorldTeleportCommand extends SimpleCommand {
 
         final var message = entities.size() == 1
                 ? "world.teleport.other" : entities.isEmpty()
-                                           ? "world.teleport.none" : "world.teleport.others";
+                ? "world.teleport.none" : "world.teleport.others";
         final var entity = entities.isEmpty() ? null : entities.getFirst();
 
 

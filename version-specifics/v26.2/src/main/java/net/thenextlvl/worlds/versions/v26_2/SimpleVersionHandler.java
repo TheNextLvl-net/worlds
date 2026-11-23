@@ -7,9 +7,9 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.JsonOps;
 import io.papermc.paper.FeatureHooks;
 import io.papermc.paper.math.Rotation;
-import io.papermc.paper.world.flag.PaperFeatureFlagProviderImpl;
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader;
 import io.papermc.paper.world.PaperWorldLoader;
+import io.papermc.paper.world.flag.PaperFeatureFlagProviderImpl;
 import io.papermc.paper.world.migration.WorldFolderMigration;
 import io.papermc.paper.world.saveddata.PaperWorldPDC;
 import net.kyori.adventure.key.Key;
@@ -286,7 +286,7 @@ public final class SimpleVersionHandler extends VersionHandler {
             final var levelType = getGeneratorTypeName(level.getGeneratorType()).asString(); // Worlds - get actual level type name
             final DedicatedServerProperties.WorldDimensionData properties = new DedicatedServerProperties.WorldDimensionData(generatorSettings, levelType);
             final WorldDimensions presetDimensions = properties.create(context.datapackWorldgen());
-            
+
             // Worlds start - create and replace generators and biome sources
             WorldDimensions worldDimensions = new WorldDimensions(presetDimensions.bake(
                     context.datapackDimensions().lookupOrThrow(Registries.LEVEL_STEM)

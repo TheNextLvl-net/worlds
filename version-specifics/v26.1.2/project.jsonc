@@ -1,0 +1,15 @@
+// Imported from Gradle by `jpm import`. Edit freely; jpm does not read the Gradle build any more.
+{
+  "$schema": "https://github.com/java-package-manager/jpm/releases/latest/download/project.schema.json",
+  "name": "v26.1.2",
+  "group": "net.thenextlvl.worlds",
+  "layout": "maven",
+  "dev": {
+    "dev.faststats.metrics:bukkit": "0.32.1",
+    "workspace:api": "*",
+    "workspace:version-specifics": "*"
+  },
+  "test": {
+    "org.junit.jupiter:junit-jupiter": "6.2.0-SNAPSHOT"
+  }
+}

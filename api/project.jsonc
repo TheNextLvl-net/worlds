@@ -1,0 +1,33 @@
+// Imported from Gradle by `jpm import`. Edit freely; jpm does not read the Gradle build any more.
+{
+  "$schema": "https://github.com/java-package-manager/jpm/releases/latest/download/project.schema.json",
+  "name": "api",
+  "group": "net.thenextlvl.worlds",
+  "layout": "maven",
+  "java": "25",
+  "runtime": {
+    "net.thenextlvl:static-binder": "0.1.3"
+  },
+  "dev": {
+    "io.papermc.paper:paper-api": "26.1.2.build.+"
+  },
+  "test": {
+    "io.papermc.paper:paper-api": "26.1.2.build.+",
+    "net.thenextlvl:nbt": "4.3.6",
+    "org.junit.jupiter:junit-jupiter": "6.2.0-SNAPSHOT"
+  },
+  "extensions": {
+    "publish": {
+      // artifactId = "worlds"
+      // groupId = "net.thenextlvl"
+      "javadoc": true,
+      "scm": "https://github.com/TheNextLvl-net/worlds",
+      "repositories": {
+        "thenextlvl": {
+          "url": "https://repo.thenextlvl.net/releases",
+          "snapshots": "https://repo.thenextlvl.net/snapshots"
+        }
+      }
+    }
+  }
+}

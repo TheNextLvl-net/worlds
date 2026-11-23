@@ -1,0 +1,29 @@
+// Imported from Gradle by `jpm import`. Edit freely; jpm does not read the Gradle build any more.
+{
+  "$schema": "https://github.com/java-package-manager/jpm/releases/latest/download/project.schema.json",
+  "name": "worlds",
+  "version": "4.5.2",
+  "java": "25",
+  "license": "AGPL-3.0-or-later",
+  "url": "https://thenextlvl.net/docs/worlds",
+  "workspace": [
+    "api",
+    "plugin",
+    "version-specifics",
+    "version-specifics/v26.1.2",
+    "version-specifics/v26.2",
+    "version-specifics/v26.3"
+  ],
+  "repositories": [
+    "https://repo.thenextlvl.net/releases/",
+    "https://repo.thenextlvl.net/snapshots/",
+    "https://repo.papermc.io/repository/maven-public/",
+    "https://maven.fabricmc.net/",
+    "https://maven.neoforged.net/releases/"
+  ],
+  "extensions": {
+    "github:java-package-manager/jpm-changeset": "^0.3.2",
+    "github:java-package-manager/jpm-format": "^0.7.0",
+    "github:java-package-manager/jpm-publish": "^0.3.0"
+  }
+}
